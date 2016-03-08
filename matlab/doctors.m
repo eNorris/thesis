@@ -26,7 +26,9 @@
 % Last modified by Xin Liu on Mar, 2016
 
 %function doctors(configfilename)
-clear;
+clear all;
+close all;
+
 %   %
 %   % Show syntax
 %   %

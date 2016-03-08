@@ -55,7 +55,13 @@ maxdiff = 1.0;
 for ieg=1:cfg.igm  % Loop over energy groups
     disp(['Energy group #', num2str(ieg)]);
     while (num_iter<=cfg.maxit && maxdiff>cfg.epsi) 
-        figure;imagesc(flux(:,:,15,ieg)); title(['Energy Group #',num2str(ieg),' Iteration #',num2str(num_iter)]); grid on; colorbar;
+        % Plot the solution
+        figure();
+        imagesc(flux(:,:,15,ieg)); 
+        title(['Energy Group #',num2str(ieg),' - Iteration #',num2str(num_iter)]); 
+        grid on; 
+        colorbar;
+        
         preflux = tempflux;  % Store the flux for the previous iteration result
         totsource = extsource(:,:,:,ieg)+isoscasource(flux,ieg,cfg,zone_id, msig); % Calculate source contributed by scatter
         tempflux = zeros(cfg.xmesh,cfg.ymesh, cfg.zmesh); % Clear flux content for new sweep
