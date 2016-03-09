@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -14,9 +15,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    config.cpp
+    config.cpp \
+    quadrature.cpp
 
 HEADERS  += mainwindow.h \
-    config.h
+    config.h \
+    quadrature.h
 
 FORMS    += mainwindow.ui
