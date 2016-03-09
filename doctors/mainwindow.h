@@ -4,6 +4,7 @@
 #include <QMainWindow>
 
 #include "config.h"
+#include "quadrature.h"
 
 namespace Ui {
 class MainWindow;

@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "config.h"
+#include "quadrature.h"
 
 class Mesh
 {
@@ -18,7 +19,7 @@ public:
     int yIndex;
     int zIndex;
 
-    void load(const Config &config);
+    void load(const Config &config, const Quadrature &quad);
 };
 
 #endif // MESH_H
