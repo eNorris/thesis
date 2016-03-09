@@ -70,6 +70,7 @@ close all;
     t = zone_id(:,:,15);
     figure();
     contourf(t, 3);
+    axis equal;
     
     gip;          % Setup group-organized x-section data
     

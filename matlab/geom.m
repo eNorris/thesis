@@ -6,7 +6,7 @@
 % Setup the mesh interval for x, y, z dimension
 % Use odd number to make sure the source is NOT on the mesh boundary
 display('Setup mesh ...');
-cfg.xmesh = 89;
+cfg.xmesh = 59;
 cfg.ymesh = 99;
 cfg.zmesh = ceil(5/(cfg.source_front_gap*2));
 

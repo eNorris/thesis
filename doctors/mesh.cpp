@@ -79,15 +79,15 @@ void Mesh::load(const Config &config, const Quadrature &quad)
 
         for(int yIndx = 0; yIndx < yMesh; yIndx++)
             for(int zIndx = 0; zIndx < zMesh; zIndx++)
-                DA[eIndx * yMesh*zMesh + yIndx * zMesh + zIndx];
+                DA[eIndx * yMesh*zMesh + yIndx * zMesh + zIndx] = vMu * dy[yIndx] * dz[zIndx];
 
         for(int xIndx = 0; xIndx < xMesh; xIndx++)
             for(int zIndx = 0; zIndx < zMesh; zIndx++)
-                DB[eIndx * xMesh*zMesh + xIndx * zMesh + zIndx];
+                DB[eIndx * xMesh*zMesh + xIndx * zMesh + zIndx] = vEta * dx[xIndx] * dz[zIndx];
 
         for(int xIndx = 0; xIndx < xMesh; xIndx++)
             for(int yIndx = 0; yIndx < yMesh; yIndx++)
-                DC[eIndx * xMesh*yMesh + xIndx * yMesh + yIndx];
+                DC[eIndx * xMesh*yMesh + xIndx * yMesh + yIndx] = vZi * dx[xIndx] * dy[yIndx];
 
         for(int xIndx = 0; xIndx < xMesh; xIndx++)
             for(int yIndx = 0; yIndx < yMesh; yIndx++)
@@ -145,6 +145,21 @@ void Mesh::load(const Config &config, const Quadrature &quad)
     //zone_id(left_x:right_x, top_y:bottom_y, front_z:back_z) = 2;                       % set collimator zone as 2
 
     //zone_id(left_gap_x:right_gap_x, top_gap_y:bottom_y, front_gap_z:back_gap_z) = 0;   % set the hole in collimator zone 0
+
+    float radius = 17.5;
+    float xCenter = config.xLen/2.0;
+    float yCenter = 50.0;  //config.yLen - config.so
+
+    //TODO - The above yCenter should actually be calculated
+    for(int i = 0; i < xMesh; i++)
+        for(int j = 0; j < yMesh; j++)
+            for(int k = 0; k < zMesh; k++)
+            {
+                float x = xIndex[i] + dx[i]/2.0;
+                float y = yIndex[i] + dy[i]/2.0;
+                if((x-xCenter)*(x-xCenter) + (y-yCenter)*(y-yCenter) <= (radius)*(radius))
+                    zoneId[i*yMesh*zMesh + j*zMesh + k] = 1;
+            }
 
 }
 
