@@ -7,6 +7,11 @@ Mesh::Mesh()
 
 }
 
+Mesh::Mesh(const Config &config, const Quadrature &quad)
+{
+    load(config, quad);
+}
+
 void Mesh::load(const Config &config, const Quadrature &quad)
 {
     // these are the number of mesh elements
@@ -14,19 +19,7 @@ void Mesh::load(const Config &config, const Quadrature &quad)
     yMesh = 99;
     zMesh = ceil(5.0 / (2.0 * config.sourceFrontGap));
 
-    std::vector<float> xIndex;
-    std::vector<float> yIndex;
-    std::vector<float> zIndex;
 
-    std::vector<float> dx;
-    std::vector<float> dy;
-    std::vector<float> dz;
-
-    std::vector<float> DA;  // Area of the yz plane a ray sees
-    std::vector<float> DB;  // Area of the xz plane a ray sees
-    std::vector<float> DC;  // Area of the xy plane a ray sees
-
-    std::vector<float> vol;
 
     // Allocate space
     xIndex.resize(xMesh + 1);
@@ -70,6 +63,11 @@ void Mesh::load(const Config &config, const Quadrature &quad)
     for(int i = 0; i < zMesh; i++)
         dz[i] = zIndex[i+1] - zIndex[i];
 
+    for(int xIndx = 0; xIndx < xMesh; xIndx++)
+        for(int yIndx = 0; yIndx < yMesh; yIndx++)
+            for(int zIndx = 0; zIndx < zMesh; zIndx++)
+                vol[xIndx * yMesh*zMesh + yIndx * zMesh + zIndx] = dx[xIndx] * dy[yIndx] * dz[zIndx];
+
     // Calculate the cell face area for each angle as well as volume
     for(int eIndx = 0; eIndx < config.m; eIndx++)
     {
@@ -88,11 +86,6 @@ void Mesh::load(const Config &config, const Quadrature &quad)
         for(int xIndx = 0; xIndx < xMesh; xIndx++)
             for(int yIndx = 0; yIndx < yMesh; yIndx++)
                 DC[eIndx * xMesh*yMesh + xIndx * yMesh + yIndx] = vZi * dx[xIndx] * dy[yIndx];
-
-        for(int xIndx = 0; xIndx < xMesh; xIndx++)
-            for(int yIndx = 0; yIndx < yMesh; yIndx++)
-                for(int zIndx = 0; zIndx < zMesh; zIndx++)
-                    vol[xIndx * yMesh*zMesh + yIndx * zMesh + zIndx] = dx[xIndx] * dy[yIndx] * dz[zIndx];
     }
 
     // 0 = air, 1 = water, 2 = lead/tungsten

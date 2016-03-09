@@ -1,0 +1,13 @@
+#ifndef SOLVERS_H
+#define SOLVERS_H
+
+#include <vector>
+
+//#include "config.h"
+#include "mesh.h"
+#include "quadrature.h"
+#include "xsection.h"
+
+std::vector<float> gssolver(const Quadrature &quad, const Mesh &mesh, const XSection &xs);
+
+#endif // SOLVERS_H

@@ -3,8 +3,9 @@
 
 #include <QMainWindow>
 
-#include "config.h"
-#include "quadrature.h"
+//#include "config.h"
+//#include "quadrature.h"
+//#include "mesh.h"
 
 namespace Ui {
 class MainWindow;

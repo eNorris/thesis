@@ -17,11 +17,15 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     config.cpp \
     quadrature.cpp \
-    mesh.cpp
+    mesh.cpp \
+    xsection.cpp \
+    solvers.cpp
 
 HEADERS  += mainwindow.h \
     config.h \
     quadrature.h \
-    mesh.h
+    mesh.h \
+    xsection.h \
+    solvers.h
 
 FORMS    += mainwindow.ui
