@@ -131,12 +131,30 @@
     </property>
     <addaction name="actionExit"/>
    </widget>
+   <widget class="QMenu" name="menuViewers">
+    <property name="title">
+     <string>Viewers</string>
+    </property>
+    <addaction name="actionSolution_Explorer"/>
+    <addaction name="actionProblem_Explorer"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuViewers"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionSolution_Explorer">
+   <property name="text">
+    <string>Solution Explorer</string>
+   </property>
+  </action>
+  <action name="actionProblem_Explorer">
+   <property name="text">
+    <string>Problem Explorer</string>
    </property>
   </action>
  </widget>
