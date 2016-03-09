@@ -67,6 +67,10 @@ close all;
     
     geom;         % Setup mesh, zone id, cell face area, cell volume
     
+    t = zone_id(:,:,15);
+    figure();
+    contourf(t, 3);
+    
     gip;          % Setup group-organized x-section data
     
     gssolver;     % Iterative solve flux by Gauss-Seidel method
