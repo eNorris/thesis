@@ -16,10 +16,12 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     config.cpp \
-    quadrature.cpp
+    quadrature.cpp \
+    mesh.cpp
 
 HEADERS  += mainwindow.h \
     config.h \
-    quadrature.h
+    quadrature.h \
+    mesh.h
 
 FORMS    += mainwindow.ui

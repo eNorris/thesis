@@ -14,6 +14,8 @@ MainWindow::MainWindow(QWidget *parent) :
     config.loadDefaults();
 
     qDebug() << "Loaded default configuration";
+
+    Quadrature quad(config);
 }
 
 MainWindow::~MainWindow()
