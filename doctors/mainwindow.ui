@@ -112,9 +112,6 @@
      </layout>
     </item>
    </layout>
-   <zorder>verticalLayoutWidget</zorder>
-   <zorder>label</zorder>
-   <zorder>gridLayoutWidget</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -137,6 +134,7 @@
     </property>
     <addaction name="actionSolution_Explorer"/>
     <addaction name="actionProblem_Explorer"/>
+    <addaction name="actionLoad_Balancer"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuViewers"/>
@@ -155,6 +153,11 @@
   <action name="actionProblem_Explorer">
    <property name="text">
     <string>Problem Explorer</string>
+   </property>
+  </action>
+  <action name="actionLoad_Balancer">
+   <property name="text">
+    <string>Load Balancer</string>
    </property>
   </action>
  </widget>
