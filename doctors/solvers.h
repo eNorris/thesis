@@ -8,6 +8,8 @@
 #include "quadrature.h"
 #include "xsection.h"
 
-std::vector<float> gssolver(const Quadrature &quad, const Mesh &mesh, const XSection &xs);
+// No longer used
+
+//std::vector<float> gssolver(const Quadrature &quad, const Mesh &mesh, const XSection &xs);
 
 #endif // SOLVERS_H

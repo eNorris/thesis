@@ -6,8 +6,9 @@
 class OutputDialog;
 
 //#include "config.h"
-//#include "quadrature.h"
-//#include "mesh.h"
+#include "quadrature.h"
+#include "mesh.h"
+#include "xsection.h"
 
 namespace Ui {
 class MainWindow;
@@ -25,6 +26,11 @@ private:
     Ui::MainWindow *ui;
 
     OutputDialog *outputDialog;
+
+    std::vector<float> gssolver(const Quadrature &quad, const Mesh &mesh, const XSection &xs);
+
+signals:
+    void signalNewIteration(std::vector<float>);
 };
 
 #endif // MAINWINDOW_H

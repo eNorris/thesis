@@ -6,9 +6,6 @@
 #include "outputdialog.h"
 
 #include "config.h"
-#include "quadrature.h"
-#include "mesh.h"
-#include "xsection.h"
 #include "solvers.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -20,6 +17,8 @@ MainWindow::MainWindow(QWidget *parent) :
     outputDialog = new OutputDialog();
 
     connect(ui->actionSolution_Explorer, SIGNAL(triggered()), outputDialog, SLOT(show()));
+
+    connect(this, SIGNAL(signalNewIteration(std::vector<float>)), outputDialog, SLOT(disp(std::vector<float>)));
 
     // Make a configuration object and load its defaults
     Config config;
