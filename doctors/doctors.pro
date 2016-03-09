@@ -19,13 +19,16 @@ SOURCES += main.cpp\
     quadrature.cpp \
     mesh.cpp \
     xsection.cpp \
-    solvers.cpp
+    solvers.cpp \
+    outputdialog.cpp
 
 HEADERS  += mainwindow.h \
     config.h \
     quadrature.h \
     mesh.h \
     xsection.h \
-    solvers.h
+    solvers.h \
+    outputdialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    outputdialog.ui

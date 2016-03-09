@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+class OutputDialog;
+
 //#include "config.h"
 //#include "quadrature.h"
 //#include "mesh.h"
@@ -21,6 +23,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    OutputDialog *outputDialog;
 };
 
 #endif // MAINWINDOW_H

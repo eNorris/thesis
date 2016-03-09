@@ -3,6 +3,8 @@
 
 #include <QDebug>
 
+#include "outputdialog.h"
+
 #include "config.h"
 #include "quadrature.h"
 #include "mesh.h"
@@ -14,6 +16,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    outputDialog = new OutputDialog();
+
+    connect(ui->actionSolution_Explorer, SIGNAL(triggered()), outputDialog, SLOT(show()));
 
     // Make a configuration object and load its defaults
     Config config;
