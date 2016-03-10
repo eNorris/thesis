@@ -24,7 +24,12 @@ private:
     QGraphicsScene *scene;
     QGraphicsRectItem *rect;
 
+    std::vector<QGraphicsRectItem*> rects;
+    std::vector<QBrush> brushes;
+
     std::vector<float> m_data;
+
+    void loadParula();
 
 protected slots:
     void disp(std::vector<float>);
