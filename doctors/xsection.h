@@ -5,6 +5,7 @@
 
 #include "config.h"
 
+
 class XSection
 {
 public:

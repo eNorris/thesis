@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+class Mesh;
+
 namespace Ui {
 class GeomDialog;
 }
@@ -15,8 +17,11 @@ public:
     explicit GeomDialog(QWidget *parent = 0);
     ~GeomDialog();
 
+    void updateMesh(Mesh *mesh);
+
 private:
     Ui::GeomDialog *ui;
+    Mesh *m_mesh;
 };
 
 #endif // GEOMDIALOG_H

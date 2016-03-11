@@ -22,7 +22,8 @@ SOURCES += main.cpp\
     solvers.cpp \
     outputdialog.cpp \
     geomdialog.cpp \
-    quaddialog.cpp
+    quaddialog.cpp \
+    xsectiondialog.cpp
 
 HEADERS  += mainwindow.h \
     config.h \
@@ -32,9 +33,11 @@ HEADERS  += mainwindow.h \
     solvers.h \
     outputdialog.h \
     geomdialog.h \
-    quaddialog.h
+    quaddialog.h \
+    xsectiondialog.h
 
 FORMS    += mainwindow.ui \
     outputdialog.ui \
     geomdialog.ui \
-    quaddialog.ui
+    quaddialog.ui \
+    xsectiondialog.ui
