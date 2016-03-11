@@ -33,6 +33,10 @@ public:
     std::vector<unsigned short> zoneId;
 
     void load(const Config *config, const Quadrature *quad);
+
+private:
+    bool insideBox(int x, int y, int z, int xmin, int xmax, int ymin, int ymax, int zmin, int zmax);
+    bool insideTightBox(int x, int y, int z, int xmin, int xmax, int ymin, int ymax, int zmin, int zmax);
 };
 
 #endif // MESH_H

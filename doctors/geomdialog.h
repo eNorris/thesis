@@ -32,6 +32,7 @@ private:
 
 protected slots:
     void setSliceLevel(int level);
+    void updateMeshSlicePlane();
 };
 
 #endif // GEOMDIALOG_H

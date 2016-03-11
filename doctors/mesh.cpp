@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include <QDebug>
+
 Mesh::Mesh()
 {
 
@@ -35,23 +37,16 @@ void Mesh::load(const Config *config, const Quadrature *quad)
     vol.resize(xMesh * yMesh * zMesh);
 
     // The coordinates between mesh elements
-    for(int i = 0; i < xMesh; i++)
+    for(int i = 0; i < xMesh+1; i++)  // iterate the xMesh+1 to get the last bin
         xIndex[i] = i * (config->xLen / xMesh);
 
-    for(int i = 0; i < yMesh; i++)
+    for(int i = 0; i < yMesh+1; i++)
         yIndex[i] = i * (config->yLen / yMesh);
 
-    for(int i = 0; i < zMesh; i++)
+    for(int i = 0; i < zMesh+1; i++)
         zIndex[i] = i * (config->zLen / zMesh);
-    //for(float xPt = 0.0; xPt < config.xLen; xPt += config.xLen/xMesh)  // xMesh + 1 elements
-    //    xIndex.push_back(xPt);
 
-    //for(float yPt = 0.0; yPt < config.yLen; yPt += config.yLen/yMesh)  // yMesh + 1 elements
-    //    yIndex.push_back(yPt);
-
-    //for(float zPt = 0.0; zPt < config.zLen; zPt += config.zLen/zMesh)  // zMesh + 1 elements
-    //    zIndex.push_back(zPt);
-
+    // Calculate the segment sizes
     for(int i = 0; i < xMesh; i++)
         dx[i] = xIndex[i+1] - xIndex[i];
 
@@ -88,7 +83,7 @@ void Mesh::load(const Config *config, const Quadrature *quad)
 
     // 0 = air, 1 = water, 2 = lead/tungsten
     //std::vector<unsigned short> zoneId;
-    zoneId.resize(xMesh * yMesh * zMesh);
+    zoneId.resize(xMesh * yMesh * zMesh, 0);  // Initialize to all zeros
 
 
     // Do all of the +1 need to be removed?
@@ -106,17 +101,31 @@ void Mesh::load(const Config *config, const Quadrature *quad)
     int zFrontGapIndx = (zMesh-1)/2 + 1 - round(config->sourceFrontGap/(config->zLen/zMesh));
     int zBackGapIndx = (zMesh-1)/2 + 1 + round(config->sourceFrontGap/(config->zLen/zMesh));
 
+    qDebug() << "x in " << xLeftIndx <<", " << xRightIndx << "  and out " << xLeftGapIndx << ", " << xRightGapIndx;
+    qDebug() << "y in " << yTopIndx <<", " << yBottomIndx << "  and out " << yTopGapIndx << ", _";
+    qDebug() << "z in " << zFrontIndx <<", " << zBackIndx << "  and out " << zFrontGapIndx << ", " << zBackGapIndx;
+
+
     for(int i = 0; i < xMesh; i++)
         for(int j = 0; j < yMesh; j++)
             for(int k = 0; k < zMesh; k++)
-                // Not sure if these should be < or <=
-                if(xLeftIndx <= i && i <= xRightIndx &&  // If inside collimator
-                   yTopIndx <= j && j <= yBottomIndx &&
-                   zFrontIndx <= k && k <= zBackIndx  &&
-                   xLeftGapIndx >= i && i >= xRightGapIndx &&  // and outside gap
-                   yTopGapIndx >= j &&  // Not bottom gap
-                   zFrontGapIndx >= k && k >= zBackGapIndx)
+                if(insideBox(i,j,k, xLeftIndx, xRightIndx, yTopIndx, yBottomIndx, zFrontIndx, zBackIndx) &&
+                        !insideTightBox(i,j,k, xLeftGapIndx, xRightGapIndx, yTopGapIndx, 1000000, zFrontGapIndx, zBackGapIndx))
+                {
+                    //qDebug() << "Setting to zone 2";
                     zoneId[i*yMesh*zMesh + j*zMesh + k] = 2;
+                }
+                // Not sure if these should be < or <=
+                //if(xLeftIndx <= i && i <= xRightIndx &&  // If inside collimator
+                //   yTopIndx <= j && j <= yBottomIndx &&
+                //   zFrontIndx <= k && k <= zBackIndx  &&
+                //   (xLeftGapIndx >= i && i >= xRightGapIndx &&  // and outside gap
+                //   yTopGapIndx >= j &&  // Not bottom gap
+                //   zFrontGapIndx >= k && k >= zBackGapIndx))
+                //{
+                //    qDebug() << "Setting to zone 2";
+                //    zoneId[i*yMesh*zMesh + j*zMesh + k] = 2;
+                //}
 
 
     //left_x = (cfg.xmesh-1)/2+1-round(cfg.col_xlen/2/(cfg.xlen/cfg.xmesh));             % collimator x left index
@@ -154,8 +163,19 @@ void Mesh::load(const Config *config, const Quadrature *quad)
 
 }
 
+bool Mesh::insideBox(int x, int y, int z, int xmin, int xmax, int ymin, int ymax, int zmin, int zmax)
+{
+    return x >= xmin && x <= xmax &&
+            y >= ymin && y <= ymax &&
+            z >= zmin && z <= zmax;
+}
 
-
+bool Mesh::insideTightBox(int x, int y, int z, int xmin, int xmax, int ymin, int ymax, int zmin, int zmax)
+{
+    return x > xmin && x < xmax &&
+            y > ymin && y < ymax &&
+            z > zmin && z < zmax;
+}
 
 
 
