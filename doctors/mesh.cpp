@@ -110,7 +110,7 @@ void Mesh::load(const Config *config, const Quadrature *quad)
         for(int j = 0; j < yMesh; j++)
             for(int k = 0; k < zMesh; k++)
                 if(insideBox(i,j,k, xLeftIndx, xRightIndx, yTopIndx, yBottomIndx, zFrontIndx, zBackIndx) &&
-                        !insideTightBox(i,j,k, xLeftGapIndx, xRightGapIndx, yTopGapIndx, 1000000, zFrontGapIndx, zBackGapIndx))
+                        !insideBox(i,j,k, xLeftGapIndx, xRightGapIndx, yTopGapIndx, 1000000, zFrontGapIndx, zBackGapIndx))
                 {
                     //qDebug() << "Setting to zone 2";
                     zoneId[i*yMesh*zMesh + j*zMesh + k] = 2;
@@ -156,7 +156,7 @@ void Mesh::load(const Config *config, const Quadrature *quad)
             for(int k = 0; k < zMesh; k++)
             {
                 float x = xIndex[i] + dx[i]/2.0;
-                float y = yIndex[i] + dy[i]/2.0;
+                float y = yIndex[j] + dy[j]/2.0;
                 if((x-xCenter)*(x-xCenter) + (y-yCenter)*(y-yCenter) <= (radius)*(radius))
                     zoneId[i*yMesh*zMesh + j*zMesh + k] = 1;
             }
