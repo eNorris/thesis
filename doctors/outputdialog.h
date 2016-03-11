@@ -29,7 +29,8 @@ private:
 
     std::vector<float> m_data;
 
-    void loadParula();
+    void loadParulaBrush();
+    void loadUniqueBrush();
 
 protected slots:
     void disp(std::vector<float>);

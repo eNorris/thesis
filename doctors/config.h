@@ -65,9 +65,6 @@ public:
     // Source iteration data set
     float epsi;  // Convergence criteria
     float maxit;  // Max number of inner iterations (default = 20)
-
-
-
 };
 
 #endif // CONFIG_H

@@ -25,7 +25,7 @@ OutputDialog::OutputDialog(QWidget *parent) :
     //    brushes.push_back(b);
     //}
 
-    loadParula();
+    loadParulaBrush();
 
     for(int i = 0; i < 100; i++)
         for(int j = 0; j < 100; j++)
@@ -77,7 +77,7 @@ void OutputDialog::disp(std::vector<float> vdata)
         rects[i]->setBrush(brushes[((maxval-vdata[i])/(vdata[i]-minval) + 1)*63]);
 }
 
-void OutputDialog::loadParula()
+void OutputDialog::loadParulaBrush()
 {
     brushes.clear();
 
@@ -145,4 +145,17 @@ void OutputDialog::loadParula()
     brushes.push_back(QBrush(QColor::fromRgbF(0.9598,    0.9218,    0.0948)));
     brushes.push_back(QBrush(QColor::fromRgbF(0.9661,    0.9514,    0.0755)));
     brushes.push_back(QBrush(QColor::fromRgbF(0.9763,    0.9831,    0.0538)));
+}
+
+void OutputDialog::loadUniqueBrush()
+{
+    brushes.clear();
+
+    brushes.push_back(QBrush(QColor::fromRgbF(0.0000,    0.4470,    0.7410)));
+    brushes.push_back(QBrush(QColor::fromRgbF(0.8500,    0.3250,    0.0980)));
+    brushes.push_back(QBrush(QColor::fromRgbF(0.9290,    0.6940,    0.1250)));
+    brushes.push_back(QBrush(QColor::fromRgbF(0.4940,    0.1840,    0.5560)));
+    brushes.push_back(QBrush(QColor::fromRgbF(0.4660,    0.6740,    0.1880)));
+    brushes.push_back(QBrush(QColor::fromRgbF(0.3010,    0.7450,    0.9330)));
+    brushes.push_back(QBrush(QColor::fromRgbF(0.6350,    0.0780,    0.1840)));
 }

@@ -20,7 +20,9 @@ SOURCES += main.cpp\
     mesh.cpp \
     xsection.cpp \
     solvers.cpp \
-    outputdialog.cpp
+    outputdialog.cpp \
+    geomdialog.cpp \
+    quaddialog.cpp
 
 HEADERS  += mainwindow.h \
     config.h \
@@ -28,7 +30,11 @@ HEADERS  += mainwindow.h \
     mesh.h \
     xsection.h \
     solvers.h \
-    outputdialog.h
+    outputdialog.h \
+    geomdialog.h \
+    quaddialog.h
 
 FORMS    += mainwindow.ui \
-    outputdialog.ui
+    outputdialog.ui \
+    geomdialog.ui \
+    quaddialog.ui

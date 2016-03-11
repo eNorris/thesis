@@ -4,6 +4,8 @@
 #include <QMainWindow>
 
 class OutputDialog;
+class GeomDialog;
+class QuadDialog;
 
 //#include "config.h"
 #include "quadrature.h"
@@ -26,6 +28,8 @@ private:
     Ui::MainWindow *ui;
 
     OutputDialog *outputDialog;
+    GeomDialog *geomDialog;
+    QuadDialog *quadDialog;
 
     std::vector<float> gssolver(const Quadrature &quad, const Mesh &mesh, const XSection &xs);
 
