@@ -14,6 +14,10 @@ public:
 
     void loadParulaBrush();
     void loadUniqueBrush();
+
+protected:
+    enum ColorId {NONE, PARULA, UNIQUE};
+    ColorId m_colorId;
 };
 
 #endif // COLORMAPPABLE_H

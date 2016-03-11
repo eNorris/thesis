@@ -1,12 +1,17 @@
 #include "colormappable.h"
 
-ColorMappable::ColorMappable()
+ColorMappable::ColorMappable() : m_colorId(NONE)
 {
 
 }
 
 void ColorMappable::loadParulaBrush()
 {
+
+    if(m_colorId == PARULA)
+        return;
+    m_colorId = PARULA;
+
     brushes.clear();
 
     brushes.push_back(QBrush(QColor::fromRgbF(0.2081,    0.1663,    0.5292)));
@@ -77,6 +82,11 @@ void ColorMappable::loadParulaBrush()
 
 void ColorMappable::loadUniqueBrush()
 {
+
+    if(m_colorId == UNIQUE)
+        return;
+    m_colorId = UNIQUE;
+
     brushes.clear();
 
     brushes.push_back(QBrush(QColor::fromRgbF(0.0000,    0.4470,    0.7410)));
