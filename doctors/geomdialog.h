@@ -22,6 +22,9 @@ public:
 private:
     Ui::GeomDialog *ui;
     Mesh *m_mesh;
+
+protected slots:
+    void setSliceLevel(int level);
 };
 
 #endif // GEOMDIALOG_H
