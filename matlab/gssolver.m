@@ -66,6 +66,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
         totsource = extsource(:,:,:,ieg)+isoscasource(flux,ieg,cfg,zone_id, msig); % Calculate source contributed by scatter
         tempflux = zeros(cfg.xmesh,cfg.ymesh, cfg.zmesh); % Clear flux content for new sweep
         for iang=1:cfg.m   % Loop over angles
+          disp(['Angle group #', num2str(iang)]);
           if(emu(iang)<0 && eta(iang)<0 && xzi(iang)<0) % Octant #1
               for kk=cfg.zmesh:-1:1       % Sweep through the 3D mesh from corner       
                   for jj=cfg.ymesh:-1:1
