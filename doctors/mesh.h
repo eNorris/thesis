@@ -10,15 +10,11 @@ class Mesh
 {
 public:
     Mesh();
-    Mesh(const Config &config, const Quadrature &quad);
+    Mesh(const Config *config, const Quadrature *quad);
 
     int xMesh;
     int yMesh;
     int zMesh;
-
-    //int xIndex;
-    //int yIndex;
-    //int zIndex;
 
     std::vector<float> xIndex;
     std::vector<float> yIndex;
@@ -34,7 +30,9 @@ public:
 
     std::vector<float> vol;
 
-    void load(const Config &config, const Quadrature &quad);
+    std::vector<unsigned short> zoneId;
+
+    void load(const Config *config, const Quadrature *quad);
 };
 
 #endif // MESH_H

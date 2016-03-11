@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     outputdialog.cpp \
     geomdialog.cpp \
     quaddialog.cpp \
-    xsectiondialog.cpp
+    xsectiondialog.cpp \
+    colormappable.cpp
 
 HEADERS  += mainwindow.h \
     config.h \
@@ -34,7 +35,8 @@ HEADERS  += mainwindow.h \
     outputdialog.h \
     geomdialog.h \
     quaddialog.h \
-    xsectiondialog.h
+    xsectiondialog.h \
+    colormappable.h
 
 FORMS    += mainwindow.ui \
     outputdialog.ui \

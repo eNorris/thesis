@@ -5,7 +5,8 @@
 
 XSectionDialog::XSectionDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::XSectionDialog)
+    ui(new Ui::XSectionDialog),
+    m_xs(NULL)
 {
     ui->setupUi(this);
 }
@@ -13,6 +14,9 @@ XSectionDialog::XSectionDialog(QWidget *parent) :
 XSectionDialog::~XSectionDialog()
 {
     delete ui;
+
+    if(m_xs != NULL)
+        delete m_xs;
 }
 
 void XSectionDialog::updateXs(XSection *xs)

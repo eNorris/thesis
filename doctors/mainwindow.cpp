@@ -13,7 +13,8 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    config(NULL)
 {
     ui->setupUi(this);
 
@@ -33,19 +34,20 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(signalNewIteration(std::vector<float>)), outputDialog, SLOT(disp(std::vector<float>)));
 
     // Make a configuration object and load its defaults
-    Config config;
-    config.loadDefaults();
+    config = new Config;
+    config->loadDefaults();
 
     qDebug() << "Loaded default configuration";
 
-    Quadrature quad(config);
-    quadDialog->updateQuad(&quad);
+    Quadrature *quad = new Quadrature(config);
+    quadDialog->updateQuad(quad);
 
-    Mesh mesh(config, quad);
-    geomDialog->updateMesh(&mesh);
+    Mesh *mesh = new Mesh(config, quad);
+    qDebug() << "Here the zslice = " << mesh->zMesh;
+    geomDialog->updateMesh(mesh);
 
-    XSection xs(config);
-    xsDialog->updateXs(&xs);
+    XSection *xs = new XSection(config);
+    xsDialog->updateXs(xs);
 
     std::vector<float> solution = gssolver(quad, mesh, xs);
 }
@@ -53,4 +55,7 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+
+    if(config != NULL)
+        delete config;
 }

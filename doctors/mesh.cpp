@@ -7,19 +7,17 @@ Mesh::Mesh()
 
 }
 
-Mesh::Mesh(const Config &config, const Quadrature &quad)
+Mesh::Mesh(const Config *config, const Quadrature *quad)
 {
     load(config, quad);
 }
 
-void Mesh::load(const Config &config, const Quadrature &quad)
+void Mesh::load(const Config *config, const Quadrature *quad)
 {
     // these are the number of mesh elements
     xMesh = 89;
     yMesh = 99;
-    zMesh = ceil(5.0 / (2.0 * config.sourceFrontGap));
-
-
+    zMesh = ceil(5.0 / (2.0 * config->sourceFrontGap));
 
     // Allocate space
     xIndex.resize(xMesh + 1);
@@ -30,21 +28,21 @@ void Mesh::load(const Config &config, const Quadrature &quad)
     dy.resize(yMesh);
     dz.resize(zMesh);
 
-    DA.resize(config.m * yMesh * zMesh);
-    DB.resize(config.m * xMesh * zMesh);
-    DC.resize(config.m * xMesh * yMesh);
+    DA.resize(config->m * yMesh * zMesh);
+    DB.resize(config->m * xMesh * zMesh);
+    DC.resize(config->m * xMesh * yMesh);
 
     vol.resize(xMesh * yMesh * zMesh);
 
     // The coordinates between mesh elements
     for(int i = 0; i < xMesh; i++)
-        xIndex[i] = i * (config.xLen / xMesh);
+        xIndex[i] = i * (config->xLen / xMesh);
 
     for(int i = 0; i < yMesh; i++)
-        yIndex[i] = i * (config.yLen / yMesh);
+        yIndex[i] = i * (config->yLen / yMesh);
 
     for(int i = 0; i < zMesh; i++)
-        zIndex[i] = i * (config.zLen / zMesh);
+        zIndex[i] = i * (config->zLen / zMesh);
     //for(float xPt = 0.0; xPt < config.xLen; xPt += config.xLen/xMesh)  // xMesh + 1 elements
     //    xIndex.push_back(xPt);
 
@@ -69,11 +67,11 @@ void Mesh::load(const Config &config, const Quadrature &quad)
                 vol[xIndx * yMesh*zMesh + yIndx * zMesh + zIndx] = dx[xIndx] * dy[yIndx] * dz[zIndx];
 
     // Calculate the cell face area for each angle as well as volume
-    for(int eIndx = 0; eIndx < config.m; eIndx++)
+    for(int eIndx = 0; eIndx < config->m; eIndx++)
     {
-        float vMu = abs(quad.mu[eIndx]);
-        float vEta = abs(quad.eta[eIndx]);
-        float vZi = abs(quad.zi[eIndx]);
+        float vMu = abs(quad->mu[eIndx]);
+        float vEta = abs(quad->eta[eIndx]);
+        float vZi = abs(quad->zi[eIndx]);
 
         for(int yIndx = 0; yIndx < yMesh; yIndx++)
             for(int zIndx = 0; zIndx < zMesh; zIndx++)
@@ -89,24 +87,24 @@ void Mesh::load(const Config &config, const Quadrature &quad)
     }
 
     // 0 = air, 1 = water, 2 = lead/tungsten
-    std::vector<unsigned short> zoneId;
+    //std::vector<unsigned short> zoneId;
     zoneId.resize(xMesh * yMesh * zMesh);
 
 
     // Do all of the +1 need to be removed?
-    int xLeftIndx  = (xMesh-1)/2 + 1 - round(config.colXLen/2/(config.xLen/xMesh));
-    int xRightIndx = (xMesh-1)/2 + 1 + round(config.colXLen/2/(config.xLen/xMesh));
-    int xLeftGapIndx = (xMesh-1)/2 + 1 - round(config.sourceLeftGap/(config.xLen/xMesh));
-    int xRightGapIndx = (xMesh-1)/2 + 1 + round(config.sourceLeftGap/(config.xLen/xMesh));
+    int xLeftIndx  = (xMesh-1)/2 + 1 - round(config->colXLen/2/(config->xLen/xMesh));
+    int xRightIndx = (xMesh-1)/2 + 1 + round(config->colXLen/2/(config->xLen/xMesh));
+    int xLeftGapIndx = (xMesh-1)/2 + 1 - round(config->sourceLeftGap/(config->xLen/xMesh));
+    int xRightGapIndx = (xMesh-1)/2 + 1 + round(config->sourceLeftGap/(config->xLen/xMesh));
 
     int yTopIndx = 0;
-    int yBottomIndx = round(config.colYLen/(config.yLen/yMesh));
-    int yTopGapIndx = round((config.colYLen/2 - config.sourceTopGap) / (config.yLen/yMesh));
+    int yBottomIndx = round(config->colYLen/(config->yLen/yMesh));
+    int yTopGapIndx = round((config->colYLen/2 - config->sourceTopGap) / (config->yLen/yMesh));
 
-    int zFrontIndx = (zMesh-1)/2 + 1 - round(config.colZLen/2/(config.zLen/zMesh));
-    int zBackIndx = (zMesh-1)/2 + 1 + round(config.colZLen/2/(config.zLen/zMesh));
-    int zFrontGapIndx = (zMesh-1)/2 + 1 - round(config.sourceFrontGap/(config.zLen/zMesh));
-    int zBackGapIndx = (zMesh-1)/2 + 1 + round(config.sourceFrontGap/(config.zLen/zMesh));
+    int zFrontIndx = (zMesh-1)/2 + 1 - round(config->colZLen/2/(config->zLen/zMesh));
+    int zBackIndx = (zMesh-1)/2 + 1 + round(config->colZLen/2/(config->zLen/zMesh));
+    int zFrontGapIndx = (zMesh-1)/2 + 1 - round(config->sourceFrontGap/(config->zLen/zMesh));
+    int zBackGapIndx = (zMesh-1)/2 + 1 + round(config->sourceFrontGap/(config->zLen/zMesh));
 
     for(int i = 0; i < xMesh; i++)
         for(int j = 0; j < yMesh; j++)
@@ -140,7 +138,7 @@ void Mesh::load(const Config &config, const Quadrature &quad)
     //zone_id(left_gap_x:right_gap_x, top_gap_y:bottom_y, front_gap_z:back_gap_z) = 0;   % set the hole in collimator zone 0
 
     float radius = 17.5;
-    float xCenter = config.xLen/2.0;
+    float xCenter = config->xLen/2.0;
     float yCenter = 50.0;  //config.yLen - config.so
 
     //TODO - The above yCenter should actually be calculated

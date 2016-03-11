@@ -9,7 +9,7 @@ class Quadrature
 {
 public:
     Quadrature();
-    Quadrature(const Config &config);
+    Quadrature(const Config *config);
     Quadrature(const int sn);
 
     static const Quadrature& getSn2();
@@ -19,7 +19,7 @@ public:
     std::vector<float> eta;
     std::vector<float> zi;
 
-    void load(const Config &config);
+    void load(const Config *config);
     void load(const int sn);
 
 private:

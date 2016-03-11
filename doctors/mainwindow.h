@@ -28,12 +28,14 @@ public:
 private:
     Ui::MainWindow *ui;
 
+    Config *config;
+
     OutputDialog *outputDialog;
     GeomDialog *geomDialog;
     QuadDialog *quadDialog;
     XSectionDialog *xsDialog;
 
-    std::vector<float> gssolver(const Quadrature &quad, const Mesh &mesh, const XSection &xs);
+    std::vector<float> gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs);
 
 signals:
     void signalNewIteration(std::vector<float>);

@@ -10,7 +10,7 @@ Quadrature::Quadrature()
 
 }
 
-Quadrature::Quadrature(const Config &config)
+Quadrature::Quadrature(const Config *config)
 {
     load(config);
 }
@@ -20,9 +20,9 @@ Quadrature::Quadrature(const int sn)
     load(sn);
 }
 
-void Quadrature::load(const Config &config)
+void Quadrature::load(const Config *config)
 {
-    int sn = config.sn;
+    int sn = config->sn;
     load(sn);
 
     /*

@@ -7,11 +7,13 @@
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
 
+#include "colormappable.h"
+
 namespace Ui {
 class OutputDialog;
 }
 
-class OutputDialog : public QDialog
+class OutputDialog : public QDialog, public ColorMappable
 {
     Q_OBJECT
 
@@ -25,12 +27,12 @@ private:
     QGraphicsRectItem *rect;
 
     std::vector<QGraphicsRectItem*> rects;
-    std::vector<QBrush> brushes;
+    //std::vector<QBrush> brushes;
 
     std::vector<float> m_data;
 
-    void loadParulaBrush();
-    void loadUniqueBrush();
+    //void loadParulaBrush();
+    //void loadUniqueBrush();
 
 protected slots:
     void disp(std::vector<float>);

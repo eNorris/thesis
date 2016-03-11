@@ -13,10 +13,10 @@ public:
     std::vector<float> msig;
 
     XSection();
-    XSection(const Config &config);
+    XSection(const Config *config);
     ~XSection();
 
-    void load(const Config &config);
+    void load(const Config *config);
 };
 
 #endif // XSECTION_H
