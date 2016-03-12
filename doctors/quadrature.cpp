@@ -5,12 +5,12 @@
 // Static allocators
 const Quadrature Quadrature::ms_sn2(2);
 
-Quadrature::Quadrature()
+Quadrature::Quadrature() : m_angles(0)
 {
 
 }
 
-Quadrature::Quadrature(const Config *config)
+Quadrature::Quadrature(const Config *config) : m_angles(0)
 {
     load(config);
 }
@@ -74,10 +74,11 @@ void Quadrature::load(const int sn)
 {
     if(sn == 2)
     {
-        mu.resize(8);
-        eta.resize(8);
-        zi.resize(8);
-        wt.resize(8);
+        m_angles = 8;
+        mu.resize(m_angles);
+        eta.resize(m_angles);
+        zi.resize(m_angles);
+        wt.resize(m_angles);
 
         mu[0] = -.577350;
         mu[1] =  .577350;
@@ -118,4 +119,9 @@ void Quadrature::load(const int sn)
 const Quadrature& Quadrature::getSn2()
 {
     return ms_sn2;
+}
+
+int Quadrature::angleCount() const
+{
+    return m_angles;
 }

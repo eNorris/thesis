@@ -6,8 +6,8 @@
 
 ZoomablePannableGraphicsView::ZoomablePannableGraphicsView(QWidget *parent) :
     QGraphicsView(parent),
-    m_zoomFactorBase(1.006f),
-    m_modifiers(Qt::NoModifier)
+    m_zoomFactorBase(1.002f),
+    m_modifiers(Qt::NoModifier)  // Qt::ControlModifier
 {
 
 }

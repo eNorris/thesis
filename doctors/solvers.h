@@ -1,6 +1,8 @@
 #ifndef SOLVERS_H
 #define SOLVERS_H
 
+// DEPRICATED
+
 #include <vector>
 
 //#include "config.h"

@@ -9,9 +9,10 @@ class QuadDialog;
 class XSectionDialog;
 
 //#include "config.h"
-#include "quadrature.h"
-#include "mesh.h"
-#include "xsection.h"
+class Quadrature;
+class Mesh;
+class XSection;
+class Config;
 
 namespace Ui {
 class MainWindow;
@@ -35,7 +36,10 @@ private:
     QuadDialog *quadDialog;
     XSectionDialog *xsDialog;
 
-    std::vector<float> gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs);
+    std::vector<float> gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config);
+
+protected slots:
+    void launchSolver();
 
 signals:
     void signalNewIteration(std::vector<float>);

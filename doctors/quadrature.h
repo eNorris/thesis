@@ -22,8 +22,11 @@ public:
     void load(const Config *config);
     void load(const int sn);
 
+    int angleCount() const;
+
 private:
     static const Quadrature ms_sn2;
+    int m_angles;
 
 };
 

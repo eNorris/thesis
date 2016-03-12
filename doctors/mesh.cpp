@@ -177,8 +177,20 @@ bool Mesh::insideTightBox(int x, int y, int z, int xmin, int xmax, int ymin, int
             z > zmin && z < zmax;
 }
 
+int Mesh::voxelCount() const
+{
+    return xMesh * yMesh * zMesh;
+}
 
+int Mesh::xjmp() const
+{
+    return yMesh * zMesh;
+}
 
+int Mesh::yjmp() const
+{
+    return zMesh;
+}
 
 
 

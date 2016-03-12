@@ -34,6 +34,10 @@ public:
 
     void load(const Config *config, const Quadrature *quad);
 
+    int voxelCount() const;
+    int xjmp() const;
+    int yjmp() const;
+
 private:
     bool insideBox(int x, int y, int z, int xmin, int xmax, int ymin, int ymax, int zmin, int zmax);
     bool insideTightBox(int x, int y, int z, int xmin, int xmax, int ymin, int ymax, int zmin, int zmax);

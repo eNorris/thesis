@@ -3,6 +3,10 @@
 
 #include <QDebug>
 
+#include "quadrature.h"
+#include "mesh.h"
+#include "xsection.h"
+
 #include "outputdialog.h"
 #include "geomdialog.h"
 #include "quaddialog.h"
@@ -31,6 +35,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->loadXsPushButton, SIGNAL(clicked()), xsDialog, SLOT(show()));
 
+    connect(ui->launchSolverPushButton, SIGNAL(clicked()), this, SLOT(launchSolver()));
+
     connect(this, SIGNAL(signalNewIteration(std::vector<float>)), outputDialog, SLOT(disp(std::vector<float>)));
 
     // Make a configuration object and load its defaults
@@ -49,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent) :
     XSection *xs = new XSection(config);
     xsDialog->updateXs(xs);
 
-    std::vector<float> solution = gssolver(quad, mesh, xs);
+    std::vector<float> solution = gssolver(quad, mesh, xs, config);
 }
 
 MainWindow::~MainWindow()
@@ -58,4 +64,9 @@ MainWindow::~MainWindow()
 
     if(config != NULL)
         delete config;
+}
+
+void MainWindow::launchSolver()
+{
+    qDebug() << "Solver isn't implemented yet!";
 }

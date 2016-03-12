@@ -17,6 +17,11 @@ public:
     ~XSection();
 
     void load(const Config *config);
+
+    int groupCount() const;
+
+private:
+    int m_groups;
 };
 
 #endif // XSECTION_H
