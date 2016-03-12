@@ -20,6 +20,7 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
     std::vector<float> preFlux;
     std::vector<float> totalSource;
     std::vector<float> isocaSource;
+    std::vector<float> errList;
 
     std::vector<float> extSource;
 
@@ -138,13 +139,22 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                                     fluxk_pre[ix*mesh->xMesh + iy] = fluxk[ix*mesh->xMesh + iy];
                                 }
 
-                                angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz] = 5;
-                                tempFlux[ix*xjmp + iy*yjmp + iz] = 1;
+                                angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz] = ix;
+                                tempFlux[ix*xjmp + iy*yjmp + iz] = ix;
                             }
                         }
                     }
                 }  // End of octant 1
-            }
+            } // end of all angles
+
+            maxDiff = -1E35;
+            for(unsigned int i = 0; i < tempFlux.size(); i++)
+                maxDiff = qMax(maxDiff, qAbs((tempFlux[i] - preFlux[i])/tempFlux[i]));
+
+            errList.push_back(maxDiff);
+
+            for(unsigned int i = 0; i < tempFlux.size(); i++)
+                scalarFlux[ie*ejmp + i] = tempFlux[i];
 
             iterNum++;
         }
@@ -153,6 +163,9 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
     }
 
     qDebug() << "Time to complete: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
+
+    for(unsigned int i = 0; i < errList.size(); i++)
+        qDebug() << i << " maxDiff: " << errList[i];
 
     return scalarFlux;
 }

@@ -40,6 +40,7 @@ protected slots:
     //void disp(std::vector<float>);
     void setSliceLevel(int level);
     void updateMeshSlicePlane();
+    void reRender(std::vector<float>);
 };
 
 #endif // OUTPUTDIALOG_H

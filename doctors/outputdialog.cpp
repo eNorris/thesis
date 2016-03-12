@@ -2,6 +2,7 @@
 #include "ui_outputdialog.h"
 
 #include <QDebug>
+#include <cmath>
 
 #include "mesh.h"
 
@@ -99,17 +100,27 @@ void OutputDialog::updateSolution(std::vector<float> data)
 }
 
 
+void OutputDialog::reRender(std::vector<float> data)
+{
+    updateSolution(data);
+    setSliceLevel(ui->sliceVerticalSlider->value());
+}
+
+
 void OutputDialog::setSliceLevel(int level)
 {
     qDebug() << "Set the slice to " << level;
 
-    if(m_mesh == NULL)
+    if(m_mesh == NULL || m_data.size() == 0)
     {
         qDebug() << "ERROR: setSliceLevel on a NULL pointer";
         return;
     }
 
     loadParulaBrush();
+
+    float minval = 1E35;
+    float maxval = -1E35;
 
     if(ui->xyRadioButton->isChecked())
     {
@@ -119,12 +130,39 @@ void OutputDialog::setSliceLevel(int level)
             return;
         }
 
+        for(int ix = 0; ix < m_mesh->xMesh; ix++)
+            for(int iy = 0; iy < m_mesh->yMesh; iy++)
+            {
+                if(m_data[ix*m_mesh->yMesh*m_mesh->zMesh + iy*m_mesh->zMesh + level] < minval)
+                    minval = m_data[ix*m_mesh->yMesh*m_mesh->zMesh + iy*m_mesh->zMesh + level];
+                else if(m_data[ix*m_mesh->yMesh*m_mesh->zMesh + iy*m_mesh->zMesh + level] > maxval)
+                    maxval = m_data[ix*m_mesh->yMesh*m_mesh->zMesh + iy*m_mesh->zMesh + level];
+            }
+
+        if(maxval == 0)
+        {
+            qDebug() << "Zero flux everywhere!";
+            return;
+        }
+
+        if(minval < 0)
+        {
+            qDebug() << "WARNING: Negative flux!";
+        }
+
+        if((maxval - minval) / maxval < 1E-5)
+        {
+            qDebug() << "Displaying a flat surface!";
+            return;
+        }
 
         for(int i = 0; i < m_mesh->xMesh; i++)
             for(int j = 0; j < m_mesh->yMesh; j++)
             {
-                int zid = m_mesh->zoneId[i*m_mesh->yMesh*m_mesh->zMesh + j*m_mesh->zMesh + level];
-                rects[i*m_mesh->yMesh + j]->setBrush(brushes[zid]);
+                //int zid = m_mesh->zoneId[i*m_mesh->yMesh*m_mesh->zMesh + j*m_mesh->zMesh + level];
+                float flux = m_data[i*m_mesh->yMesh*m_mesh->zMesh + j*m_mesh->zMesh + level];
+                int fid = round(63*(flux-minval) / (maxval-minval));
+                rects[i*m_mesh->yMesh + j]->setBrush(brushes[fid]);
             }
     }
     else if(ui->xzRadioButton->isChecked())
@@ -173,7 +211,6 @@ void OutputDialog::updateMeshSlicePlane()
     if(ui->xyRadioButton->isChecked())
     {
         qDebug() << "Setting to XY slice";
-
 
         QBrush greenBrush(Qt::green);
         for(int i = 0; i < m_mesh->xMesh; i++)

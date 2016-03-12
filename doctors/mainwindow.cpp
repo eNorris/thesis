@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //connect(this, SIGNAL(signalNewIteration(std::vector<float>)), outputDialog, SLOT(disp(std::vector<float>)));
     // TODO - Update like above at some point
+    connect(this, SIGNAL(signalNewIteration(std::vector<float>)), outputDialog, SLOT(reRender(std::vector<float>)));
 
     // Make a configuration object and load its defaults
     config = new Config;
