@@ -84,9 +84,9 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                 {
                     for(int iz = mesh->zMesh-1; iz >= 0; iz--)  // Start at corner and sweep toward 0
                     {
-                        for(int iy = mesh->yMesh; iy >= 0; iy--)
+                        for(int iy = mesh->yMesh-1; iy >= 0; iy--)
                         {
-                            for(int ix = mesh->xMesh; ix >= 0; ix--)
+                            for(int ix = mesh->xMesh-1; ix >= 0; ix--)
                             {
                                 int zid = mesh->zoneId[ix*mesh->xjmp() + iy*mesh->yjmp() + iz];
 
@@ -139,6 +139,9 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                                 }
 
                                 angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz] = 5;
+                                //int qq = ix*xjmp + iy*yjmp + iz;
+                                //int qqq = tempFlux.size();
+                                //qDebug() << qq << "     " << qqq;
                                 tempFlux[ix*xjmp + iy*yjmp + iz] = 1;
                             }
                         }
