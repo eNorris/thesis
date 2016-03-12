@@ -105,10 +105,17 @@
     </layout>
    </item>
    <item row="0" column="0" rowspan="3">
-    <widget class="QGraphicsView" name="graphicsView"/>
+    <widget class="ZoomablePannableGraphicsView" name="graphicsView"/>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ZoomablePannableGraphicsView</class>
+   <extends>QGraphicsView</extends>
+   <header>zoomablepannablegraphicsview.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

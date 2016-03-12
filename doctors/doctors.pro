@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     geomdialog.cpp \
     quaddialog.cpp \
     xsectiondialog.cpp \
-    colormappable.cpp
+    colormappable.cpp \
+    zoomablepannablegraphicsview.cpp
 
 HEADERS  += mainwindow.h \
     config.h \
@@ -36,7 +37,8 @@ HEADERS  += mainwindow.h \
     geomdialog.h \
     quaddialog.h \
     xsectiondialog.h \
-    colormappable.h
+    colormappable.h \
+    zoomablepannablegraphicsview.h
 
 FORMS    += mainwindow.ui \
     outputdialog.ui \

@@ -17,6 +17,10 @@ GeomDialog::GeomDialog(QWidget *parent) :
 
     ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
     ui->graphicsView->setInteractive(true);
+    ui->graphicsView->setMouseTracking(true);
+    //ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    //ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
 
     connect(ui->sliceVerticalSlider, SIGNAL(sliderMoved(int)), ui->sliceSpinBox, SLOT(setValue(int)));
     connect(ui->sliceSpinBox, SIGNAL(valueChanged(int)), ui->sliceVerticalSlider, SLOT(setValue(int)));
