@@ -139,9 +139,6 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                                 }
 
                                 angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz] = 5;
-                                //int qq = ix*xjmp + iy*yjmp + iz;
-                                //int qqq = tempFlux.size();
-                                //qDebug() << qq << "     " << qqq;
                                 tempFlux[ix*xjmp + iy*yjmp + iz] = 1;
                             }
                         }

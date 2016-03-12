@@ -9,6 +9,8 @@
 
 #include "colormappable.h"
 
+class Mesh;
+
 namespace Ui {
 class OutputDialog;
 }
@@ -21,21 +23,23 @@ public:
     explicit OutputDialog(QWidget *parent = 0);
     ~OutputDialog();
 
+    void updateMesh(Mesh *mesh);
+    void updateSolution(std::vector<float> data);
+
 private:
     Ui::OutputDialog *ui;
     QGraphicsScene *scene;
     QGraphicsRectItem *rect;
 
     std::vector<QGraphicsRectItem*> rects;
-    //std::vector<QBrush> brushes;
 
     std::vector<float> m_data;
-
-    //void loadParulaBrush();
-    //void loadUniqueBrush();
+    Mesh *m_mesh;
 
 protected slots:
-    void disp(std::vector<float>);
+    //void disp(std::vector<float>);
+    void setSliceLevel(int level);
+    void updateMeshSlicePlane();
 };
 
 #endif // OUTPUTDIALOG_H

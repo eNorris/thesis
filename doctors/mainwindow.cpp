@@ -37,7 +37,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->launchSolverPushButton, SIGNAL(clicked()), this, SLOT(launchSolver()));
 
-    connect(this, SIGNAL(signalNewIteration(std::vector<float>)), outputDialog, SLOT(disp(std::vector<float>)));
+    //connect(this, SIGNAL(signalNewIteration(std::vector<float>)), outputDialog, SLOT(disp(std::vector<float>)));
+    // TODO - Update like above at some point
 
     // Make a configuration object and load its defaults
     config = new Config;
@@ -55,7 +56,9 @@ MainWindow::MainWindow(QWidget *parent) :
     XSection *xs = new XSection(config);
     xsDialog->updateXs(xs);
 
+    outputDialog->updateMesh(mesh);
     std::vector<float> solution = gssolver(quad, mesh, xs, config);
+    outputDialog->updateSolution(solution);
 }
 
 MainWindow::~MainWindow()
