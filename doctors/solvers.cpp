@@ -140,7 +140,9 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                                 }
 
                                 angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz] = ix;
-                                tempFlux[ix*xjmp + iy*yjmp + iz] = ix;
+
+                                // Sum all the angular fluxes
+                                tempFlux[ix*xjmp + iy*yjmp + iz] = tempFlux[ix*xjmp + iy*yjmp + iz] + quad->wt[iang]*angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz];
                             }
                         }
                     }
