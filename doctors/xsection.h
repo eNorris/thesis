@@ -20,8 +20,16 @@ public:
 
     int groupCount() const;
 
+    int dim1() const;
+    int dim2() const;
+    int dim3() const;
+
 private:
     int m_groups;
+
+    int m_dim1;
+    int m_dim2;
+    int m_dim3;
 };
 
 #endif // XSECTION_H

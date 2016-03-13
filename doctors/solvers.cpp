@@ -139,7 +139,15 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                                     fluxk_pre[ix*mesh->xMesh + iy] = fluxk[ix*mesh->xMesh + iy];
                                 }
 
-                                angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz] = ix;
+                                float numer = totalSource[ix*xjmp+iy*yjmp+iz] * mesh->vol[ix*xjmp+iy*yjmp+iz] +
+                                        2*mesh->DA[iang*mesh->yMesh*mesh->zMesh + iy*mesh->zMesh + iz] * fluxi +
+                                        2*mesh->DB[iang*mesh->xMesh*mesh->zMesh + ix*mesh->zMesh + iz] * fluxj[ix] +
+                                        2*mesh->DC[iang*mesh->xMesh*mesh->yMesh + ix*mesh->yMesh + iy] * fluxk[ix*mesh->xMesh + iy];
+                                float denom = mesh->vol[ix*xjmp+iy*yjmp+iz]*xs->msig[ie*xs->dim1()*xs->dim2()*xs->dim3() + zid*xs->dim2()*xs->dim3() + xs->dim3()] +
+                                        2*mesh->DA[iang*mesh->yMesh*mesh->zMesh + iy*mesh->zMesh + iz] +
+                                        2*mesh->DB[iang*mesh->xMesh*mesh->zMesh + ix*mesh->zMesh + iz] +
+                                        2*mesh->DC[iang*mesh->xMesh*mesh->yMesh + ix*mesh->yMesh + iy];
+                                angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz] = numer/denom;
 
                                 // Sum all the angular fluxes
                                 tempFlux[ix*xjmp + iy*yjmp + iz] = tempFlux[ix*xjmp + iy*yjmp + iz] + quad->wt[iang]*angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz];

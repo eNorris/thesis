@@ -30,9 +30,13 @@ void Mesh::load(const Config *config, const Quadrature *quad)
     dy.resize(yMesh);
     dz.resize(zMesh);
 
-    DA.resize(config->m * yMesh * zMesh);
-    DB.resize(config->m * xMesh * zMesh);
-    DC.resize(config->m * xMesh * yMesh);
+    //DA.resize(config->m * yMesh * zMesh);
+    //DB.resize(config->m * xMesh * zMesh);
+    //DC.resize(config->m * xMesh * yMesh);
+
+    DA.resize(quad->angleCount() * yMesh * zMesh);
+    DB.resize(quad->angleCount() * xMesh * zMesh);
+    DC.resize(quad->angleCount() * xMesh * yMesh);
 
     vol.resize(xMesh * yMesh * zMesh);
 

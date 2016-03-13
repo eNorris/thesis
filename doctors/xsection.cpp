@@ -32,21 +32,47 @@ void XSection::load(const Config *config)
         m_groups = config->igm;
 
         // TODO - What is this?
-        int t1 = round(config->mtm / (1 + config->isct));
-        int t2 = 1 + config->isct;
-        int t3 = 2 + config->ihm - config->ihs;
+        //int t1 = round(config->mtm / (1 + config->isct));
+        //int t2 = 1 + config->isct;
+        //int t3 = 2 + config->ihm - config->ihs;
 
-        msig.resize(m_groups * t1 * t2 * t3);
+        m_dim1 = round(config->mtm / (1 + config->isct));
+        m_dim2 = 1 + config->isct;
+        m_dim3 = 2 + config->ihm - config->ihs;
+
+        //msig.resize(m_groups * t1 * t2 * t3);
+        msig.resize(m_groups * m_dim1 * m_dim2 * m_dim3);
+
+        //for(int i = 0; i < m_groups; i++)
+        //    for(int j = 0; j < t1; j++)
+        //        for(int k = 0; k < t2; k++)
+        //            for(int m = 0; m < t3; m++)
+        //                msig[i*t1*t2*t3 + j*t2*t3 + k*t3 + m] = config->xsection[((j-1) * (1+config->isct) + k)*4 + config->iht + m - 1];
 
         for(int i = 0; i < m_groups; i++)
-            for(int j = 0; j < t1; j++)
-                for(int k = 0; k < t2; k++)
-                    for(int m = 0; m < t3; m++)
-                        msig[i*t1*t2*t3 + j*t2*t3 + k*t3 + m] = config->xsection[((j-1) * (1+config->isct) + k)*4 + config->iht + m - 1];
+            for(int j = 0; j < m_dim1; j++)
+                for(int k = 0; k < m_dim2; k++)
+                    for(int m = 0; m < m_dim3; m++)
+                        msig[i*m_dim1*m_dim2*m_dim3 + j*m_dim2*m_dim3 + k*m_dim3 + m] = config->xsection[((j-1) * (1+config->isct) + k)*4 + config->iht + m - 1];
     }
 }
 
 int XSection::groupCount() const
 {
     return m_groups;
+}
+
+int XSection::dim1() const
+{
+    return m_dim1;
+}
+
+int XSection::dim2() const
+{
+    return m_dim2;
+}
+
+int XSection::dim3() const
+{
+    return m_dim3;
 }
