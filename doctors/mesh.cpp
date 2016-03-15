@@ -68,9 +68,9 @@ void Mesh::load(const Config *config, const Quadrature *quad)
     // Calculate the cell face area for each angle as well as volume
     for(int eIndx = 0; eIndx < config->m; eIndx++)
     {
-        float vMu = abs(quad->mu[eIndx]);
-        float vEta = abs(quad->eta[eIndx]);
-        float vZi = abs(quad->zi[eIndx]);
+        float vMu = fabs(quad->mu[eIndx]);
+        float vEta = fabs(quad->eta[eIndx]);
+        float vZi = fabs(quad->zi[eIndx]);
 
         for(int yIndx = 0; yIndx < yMesh; yIndx++)
             for(int zIndx = 0; zIndx < zMesh; zIndx++)

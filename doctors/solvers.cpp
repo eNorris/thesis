@@ -31,6 +31,11 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
     std::vector<float> fluxj_pre;
     std::vector<float> fluxk_pre;
 
+    int ejmp = mesh->voxelCount() * quad->angleCount();
+    int ajmp = mesh->voxelCount();
+    int xjmp = mesh->xjmp();
+    int yjmp = mesh->yjmp();
+
     scalarFlux.resize(xs->groupCount() * mesh->voxelCount());
     tempFlux.resize(mesh->voxelCount());
     angularFlux.resize(xs->groupCount() * quad->angleCount() * mesh->voxelCount());
@@ -39,17 +44,14 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
 
     extSource.resize(mesh->voxelCount(), 0.0f);
 
-    extSource[((mesh->xMesh + 1)/2)*(mesh->xjmp()) + ((mesh->yMesh-1)/2)*mesh->yjmp() + ((mesh->zMesh+1)/2)] = 1E6;
+    extSource[((mesh->xMesh + 1)/2)*xjmp + ((mesh->yMesh-1)/2)*yjmp + ((mesh->zMesh+1)/2)] = 1E6;
 
     fluxj.resize(mesh->xMesh, 0.0f);
     fluxk.resize(mesh->xMesh * mesh->yMesh, 0.0f);
     fluxj_pre.resize(mesh->xMesh, 0.0f);
     fluxk_pre.resize(mesh->xMesh * mesh->yMesh, 0.0f);
 
-    int ejmp = mesh->voxelCount() * quad->angleCount();
-    int ajmp = mesh->voxelCount();
-    int xjmp = mesh->xjmp();
-    int yjmp = mesh->yjmp();
+
 
     qDebug() << "Solving " << mesh->voxelCount() * quad->angleCount() * xs->groupCount() << " elements in phase space";
 
@@ -149,6 +151,12 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                                         2*mesh->DC[iang*mesh->xMesh*mesh->yMesh + ix*mesh->yMesh + iy];
                                 angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz] = numer/denom;
 
+                                if(denom == 0)
+                                    qDebug() << "All life is over!";
+
+                                if(numer != 0)
+                                    qDebug() << "Got a fish!";
+
                                 // Sum all the angular fluxes
                                 tempFlux[ix*xjmp + iy*yjmp + iz] = tempFlux[ix*xjmp + iy*yjmp + iz] + quad->wt[iang]*angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz];
                             }
@@ -159,7 +167,10 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
 
             maxDiff = -1E35;
             for(unsigned int i = 0; i < tempFlux.size(); i++)
+            {
+                float z = qAbs((tempFlux[i] - preFlux[i])/tempFlux[i]);
                 maxDiff = qMax(maxDiff, qAbs((tempFlux[i] - preFlux[i])/tempFlux[i]));
+            }
 
             errList.push_back(maxDiff);
 
