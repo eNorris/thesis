@@ -36,9 +36,13 @@ void XSection::load(const Config *config)
         //int t2 = 1 + config->isct;
         //int t3 = 2 + config->ihm - config->ihs;
 
-        m_dim1 = round(config->mtm / (1 + config->isct));
-        m_dim2 = 1 + config->isct;
-        m_dim3 = 2 + config->ihm - config->ihs;
+        int dim1 = round(config->mtm / (1 + config->isct));
+        int dim2 = 1 + config->isct;
+        int dim3 = 2 + config->ihm - config->ihs;
+
+        m_dim1 = dim1*dim2*dim3;
+        m_dim2 = dim2*dim3;
+        m_dim3 = dim3;
 
         //msig.resize(m_groups * t1 * t2 * t3);
         msig.resize(m_groups * m_dim1 * m_dim2 * m_dim3);
@@ -53,8 +57,13 @@ void XSection::load(const Config *config)
             for(int j = 0; j < m_dim1; j++)
                 for(int k = 0; k < m_dim2; k++)
                     for(int m = 0; m < m_dim3; m++)
-                        msig[i*m_dim1*m_dim2*m_dim3 + j*m_dim2*m_dim3 + k*m_dim3 + m] = config->xsection[((j-1) * (1+config->isct) + k)*4 + config->iht + m - 1];
+                        msig[i*m_dim1 + j*m_dim2 + k*m_dim3 + m] = config->xsection[((j-1) * (1+config->isct) + k)*4 + config->iht + m - 1];
     }
+}
+
+int XSection::operator()(int grp, int d2, int d3, int d4) const
+{
+    return msig[grp*m_dim1 + d2*m_dim2 + d3*m_dim3 + d4];
 }
 
 int XSection::groupCount() const

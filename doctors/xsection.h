@@ -16,6 +16,9 @@ public:
     XSection(const Config *config);
     ~XSection();
 
+
+    int operator()(int grp, int d2, int d3, int d4) const;
+
     void load(const Config *config);
 
     int groupCount() const;
