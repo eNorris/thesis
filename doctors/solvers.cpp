@@ -71,6 +71,15 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
 
             // Calculate the scattering source
             // TODO
+            for(int iie = 0; iie < ie; iie++)
+                for(int iik = 0; iik < mesh->zMesh; iik++)
+                    for(int iij = 0; iij < mesh->yMesh; iij++)
+                        for(int iii = 0; iii < mesh->xMesh; iii++)
+                        {
+                            int indx = iii*mesh->xjmp() + iij*mesh->yjmp() + iik;
+                            int zidIndx = mesh->zoneId[indx];
+                            isocaSource[indx] = isocaSource[indx] + 1.0/(4.0*M_PI)*(scalarFlux[iie*mesh->voxelCount() + indx] * (*xs)(ie-1, zidIndx, 0, iie));
+                        }
 
             // Calculate the total flux
             for(int i = 0; i < mesh->voxelCount(); i++)
