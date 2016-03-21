@@ -23,9 +23,9 @@ public:
 
     int groupCount() const;
 
-    int dim1() const;
-    int dim2() const;
-    int dim3() const;
+    //int dim1() const;
+    //int dim2() const;
+    //int dim3() const;
 
 private:
     int m_groups;

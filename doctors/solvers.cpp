@@ -154,7 +154,7 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                                         2*mesh->DA[iang*mesh->yMesh*mesh->zMesh + iy*mesh->zMesh + iz] * fluxi +
                                         2*mesh->DB[iang*mesh->xMesh*mesh->zMesh + ix*mesh->zMesh + iz] * fluxj[ix] +
                                         2*mesh->DC[iang*mesh->xMesh*mesh->yMesh + ix*mesh->yMesh + iy] * fluxk[ix*mesh->xMesh + iy];
-                                float denom = mesh->vol[ix*xjmp+iy*yjmp+iz]*xs->msig[ie*xs->dim1()*xs->dim2()*xs->dim3() + zid*xs->dim2()*xs->dim3() + xs->dim3()] +
+                                float denom = mesh->vol[ix*xjmp+iy*yjmp+iz]*xs->operator ()(ie, zid, 0, 0) + //xs->msig[ie*xs->dim1()*xs->dim2()*xs->dim3() + zid*xs->dim2()*xs->dim3() + xs->dim3()] +
                                         2*mesh->DA[iang*mesh->yMesh*mesh->zMesh + iy*mesh->zMesh + iz] +
                                         2*mesh->DB[iang*mesh->xMesh*mesh->zMesh + ix*mesh->zMesh + iz] +
                                         2*mesh->DC[iang*mesh->xMesh*mesh->yMesh + ix*mesh->yMesh + iy];

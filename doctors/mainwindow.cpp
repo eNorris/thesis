@@ -47,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Make a configuration object and load its defaults
     //config = new Config;
     m_config = new Config;
+    m_config->loadFile("testinput.cfg");
     m_config->loadDefaults();
 
     qDebug() << "Loaded default configuration";

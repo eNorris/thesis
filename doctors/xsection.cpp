@@ -63,6 +63,9 @@ void XSection::load(const Config *config)
 
 int XSection::operator()(int grp, int d2, int d3, int d4) const
 {
+    int indx = grp*m_dim1 + d2*m_dim2 + d3*m_dim3 + d4;
+    if(indx >= msig.size())
+        qDebug() << "XSection indexing error: Accessed " << (indx+1) << "/" << msig.size();
     return msig[grp*m_dim1 + d2*m_dim2 + d3*m_dim3 + d4];
 }
 
@@ -70,7 +73,7 @@ int XSection::groupCount() const
 {
     return m_groups;
 }
-
+/*
 int XSection::dim1() const
 {
     return m_dim1;
@@ -85,3 +88,4 @@ int XSection::dim3() const
 {
     return m_dim3;
 }
+*/

@@ -1,6 +1,10 @@
 #include "config.h"
 
+#include <QDebug>
+
 #include <cmath>
+
+#include <libconfig.h++>
 
 Config::Config() //: m_flatFilterThickness(NULL), m_flatFilterMat(NULL), m_xsection(NULL)
 {
@@ -9,26 +13,7 @@ Config::Config() //: m_flatFilterThickness(NULL), m_flatFilterMat(NULL), m_xsect
 
 Config::~Config()
 {
-    // Release allocated heap memory
-    /*
-    if(m_flatFilterMat != NULL)
-    {
-        delete [] m_flatFilterThickness;
-        m_flatFilterThickness = NULL;
-    }
 
-    if(m_flatFilterMat != NULL)
-    {
-        delete [] m_flatFilterMat;
-        m_flatFilterMat = NULL;
-    }
-
-    if(m_xsection != NULL)
-    {
-        delete [] m_xsection;
-        m_xsection = NULL;
-    }
-    */
 }
 
 void Config::loadDefaults()
@@ -93,7 +78,31 @@ void Config::loadDefaults()
     maxit = 5;  // Max number of inner iterations (default = 20)
 }
 
+void Config::loadFile(std::string filename)
+{
+    libconfig::Config cfg;
+    try{
+        cfg.readFile(filename.c_str());
+    } catch(const libconfig::FileIOException &fioex) {
+        qDebug() << "I/O error reading file: " << QString::fromStdString(filename) << ": " << fioex.what();
+        return;
+    } catch(const libconfig::ParseException &pex) {
+        qDebug() << "Parse error at " << pex.getFile() << ":" << pex.getLine() << " - " << pex.getError();
+        return;
+    }
 
+    try{
+        std::string name = cfg.lookup("name");
+        qDebug() << "I read the phrase: " << QString::fromStdString(name) << "!";
+    } catch(const libconfig::SettingNotFoundException &nfex){
+        qDebug() << "No 'name' setting in config file";
+        return;
+    }
+
+    const libconfig::Setting &root = cfg.getRoot();
+
+
+}
 
 
 

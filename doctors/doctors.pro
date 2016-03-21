@@ -45,3 +45,8 @@ FORMS    += mainwindow.ui \
     geomdialog.ui \
     quaddialog.ui \
     xsectiondialog.ui
+
+DISTFILES += \
+    testinput.cfg
+
+unix|win32: LIBS += -lconfig++
