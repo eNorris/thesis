@@ -31,67 +31,19 @@ OutputDialog::OutputDialog(QWidget *parent) :
     connect(ui->xyRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
     connect(ui->xzRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
     connect(ui->yzRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
-
-
-    //QBrush greenBrush(Qt::green);
-
-    //loadParulaBrush();
-
-    //for(int i = 0; i < 100; i++)
-    //    for(int j = 0; j < 100; j++)
-    //        rects.push_back(scene->addRect(5*i, 5*j, 5, 5, Qt::NoPen, greenBrush));
-
-    //for(int i = 0; i < 100*100; i++)
-    //    rects[i]->setBrush(brushes[i % brushes.size()]);
-
-
-    //QPen outlinePen(Qt::black);
-    //outlinePen.setWidth(2);
-
-    //rect = scene->addRect(100, 0, 80, 100, outlinePen, greenBrush);
 }
 
 OutputDialog::~OutputDialog()
 {
     delete ui;
 }
-/*
-void OutputDialog::disp(std::vector<float> vdata)
-{
-    qDebug() << "Displaying a new vector...";
-
-    float minval = 1E35;
-    float maxval = -1E35;
-
-    for(int i = 0; i < vdata.size(); i++)
-    {
-        if(vdata[i] < minval)
-            minval = vdata[i];
-        else if(vdata[i] > maxval)
-            maxval = vdata[i];
-    }
-
-    if((maxval - minval) / maxval < 1E-5)
-    {
-        qDebug() << "Displaying a flat surface!";
-        return;
-    }
-
-    if(rects.size() != vdata.size())
-    {
-        qDebug() << "Displaying a mismatch of data!";
-        return;
-    }
-
-    for(int i = 0; i < rects.size(); i++)
-        rects[i]->setBrush(brushes[((maxval-vdata[i])/(vdata[i]-minval) + 1)*63]);
-}
-*/
 
 void OutputDialog::updateMesh(Mesh *mesh)
 {
     m_mesh = mesh;
-    updateMeshSlicePlane();
+
+    // I don't know the geometry anymore, so it doesn't make sense to draw anything
+    //updateMeshSlicePlane();
 }
 
 void OutputDialog::updateSolution(std::vector<float> data)
@@ -103,17 +55,31 @@ void OutputDialog::updateSolution(std::vector<float> data)
 void OutputDialog::reRender(std::vector<float> data)
 {
     updateSolution(data);
+    updateMeshSlicePlane();
     setSliceLevel(ui->sliceVerticalSlider->value());
 }
 
 
 void OutputDialog::setSliceLevel(int level)
 {
-    qDebug() << "Set the slice to " << level;
+    //qDebug() << "Set the slice to " << level;
 
-    if(m_mesh == NULL || m_data.size() == 0)
+    if(m_mesh == NULL)
     {
-        qDebug() << "ERROR: setSliceLevel on a NULL pointer";
+        qDebug() << "ERROR: setSliceLevel on a NULL pointer!";
+        return;
+    }
+
+    if(m_data.size() == 0)
+    {
+        qDebug() << "ERROR: Setting level slice with no solution data";
+        return;
+    }
+
+    if(rects.size() == 0)
+    {
+        qDebug() << "ERROR: There are no rectangles in the drawing pipeline!";
+        qDebug() << "Did you call the mesher?";
         return;
     }
 
@@ -205,6 +171,8 @@ void OutputDialog::setSliceLevel(int level)
 
 void OutputDialog::updateMeshSlicePlane()
 {
+    qDebug() << "Calling the mesher!";
+
     rects.clear();
     scene->clear();
 

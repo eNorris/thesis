@@ -18,7 +18,10 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    config(NULL)
+    m_config(NULL),
+    m_mesh(NULL),
+    m_xs(NULL),
+    m_quad(NULL)
 {
     ui->setupUi(this);
 
@@ -42,23 +45,27 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(signalNewIteration(std::vector<float>)), outputDialog, SLOT(reRender(std::vector<float>)));
 
     // Make a configuration object and load its defaults
-    config = new Config;
-    config->loadDefaults();
+    //config = new Config;
+    m_config = new Config;
+    m_config->loadDefaults();
 
     qDebug() << "Loaded default configuration";
 
-    Quadrature *quad = new Quadrature(config);
-    quadDialog->updateQuad(quad);
+    //Quadrature *m_quad = new Quadrature(config);
+    m_quad = new Quadrature(m_config);
+    quadDialog->updateQuad(m_quad);
 
-    Mesh *mesh = new Mesh(config, quad);
-    qDebug() << "Here the zslice = " << mesh->zMesh;
-    geomDialog->updateMesh(mesh);
+    //Mesh *mesh = new Mesh(config, quad);
+    m_mesh = new Mesh(m_config, m_quad);
+    qDebug() << "Here the zslice = " << m_mesh->zMesh;
+    geomDialog->updateMesh(m_mesh);
 
-    XSection *xs = new XSection(config);
-    xsDialog->updateXs(xs);
+    //XSection *xs = new XSection(config);
+    m_xs = new XSection(m_config);
+    xsDialog->updateXs(m_xs);
 
-    outputDialog->updateMesh(mesh);
-    std::vector<float> solution = gssolver(quad, mesh, xs, config);
+    outputDialog->updateMesh(m_mesh);
+    std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, m_config);
     outputDialog->updateSolution(solution);
 }
 
@@ -66,11 +73,23 @@ MainWindow::~MainWindow()
 {
     delete ui;
 
-    if(config != NULL)
-        delete config;
+    if(m_config != NULL)
+        delete m_config;
+
+    if(m_mesh != NULL)
+        delete m_mesh;
+
+    if(m_xs != NULL)
+        delete m_xs;
+
+    if(m_quad != NULL)
+        delete m_quad;
 }
 
 void MainWindow::launchSolver()
 {
-    qDebug() << "Solver isn't implemented yet!";
+    //qDebug() << "Solver isn't implemented yet!";
+
+    std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, m_config);
+    outputDialog->updateSolution(solution);
 }

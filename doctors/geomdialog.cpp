@@ -40,9 +40,6 @@ GeomDialog::GeomDialog(QWidget *parent) :
 GeomDialog::~GeomDialog()
 {
     delete ui;
-
-    if(m_mesh != NULL)
-        delete m_mesh;
 }
 
 void GeomDialog::updateMesh(Mesh *mesh)

@@ -15,8 +15,8 @@ XSectionDialog::~XSectionDialog()
 {
     delete ui;
 
-    if(m_xs != NULL)
-        delete m_xs;
+    //if(m_xs != NULL)
+    //    delete m_xs;
 }
 
 void XSectionDialog::updateXs(XSection *xs)

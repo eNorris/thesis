@@ -29,12 +29,17 @@ public:
 private:
     Ui::MainWindow *ui;
 
-    Config *config;
+    Config *m_config;
+    Mesh *m_mesh;
+    XSection *m_xs;
+    Quadrature *m_quad;
 
     OutputDialog *outputDialog;
     GeomDialog *geomDialog;
     QuadDialog *quadDialog;
     XSectionDialog *xsDialog;
+
+
 
     std::vector<float> gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config);
 

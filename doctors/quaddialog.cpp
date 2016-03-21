@@ -15,8 +15,8 @@ QuadDialog::~QuadDialog()
 {
     delete ui;
 
-    if(m_quad != NULL)
-        delete m_quad;
+    //if(m_quad != NULL)
+    //    delete m_quad;
 }
 
 void QuadDialog::updateQuad(Quadrature *quad)

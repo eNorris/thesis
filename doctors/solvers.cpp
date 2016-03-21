@@ -76,7 +76,7 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
             for(int i = 0; i < mesh->voxelCount(); i++)
                 totalSource[i] = extSource[ie*mesh->voxelCount() + i] + isocaSource[i];
 
-            for(int i = 0; i < tempFlux.size(); i++) // Clear for a new sweep
+            for(unsigned int i = 0; i < tempFlux.size(); i++) // Clear for a new sweep
                 tempFlux[i] = 0;
 
             for(int iang = 0; iang < quad->angleCount(); iang++)
@@ -151,11 +151,11 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                                         2*mesh->DC[iang*mesh->xMesh*mesh->yMesh + ix*mesh->yMesh + iy];
                                 angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz] = numer/denom;
 
-                                if(denom == 0)
-                                    qDebug() << "All life is over!";
+                                //if(denom == 0)
+                                //    qDebug() << "All life is over!";
 
-                                if(numer != 0)
-                                    qDebug() << "Got a fish!";
+                                //if(numer != 0)
+                                //    qDebug() << "Got a fish!";
 
                                 // Sum all the angular fluxes
                                 tempFlux[ix*xjmp + iy*yjmp + iz] = tempFlux[ix*xjmp + iy*yjmp + iz] + quad->wt[iang]*angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz];
@@ -168,7 +168,7 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
             maxDiff = -1E35;
             for(unsigned int i = 0; i < tempFlux.size(); i++)
             {
-                float z = qAbs((tempFlux[i] - preFlux[i])/tempFlux[i]);
+                //float z = qAbs((tempFlux[i] - preFlux[i])/tempFlux[i]);
                 maxDiff = qMax(maxDiff, qAbs((tempFlux[i] - preFlux[i])/tempFlux[i]));
             }
 
