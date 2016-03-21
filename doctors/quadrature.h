@@ -20,7 +20,7 @@ public:
     std::vector<float> zi;
 
     void load(const Config *config);
-    void load(const int sn);
+    void loadSn(const int sn);
 
     int angleCount() const;
 

@@ -46,6 +46,7 @@ public:
     std::vector<float> flatFilterThickness;
 
     // Directional quadrature set
+    std::string quadType;
     int sn;  // N in Sn quadrature order
     int m;  // Total number of directions in all 8 octants
 

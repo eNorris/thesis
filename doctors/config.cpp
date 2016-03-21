@@ -67,7 +67,8 @@ void Config::loadDefaults()
     flatFilterMat = {"cu"};
 
     // Directional quadrature set
-    sn = 2;  // N in Sn quadrature order
+    quadType = "sn";  // Type of quadrature
+    sn = 4;  // N in Sn quadrature order
     m = sn * (sn + 2);  // Total number of directions in all 8 octants
 
     // Cross section data set
@@ -79,7 +80,7 @@ void Config::loadDefaults()
     ihm = 4;  // Cross section table length per energy group (usually ihm = iht+igm)
     ms = 0;   // Cross section mixing table length (ms = 0 no mixing)
     mtm = 6;  // Total number of materials including al Pns (each Pn is considered a nuclide)
-    isct = 1; // Maximum jorder of Legendre (ie scattering) expansion of the cross section (lowest is 0)
+    isct = 1; // Maximum order of Legendre (ie scattering) expansion of the cross section (lowest is 0)
     xsection = {0.0, 0.0,  0.0002, 0.0002,     // Air x-section at 60 keV nearly void P0
                   0.0, 0.0,  0.0000, 0.0002,     // Air x-section P1 expansion
                   0.0, 0.0,  0.2059, 0.1770,     // Water x-section at 60 keV  P0

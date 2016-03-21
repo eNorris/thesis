@@ -1,6 +1,7 @@
 #include "quadrature.h"
 
 #include <QDebug>
+#include <string>
 
 // Static allocators
 const Quadrature Quadrature::ms_sn2(2);
@@ -17,68 +18,34 @@ Quadrature::Quadrature(const Config *config) : m_angles(0)
 
 Quadrature::Quadrature(const int sn)
 {
-    load(sn);
+    loadSn(sn);
 }
 
 void Quadrature::load(const Config *config)
 {
-    int sn = config->sn;
-    load(sn);
-
-    /*
-    if(config.sn == 2)
-    {
-        mu.resize(8);
-        eta.resize(8);
-        zi.resize(8);
-        wt.resize(8);
-
-        mu[0] = -.577350;
-        mu[1] =  .577350;
-        mu[2] = -.577350;
-        mu[3] =  .577350;
-        for(int i = 4; i < 8; i++)
-            mu[i] = mu[i-4];
-
-        for(int i = 0; i < 4; i++)
-            eta[i] = -.577350;
-        for(int i = 4; i < 8; i++)
-            eta[i] = .577350;
-
-        for(int i = 0; i < 2; i++)
-            zi[i] = -sqrt(1 - mu[i]*mu[i] - eta[i]*eta[i]);
-        for(int i = 2; i < 4; i++)
-            zi[i] = -zi[i-2];
-        for(int i = 4; i < 8; i++)
-            zi[i] = zi[i-4];
-
-        for(int i = 0; i < 8; i++)
-            wt[i] = 1.0 / 8.0;
-    }
-    else if(config.sn == 4)
-    {
-        qDebug() << "ERROR: Not implemented quadrature!!";
-    }
-    else if(config.sn == 6)
-    {
-        qDebug() << "ERROR: Not implemented quadrature!!";
-    }
+    //int sn = config->sn;
+    if(config->quadType == "sn")
+        loadSn(config->sn);
     else
-    {
-        qDebug() << "ERROR: Unknown quadrature!!";
-    }
-    */
+        qDebug() << "Unknown quadrature type: " << QString::fromStdString(config->quadType);
 }
 
-void Quadrature::load(const int sn)
+void Quadrature::loadSn(const int sn)
 {
+    m_angles = sn * (sn + 2);
+
+    mu.resize(m_angles);
+    eta.resize(m_angles);
+    zi.resize(m_angles);
+    wt.resize(m_angles);
+
     if(sn == 2)
     {
-        m_angles = 8;
-        mu.resize(m_angles);
-        eta.resize(m_angles);
-        zi.resize(m_angles);
-        wt.resize(m_angles);
+
+        //mu.resize(m_angles);
+        //eta.resize(m_angles);
+        //zi.resize(m_angles);
+        //wt.resize(m_angles);
 
         mu[0] = -.577350;
         mu[1] =  .577350;
@@ -104,7 +71,37 @@ void Quadrature::load(const int sn)
     }
     else if(sn == 4)
     {
-        qDebug() << "ERROR: Not implemented quadrature!!";
+        mu[0] = -0.868890;
+        mu[1] =  -0.350021;
+        mu[2] = -0.350021;
+        mu[3] =  0.350021;
+        mu[4] = .350021;
+        mu[5] = 0.868890;
+        for(int i = 6; i < 12; i++)
+            mu[i] = mu[i-6];
+        for(int i = 12; i < 24; i++)
+            mu[i] = mu[i-12];
+
+        eta[0] = -0.350021;
+        eta[1] = -0.350021;
+        eta[2] = -0.868890;
+        eta[3] = -0.868890;
+        eta[4] = -0.350021;
+        eta[5] = -0.350021;
+        for(int i = 6; i < 12; i++)
+            eta[i] = eta[i-6];
+        for(int i = 12; i < 24; i++)
+            eta[i] = -eta[i-12];
+
+        for(int i = 0; i < 6; i++)
+            zi[i] = -sqrt(1 - mu[i]*mu[i] - eta[i]*eta[i]);
+        for(int i = 6; i < 12; i++)
+            zi[i] = -zi[i-6];
+        for(int i = 12; i < 24; i++)
+            zi[i] = zi[i-12];
+
+        for(int i = 0; i < 8; i++)
+            wt[i] = 1.0 / 8.0;
     }
     else if(sn == 6)
     {
@@ -112,7 +109,7 @@ void Quadrature::load(const int sn)
     }
     else
     {
-        qDebug() << "ERROR: Unknown quadrature!!";
+        qDebug() << "ERROR: Unknown quadrature!! Sn=" << sn;
     }
 }
 
