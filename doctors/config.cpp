@@ -93,15 +93,15 @@ void Config::loadFile(std::string filename)
 
     try{
         std::string name = cfg.lookup("name");
-        qDebug() << "I read the phrase: " << QString::fromStdString(name) << "!";
+        qDebug() << "I read the phrase:" << QString::fromStdString(name).trimmed() << "!";
     } catch(const libconfig::SettingNotFoundException &nfex){
         qDebug() << "No 'name' setting in config file";
         return;
     }
 
-    const libconfig::Setting &root = cfg.getRoot();
+    //const libconfig::Setting &root = cfg.getRoot();
 
-
+    return;
 }
 
 

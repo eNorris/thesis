@@ -49,6 +49,12 @@ FORMS    += mainwindow.ui \
 DISTFILES += \
     testinput.cfg
 
+# Copies testinput.cfg from the source directory to the build directory (where the executable eventually lives) so that it can be found and parsed
+#   properly.
+install_it.path = $$OUT_PWD
+install_it.files = ./testinput.cfg
+INSTALLS += install_it
+
 # This project relies on libconfig++ being installed. To install it, download libconfig-X.X.tar.gz from http://www.hyperrealm.com/libconfig/  unzip.
-# Follow the directions in the INSTALL file. Then run "sudo ldconfig" to update the LD path variables so it can be found.
+#   Follow the directions in the INSTALL file. Then run "sudo ldconfig" to update the LD path variables so it can be found.
 unix|win32: LIBS += -lconfig++
