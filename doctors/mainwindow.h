@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QWaitCondition>
+#include <QMutex>
 
 class OutputDialog;
 class GeomDialog;
@@ -39,12 +41,18 @@ private:
     QuadDialog *quadDialog;
     XSectionDialog *xsDialog;
 
-
+    QWaitCondition m_pendingUserContinue;
+    QMutex m_mutex;
 
     std::vector<float> gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config);
 
+public:
+    QMutex &getBlockingMutex();
+
 protected slots:
     void launchSolver();
+    void userDebugNext();
+    void userDebugAbort();
 
 signals:
     void signalNewIteration(std::vector<float>);

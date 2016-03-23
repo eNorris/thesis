@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <cmath>
 
+#include "mainwindow.h"
 #include "mesh.h"
 
 OutputDialog::OutputDialog(QWidget *parent) :
@@ -38,6 +39,9 @@ OutputDialog::OutputDialog(QWidget *parent) :
 
     connect(ui->debugModeCheckBox, SIGNAL(toggled(bool)), ui->debugNextPushButton, SLOT(setEnabled(bool)));
     connect(ui->debugModeCheckBox, SIGNAL(toggled(bool)), ui->debugAbortPushButton, SLOT(setEnabled(bool)));
+
+    MainWindow *mainWinParent = static_cast<MainWindow*>(parent);
+    connect(ui->debugNextPushButton, SIGNAL(clicked()), mainWinParent, SLOT(userDebugNext()));
 }
 
 OutputDialog::~OutputDialog()

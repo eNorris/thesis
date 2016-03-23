@@ -25,10 +25,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    outputDialog = new OutputDialog();
-    geomDialog = new GeomDialog();
-    quadDialog = new QuadDialog();
-    xsDialog = new XSectionDialog();
+    outputDialog = new OutputDialog(this);
+    geomDialog = new GeomDialog(this);
+    quadDialog = new QuadDialog(this);
+    xsDialog = new XSectionDialog(this);
 
     connect(ui->actionSolution_Explorer, SIGNAL(triggered()), outputDialog, SLOT(show()));
 
@@ -95,4 +95,19 @@ void MainWindow::launchSolver()
 
     std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, m_config);
     outputDialog->updateSolution(solution);
+}
+
+void MainWindow::userDebugNext()
+{
+    m_mutex.unlock();
+}
+
+void MainWindow::userDebugAbort()
+{
+
+}
+
+QMutex &MainWindow::getBlockingMutex()
+{
+    return m_mutex;
 }

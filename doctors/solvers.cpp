@@ -174,6 +174,8 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                 }  // End of octant 1
 
                 emit signalDebugHalt(tempFlux);
+                m_pendingUserContinue.wait(&m_mutex);
+
 
             } // end of all angles
 
