@@ -1,6 +1,6 @@
 #include "colormappable.h"
 
-ColorMappable::ColorMappable() : m_colorId(NONE)
+ColorMappable::ColorMappable() : brushes(), errBrush(Qt::green), m_colorId(NONE)
 {
 
 }

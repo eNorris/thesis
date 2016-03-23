@@ -11,6 +11,7 @@ public:
     ColorMappable();
 
     std::vector<QBrush> brushes;
+    QBrush errBrush;
 
     void loadParulaBrush();
     void loadUniqueBrush();
