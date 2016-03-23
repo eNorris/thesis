@@ -41,12 +41,6 @@ void Quadrature::loadSn(const int sn)
 
     if(sn == 2)
     {
-
-        //mu.resize(m_angles);
-        //eta.resize(m_angles);
-        //zi.resize(m_angles);
-        //wt.resize(m_angles);
-
         mu[0] = -.577350;
         mu[1] =  .577350;
         mu[2] = -.577350;
@@ -105,7 +99,63 @@ void Quadrature::loadSn(const int sn)
     }
     else if(sn == 6)
     {
-        qDebug() << "ERROR: Not implemented quadrature!!";
+        mu[0] = -0.926181;
+        mu[1] = -0.681508;
+        mu[2] = -0.681508;
+        mu[3] = -0.266636;
+        mu[4] = -0.266636;
+        mu[5] = -0.266636;
+        mu[6] =  0.266636;
+        mu[7] =  0.266636;
+        mu[8] =  0.266636;
+        mu[9] = 0.681508;
+        mu[10] = 0.681508;
+        mu[11] = 0.926181;
+        for(int i = 12; i < 24; i++)
+            mu[i] = mu[i-12];
+        for(int i = 24; i < 48; i++)
+            mu[i] = mu[i-24];
+
+        eta[0] = -0.266636;
+        eta[1] = -0.266636;
+        eta[2] = -0.681508;
+        eta[3] = -0.266636;
+        eta[4] = -0.681508;
+        eta[5] = -0.926181;
+        eta[6] = -0.926181;
+        eta[7] = -0.681508;
+        eta[8] = -0.266636;
+        eta[9] = -0.681508;
+        eta[10] = -0.266636;
+        eta[11] = -0.266636;
+        for(int i = 12; i < 24; i++)
+            eta[i] = eta[i-12];
+        for(int i = 24; i < 48; i++)
+            eta[i] = -eta[i-24];
+
+        for(int i = 0; i < 12; i++)
+            zi[i] = -sqrt(1 - mu[i]*mu[i] - eta[i]*eta[i]);
+        for(int i = 12; i < 24; i++)
+            zi[i] = -zi[i-12];
+        for(int i = 24; i < 48; i++)
+            zi[i] = zi[i-24];
+
+        wt[0] = 0.176126;
+        wt[1] = 0.157207;
+        wt[2] = 0.157207;
+        wt[3] = 0.176126;
+        wt[4] = 0.157207;
+        wt[5] = 0.176126;
+        wt[6] = 0.176126;
+        wt[7] = 0.157207;
+        wt[8] = 0.176126;
+        wt[9] = 0.157207;
+        wt[10] = 0.157207;
+        wt[11] = 0.176126;
+        for(int i = 12; i < 24; i++)
+            wt[i] = wt[i-12];
+        for(int i = 24; i < 48; i++)
+            wt[i] = wt[i-24];
     }
     else
     {
