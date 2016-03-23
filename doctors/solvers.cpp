@@ -172,6 +172,9 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                         }
                     }
                 }  // End of octant 1
+
+                emit signalDebugHalt(tempFlux);
+
             } // end of all angles
 
             maxDiff = -1E35;

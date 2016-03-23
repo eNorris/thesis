@@ -25,22 +25,27 @@ public:
 
     void updateMesh(Mesh *mesh);
     void updateSolution(std::vector<float> data);
+    void dispErrMap();
 
 private:
+    bool m_logInterp;
     Ui::OutputDialog *ui;
     QGraphicsScene *scene;
-    QGraphicsRectItem *rect;
+    //QGraphicsRectItem *rect;
 
     std::vector<QGraphicsRectItem*> rects;
 
     std::vector<float> m_data;
     Mesh *m_mesh;
 
+
 protected slots:
     //void disp(std::vector<float>);
     void setSliceLevel(int level);
     void updateMeshSlicePlane();
     void reRender(std::vector<float>);
+    void setLinearInterp();
+    void setLogInterp();
 };
 
 #endif // OUTPUTDIALOG_H

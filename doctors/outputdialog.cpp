@@ -8,6 +8,7 @@
 
 OutputDialog::OutputDialog(QWidget *parent) :
     QDialog(parent),
+    m_logInterp(false),
     ui(new Ui::OutputDialog)
 {
     ui->setupUi(this);
@@ -31,6 +32,12 @@ OutputDialog::OutputDialog(QWidget *parent) :
     connect(ui->xyRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
     connect(ui->xzRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
     connect(ui->yzRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
+
+    connect(ui->linearInterpRadioButton, SIGNAL(clicked()), this, SLOT(setLinearInterp()));
+    connect(ui->logInterpRadioButton, SIGNAL(clicked()), this, SLOT(setLogInterp()));
+
+    connect(ui->debugModeCheckBox, SIGNAL(toggled(bool)), ui->debugNextPushButton, SLOT(setEnabled(bool)));
+    connect(ui->debugModeCheckBox, SIGNAL(toggled(bool)), ui->debugAbortPushButton, SLOT(setEnabled(bool)));
 }
 
 OutputDialog::~OutputDialog()
@@ -67,12 +74,14 @@ void OutputDialog::setSliceLevel(int level)
     if(m_mesh == NULL)
     {
         qDebug() << "ERROR: setSliceLevel on a NULL pointer!";
+        dispErrMap();
         return;
     }
 
     if(m_data.size() == 0)
     {
         qDebug() << "ERROR: Setting level slice with no solution data";
+        dispErrMap();
         return;
     }
 
@@ -80,6 +89,7 @@ void OutputDialog::setSliceLevel(int level)
     {
         qDebug() << "ERROR: There are no rectangles in the drawing pipeline!";
         qDebug() << "Did you call the mesher?";
+        dispErrMap();
         return;
     }
 
@@ -93,6 +103,7 @@ void OutputDialog::setSliceLevel(int level)
         if(level >= m_mesh->zMesh)
         {
             qDebug() << "level is too high! z-slices = " << m_mesh->zMesh;
+            dispErrMap();
             return;
         }
 
@@ -100,14 +111,18 @@ void OutputDialog::setSliceLevel(int level)
             for(int iy = 0; iy < m_mesh->yMesh; iy++)
             {
                 if(m_data[ix*m_mesh->yMesh*m_mesh->zMesh + iy*m_mesh->zMesh + level] < minval)
-                    minval = m_data[ix*m_mesh->yMesh*m_mesh->zMesh + iy*m_mesh->zMesh + level];
+                    if(m_logInterp && m_data[ix*m_mesh->yMesh*m_mesh->zMesh + iy*m_mesh->zMesh + level] <= 0)  // Don't count 0 on log scale
+                        ; // do nothing
+                    else
+                        minval = m_data[ix*m_mesh->yMesh*m_mesh->zMesh + iy*m_mesh->zMesh + level];
                 else if(m_data[ix*m_mesh->yMesh*m_mesh->zMesh + iy*m_mesh->zMesh + level] > maxval)
                     maxval = m_data[ix*m_mesh->yMesh*m_mesh->zMesh + iy*m_mesh->zMesh + level];
             }
 
-        if(maxval == 0)
+        if(maxval <= 1E-35)
         {
             qDebug() << "Zero flux everywhere!";
+            dispErrMap();
             return;
         }
 
@@ -119,7 +134,17 @@ void OutputDialog::setSliceLevel(int level)
         if((maxval - minval) / maxval < 1E-5)
         {
             qDebug() << "Displaying a flat surface!";
+            dispErrMap();
             return;
+        }
+
+        qDebug() << "minval = " << minval << "  maxval = " << maxval;
+
+        if(m_logInterp)
+        {
+            minval = log10(minval);
+            maxval = log10(maxval);
+            qDebug() << "log(minval) = " << minval << "  log(maxval) = " << maxval;
         }
 
         for(int i = 0; i < m_mesh->xMesh; i++)
@@ -127,6 +152,12 @@ void OutputDialog::setSliceLevel(int level)
             {
                 //int zid = m_mesh->zoneId[i*m_mesh->yMesh*m_mesh->zMesh + j*m_mesh->zMesh + level];
                 float flux = m_data[i*m_mesh->yMesh*m_mesh->zMesh + j*m_mesh->zMesh + level];
+
+                if(m_logInterp)
+                    if(flux <= 1E-35)
+                        rects[i*m_mesh->yMesh + j]->setBrush(errBrush);
+                    else
+                        flux = log10(flux);
                 int fid = round(63*(flux-minval) / (maxval-minval));
                 rects[i*m_mesh->yMesh + j]->setBrush(brushes[fid]);
             }
@@ -136,6 +167,7 @@ void OutputDialog::setSliceLevel(int level)
         if(level >= m_mesh->yMesh)
         {
             qDebug() << "level is too high! y-slices = " << m_mesh->yMesh;
+            dispErrMap();
             return;
         }
 
@@ -231,9 +263,23 @@ void OutputDialog::updateMeshSlicePlane()
     setSliceLevel(0);
 }
 
+void OutputDialog::dispErrMap()
+{
+    for(unsigned int i = 0; i < rects.size(); i++)
+        rects[i]->setBrush(errBrush);
+}
 
+void OutputDialog::setLinearInterp()
+{
+    m_logInterp = false;
+    setSliceLevel(ui->sliceVerticalSlider->value());
+}
 
-
+void OutputDialog::setLogInterp()
+{
+    m_logInterp = true;
+    setSliceLevel(ui->sliceVerticalSlider->value());
+}
 
 
 

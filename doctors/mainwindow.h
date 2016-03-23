@@ -48,6 +48,7 @@ protected slots:
 
 signals:
     void signalNewIteration(std::vector<float>);
+    void signalDebugHalt(std::vector<float>);
 };
 
 #endif // MAINWINDOW_H
