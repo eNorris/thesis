@@ -4,6 +4,8 @@
 
 #include <cmath>
 
+// This project relies on libconfig++ being installed. To install it, download libconfig-X.X.tar.gz from http://www.hyperrealm.com/libconfig/  unzip.
+//   Follow the directions in the INSTALL file (./configure, make, make install). Then run "sudo ldconfig" to update the LD path variables so it can be found.
 #include <libconfig.h++>
 
 Config::Config() //: m_flatFilterThickness(NULL), m_flatFilterMat(NULL), m_xsection(NULL)
@@ -53,7 +55,7 @@ void Config::loadDefaults()
 
     // Directional quadrature set
     quadType = "sn";  // Type of quadrature
-    sn = 4;  // N in Sn quadrature order
+    sn = 2;  // N in Sn quadrature order
     m = sn * (sn + 2);  // Total number of directions in all 8 octants
 
     // Cross section data set
