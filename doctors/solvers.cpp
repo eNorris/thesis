@@ -9,6 +9,8 @@
 #include "xsection.h"
 #include "config.h"
 
+#include "outputdialog.h"
+
 std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config)
 {
 
@@ -173,8 +175,11 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                     }
                 }  // End of octant 1
 
-                emit signalDebugHalt(tempFlux);
-                m_pendingUserContinue.wait(&m_mutex);
+                if(outputDialog->debuggingEnabled())
+                {
+                    emit signalDebugHalt(tempFlux);
+                    m_pendingUserContinue.wait(&m_mutex);
+                }
 
 
             } // end of all angles

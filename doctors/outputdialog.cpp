@@ -285,7 +285,10 @@ void OutputDialog::setLogInterp()
     setSliceLevel(ui->sliceVerticalSlider->value());
 }
 
-
+bool OutputDialog::debuggingEnabled()
+{
+    return ui->debugModeCheckBox->isChecked();
+}
 
 
 

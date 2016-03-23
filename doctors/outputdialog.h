@@ -27,6 +27,8 @@ public:
     void updateSolution(std::vector<float> data);
     void dispErrMap();
 
+    bool debuggingEnabled();
+
 private:
     bool m_logInterp;
     Ui::OutputDialog *ui;

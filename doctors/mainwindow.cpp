@@ -91,8 +91,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::launchSolver()
 {
-    //qDebug() << "Solver isn't implemented yet!";
-
     std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, m_config);
     outputDialog->updateSolution(solution);
 }

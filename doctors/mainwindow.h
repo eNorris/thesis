@@ -44,6 +44,7 @@ private:
     QWaitCondition m_pendingUserContinue;
     QMutex m_mutex;
 
+    // Implemented in solvers.cpp instead of mainwindow.cpp
     std::vector<float> gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config);
 
 public:
