@@ -14,9 +14,6 @@ QuadDialog::QuadDialog(QWidget *parent) :
 QuadDialog::~QuadDialog()
 {
     delete ui;
-
-    //if(m_quad != NULL)
-    //    delete m_quad;
 }
 
 void QuadDialog::updateQuad(Quadrature *quad)
