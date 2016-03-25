@@ -46,11 +46,51 @@ extsource((cfg.xmesh-1)/2+1, cfg.col_ylen/2, (cfg.zmesh-1)/2+1, cfg.igm) = 1.0e6
 
 % % Setup vaccum boundary 
 % Initialization, fluxi, fluxj, fluxk are outward flux crossing the cell
-  fluxj=zeros(cfg.xmesh,1);
-  fluxk=zeros(cfg.xmesh,cfg.ymesh);
-  fluxj_pre=zeros(cfg.xmesh,1);
-  fluxk_pre=zeros(cfg.xmesh,cfg.ymesh);
+fluxj=zeros(cfg.xmesh,1);
+fluxk=zeros(cfg.xmesh,cfg.ymesh);
+fluxj_pre=zeros(cfg.xmesh,1);
+fluxk_pre=zeros(cfg.xmesh,cfg.ymesh);
 
+% Plot the quadrature
+figure();
+x = zeros(2, length(wt));
+y = zeros(2, length(wt));
+z = zeros(2, length(wt));
+x(2,:) = emu;
+y(2,:) = eta;
+z(2,:) = xzi;
+plot3(x, y, z, 'r');
+hold on;
+plot3([0; 1], [0; 0], [0; 0], 'k');
+plot3([0; 0], [0; 1], [0; 0], 'k');
+plot3([0; 0], [0; 0], [0; 1], 'k');
+xlabel('x');
+ylabel('y');
+zlabel('z');
+hold off;
+title('Quadrature');
+
+figure();
+l = length(wt)/8;
+x = zeros(2, l);
+y = zeros(2, l);
+z = zeros(2, l);
+ll = (emu>0) & (eta > 0) & (xzi > 0);
+x(2,:) = emu(ll);
+y(2,:) = eta(ll);
+z(2,:) = xzi(ll);
+plot3(x, y, z, 'r');
+hold on;
+plot3([0; 1], [0; 0], [0; 0], 'k');
+plot3([0; 0], [0; 1], [0; 0], 'k');
+plot3([0; 0], [0; 0], [0; 1], 'k');
+xlabel('x');
+ylabel('y');
+zlabel('z');
+hold off;
+title('Quadrature - Octant 1');
+
+tic;  % Start the timer
 % Start the source iteration
 num_iter = 1;
 maxdiff = 1.0;
@@ -59,6 +99,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
     while (num_iter<=cfg.maxit && maxdiff>cfg.epsi) 
         figure;
         imagesc(log10(flux(:,:,15,ieg))); 
+        caxis([-10, 6]);
         title(['Energy Group #',num2str(ieg),' Iteration #',num2str(num_iter)]); 
         grid on; 
         colorbar;
@@ -494,4 +535,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
     
     
 end % End loop of the energy groups
+
+timetorun = toc;
+disp(['Time to run: ', num2str(timetorun)])
 
