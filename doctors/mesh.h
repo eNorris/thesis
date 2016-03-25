@@ -3,11 +3,14 @@
 
 #include <vector>
 
+#include <QObject>
+
 #include "config.h"
 #include "quadrature.h"
 
-class Mesh
+class Mesh : public QObject
 {
+    Q_OBJECT
 public:
     Mesh();
     Mesh(const Config *config, const Quadrature *quad);
@@ -37,6 +40,9 @@ public:
     int voxelCount() const;
     int xjmp() const;
     int yjmp() const;
+
+public slots:
+    void remesh(int xelems, int yelems, int zelems, const Config *config, const Quadrature *quad);
 
 private:
     bool insideBox(int x, int y, int z, int xmin, int xmax, int ymin, int ymax, int zmin, int zmax);

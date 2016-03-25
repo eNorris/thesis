@@ -13,7 +13,7 @@
 #include "xsectiondialog.h"
 
 #include "config.h"
-#include "solvers.h"
+//#include "solvers.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),

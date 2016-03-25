@@ -55,7 +55,6 @@ HEADERS  += mainwindow.h \
     quadrature.h \
     mesh.h \
     xsection.h \
-    solvers.h \
     outputdialog.h \
     geomdialog.h \
     quaddialog.h \
