@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>564</width>
+    <width>459</width>
     <height>380</height>
    </rect>
   </property>
@@ -27,9 +27,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item row="2" column="0">
-    <widget class="QGraphicsView" name="graphicsView"/>
    </item>
    <item row="0" column="0">
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -114,18 +111,18 @@
      </item>
     </layout>
    </item>
-   <item row="2" column="2">
-    <widget class="QOpenGLWidget" name="openGLWidget">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-    </widget>
+   <item row="2" column="0">
+    <widget class="QuadGlWidget" name="openGlWidget"/>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QuadGlWidget</class>
+   <extends>QOpenGLWidget</extends>
+   <header>quadglwidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
