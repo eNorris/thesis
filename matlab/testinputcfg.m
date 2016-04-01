@@ -48,7 +48,7 @@ cfg.flat_filters = {'cu', 0.002};                                  % Material-de
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DIRECTONAL QUNDRATURE SET %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-cfg.sn = 6;                                                      % N in Sn - quadrature order
+cfg.sn = 4;                                                      % N in Sn - quadrature order
 cfg.m = cfg.sn*(cfg.sn+2);                                       % Total number of directions in all 8 octants
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -75,7 +75,7 @@ cfg.xsection = [0.0 0.0  0.0002 0.0002;                             % Air x-sect
 % SOURCE ITERATION DATA SET%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 cfg.epsi = 5.0e-5;                                                   % Convergence criterion on inner iterations (default = 5.e-5)
-cfg.maxit = 20;                                                     % Maximum number of inner iterations (default = 20)
+cfg.maxit = 10;                                                     % Maximum number of inner iterations (default = 20)
 
 
 

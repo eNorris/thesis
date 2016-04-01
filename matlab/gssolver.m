@@ -43,6 +43,7 @@ tempflux = zeros(cfg.xmesh, cfg.ymesh, cfg.zmesh); % temporary flux array
 % Initialize the multigroup source with zeros except the point source 
 extsource = zeros(cfg.xmesh, cfg.ymesh, cfg.zmesh, cfg.igm);
 extsource((cfg.xmesh-1)/2+1, cfg.col_ylen/2, (cfg.zmesh-1)/2+1, cfg.igm) = 1.0e6;   % Fixed one-group point source 
+%extsource((cfg.xmesh-1)/2+1, (cfg.ymesh-1)/2+1, (cfg.zmesh-1)/2+1, cfg.igm) = 1.0e6;   % Fixed one-group point source 
 
 % % Setup vaccum boundary 
 % Initialization, fluxi, fluxj, fluxk are outward flux crossing the cell
@@ -99,7 +100,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
     while (num_iter<=cfg.maxit && maxdiff>cfg.epsi) 
         figure;
         imagesc(log10(flux(:,:,15,ieg))); 
-        caxis([-10, 6]);
+        %caxis([-10, 6]);
         title(['Energy Group #',num2str(ieg),' Iteration #',num2str(num_iter)]); 
         grid on; 
         colorbar;
@@ -108,6 +109,8 @@ for ieg=1:cfg.igm  % Loop over energy groups
         tempflux = zeros(cfg.xmesh,cfg.ymesh, cfg.zmesh); % Clear flux content for new sweep
         for iang=1:cfg.m   % Loop over angles
           disp(['Angle group #', num2str(iang)]);
+          
+          
           if(emu(iang)<0 && eta(iang)<0 && xzi(iang)<0) % Octant #1
               for kk=cfg.zmesh:-1:1       % Sweep through the 3D mesh from corner       
                   for jj=cfg.ymesh:-1:1
@@ -117,7 +120,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxi = 0;    % fluxi is the inward flux in x direction
                               fluxi_pre = 0;
                           else
-                              fluxi = 2*angflux(ii+1,jj,kk,iang,ieg)-fluxi_pre;
+                              fluxi = angflux(ii+1,jj,kk,iang,ieg);  %2*angflux(ii+1,jj,kk,iang,ieg)-fluxi_pre;
                               if fluxi<0   %  Non negtive fix
                                   fluxi = 0.0;
                                   angflux(ii+1,jj,kk,iang,ieg) = 0.5*(fluxi+fluxi_pre);  % Update the angular flux
@@ -128,7 +131,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxj(ii) = 0;    % fluxj is the inward flux in y direction
                               fluxj_pre(ii) = 0;
                           else
-                              fluxj(ii) = 2*angflux(ii,jj+1,kk,iang,ieg)-fluxj_pre(ii);
+                              fluxj(ii) = angflux(ii,jj+1,kk,iang,ieg);  %2*angflux(ii,jj+1,kk,iang,ieg)-fluxj_pre(ii);
                               if fluxj(ii)<0
                                   fluxj(ii) = 0.0;
                                   angflux(ii,jj+1,kk,iang,ieg) = 0.5*(fluxj(ii)+fluxj_pre(ii));
@@ -139,7 +142,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxk(ii,jj) = 0;    % fluxk is the inward flux in z direction
                               fluxk_pre(ii,jj) =0;
                           else
-                              fluxk(ii,jj) = 2*angflux(ii,jj,kk+1,iang,ieg)-fluxk_pre(ii,jj);
+                              fluxk(ii,jj) = angflux(ii,jj,kk+1,iang,ieg);  %2*angflux(ii,jj,kk+1,iang,ieg)-fluxk_pre(ii,jj);
                               if fluxk(ii,jj)<0
                                   fluxk(ii,jj) = 0.0;
                                   angflux(ii,jj,kk+1,iang,ieg) = 0.5*(fluxk(ii,jj)+fluxk_pre(ii,jj));
@@ -165,7 +168,6 @@ for ieg=1:cfg.igm  % Loop over energy groups
                   end
               end
           end % End of octant #1
-          
              
           if(emu(iang)>0 && eta(iang)<0 && xzi(iang)<0) % Octant #2
               for kk=cfg.zmesh:-1:1       % Sweep through the 3D mesh from corner       
@@ -176,7 +178,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxi = 0;
                               fluxi_pre =0;
                           else
-                              fluxi = 2*angflux(ii-1,jj,kk,iang,ieg)-fluxi_pre;
+                              fluxi = angflux(ii-1,jj,kk,iang,ieg);  %2*angflux(ii-1,jj,kk,iang,ieg)-fluxi_pre;
                               if fluxi<0   %  Non negtive fix
                                   fluxi = 0.0;
                                   angflux(ii-1,jj,kk,iang,ieg) = 0.5*(fluxi+fluxi_pre);  % Update the angular flux
@@ -187,7 +189,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxj(ii) = 0;
                               fluxj_pre(ii) = 0;
                           else
-                              fluxj(ii) = 2*angflux(ii,jj+1,kk,iang,ieg)-fluxj_pre(ii);
+                              fluxj(ii) = angflux(ii,jj+1,kk,iang,ieg);  %2*angflux(ii,jj+1,kk,iang,ieg)-fluxj_pre(ii);
                               if fluxj(ii)<0
                                   fluxj(ii) = 0.0;
                                   angflux(ii,jj+1,kk,iang,ieg) = 0.5*(fluxj(ii)+fluxj_pre(ii));
@@ -198,7 +200,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxk(ii,jj) = 0;
                               fluxk_pre(ii,jj) =0;
                           else
-                              fluxk(ii,jj) = 2*angflux(ii,jj,kk+1,iang,ieg)-fluxk_pre(ii,jj);
+                              fluxk(ii,jj) = angflux(ii,jj,kk+1,iang,ieg);  %2*angflux(ii,jj,kk+1,iang,ieg)-fluxk_pre(ii,jj);
                               if fluxk(ii,jj)<0
                                   fluxk(ii,jj) = 0.0;
                                   angflux(ii,jj,kk+1,iang,ieg) = 0.5*(fluxk(ii,jj)+fluxk_pre(ii,jj));
@@ -225,7 +227,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxi = 0;
                               fluxi_pre =0;
                           else
-                              fluxi = 2*angflux(ii+1,jj,kk,iang,ieg)-fluxi_pre;
+                              fluxi = angflux(ii+1,jj,kk,iang,ieg);  %2*angflux(ii+1,jj,kk,iang,ieg)-fluxi_pre;
                               if fluxi<0   %  Non negtive fix
                                   fluxi = 0.0;
                                   angflux(ii+1,jj,kk,iang,ieg) = 0.5*(fluxi+fluxi_pre);  % Update the angular flux
@@ -236,7 +238,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxj(ii) = 0;
                               fluxj_pre(ii) =0;
                           else
-                              fluxj(ii) = 2*angflux(ii,jj-1,kk,iang,ieg)-fluxj_pre(ii);
+                              fluxj(ii) = angflux(ii,jj-1,kk,iang,ieg);  %2*angflux(ii,jj-1,kk,iang,ieg)-fluxj_pre(ii);
                               if fluxj(ii)<0
                                   fluxj(ii) = 0.0;
                                   angflux(ii,jj-1,kk,iang,ieg) = 0.5*(fluxj(ii)+fluxj_pre(ii));
@@ -247,7 +249,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxk(ii,jj) = 0;
                               fluxk_pre(ii,jj) = 0;
                           else
-                              fluxk(ii,jj) = 2*angflux(ii,jj,kk+1,iang,ieg)-fluxk_pre(ii,jj);
+                              fluxk(ii,jj) = angflux(ii,jj,kk+1,iang,ieg);  %2*angflux(ii,jj,kk+1,iang,ieg)-fluxk_pre(ii,jj);
                               if fluxk(ii,jj)<0
                                   fluxk(ii,jj) = 0.0;
                                   angflux(ii,jj,kk+1,iang,ieg) = 0.5*(fluxk(ii,jj)+fluxk_pre(ii,jj));
@@ -275,7 +277,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxi = 0;
                               fluxi_pre =0;
                           else
-                              fluxi = 2*angflux(ii-1,jj,kk,iang,ieg)-fluxi_pre;
+                              fluxi = angflux(ii-1,jj,kk,iang,ieg);  %2*angflux(ii-1,jj,kk,iang,ieg)-fluxi_pre;
                               if fluxi<0   %  Non negtive fix
                                   fluxi = 0.0;
                                   angflux(ii-1,jj,kk,iang,ieg) = 0.5*(fluxi+fluxi_pre);  % Update the angular flux
@@ -286,7 +288,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxj(ii) = 0;
                               fluxj_pre(ii) = 0;
                           else
-                              fluxj(ii) = 2*angflux(ii,jj-1,kk,iang,ieg)-fluxj_pre(ii);
+                              fluxj(ii) = angflux(ii,jj-1,kk,iang,ieg);  %2*angflux(ii,jj-1,kk,iang,ieg)-fluxj_pre(ii);
                               if fluxj(ii)<0
                                   fluxj(ii) = 0.0;
                                   angflux(ii,jj-1,kk,iang,ieg) = 0.5*(fluxj(ii)+fluxj_pre(ii));
@@ -297,7 +299,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxk(ii,jj) = 0;
                               fluxk_pre(ii,jj) =0;
                           else
-                              fluxk(ii,jj) = 2*angflux(ii,jj,kk+1,iang,ieg)-fluxk_pre(ii,jj);
+                              fluxk(ii,jj) = angflux(ii,jj,kk+1,iang,ieg);  %2*angflux(ii,jj,kk+1,iang,ieg)-fluxk_pre(ii,jj);
                               if fluxk(ii,jj)<0
                                   fluxk(ii,jj) = 0.0;
                                   angflux(ii,jj,kk+1,iang,ieg) = 0.5*(fluxk(ii,jj)+fluxk_pre(ii,jj));
@@ -324,7 +326,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxi = 0;
                               fluxi_pre =0;
                           else
-                              fluxi = 2*angflux(ii+1,jj,kk,iang,ieg)-fluxi_pre;
+                              fluxi = angflux(ii+1,jj,kk,iang,ieg);  %2*angflux(ii+1,jj,kk,iang,ieg)-fluxi_pre;
                               if fluxi<0   %  Non negtive fix
                                   fluxi = 0.0;
                                   angflux(ii+1,jj,kk,iang,ieg) = 0.5*(fluxi+fluxi_pre);  % Update the angular flux
@@ -335,7 +337,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxj(ii) = 0;
                               fluxj_pre(ii) = 0;
                           else
-                              fluxj(ii) = 2*angflux(ii,jj+1,kk,iang,ieg)-fluxj_pre(ii);
+                              fluxj(ii) = angflux(ii,jj+1,kk,iang,ieg);  %2*angflux(ii,jj+1,kk,iang,ieg)-fluxj_pre(ii);
                               if fluxj(ii)<0
                                   fluxj(ii) = 0.0;
                                   angflux(ii,jj+1,kk,iang,ieg) = 0.5*(fluxj(ii)+fluxj_pre(ii));
@@ -346,7 +348,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxk(ii,jj) = 0;
                               fluxk_pre(ii,jj) = 0;
                           else
-                              fluxk(ii,jj) = 2*angflux(ii,jj,kk-1,iang,ieg)-fluxk_pre(ii,jj);
+                              fluxk(ii,jj) = angflux(ii,jj,kk-1,iang,ieg);  %2*angflux(ii,jj,kk-1,iang,ieg)-fluxk_pre(ii,jj);
                               if fluxk(ii,jj)<0
                                   fluxk(ii,jj) = 0.0;
                                   angflux(ii,jj,kk-1,iang,ieg) = 0.5*(fluxk(ii,jj)+fluxk_pre(ii,jj));
@@ -373,7 +375,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxi = 0;
                               fluxi_pre =0;
                           else
-                              fluxi = 2*angflux(ii-1,jj,kk,iang,ieg)-fluxi_pre;
+                              fluxi = angflux(ii-1,jj,kk,iang,ieg);  %2*angflux(ii-1,jj,kk,iang,ieg)-fluxi_pre;
                               if fluxi<0   %  Non negtive fix
                                   fluxi = 0.0;
                                   angflux(ii-1,jj,kk,iang,ieg) = 0.5*(fluxi+fluxi_pre);  % Update the angular flux
@@ -384,7 +386,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxj(ii) = 0;
                               fluxj_pre(ii) = 0;
                           else
-                              fluxj(ii) = 2*angflux(ii,jj+1,kk,iang,ieg)-fluxj_pre(ii);
+                              fluxj(ii) = angflux(ii,jj+1,kk,iang,ieg);  %2*angflux(ii,jj+1,kk,iang,ieg)-fluxj_pre(ii);
                               if fluxj(ii)<0
                                   fluxj(ii) = 0.0;
                                   angflux(ii,jj+1,kk,iang,ieg) = 0.5*(fluxj(ii)+fluxj_pre(ii));
@@ -395,7 +397,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxk(ii,jj) = 0;
                               fluxk_pre(ii,jj) =0;
                           else
-                              fluxk(ii,jj) = 2*angflux(ii,jj,kk-1,iang,ieg)-fluxk_pre(ii,jj);
+                              fluxk(ii,jj) = angflux(ii,jj,kk-1,iang,ieg);  %2*angflux(ii,jj,kk-1,iang,ieg)-fluxk_pre(ii,jj);
                               if fluxk(ii,jj)<0
                                   fluxk(ii,jj) = 0.0;
                                   angflux(ii,jj,kk-1,iang,ieg) = 0.5*(fluxk(ii,jj)+fluxk_pre(ii,jj));
@@ -422,7 +424,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxi = 0;
                               fluxi_pre =0;
                           else
-                              fluxi = 2*angflux(ii+1,jj,kk,iang,ieg)-fluxi_pre;
+                              fluxi = angflux(ii+1,jj,kk,iang,ieg);  %2*angflux(ii+1,jj,kk,iang,ieg)-fluxi_pre;
                               if fluxi<0   %  Non negtive fix
                                   fluxi = 0.0;
                                   angflux(ii+1,jj,kk,iang,ieg) = 0.5*(fluxi+fluxi_pre);  % Update the angular flux
@@ -433,7 +435,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxj(ii) = 0;
                               fluxj_pre(ii) = 0;
                           else
-                              fluxj(ii) = 2*angflux(ii,jj-1,kk,iang,ieg)-fluxj_pre(ii);
+                              fluxj(ii) = angflux(ii,jj-1,kk,iang,ieg);  %2*angflux(ii,jj-1,kk,iang,ieg)-fluxj_pre(ii);
                               if fluxj(ii)<0
                                   fluxj(ii) = 0.0;
                                   angflux(ii,jj-1,kk,iang,ieg) = 0.5*(fluxj(ii)+fluxj_pre(ii));
@@ -444,7 +446,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxk(ii,jj) = 0;
                               fluxk_pre(ii,jj) = 0;
                           else
-                              fluxk(ii,jj) = 2*angflux(ii,jj,kk-1,iang,ieg)-fluxk_pre(ii,jj);
+                              fluxk(ii,jj) = angflux(ii,jj,kk-1,iang,ieg);  %2*angflux(ii,jj,kk-1,iang,ieg)-fluxk_pre(ii,jj);
                               if fluxk(ii,jj)<0
                                   fluxk(ii,jj) = 0.0;
                                   angflux(ii,jj,kk-1,iang,ieg) = 0.5*(fluxk(ii,jj)+fluxk_pre(ii,jj));
@@ -471,7 +473,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxi = 0;
                               fluxi_pre =0;
                           else
-                              fluxi = 2*angflux(ii-1,jj,kk,iang,ieg)-fluxi_pre;
+                              fluxi = angflux(ii-1,jj,kk,iang,ieg);  %2*angflux(ii-1,jj,kk,iang,ieg)-fluxi_pre;
                               if fluxi<0   %  Non negtive fix
                                   fluxi = 0.0;
                                   angflux(ii-1,jj,kk,iang,ieg) = 0.5*(fluxi+fluxi_pre);  % Update the angular flux
@@ -482,7 +484,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxj(ii) = 0;
                               fluxj_pre(ii) = 0;
                           else
-                              fluxj(ii) = 2*angflux(ii,jj-1,kk,iang,ieg)-fluxj_pre(ii);
+                              fluxj(ii) = angflux(ii,jj-1,kk,iang,ieg);  %2*angflux(ii,jj-1,kk,iang,ieg)-fluxj_pre(ii);
                               if fluxj(ii)<0
                                   fluxj(ii) = 0.0;
                                   angflux(ii,jj-1,kk,iang,ieg) = 0.5*(fluxj(ii)+fluxj_pre(ii));
@@ -493,7 +495,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                               fluxk(ii,jj) = 0;
                               fluxk_pre(ii,jj) = 0;
                           else
-                              fluxk(ii,jj) = 2*angflux(ii,jj,kk-1,iang,ieg)-fluxk_pre(ii,jj);
+                              fluxk(ii,jj) = angflux(ii,jj,kk-1,iang,ieg);  %2*angflux(ii,jj,kk-1,iang,ieg)-fluxk_pre(ii,jj);
                               if fluxk(ii,jj)<0
                                   fluxk(ii,jj) = 0.0;
                                   angflux(ii,jj,kk-1,iang,ieg) = 0.5*(fluxk(ii,jj)+fluxk_pre(ii,jj));
@@ -510,6 +512,7 @@ for ieg=1:cfg.igm  % Loop over energy groups
                   end
               end
           end % End of octant #8  
+          %}
           
         end % End of angle
         

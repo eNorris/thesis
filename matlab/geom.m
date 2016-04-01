@@ -25,9 +25,12 @@ for mm = 1:cfg.m               % Loop over angle
                 xx(ii) = x_index(ii+1)-x_index(ii);
                 yy(jj) = y_index(jj+1)-y_index(jj);
                 zz(kk) = z_index(kk+1)-z_index(kk);
-                DA(jj,kk,mm) = vu*yy(jj)*zz(kk);
-                DB(ii,kk,mm) = ve*xx(ii)*zz(kk);
-                DC(ii,jj,mm) = vz*xx(ii)*yy(jj);
+                DA(jj,kk,mm) = vu*yy(jj)*zz(kk);  %vu*yy(jj)*zz(kk);
+                DB(ii,kk,mm) = vz*xx(ii)*zz(kk);  %ve*xx(ii)*zz(kk);
+                DC(ii,jj,mm) = ve*xx(ii)*yy(jj);  %vz*xx(ii)*yy(jj);
+                %DA(jj,kk,mm) = vu*yy(jj)*zz(kk);
+                %DB(ii,kk,mm) = ve*xx(ii)*zz(kk);
+                %DC(ii,jj,mm) = vz*xx(ii)*yy(jj);
                 vol(ii,jj,kk) = xx(ii)*yy(jj)*zz(kk);
             end
         end
