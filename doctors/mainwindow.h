@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QWaitCondition>
 #include <QMutex>
+#include <QFileDialog>
 
 class OutputDialog;
 class GeomDialog;
@@ -41,6 +42,8 @@ private:
     QuadDialog *quadDialog;
     XSectionDialog *xsDialog;
 
+    QFileDialog *m_configSelectDialog;
+
     QWaitCondition m_pendingUserContinue;
     QMutex m_mutex;
 
@@ -54,6 +57,7 @@ protected slots:
     void launchSolver();
     void userDebugNext();
     void userDebugAbort();
+    void slotLoadConfigClicked();
 
 signals:
     void signalNewIteration(std::vector<float>);

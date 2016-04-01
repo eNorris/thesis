@@ -31,6 +31,10 @@ public:
     std::vector<float> DB;  // Area of the xz plane a ray sees
     std::vector<float> DC;  // Area of the xy plane a ray sees
 
+    std::vector<float> Axy;  // Replaces DA (Alreadys has the x2 factored in
+    std::vector<float> Ayz;  // Replaces DB
+    std::vector<float> Axz;  // Replaces DC
+
     std::vector<float> vol;
 
     std::vector<unsigned short> zoneId;

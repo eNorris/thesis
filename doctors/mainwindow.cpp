@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 
 #include <QDebug>
+#include <QFileDialog>
+#include <QDir>
 
 #include "quadrature.h"
 #include "mesh.h"
@@ -21,7 +23,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_config(NULL),
     m_mesh(NULL),
     m_xs(NULL),
-    m_quad(NULL)
+    m_quad(NULL),
+    m_configSelectDialog(NULL)
 {
     ui->setupUi(this);
 
@@ -29,6 +32,10 @@ MainWindow::MainWindow(QWidget *parent) :
     geomDialog = new GeomDialog(this);
     quadDialog = new QuadDialog(this);
     xsDialog = new XSectionDialog(this);
+
+    m_configSelectDialog = new QFileDialog(this);
+    m_configSelectDialog->setAcceptMode(QFileDialog::AcceptOpen);
+    m_configSelectDialog->setFileMode(QFileDialog::ExistingFile);
 
     connect(ui->actionSolution_Explorer, SIGNAL(triggered()), outputDialog, SLOT(show()));
 
@@ -40,6 +47,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->launchSolverPushButton, SIGNAL(clicked()), this, SLOT(launchSolver()));
 
+    connect(ui->loadInputPushButton, SIGNAL(clicked()), this, SLOT(slotLoadConfigClicked()));
+
     //connect(this, SIGNAL(signalNewIteration(std::vector<float>)), outputDialog, SLOT(disp(std::vector<float>)));
     // TODO - Update like above at some point
     connect(this, SIGNAL(signalNewIteration(std::vector<float>)), outputDialog, SLOT(reRender(std::vector<float>)));
@@ -49,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Make a configuration object and load its defaults
     //config = new Config;
     m_config = new Config;
-    m_config->loadFile("testinput.cfg");
+    //m_config->loadFile("testinput.cfg");
     m_config->loadDefaults();
 
     qDebug() << "Loaded default configuration";
@@ -108,4 +117,13 @@ void MainWindow::userDebugAbort()
 QMutex &MainWindow::getBlockingMutex()
 {
     return m_mutex;
+}
+
+void MainWindow::slotLoadConfigClicked()
+{
+    //QString filename = QFileDialog::getOpenFileName(this, "Open Config File", QDir::homePath(), "Config Files(*.cfg);;All Files (*)");
+    QString filename = QFileDialog::getOpenFileName(this, "Open Config File", "/media/data/thesis/doctors/", "Config Files(*.cfg);;All Files (*)");
+
+    if(!filename.isEmpty())
+        m_config->loadFile(filename.toStdString());
 }
