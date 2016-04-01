@@ -163,6 +163,14 @@ void OutputDialog::setSliceLevel(int level)
                     else
                         flux = log10(flux);
                 int fid = round(63*(flux-minval) / (maxval-minval));
+
+                // TODO - Not sure how this can happen, but it seems to....
+                if(fid > 63)
+                {
+                    qDebug() << "WARNING: fid > 63!";
+                    qDebug() << "flux = " << flux << "  maxval = " << maxval;
+                    fid = 63;
+                }
                 rects[i*m_mesh->yMesh + j]->setBrush(brushes[fid]);
             }
     }
