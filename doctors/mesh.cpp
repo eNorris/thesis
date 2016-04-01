@@ -226,6 +226,10 @@ void Mesh::remesh(int xelems, int yelems, int zelems, const Config *config, cons
     DB.resize(quad->angleCount() * xMesh * zMesh);
     DC.resize(quad->angleCount() * xMesh * yMesh);
 
+    Axy.resize(quad->angleCount() * xMesh * yMesh);
+    Ayz.resize(quad->angleCount() * yMesh * zMesh);
+    Axz.resize(quad->angleCount() * xMesh * zMesh);
+
     vol.resize(xMesh * yMesh * zMesh);
 
     // The coordinates between mesh elements
@@ -262,15 +266,24 @@ void Mesh::remesh(int xelems, int yelems, int zelems, const Config *config, cons
 
         for(int yIndx = 0; yIndx < yMesh; yIndx++)
             for(int zIndx = 0; zIndx < zMesh; zIndx++)
+            {
                 DA[eIndx * yMesh*zMesh + yIndx * zMesh + zIndx] = vMu * dy[yIndx] * dz[zIndx];
+                Ayz[eIndx * yMesh*zMesh + yIndx * zMesh + zIndx] = 2 * vMu * dy[yIndx] * dz[zIndx];
+            }
 
         for(int xIndx = 0; xIndx < xMesh; xIndx++)
             for(int zIndx = 0; zIndx < zMesh; zIndx++)
+            {
                 DB[eIndx * xMesh*zMesh + xIndx * zMesh + zIndx] = vEta * dx[xIndx] * dz[zIndx];
+                Axz[eIndx * xMesh*zMesh + xIndx * zMesh + zIndx] = 2 * vZi * dx[xIndx] * dz[zIndx];
+            }
 
         for(int xIndx = 0; xIndx < xMesh; xIndx++)
             for(int yIndx = 0; yIndx < yMesh; yIndx++)
+            {
                 DC[eIndx * xMesh*yMesh + xIndx * yMesh + yIndx] = vZi * dx[xIndx] * dy[yIndx];
+                Axy[eIndx * xMesh*yMesh + xIndx * yMesh + yIndx] = 2 * vEta * dx[xIndx] * dy[yIndx];
+            }
     }
 
     // 0 = air, 1 = water, 2 = lead/tungsten
