@@ -48,7 +48,7 @@ cfg.flat_filters = {'cu', 0.002};                                  % Material-de
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DIRECTONAL QUNDRATURE SET %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-cfg.sn = 4;                                                      % N in Sn - quadrature order
+cfg.sn = 6;                                                      % N in Sn - quadrature order
 cfg.m = cfg.sn*(cfg.sn+2);                                       % Total number of directions in all 8 octants
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -3,6 +3,8 @@
 
 #include <QDebug>
 #include <cmath>
+#include <QString>
+#include <QStringListModel>
 
 #include "mainwindow.h"
 #include "mesh.h"
@@ -10,9 +12,13 @@
 OutputDialog::OutputDialog(QWidget *parent) :
     QDialog(parent),
     m_logInterp(false),
-    ui(new Ui::OutputDialog)
+    ui(new Ui::OutputDialog),
+    m_listModel(NULL)
 {
     ui->setupUi(this);
+
+    m_listModel = new QStringListModel(this);
+    ui->listView->setModel(m_listModel);
 
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
@@ -47,6 +53,8 @@ OutputDialog::OutputDialog(QWidget *parent) :
 OutputDialog::~OutputDialog()
 {
     delete ui;
+    if(m_listModel != NULL)
+        delete m_listModel;
 }
 
 void OutputDialog::updateMesh(Mesh *mesh)
@@ -114,13 +122,14 @@ void OutputDialog::setSliceLevel(int level)
         for(int ix = 0; ix < m_mesh->xMesh; ix++)
             for(int iy = 0; iy < m_mesh->yMesh; iy++)
             {
-                if(m_data[ix*m_mesh->yMesh*m_mesh->zMesh + iy*m_mesh->zMesh + level] < minval)
-                    if(m_logInterp && m_data[ix*m_mesh->yMesh*m_mesh->zMesh + iy*m_mesh->zMesh + level] <= 0)  // Don't count 0 on log scale
-                        ; // do nothing
-                    else
-                        minval = m_data[ix*m_mesh->yMesh*m_mesh->zMesh + iy*m_mesh->zMesh + level];
-                else if(m_data[ix*m_mesh->yMesh*m_mesh->zMesh + iy*m_mesh->zMesh + level] > maxval)
-                    maxval = m_data[ix*m_mesh->yMesh*m_mesh->zMesh + iy*m_mesh->zMesh + level];
+                float val = m_data[ix*m_mesh->yMesh*m_mesh->zMesh + iy*m_mesh->zMesh + level];
+                if(val < minval)
+                {
+                    if(!m_logInterp || val > 0)  // Don't count 0 on log scale
+                        minval = val;
+                }
+                if(val > maxval)
+                    maxval = val;
             }
 
         if(maxval <= 1E-35)
@@ -151,7 +160,11 @@ void OutputDialog::setSliceLevel(int level)
             qDebug() << "log(minval) = " << minval << "  log(maxval) = " << maxval;
         }
 
+        QStringList list;
+        QString datastring = "";
+        QString fidstring = "";
         for(int i = 0; i < m_mesh->xMesh; i++)
+        {
             for(int j = 0; j < m_mesh->yMesh; j++)
             {
                 //int zid = m_mesh->zoneId[i*m_mesh->yMesh*m_mesh->zMesh + j*m_mesh->zMesh + level];
@@ -172,7 +185,18 @@ void OutputDialog::setSliceLevel(int level)
                     fid = 63;
                 }
                 rects[i*m_mesh->yMesh + j]->setBrush(brushes[fid]);
+                datastring += "   " + QString::number(flux);
+                fidstring += "   " + QString::number(fid);
             }
+            datastring += "\n";
+            fidstring += "\n";
+            //list << datastring;
+        }
+        list << datastring;
+        list << fidstring;
+        //qDebug() << datastring;
+        //ui->listView->set
+        m_listModel->setStringList(list);
     }
     else if(ui->xzRadioButton->isChecked())
     {

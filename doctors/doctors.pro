@@ -48,7 +48,8 @@ SOURCES += main.cpp\
     xsectiondialog.cpp \
     colormappable.cpp \
     zoomablepannablegraphicsview.cpp \
-    quadglwidget.cpp
+    quadglwidget.cpp \
+    outwriter.cpp
 
 HEADERS  += mainwindow.h \
     config.h \
@@ -61,7 +62,8 @@ HEADERS  += mainwindow.h \
     xsectiondialog.h \
     colormappable.h \
     zoomablepannablegraphicsview.h \
-    quadglwidget.h
+    quadglwidget.h \
+    outwriter.h
 
 FORMS    += mainwindow.ui \
     outputdialog.ui \

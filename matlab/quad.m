@@ -131,3 +131,4 @@ if(cfg.sn==6)                %N=6 total 48 directions in 8 octants
     wt(13:24) = wt(1:12);
     wt(25:48) = wt(1:24);
 end
+

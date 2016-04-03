@@ -55,7 +55,7 @@ void Config::loadDefaults()
 
     // Directional quadrature set
     quadType = "sn";  // Type of quadrature
-    sn = 2;  // N in Sn quadrature order
+    sn = 4;  // N in Sn quadrature order
     m = sn * (sn + 2);  // Total number of directions in all 8 octants
 
     // Cross section data set
