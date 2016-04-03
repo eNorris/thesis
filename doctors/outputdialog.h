@@ -11,6 +11,8 @@
 
 class Mesh;
 
+class QStringListModel;
+
 namespace Ui {
 class OutputDialog;
 }
@@ -34,6 +36,7 @@ private:
     Ui::OutputDialog *ui;
     QGraphicsScene *scene;
     //QGraphicsRectItem *rect;
+    QStringListModel *m_listModel;
 
     std::vector<QGraphicsRectItem*> rects;
 
