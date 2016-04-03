@@ -94,8 +94,8 @@ void Quadrature::loadSn(const int sn)
         for(int i = 12; i < 24; i++)
             zi[i] = zi[i-12];
 
-        for(int i = 0; i < 8; i++)
-            wt[i] = 1.0 / 8.0;
+        for(int i = 0; i < 24; i++)
+            wt[i] = 1.0 / 24.0;
     }
     else if(sn == 6)
     {
