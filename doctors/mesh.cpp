@@ -16,8 +16,8 @@ Mesh::Mesh(const Config *config, const Quadrature *quad)
 
 void Mesh::load(const Config *config, const Quadrature *quad)
 {
-    //remesh(89, 99, -1, config, quad);
-    remesh(11, 11, -1, config, quad);
+    remesh(89, 99, -1, config, quad);
+    //remesh(11, 11, -1, config, quad);
 }
 
 bool Mesh::insideBox(int x, int y, int z, int xmin, int xmax, int ymin, int ymax, int zmin, int zmax)
@@ -221,15 +221,15 @@ void Mesh::remesh(int xelems, int yelems, int zelems, const Config *config, cons
     qDebug() << "z in " << zFrontIndx <<", " << zBackIndx << "  and out " << zFrontGapIndx << ", " << zBackGapIndx;
 
 
-    //for(int i = 0; i < xMesh; i++)
-    //    for(int j = 0; j < yMesh; j++)
-    //        for(int k = 0; k < zMesh; k++)
-    //            if(insideBox(i,j,k, xLeftIndx, xRightIndx, yTopIndx, yBottomIndx, zFrontIndx, zBackIndx) &&
-    //                    !insideBox(i,j,k, xLeftGapIndx, xRightGapIndx, yTopGapIndx, 1000000, zFrontGapIndx, zBackGapIndx))
-    //            {
+    for(int i = 0; i < xMesh; i++)
+        for(int j = 0; j < yMesh; j++)
+            for(int k = 0; k < zMesh; k++)
+                if(insideBox(i,j,k, xLeftIndx, xRightIndx, yTopIndx, yBottomIndx, zFrontIndx, zBackIndx) &&
+                        !insideBox(i,j,k, xLeftGapIndx, xRightGapIndx, yTopGapIndx, 1000000, zFrontGapIndx, zBackGapIndx))
+                {
                     //qDebug() << "Setting to zone 2";
-    //                zoneId[i*yMesh*zMesh + j*zMesh + k] = 2;
-    //            }
+                    zoneId[i*yMesh*zMesh + j*zMesh + k] = 2;
+                }
                 // Not sure if these should be < or <=
                 //if(xLeftIndx <= i && i <= xRightIndx &&  // If inside collimator
                 //   yTopIndx <= j && j <= yBottomIndx &&

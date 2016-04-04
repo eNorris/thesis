@@ -245,7 +245,9 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
     isocaSource.resize(mesh->voxelCount());
 
     extSource.resize(mesh->voxelCount(), 0.0f);
-    extSource[((mesh->xMesh - 1)/2)*xjmp + ((mesh->yMesh-1)/2)*yjmp + ((mesh->zMesh-1)/2)] = 1E6;
+
+    //extSource[((mesh->xMesh - 1)/2)*xjmp + ((mesh->yMesh-1)/2)*yjmp + ((mesh->zMesh-1)/2)] = 1E6;
+    extSource[((mesh->xMesh - 1)/2)*xjmp + (config->colYLen/2)*yjmp + ((mesh->zMesh-1)/2)] = 1E6;
 
     qDebug() << "Solving " << mesh->voxelCount() * quad->angleCount() * xs->groupCount() << " elements in phase space";
 

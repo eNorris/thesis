@@ -167,7 +167,6 @@ void OutputDialog::setSliceLevel(int level)
         {
             for(int j = 0; j < m_mesh->yMesh; j++)
             {
-                //int zid = m_mesh->zoneId[i*m_mesh->yMesh*m_mesh->zMesh + j*m_mesh->zMesh + level];
                 float flux = m_data[i*m_mesh->yMesh*m_mesh->zMesh + j*m_mesh->zMesh + level];
 
                 if(m_logInterp)
@@ -190,13 +189,12 @@ void OutputDialog::setSliceLevel(int level)
             }
             datastring += "\n";
             fidstring += "\n";
-            //list << datastring;
         }
         list << datastring;
         list << fidstring;
-        //qDebug() << datastring;
-        //ui->listView->set
-        m_listModel->setStringList(list);
+
+        // Makes the OutputDialog update the listview
+        //m_listModel->setStringList(list);
     }
     else if(ui->xzRadioButton->isChecked())
     {
