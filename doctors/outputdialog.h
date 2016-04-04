@@ -43,6 +43,9 @@ private:
     std::vector<float> m_data;
     Mesh *m_mesh;
 
+    float m_minvalGlobal, m_maxvalGlobal;
+    float m_minvalGlobalLog, m_maxvalGlobalLog;
+
 
 protected slots:
     //void disp(std::vector<float>);
@@ -51,6 +54,7 @@ protected slots:
     void reRender(std::vector<float>);
     void setLinearInterp();
     void setLogInterp();
+    void refresh();
 };
 
 #endif // OUTPUTDIALOG_H

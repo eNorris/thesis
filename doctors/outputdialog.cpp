@@ -13,7 +13,9 @@ OutputDialog::OutputDialog(QWidget *parent) :
     QDialog(parent),
     m_logInterp(false),
     ui(new Ui::OutputDialog),
-    m_listModel(NULL)
+    m_listModel(NULL),
+    m_minvalGlobal(1E35),
+    m_maxvalGlobal(-1E35)
 {
     ui->setupUi(this);
 
@@ -42,6 +44,7 @@ OutputDialog::OutputDialog(QWidget *parent) :
 
     connect(ui->linearInterpRadioButton, SIGNAL(clicked()), this, SLOT(setLinearInterp()));
     connect(ui->logInterpRadioButton, SIGNAL(clicked()), this, SLOT(setLogInterp()));
+    connect(ui->levelScaleCheckBox, SIGNAL(clicked()), this, SLOT(refresh()));
 
     connect(ui->debugModeCheckBox, SIGNAL(toggled(bool)), ui->debugNextPushButton, SLOT(setEnabled(bool)));
     connect(ui->debugModeCheckBox, SIGNAL(toggled(bool)), ui->debugAbortPushButton, SLOT(setEnabled(bool)));
@@ -68,6 +71,22 @@ void OutputDialog::updateMesh(Mesh *mesh)
 void OutputDialog::updateSolution(std::vector<float> data)
 {
     m_data = data;
+
+    m_minvalGlobal = 1E35;
+    m_maxvalGlobal = -1E35;
+    float minGtZero = 1E35;
+
+    for(int i = 0; i < m_data.size(); i++)
+    {
+        if(m_data[i] > m_maxvalGlobal)
+            m_maxvalGlobal = m_data[i];
+        if(m_data[i] < m_minvalGlobal)
+            m_minvalGlobal = m_data[i];
+        if(m_data[i] < minGtZero && m_data[i] > 0)  // Don't allow zero in log scale
+            minGtZero = m_data[i];
+    }
+    m_minvalGlobalLog = log10(minGtZero);
+    m_maxvalGlobalLog = log10(m_maxvalGlobal);
 }
 
 
@@ -107,8 +126,8 @@ void OutputDialog::setSliceLevel(int level)
 
     loadParulaBrush();
 
-    float minval = 1E35;
-    float maxval = -1E35;
+    float minvalLevel = 1E35;
+    float maxvalLevel = -1E35;
 
     if(ui->xyRadioButton->isChecked())
     {
@@ -119,45 +138,46 @@ void OutputDialog::setSliceLevel(int level)
             return;
         }
 
+        // Get the min/max for this slice level
         for(int ix = 0; ix < m_mesh->xMesh; ix++)
             for(int iy = 0; iy < m_mesh->yMesh; iy++)
             {
                 float val = m_data[ix*m_mesh->yMesh*m_mesh->zMesh + iy*m_mesh->zMesh + level];
-                if(val < minval)
+                if(val < minvalLevel)
                 {
                     if(!m_logInterp || val > 0)  // Don't count 0 on log scale
-                        minval = val;
+                        minvalLevel = val;
                 }
-                if(val > maxval)
-                    maxval = val;
+                if(val > maxvalLevel)
+                    maxvalLevel = val;
             }
 
-        if(maxval <= 1E-35)
+        if(maxvalLevel <= 1E-35)
         {
             qDebug() << "Zero flux everywhere!";
             dispErrMap();
             return;
         }
 
-        if(minval < 0)
+        if(minvalLevel < 0)
         {
             qDebug() << "WARNING: Negative flux!";
         }
 
-        if((maxval - minval) / maxval < 1E-5)
+        if((maxvalLevel - minvalLevel) / maxvalLevel < 1E-5)
         {
             qDebug() << "Displaying a flat surface!";
             dispErrMap();
             return;
         }
 
-        qDebug() << "minval = " << minval << "  maxval = " << maxval;
+        qDebug() << "minvalglobal = " << m_minvalGlobal << "   maxvalGlobal = " << m_maxvalGlobal << "   minvalLevel = " << minvalLevel << "   maxvalLevel = " << maxvalLevel;
 
         if(m_logInterp)
         {
-            minval = log10(minval);
-            maxval = log10(maxval);
-            qDebug() << "log(minval) = " << minval << "  log(maxval) = " << maxval;
+            minvalLevel = log10(minvalLevel);
+            maxvalLevel = log10(maxvalLevel);
+            qDebug() << "log(minvalglobal) = " << m_minvalGlobalLog << "   log(maxvalGlobal) = " << m_maxvalGlobalLog << "log(minvalLevel) = " << minvalLevel << "  log(maxvalLevel) = " << maxvalLevel;
         }
 
         QStringList list;
@@ -170,17 +190,38 @@ void OutputDialog::setSliceLevel(int level)
                 float flux = m_data[i*m_mesh->yMesh*m_mesh->zMesh + j*m_mesh->zMesh + level];
 
                 if(m_logInterp)
+                {
                     if(flux <= 1E-35)
+                    {
                         rects[i*m_mesh->yMesh + j]->setBrush(errBrush);
+                        continue;
+                    }
                     else
+                    {
                         flux = log10(flux);
-                int fid = round(63*(flux-minval) / (maxval-minval));
+                    }
+                }
+
+
+                // Map the flux value to color space
+                int fid;
+                if(ui->levelScaleCheckBox->isChecked())
+                {
+                    fid = round(63*(flux-minvalLevel) / (maxvalLevel-minvalLevel));
+                }
+                else
+                {
+                    if(m_logInterp)
+                        fid = round(63*(flux-m_minvalGlobalLog) / (m_maxvalGlobalLog-m_minvalGlobalLog));
+                    else
+                        fid = round(63*(flux-m_minvalGlobal) / (m_maxvalGlobal-m_minvalGlobal));
+                }
 
                 // TODO - Not sure how this can happen, but it seems to....
                 if(fid > 63)
                 {
                     qDebug() << "WARNING: fid > 63!";
-                    qDebug() << "flux = " << flux << "  maxval = " << maxval;
+                    qDebug() << "flux = " << flux << "  maxvalLevel = " << maxvalLevel << "  maxvalGlobal = " << m_maxvalGlobal << "  log(maxvalGlobal) = " << m_maxvalGlobalLog;
                     fid = 63;
                 }
                 rects[i*m_mesh->yMesh + j]->setBrush(brushes[fid]);
@@ -306,13 +347,15 @@ void OutputDialog::dispErrMap()
 void OutputDialog::setLinearInterp()
 {
     m_logInterp = false;
-    setSliceLevel(ui->sliceVerticalSlider->value());
+    refresh();
+    //setSliceLevel(ui->sliceVerticalSlider->value());
 }
 
 void OutputDialog::setLogInterp()
 {
     m_logInterp = true;
-    setSliceLevel(ui->sliceVerticalSlider->value());
+    refresh();
+    //setSliceLevel(ui->sliceVerticalSlider->value());
 }
 
 bool OutputDialog::debuggingEnabled()
@@ -320,7 +363,10 @@ bool OutputDialog::debuggingEnabled()
     return ui->debugModeCheckBox->isChecked();
 }
 
-
+void OutputDialog::refresh()
+{
+    setSliceLevel(ui->sliceVerticalSlider->value());
+}
 
 
 

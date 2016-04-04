@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>576</width>
+    <width>589</width>
     <height>300</height>
    </rect>
   </property>
@@ -98,6 +98,13 @@
    </item>
    <item row="1" column="3">
     <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QCheckBox" name="levelScaleCheckBox">
+       <property name="text">
+        <string>Level Local Scale</string>
+       </property>
+      </widget>
+     </item>
      <item>
       <widget class="QCheckBox" name="debugModeCheckBox">
        <property name="text">
