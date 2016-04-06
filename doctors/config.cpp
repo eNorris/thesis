@@ -54,8 +54,9 @@ void Config::loadDefaults()
     flatFilterMat = {"cu"};
 
     // Directional quadrature set
-    quadType = "sn";  // Type of quadrature
-    sn = 4;  // N in Sn quadrature order
+    quadType = "special";  // Type of quadrature
+    quadSpecial = 2;  // Used for special quad types
+    sn = 6;  // N in Sn quadrature order
     m = sn * (sn + 2);  // Total number of directions in all 8 octants
 
     // Cross section data set
@@ -75,9 +76,18 @@ void Config::loadDefaults()
                   0.0, 0.0, 71.4753, 0.0000,     // Tunsgten x-section at 60 keV P0
                   0.0, 0.0, 71.4753, 0.0000};    // Tunsgten x-section P1 expansion
 
+    // Total cross section
+    xsTot = {0.0002,      // Air
+             0.2059,      // Water
+             71.4753};    // Tungster
+    // Scattering cross section
+    xsScat = { 0.0002,    // Air
+               0.1770,    // Water
+               0.0001};   // Tungster
+
     // Source iteration data set
     epsi = 5.0e-5;  // Convergence criteria
-    maxit = 5;  // Max number of inner iterations (default = 20)
+    maxit = 20;  // Max number of inner iterations (default = 20)
 }
 
 void Config::loadFile(std::string filename)

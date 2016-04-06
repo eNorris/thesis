@@ -48,6 +48,7 @@ public:
 
     // Directional quadrature set
     std::string quadType;
+    int quadSpecial;
     int sn;  // N in Sn quadrature order
     int m;  // Total number of directions in all 8 octants
 
@@ -61,6 +62,11 @@ public:
     int ms;   // Cross section mixing table length (ms = 0 no mixing)
     int mtm;  // Total number of materials including al Pns (each Pn is considered a nuclide)
     int isct; // Maximum jorder of Legendre (ie scattering) expansion of the cross section (lowest is 0)
+
+    // These two are used in my internal code, Dr. Liu uses xsection->msig
+    std::vector<float> xsTot;
+    std::vector<float> xsScat;
+
     //float *m_xsection;
     std::vector<float> xsection;
 

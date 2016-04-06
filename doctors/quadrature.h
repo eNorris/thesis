@@ -21,6 +21,7 @@ public:
 
     void load(const Config *config);
     void loadSn(const int sn);
+    void loadSpecial(const int sp);
 
     int angleCount() const;
 

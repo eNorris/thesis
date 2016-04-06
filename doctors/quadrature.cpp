@@ -26,8 +26,51 @@ void Quadrature::load(const Config *config)
     //int sn = config->sn;
     if(config->quadType == "sn")
         loadSn(config->sn);
+    else if(config->quadType == "special")
+        loadSpecial(config->quadSpecial);
     else
         qDebug() << "Unknown quadrature type: " << QString::fromStdString(config->quadType);
+}
+
+void Quadrature::loadSpecial(const int special)
+{
+    if(special == 1)
+    {
+        int N = 100;
+        m_angles = N;
+        for(int i = 0; i < N; i++)
+        {
+            float theta = 2 * M_PI * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+            float u = 2  * static_cast <float> (rand()) / static_cast <float> (RAND_MAX) - 1;
+            mu.push_back(sqrt(1-u*u)*cos(theta));
+            zi.push_back(sqrt(1-u*u)*sin(theta));
+            eta.push_back(u);
+            wt.push_back(1.0/N);
+        }
+    }
+    else if(special == 2)
+    {
+        int N = 100;
+        m_angles = N;
+
+        float dlong = M_PI * (3-sqrt(5));
+        float dz = 2.0/N;
+        float lng = 0;
+        float z = 1 - dz/2;
+
+        for(int i = 0; i < N; i++)
+        {
+            float r = sqrt(1 - z*z);
+            mu.push_back(cos(lng)*r);
+            zi.push_back(sin(lng)*r);
+            eta.push_back(z);
+            wt.push_back(1.0/N);
+            z -= dz;
+            lng += dlong;
+        }
+    }
+    else
+        qDebug() << "Unknown sqecial quadrature type: " << QString::number(special);
 }
 
 void Quadrature::loadSn(const int sn)
@@ -140,18 +183,18 @@ void Quadrature::loadSn(const int sn)
         for(int i = 24; i < 48; i++)
             zi[i] = zi[i-24];
 
-        wt[0] = 0.176126;
-        wt[1] = 0.157207;
-        wt[2] = 0.157207;
-        wt[3] = 0.176126;
-        wt[4] = 0.157207;
-        wt[5] = 0.176126;
-        wt[6] = 0.176126;
-        wt[7] = 0.157207;
-        wt[8] = 0.176126;
-        wt[9] = 0.157207;
-        wt[10] = 0.157207;
-        wt[11] = 0.176126;
+        wt[0] = 0.176126/8;
+        wt[1] = 0.157207/8;
+        wt[2] = 0.157207/8;
+        wt[3] = 0.176126/8;
+        wt[4] = 0.157207/8;
+        wt[5] = 0.176126/8;
+        wt[6] = 0.176126/8;
+        wt[7] = 0.157207/8;
+        wt[8] = 0.176126/8;
+        wt[9] = 0.157207/8;
+        wt[10] = 0.157207/8;
+        wt[11] = 0.176126/8;
         for(int i = 12; i < 24; i++)
             wt[i] = wt[i-12];
         for(int i = 24; i < 48; i++)
