@@ -252,8 +252,8 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
 
     extSource.resize(mesh->voxelCount(), 0.0f);
 
-    //extSource[((mesh->xMesh - 1)/2)*xjmp + ((mesh->yMesh-1)/2)*yjmp + ((mesh->zMesh-1)/2)] = 1E6;
-    extSource[((mesh->xMesh - 1)/2)*xjmp + (config->colYLen/2)*yjmp + ((mesh->zMesh-1)/2)] = 1E6;
+    extSource[((mesh->xMesh - 1)/2)*xjmp + ((mesh->yMesh-1)/2)*yjmp + ((mesh->zMesh-1)/2)] = 1E6;
+    //extSource[((mesh->xMesh - 1)/2)*xjmp + (config->colYLen/2)*yjmp + ((mesh->zMesh-1)/2)] = 1E6;
 
     qDebug() << "Solving " << mesh->voxelCount() * quad->angleCount() * xs->groupCount() << " elements in phase space";
 
@@ -297,26 +297,26 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                 //if(quad->mu[iang] > 0 && quad->zi[iang] > 0  && quad->eta[iang] > 0)  // Octant 1
                 //{
 
-                //if(quad->mu[iang] < 0 && quad->zi[iang] < 0 && quad->eta[iang] < 0)
-                //    continue;
+                if(quad->mu[iang] < 0 && quad->zi[iang] < 0 && quad->eta[iang] < 0)
+                    continue;
 
-                //if(quad->mu[iang] > 0 && quad->zi[iang] < 0 && quad->eta[iang] < 0)
-                //    continue;
+                if(quad->mu[iang] > 0 && quad->zi[iang] < 0 && quad->eta[iang] < 0)
+                    continue;
 
-                //if(quad->mu[iang] < 0 && quad->zi[iang] > 0 && quad->eta[iang] < 0)
-                //    continue;
+                if(quad->mu[iang] < 0 && quad->zi[iang] > 0 && quad->eta[iang] < 0)
+                    continue;
 
-                //if(quad->mu[iang] > 0 && quad->zi[iang] > 0 && quad->eta[iang] < 0)
-                //    continue;
+                if(quad->mu[iang] > 0 && quad->zi[iang] > 0 && quad->eta[iang] < 0)
+                    continue;
 
-                //if(quad->mu[iang] < 0 && quad->zi[iang] < 0 && quad->eta[iang] > 0)
-                //    continue;
+                if(quad->mu[iang] < 0 && quad->zi[iang] < 0 && quad->eta[iang] > 0)
+                    continue;
 
-                //if(quad->mu[iang] > 0 && quad->zi[iang] < 0 && quad->eta[iang] > 0)
-                //    continue;
+                if(quad->mu[iang] > 0 && quad->zi[iang] < 0 && quad->eta[iang] > 0)
+                    continue;
 
-                //if(quad->mu[iang] < 0 && quad->zi[iang] > 0 && quad->eta[iang] > 0)
-                //    continue;
+                if(quad->mu[iang] < 0 && quad->zi[iang] > 0 && quad->eta[iang] > 0)
+                    continue;
 
                 //if(quad->mu[iang] > 0 && quad->zi[iang] > 0 && quad->eta[iang] > 0)
                 //    continue;
@@ -402,6 +402,8 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                             float angFlux = numer/denom;
                             angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz] = angFlux;
 
+                            if(angFlux != 0)
+                                qDebug() << "got it";
                             //if(influxX > 0 || influxY > 0 || influxZ > 0)
                             //    qDebug() << "Gotcha!";
 
@@ -409,6 +411,9 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                             outboundFluxY[ix*xjmp + iy*yjmp + iz] = 2*angFlux - influxY;
                             outboundFluxZ[ix*xjmp + iy*yjmp + iz] = 2*angFlux - influxZ;
 
+                            float outX = 2*angFlux - influxX;
+                            float outY = 2*angFlux - influxY;
+                            float outZ = 2*angFlux - influxZ;
 
                             if(outboundFluxX[ix*xjmp + iy*yjmp + iz] < 0)
                                 outboundFluxX[ix*xjmp + iy*yjmp + iz] = 0;
