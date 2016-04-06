@@ -224,6 +224,9 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
     std::vector<float> totalSource;
     std::vector<float> isocaSource;
     std::vector<float> errList;
+    std::vector<float> outboundFluxX;
+    std::vector<float> outboundFluxY;
+    std::vector<float> outboundFluxZ;
 
     std::vector<float> extSource;
 
@@ -238,11 +241,14 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
     int xjmp = mesh->xjmp();
     int yjmp = mesh->yjmp();
 
-    scalarFlux.resize(xs->groupCount() * mesh->voxelCount());
+    scalarFlux.resize(xs->groupCount() * mesh->voxelCount(), 0.0f);
     tempFlux.resize(mesh->voxelCount());
+    outboundFluxX.resize(mesh->voxelCount(), 0.0f);
+    outboundFluxY.resize(mesh->voxelCount(), 0.0f);
+    outboundFluxZ.resize(mesh->voxelCount(), 0.0f);
     angularFlux.resize(xs->groupCount() * quad->angleCount() * mesh->voxelCount());
-    totalSource.resize(mesh->voxelCount());
-    isocaSource.resize(mesh->voxelCount());
+    totalSource.resize(mesh->voxelCount(), 0.0f);
+    isocaSource.resize(mesh->voxelCount(), 0.0f);
 
     extSource.resize(mesh->voxelCount(), 0.0f);
 
@@ -332,14 +338,18 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                                 if(ix == 0)
                                     influxX = 0.0f;
                                 else
-                                    influxX = angularFlux[ie*ejmp + iang*ajmp + (ix-1)*xjmp + iy*yjmp + iz];
+                                    influxX = outboundFluxX[(ix-1)*xjmp + iy*yjmp + iz];
+                                    //influxX = angularFlux[ie*ejmp + iang*ajmp + (ix-1)*xjmp + iy*yjmp + iz];
                             }
                             else // Approach x = xMesh-1 -> 0
                             {
                                 if(ix == mesh->xMesh-1)
                                     influxX = 0.0f;
                                 else
-                                    influxX = angularFlux[ie*ejmp + iang*ajmp + (ix+1)*xjmp + iy*yjmp + iz];
+                                    influxX = outboundFluxX[(ix+1)*xjmp + iy*yjmp + iz];
+                                //if(influxX != 0)
+                                //    qDebug() << "cat";
+                                    //influxX = angularFlux[ie*ejmp + iang*ajmp + (ix+1)*xjmp + iy*yjmp + iz];
                             }
 
                             // Handle the y influx
@@ -348,14 +358,16 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                                 if(iy == 0)
                                     influxY = 0.0f;
                                 else
-                                    influxY = angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + (iy-1)*yjmp + iz];
+                                    influxY = outboundFluxY[ix*xjmp + (iy-1)*yjmp + iz];
+                                    //influxY = angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + (iy-1)*yjmp + iz];
                             }
                             else // Approach y = yMesh-1 -> 0
                             {
                                 if(iy == mesh->yMesh-1)
                                     influxY = 0.0f;
                                 else
-                                    influxY = angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + (iy+1)*yjmp + iz];
+                                    influxY = outboundFluxY[ix*xjmp + (iy+1)*yjmp + iz];
+                                    //influxY = angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + (iy+1)*yjmp + iz];
                             }
 
                             // Handle the z influx
@@ -364,14 +376,16 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                                 if(iz == 0)
                                     influxZ = 0.0f;
                                 else
-                                    influxZ = angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz-1];
+                                    influxZ = outboundFluxZ[ix*xjmp + iy*yjmp + iz-1];
+                                    //influxZ = angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz-1];
                             }
                             else
                             {
                                 if(iz == mesh->zMesh-1)
                                     influxZ = 0.0f;
                                 else
-                                    influxZ = angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz+1];
+                                    influxZ = outboundFluxZ[ix*xjmp + iy*yjmp + iz+1];
+                                    //influxZ = angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz+1];
                             }
 
                             // I don't think the *vol should be here
@@ -385,7 +399,24 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                                     mesh->Axz[iang*mesh->xMesh*mesh->zMesh + ix*mesh->zMesh + iz] +
                                     mesh->Axy[iang*mesh->xMesh*mesh->yMesh + ix*mesh->yMesh + iy];
 
-                            angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz] = numer/denom;
+                            float angFlux = numer/denom;
+                            angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz] = angFlux;
+
+                            //if(influxX > 0 || influxY > 0 || influxZ > 0)
+                            //    qDebug() << "Gotcha!";
+
+                            outboundFluxX[ix*xjmp + iy*yjmp + iz] = 2*angFlux - influxX;
+                            outboundFluxY[ix*xjmp + iy*yjmp + iz] = 2*angFlux - influxY;
+                            outboundFluxZ[ix*xjmp + iy*yjmp + iz] = 2*angFlux - influxZ;
+
+                            if(outboundFluxX[ix*xjmp + iy*yjmp + iz] < 0)
+                                outboundFluxX[ix*xjmp + iy*yjmp + iz] = 0;
+
+                            if(outboundFluxY[ix*xjmp + iy*yjmp + iz] < 0)
+                                outboundFluxY[ix*xjmp + iy*yjmp + iz] = 0;
+
+                            if(outboundFluxZ[ix*xjmp + iy*yjmp + iz] < 0)
+                                outboundFluxZ[ix*xjmp + iy*yjmp + iz] = 0;
 
                             //if(denom == 0)
                             //    qDebug() << "All life is over!";
