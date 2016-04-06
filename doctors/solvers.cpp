@@ -252,8 +252,8 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
 
     extSource.resize(mesh->voxelCount(), 0.0f);
 
-    extSource[((mesh->xMesh - 1)/2)*xjmp + ((mesh->yMesh-1)/2)*yjmp + ((mesh->zMesh-1)/2)] = 1E6;
-    //extSource[((mesh->xMesh - 1)/2)*xjmp + (config->colYLen/2)*yjmp + ((mesh->zMesh-1)/2)] = 1E6;
+    //extSource[((mesh->xMesh - 1)/2)*xjmp + ((mesh->yMesh-1)/2)*yjmp + ((mesh->zMesh-1)/2)] = 1E6;  // [gammas / sec]
+    extSource[((mesh->xMesh - 1)/2)*xjmp + (config->colYLen/2)*yjmp + ((mesh->zMesh-1)/2)] = 1E6;
 
     qDebug() << "Solving " << mesh->voxelCount() * quad->angleCount() * xs->groupCount() << " elements in phase space";
 
@@ -271,23 +271,41 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
 
             preFlux = tempFlux;  // Store flux for previous iteration
 
+            // TODO Zero the isocasource
+            for(int i = 0; i < isocaSource.size(); i++)
+                isocaSource[i] = 0;
+
             // Calculate the scattering source
-            // TODO
-            for(int iie = 0; iie < ie; iie++)
+            for(int iie = 0; iie <= ie; iie++)
                 for(int iik = 0; iik < mesh->zMesh; iik++)
                     for(int iij = 0; iij < mesh->yMesh; iij++)
                         for(int iii = 0; iii < mesh->xMesh; iii++)
                         {
-                            int indx = iii*mesh->xjmp() + iij*mesh->yjmp() + iik;
+                            int indx = iii*xjmp + iij*yjmp + iik;
                             int zidIndx = mesh->zoneId[indx];
-                            isocaSource[indx] = isocaSource[indx] + 1.0/(4.0*M_PI)*(scalarFlux[iie*mesh->voxelCount() + indx] * xsref(ie-1, zidIndx, 0, iie));
+                            //float xsval = xsref.scatXs(zidIndx, iie, ie);
+                            //qDebug() << xsval;
+                            isocaSource[indx] += 1.0/(4.0*M_PI)*scalarFlux[iie*mesh->voxelCount() + indx] * xsref.scatXs(zidIndx, iie, ie) * mesh->vol[indx]; //xsref(ie-1, zidIndx, 0, iie));
                         }
+
+
+
+            float isomax = -1;
+            for(int ti = 0; ti < isocaSource.size(); ti++)
+                if(isocaSource[ti] > isomax)
+                    isomax = isocaSource[ti];
+
+            float scamax = -1;
+            for(int ti = 0; ti < scalarFlux.size(); ti++)
+                if(scalarFlux[ti] > scamax)
+                    scamax = scalarFlux[ti];
 
             // Calculate the total source
             for(int i = 0; i < mesh->voxelCount(); i++)
                 totalSource[i] = extSource[ie*mesh->voxelCount() + i] + isocaSource[i];
 
-            for(unsigned int i = 0; i < tempFlux.size(); i++) // Clear for a new sweep
+            // Clear for a new sweep
+            for(unsigned int i = 0; i < tempFlux.size(); i++)
                 tempFlux[i] = 0;
 
             for(int iang = 0; iang < quad->angleCount(); iang++)
@@ -297,6 +315,7 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                 //if(quad->mu[iang] > 0 && quad->zi[iang] > 0  && quad->eta[iang] > 0)  // Octant 1
                 //{
 
+                /*
                 if(quad->mu[iang] < 0 && quad->zi[iang] < 0 && quad->eta[iang] < 0)
                     continue;
 
@@ -317,6 +336,7 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
 
                 if(quad->mu[iang] < 0 && quad->zi[iang] > 0 && quad->eta[iang] > 0)
                     continue;
+                    */
 
                 //if(quad->mu[iang] > 0 && quad->zi[iang] > 0 && quad->eta[iang] > 0)
                 //    continue;
@@ -333,6 +353,9 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                             int zid = mesh->zoneId[ix*xjmp + iy*yjmp + iz];
 
                             // Handle the x influx
+                            float t1 = quad->mu[iang];
+                            float t2 = quad->zi[iang];
+                            float t3 = quad->eta[iang];
                             if(quad->mu[iang] >= 0) // Approach x = 0 -> xMesh
                             {
                                 if(ix == 0)
@@ -390,11 +413,11 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
 
                             // I don't think the *vol should be here
                             // I'm pretty sure totalSource isn't normalized by volume...
-                            float numer = totalSource[ix*xjmp+iy*yjmp+iz] * mesh->vol[ix*xjmp+iy*yjmp+iz] +
+                            float numer = totalSource[ix*xjmp+iy*yjmp+iz] + //* mesh->vol[ix*xjmp+iy*yjmp+iz] +
                                     mesh->Ayz[iang*mesh->yMesh*mesh->zMesh + iy*mesh->zMesh + iz] * influxX +  // The 2x is already factored in
                                     mesh->Axz[iang*mesh->xMesh*mesh->zMesh + ix*mesh->zMesh + iz] * influxY +
                                     mesh->Axy[iang*mesh->xMesh*mesh->yMesh + ix*mesh->yMesh + iy] * influxZ;
-                            float denom = mesh->vol[ix*xjmp+iy*yjmp+iz]*xsref(ie, zid, 0, 0) +  //xs->operator()(ie, zid, 0, 0) +
+                            float denom = mesh->vol[ix*xjmp+iy*yjmp+iz]*xsref.totXs(zid, ie) +   //xsref(ie, zid, 0, 0) +  //xs->operator()(ie, zid, 0, 0) +
                                     mesh->Ayz[iang*mesh->yMesh*mesh->zMesh + iy*mesh->zMesh + iz] +  // The 2x is already factored in
                                     mesh->Axz[iang*mesh->xMesh*mesh->zMesh + ix*mesh->zMesh + iz] +
                                     mesh->Axy[iang*mesh->xMesh*mesh->yMesh + ix*mesh->yMesh + iy];
@@ -402,8 +425,8 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                             float angFlux = numer/denom;
                             angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz] = angFlux;
 
-                            if(angFlux != 0)
-                                qDebug() << "got it";
+                            //if(angFlux != 0)
+                            //    qDebug() << "got it";
                             //if(influxX > 0 || influxY > 0 || influxZ > 0)
                             //    qDebug() << "Gotcha!";
 
@@ -415,6 +438,7 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                             float outY = 2*angFlux - influxY;
                             float outZ = 2*angFlux - influxZ;
 
+
                             if(outboundFluxX[ix*xjmp + iy*yjmp + iz] < 0)
                                 outboundFluxX[ix*xjmp + iy*yjmp + iz] = 0;
 
@@ -423,6 +447,7 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
 
                             if(outboundFluxZ[ix*xjmp + iy*yjmp + iz] < 0)
                                 outboundFluxZ[ix*xjmp + iy*yjmp + iz] = 0;
+
 
 
                             //if(denom == 0)
