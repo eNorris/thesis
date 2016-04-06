@@ -30,6 +30,7 @@ void XSection::load(const Config *config)
         qDebug() << "Reading XS locally";
 
         m_groups = config->igm;
+        m_zids = 3;
 
         // TODO - What is this?
         //int t1 = round(config->mtm / (1 + config->isct));
@@ -46,6 +47,8 @@ void XSection::load(const Config *config)
 
         //msig.resize(m_groups * t1 * t2 * t3);
         msig.resize(m_groups * m_dim1 * m_dim2 * m_dim3);
+        xsTot.resize(m_groups*m_zids);
+        xsScat.resize(m_groups*m_groups*m_zids);
 
         //for(int i = 0; i < m_groups; i++)
         //    for(int j = 0; j < t1; j++)
@@ -58,6 +61,15 @@ void XSection::load(const Config *config)
                 for(int k = 0; k < m_dim2; k++)
                     for(int m = 0; m < m_dim3; m++)
                         msig[i*m_dim1 + j*m_dim2 + k*m_dim3 + m] = config->xsection[((j-1) * (1+config->isct) + k)*4 + config->iht + m - 1];
+
+        for(int zid = 0; zid < m_zids; zid++)
+            for(int Esrc = 0; Esrc < m_groups; Esrc++)
+                for(int Etar = 0; Etar < m_groups; Etar++)
+                    xsScat[zid*m_groups*m_groups + Esrc*m_groups + Etar] = config->xsScat[zid*m_groups*m_groups + Esrc*m_groups + Etar];
+
+        for(int zid = 0; zid < m_zids; zid++)
+            for(int E = 0; E < m_groups; E++)
+                xsTot[zid*m_groups + E] = config->xsTot[zid*m_groups + E];
     }
 }
 
@@ -72,6 +84,16 @@ int XSection::operator()(int grp, int d2, int d3, int d4) const
 int XSection::groupCount() const
 {
     return m_groups;
+}
+
+float XSection::scatXs(const int zid, const int Esrc, const int Etar) const
+{
+    return xsScat[zid*m_groups*m_groups + Esrc*m_groups + Etar];
+}
+
+float XSection::totXs(const int zid, const int E) const
+{
+    return xsTot[zid*m_groups + E];
 }
 /*
 int XSection::dim1() const

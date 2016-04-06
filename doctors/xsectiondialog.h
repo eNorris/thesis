@@ -19,6 +19,8 @@ public:
 
     void updateXs(XSection *xs);
 
+
+
 private:
     Ui::XSectionDialog *ui;
 

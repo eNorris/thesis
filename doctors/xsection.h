@@ -12,6 +12,9 @@ public:
 
     std::vector<float> msig;
 
+    std::vector<float> xsTot;
+    std::vector<float> xsScat;
+
     XSection();
     XSection(const Config *config);
     ~XSection();
@@ -23,12 +26,16 @@ public:
 
     int groupCount() const;
 
+    float scatXs(const int zid, const int Esrc, const int Etar) const;
+    float totXs(const int zid, const int E) const;
+
     //int dim1() const;
     //int dim2() const;
     //int dim3() const;
 
 private:
     int m_groups;
+    int m_zids;
 
     int m_dim1;
     int m_dim2;
