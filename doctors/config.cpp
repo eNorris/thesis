@@ -54,9 +54,9 @@ void Config::loadDefaults()
     flatFilterMat = {"cu"};
 
     // Directional quadrature set
-    quadType = "special";  // Type of quadrature
+    quadType = "sn";  // Type of quadrature
     quadSpecial = 2;  // Used for special quad types
-    sn = 6;  // N in Sn quadrature order
+    sn = 4;  // N in Sn quadrature order
     m = sn * (sn + 2);  // Total number of directions in all 8 octants
 
     // Cross section data set
