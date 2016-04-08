@@ -58,25 +58,85 @@ The abstract text goes here.
 \section{CODE}
 Consider that we have the following variables, $\Psi$ which is a function of $x$, $y$, $z$, $E$, and $\hat{\Omega}$. Further, we have the in-flux variables $\Psi_{x-in}$, $\Psi_{y-in}$, and $\Psi_{z-in]}$. 
 
+Given:
+\begin{itemize}
+\item A list of all energies, $\mathcal{E}$
+\item A list of all directions in the quadrature, $Q$
+\item A mapping from $r$ to zone number, $\mathcal{Z}(r)$
+\item Lists of direction cosines, $\mu$, $\xi$, and $\eta$
+\item A map of $r$ to voxel volume, $V(r)$
+\item A list of all $x$, $y$, and $z$ voxel centers, $X$, $Y$, and $Z$
+\item A list of weights for the quadrature, $\omega$
+\item A list of scatter cross sections in zone $\mathcal{Z}(r)$ from energy $E'$ to $E$, $\Sigma_s(\mathcal{Z}(r), E', E)$
+\item A list of total cross sections in zone $\mathcal{Z}(r)$ at energy $E$, $\Sigma_T(\mathcal{Z}(r), E)$
+\item The surface area of all voxels, $A_{xy}(r)$, $A_{yz}(r)$, $A_{xz}(r)$
+\end{itemize}
+
+\pagebreak
 \begin{lstlisting}[escapeinside={(*}{*)}]
-  (*$\Psi(x, y, z, E, \hat{\Omega}) \leftarrow 123$*)
-  list= { (*$S_1,S_2,S_3$*) }
+function sweep()
+
+  (*$\phi(r, E) = \vec{0}$*)    # Scalar flux
+  (*$\Psi(r, \Omega, E) = \vec{0}$*)  # Angular flux
+  
+  for (*$E \in \mathcal{E}$*) in descending order
+    while not converged
+      for (*$\Omega \in Q$*) in any order
+        if (*$\mu(\Omega) > 0$*) and (*$\xi(\Omega) > 0$*) and (*$\eta(\Omega) > 0$*)
+          octant1()
+        else if (*$\mu(\Omega) > 0$*) and (*$\xi(\Omega) > 0$*) and (*$\eta(\Omega) < 0$*)
+          octant2()
+        ...
+        else
+          octant8()
 \end{lstlisting}
 
+\pagebreak
 \begin{lstlisting}[escapeinside={(*}{*)}]
-for (*$E \in \mathcal{E}$*) in descending order
-  for (*$\Omega \in Q$*) in any order
-    if (*$\mu(\Omega) > 0$*) and (*$\xi(\Omega) > 0$*) and (*$\eta(\Omega) > 0$*)
-      for (*$x \in X$*) in ascending order
-        for (*$y \in Y$*) in ascending order
-          for (*$z \in Z$*) in ascending order
-            (*$\Psi_{x-in}(x, y, z, E, \Omega) \leftarrow 123$*)
-            (*$\Psi_{y-in}(x, y, z, E, \Omega) \leftarrow 123$*)
-            (*$\Psi_{z-in}(x, y, z, E, \Omega) \leftarrow 123$*)
-            (*$\Psi(x, y, z, E, \Omega) \leftarrow 123$*)
+function octant1()
+
+  for (*$x \in X$*) in ascending order
+    for (*$y \in Y$*) in ascending order
+      for (*$z \in Z$*) in ascending order
             
-            (*$\Phi(x, y, z, E) \leftarrow \Phi(x, y, z, E) + \omega(\Omega) \Psi(x, y, z, E, \Omega)$*)
-  list= { (*$S_1,S_2,S_3$*) }
+        (*$S$*) = totalScatter((*$x, y, z, \Omega, E$*))            
+            
+        # Get the in-flux from the previous out-flux
+        (*$\Psi_{x-in}(x, y, z, E, \Omega) \leftarrow \Psi_{x-out}(x-\Delta x, y, z, E, \Omega)$*)
+        (*$\Psi_{y-in}(x, y, z, E, \Omega) \leftarrow \Psi_{x-out}(x, y-\Delta y, z, E, \Omega)$*)
+        (*$\Psi_{z-in}(x, y, z, E, \Omega) \leftarrow \Psi_{x-out}(x, y, z-\Delta z, E, \Omega)$*)
+              
+        # Calculate the angular flux
+        (*$n \leftarrow S + 2\mu(\Omega)A_{yz}(y,z)\Psi_{x-in}(x,y,z,E,\Omega) + $*)
+               (*$2\xi(\Omega)A_{xz}(x,z)\Psi_{y-in}(x,y,z,E,\Omega) + $*)
+               (*$2\eta(\Omega)A_{xy}(x,y)\Psi_{z-in}(x,y,z,E,\Omega)$*)
+        (*$d \leftarrow 2\mu(\Omega)A_{yz}(y,z) + 2\xi(\Omega)A_{xz}(x,z) + 2\eta(\Omega)A_{xy}(x,y) + \Sigma_T(\mathcal{Z}(r), E)$*)
+        (*$\Psi(x, y, z, E, \Omega) \leftarrow n/d $*)
+              
+        # Calculate the out-flux
+        (*$\Psi_{x-out}(x, y, z, E, \Omega) \leftarrow 2 \Psi(x, y, z, E, \Omega) - \Psi_{x-in}(x, y, z, E, \Omega)$*)
+        (*$\Psi_{y-out}(x, y, z, E, \Omega) \leftarrow 2 \Psi(x, y, z, E, \Omega) - \Psi_{y-in}(x, y, z, E, \Omega)$*)
+        (*$\Psi_{z-out}(x, y, z, E, \Omega) \leftarrow 2 \Psi(x, y, z, E, \Omega) - \Psi_{z-in}(x, y, z, E, \Omega)$*)
+            
+        # Increment the scalar flux
+        (*$\phi(x, y, z, E) \leftarrow \phi(x, y, z, E) + \omega(\Omega) \Psi(x, y, z, E, \Omega)$*)
+\end{lstlisting}
+
+\pagebreak
+\begin{lstlisting}[escapeinside={(*}{*)}]
+function totalScatter((*$r, \Omega, E$*))
+
+  # Assume a point source at (*\color{mygreen} $r_0$*) with energy (*\color{mygreen} $E_0$*) and strength (*\color{mygreen} $S_0$*) particles / sec
+  (*$S_x \leftarrow 0$*)
+  if (*$r = r_0$*) and (*$E = E_0$*)
+    (*$S_x \leftarrow (1/4\pi) \times S_0$*)
+
+  (*$S_D \leftarrow 0$*)
+  for (*$E' \in \mathcal{E} | E' \geq E$*)
+    (*$S_D = S_D + (1/4\pi) \times \phi(r, \Omega, E') \times \Sigma_s(\mathcal{Z}(r), E', E) \times V(r)$*)
+    
+  (*$S_T = S_x + S_D$*)
+  return (*$S_T$*)
 \end{lstlisting}
 
 \section{Introduction}
