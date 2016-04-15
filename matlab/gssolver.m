@@ -47,10 +47,17 @@ extsource((cfg.xmesh-1)/2+1, cfg.col_ylen/2, (cfg.zmesh-1)/2+1, cfg.igm) = 1.0e6
 
 % % Setup vaccum boundary 
 % Initialization, fluxi, fluxj, fluxk are outward flux crossing the cell
-fluxj=zeros(cfg.xmesh,1);
-fluxk=zeros(cfg.xmesh,cfg.ymesh);
-fluxj_pre=zeros(cfg.xmesh,1);
-fluxk_pre=zeros(cfg.xmesh,cfg.ymesh);
+%fluxj=zeros(cfg.xmesh,1);
+%fluxk=zeros(cfg.xmesh,cfg.ymesh);
+%fluxj_pre=zeros(cfg.xmesh,1);
+%fluxk_pre=zeros(cfg.xmesh,cfg.ymesh);
+
+xinflux = zeros(cfg.xmesh, cfg.ymesh, cfg.zmesh);
+xoutflux = zeros(cfg.xmesh, cfg.ymesh, cfg.zmesh);
+yinflux = zeros(cfg.xmesh, cfg.ymesh, cfg.zmesh);
+youtflux = zeros(cfg.xmesh, cfg.ymesh, cfg.zmesh);
+zinflux = zeros(cfg.xmesh, cfg.ymesh, cfg.zmesh);
+zoutflux = zeros(cfg.xmesh, cfg.ymesh, cfg.zmesh);
 
 % Plot the quadrature
 figure();
@@ -100,9 +107,10 @@ for ieg=1:cfg.igm  % Loop over energy groups
     while (num_iter<=cfg.maxit && maxdiff>cfg.epsi) 
         figure;
         imagesc(log10(flux(:,:,15,ieg))); 
-        %caxis([-10, 6]);
+        caxis([-10, 6]);
         title(['Energy Group #',num2str(ieg),' Iteration #',num2str(num_iter)]); 
         grid on; 
+        axis equal;
         colorbar;
         preflux = tempflux;  % Store the flux for the previous iteration result
         totsource = extsource(:,:,:,ieg)+isoscasource(flux,ieg,cfg,zone_id, msig); % Calculate source contributed by scatter
@@ -117,101 +125,117 @@ for ieg=1:cfg.igm  % Loop over energy groups
                       for ii=cfg.xmesh:-1:1
                           zid = zone_id(ii,jj,kk)+1; %Note: zone id start at 0, so the array index plus 1.
                           if(ii==cfg.xmesh) % At boundary setup vaccum boundary condition 
-                              fluxi = 0;    % fluxi is the inward flux in x direction
-                              fluxi_pre = 0;
+                              xinflux(ii,jj,kk) = 0;
                           else
-                              fluxi = angflux(ii+1,jj,kk,iang,ieg);  %2*angflux(ii+1,jj,kk,iang,ieg)-fluxi_pre;
-                              if fluxi<0   %  Non negtive fix
-                                  fluxi = 0.0;
-                                  angflux(ii+1,jj,kk,iang,ieg) = 0.5*(fluxi+fluxi_pre);  % Update the angular flux
-                              end
-                              fluxi_pre = fluxi;
+                              xinflux(ii,jj,kk) = xoutflux(ii+1,jj,kk);
+                              %if xinflux(ii,jj,kk) < 0
+                              %    xinflux(ii,jj,kk) = 0;
+                              %    angflux(ii,jj,kk,iang,ieg) = 0.5*outflux(ii-1,jj,kk);
+                              %end
                           end                          
                           if(jj==cfg.ymesh) % At boundary setup vaccum boundary condition
-                              fluxj(ii) = 0;    % fluxj is the inward flux in y direction
-                              fluxj_pre(ii) = 0;
+                              yinflux(ii,jj,kk) = 0;
                           else
-                              fluxj(ii) = angflux(ii,jj+1,kk,iang,ieg);  %2*angflux(ii,jj+1,kk,iang,ieg)-fluxj_pre(ii);
-                              if fluxj(ii)<0
-                                  fluxj(ii) = 0.0;
-                                  angflux(ii,jj+1,kk,iang,ieg) = 0.5*(fluxj(ii)+fluxj_pre(ii));
-                              end
-                              fluxj_pre(ii) = fluxj(ii);
+                              yinflux(ii,jj,kk) = youtflux(ii,jj+1,kk);
+                              %if xinflux(ii,jj,kk) < 0
+                              %    xinflux(ii,jj,kk) = 0;
+                              %    angflux(ii,jj,kk,iang,ieg) = 0.5*outflux(ii-1,jj,kk);
+                              %end
                           end
                           if(kk==cfg.zmesh) % At boundary setup vaccum boundary condition
-                              fluxk(ii,jj) = 0;    % fluxk is the inward flux in z direction
-                              fluxk_pre(ii,jj) =0;
+                              %fluxk(ii,jj) = 0;    % fluxk is the inward flux in z direction
+                              %fluxk_pre(ii,jj) =0;
+                              zinflux(ii,jj,kk) = 0;
                           else
-                              fluxk(ii,jj) = angflux(ii,jj,kk+1,iang,ieg);  %2*angflux(ii,jj,kk+1,iang,ieg)-fluxk_pre(ii,jj);
-                              if fluxk(ii,jj)<0
-                                  fluxk(ii,jj) = 0.0;
-                                  angflux(ii,jj,kk+1,iang,ieg) = 0.5*(fluxk(ii,jj)+fluxk_pre(ii,jj));
-                              end
-                              fluxk_pre(ii,jj) = fluxk(ii,jj);
+                              zinflux(ii,jj,kk) = zoutflux(ii,jj,kk+1);
+                              %fluxk(ii,jj) = 2*angflux(ii,jj,kk,iang,ieg)-fluxk_pre(ii,jj);  %2*angflux(ii,jj,kk+1,iang,ieg)-fluxk_pre(ii,jj);
+                              %if fluxk(ii,jj)<0
+                              %    fluxk(ii,jj) = 0.0;
+                              %    angflux(ii,jj,kk+1,iang,ieg) = 0.5*(fluxk(ii,jj)+fluxk_pre(ii,jj));
+                              %end
+                              %fluxk_pre(ii,jj) = fluxk(ii,jj);
                           end
-                          angflux(ii,jj,kk,iang,ieg) = (totsource(ii,jj,kk)*vol(ii,jj,kk)+2*DA(jj,kk,iang)*fluxi+2*DB(ii,kk,iang)*fluxj(ii)+2*DC(ii,jj,iang)*fluxk(ii,jj))/ ...
+                          
+                          % Calculate the angular and total flux
+                          angflux(ii,jj,kk,iang,ieg) = (totsource(ii,jj,kk)*vol(ii,jj,kk) + ...
+                                                        2*DA(jj,kk,iang)*xinflux(ii,jj,kk) + ...
+                                                        2*DB(ii,kk,iang)*yinflux(ii,jj,kk) + ...
+                                                        2*DC(ii,jj,iang)*zinflux(ii,jj,kk)) / ...
                                    (vol(ii,jj,kk)*msig(ieg, zid,1,1)+2*(DA(jj,kk,iang)+DB(ii,kk,iang)+DC(ii,jj,iang)));
-%                           if angflux(ii,jj,kk,iang,ieg)<0 % Negtive flux fix
-%                               angflux(ii,jj,kk,iang,ieg)=0.0;
-%                           end
+                               
+                          % Now we calculate the outgoing flux 
+                          xoutflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - xinflux(ii,jj,kk);
+                          youtflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - yinflux(ii,jj,kk);
+                          zoutflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - zinflux(ii,jj,kk);
+                          
+                          % Flux fixup
+                          if xoutflux(ii,jj,kk) < 0
+                              xoutflux(ii,jj,kk) = 0;
+                          end
+                          if youtflux(ii,jj,kk) < 0
+                              youtflux(ii,jj,kk) = 0;
+                          end
+                          if zoutflux(ii,jj,kk) < 0
+                              zoutflux(ii,jj,kk) = 0;
+                          end
+                          
+                          angflux(ii,jj,kk,iang,ieg) = (xinflux(ii,jj,kk) + yinflux(ii,jj,kk) + zinflux(ii,jj,kk) + ...
+                                                        xoutflux(ii,jj,kk) + youtflux(ii,jj,kk) + zoutflux(ii,jj,kk))/6;
+                               
                           tempflux(ii,jj,kk) = tempflux(ii,jj,kk)+wt(iang)*angflux(ii,jj,kk,iang,ieg); % Scalar flux is the summation of angular flux
-                          
-%                           if(jj==1 && kk==1)
-%                               disp(['fluxi=',num2str(fluxi), 'fluxj=', num2str(fluxj(ii)), 'fluxk=', num2str(fluxk(ii,jj))]);
-%                           end
-%                           if(ii==31 && jj==2 && kk==13)
-%                             disp(['ii=',num2str(ii), 'jj=', num2str(jj), 'kk=', num2str(kk),'  ', num2str(max(max(max(tempflux))))]);
-%                             keyboard
-%                           end
-                          
                       end
                   end
               end
           end % End of octant #1
              
+          
           if(emu(iang)>0 && eta(iang)<0 && xzi(iang)<0) % Octant #2
               for kk=cfg.zmesh:-1:1       % Sweep through the 3D mesh from corner       
                   for jj=cfg.ymesh:-1:1
                       for ii=1:1:cfg.xmesh
-                          zid = zone_id(ii,jj,kk)+1;
-                          if(ii==1) % At boundary setup vaccum boundary condition
-                              fluxi = 0;
-                              fluxi_pre =0;
+                          zid = zone_id(ii,jj,kk)+1; %Note: zone id start at 0, so the array index plus 1.
+                          if(ii==1) % At boundary setup vaccum boundary condition 
+                              xinflux(ii,jj,kk) = 0;
                           else
-                              fluxi = angflux(ii-1,jj,kk,iang,ieg);  %2*angflux(ii-1,jj,kk,iang,ieg)-fluxi_pre;
-                              if fluxi<0   %  Non negtive fix
-                                  fluxi = 0.0;
-                                  angflux(ii-1,jj,kk,iang,ieg) = 0.5*(fluxi+fluxi_pre);  % Update the angular flux
-                              end
-                              fluxi_pre = fluxi;
+                              xinflux(ii,jj,kk) = xoutflux(ii-1,jj,kk);
                           end                          
                           if(jj==cfg.ymesh) % At boundary setup vaccum boundary condition
-                              fluxj(ii) = 0;
-                              fluxj_pre(ii) = 0;
+                              yinflux(ii,jj,kk) = 0;
                           else
-                              fluxj(ii) = angflux(ii,jj+1,kk,iang,ieg);  %2*angflux(ii,jj+1,kk,iang,ieg)-fluxj_pre(ii);
-                              if fluxj(ii)<0
-                                  fluxj(ii) = 0.0;
-                                  angflux(ii,jj+1,kk,iang,ieg) = 0.5*(fluxj(ii)+fluxj_pre(ii));
-                              end
-                              fluxj_pre(ii) = fluxj(ii);
+                              yinflux(ii,jj,kk) = youtflux(ii,jj+1,kk);
                           end
                           if(kk==cfg.zmesh) % At boundary setup vaccum boundary condition
-                              fluxk(ii,jj) = 0;
-                              fluxk_pre(ii,jj) =0;
+                              zinflux(ii,jj,kk) = 0;
                           else
-                              fluxk(ii,jj) = angflux(ii,jj,kk+1,iang,ieg);  %2*angflux(ii,jj,kk+1,iang,ieg)-fluxk_pre(ii,jj);
-                              if fluxk(ii,jj)<0
-                                  fluxk(ii,jj) = 0.0;
-                                  angflux(ii,jj,kk+1,iang,ieg) = 0.5*(fluxk(ii,jj)+fluxk_pre(ii,jj));
-                              end
-                              fluxk_pre(ii,jj) = fluxk(ii,jj);
+                              zinflux(ii,jj,kk) = zoutflux(ii,jj,kk+1);
                           end
-                          angflux(ii,jj,kk,iang,ieg) = (totsource(ii,jj,kk)*vol(ii,jj,kk)+2*DA(jj,kk,iang)*fluxi+2*DB(ii,kk,iang)*fluxj(ii)+2*DC(ii,jj,iang)*fluxk(ii,jj))/ ...
+                          
+                          % Calculate the angular and total flux
+                          angflux(ii,jj,kk,iang,ieg) = (totsource(ii,jj,kk)*vol(ii,jj,kk) + ...
+                                                        2*DA(jj,kk,iang)*xinflux(ii,jj,kk) + ...
+                                                        2*DB(ii,kk,iang)*yinflux(ii,jj,kk) + ...
+                                                        2*DC(ii,jj,iang)*zinflux(ii,jj,kk)) / ...
                                    (vol(ii,jj,kk)*msig(ieg, zid,1,1)+2*(DA(jj,kk,iang)+DB(ii,kk,iang)+DC(ii,jj,iang)));
-%                           if angflux(ii,jj,kk,iang,ieg)<0 % Negtive flux fix
-%                               angflux(ii,jj,kk,iang,ieg)=0.0;
-%                           end
+                               
+                          % Now we calculate the outgoing flux 
+                          xoutflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - xinflux(ii,jj,kk);
+                          youtflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - yinflux(ii,jj,kk);
+                          zoutflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - zinflux(ii,jj,kk);
+                          
+                          % Flux fixup
+                          if xoutflux(ii,jj,kk) < 0
+                              xoutflux(ii,jj,kk) = 0;
+                          end
+                          if youtflux(ii,jj,kk) < 0
+                              youtflux(ii,jj,kk) = 0;
+                          end
+                          if zoutflux(ii,jj,kk) < 0
+                              zoutflux(ii,jj,kk) = 0;
+                          end
+                          
+                          angflux(ii,jj,kk,iang,ieg) = (xinflux(ii,jj,kk) + yinflux(ii,jj,kk) + zinflux(ii,jj,kk) + ...
+                                                        xoutflux(ii,jj,kk) + youtflux(ii,jj,kk) + zoutflux(ii,jj,kk))/6;
+                               
                           tempflux(ii,jj,kk) = tempflux(ii,jj,kk)+wt(iang)*angflux(ii,jj,kk,iang,ieg); % Scalar flux is the summation of angular flux
                       end
                   end
@@ -219,48 +243,52 @@ for ieg=1:cfg.igm  % Loop over energy groups
           end % End of octant #2
           
           if(emu(iang)<0 && eta(iang)>0 && xzi(iang)<0) % Octant #3
-              for kk=cfg.zmesh:-1:1       % Sweep through the 3D mesh from corner       
-                  for jj=1:1:cfg.ymesh
+              for kk=1:1:cfg.zmesh       % Sweep through the 3D mesh from corner       
+                  for jj=cfg.ymesh:-1:1
                       for ii=cfg.xmesh:-1:1
-                          zid = zone_id(ii,jj,kk)+1;
-                          if(ii==cfg.xmesh) % At boundary setup vaccum boundary condition
-                              fluxi = 0;
-                              fluxi_pre =0;
+                          zid = zone_id(ii,jj,kk)+1; %Note: zone id start at 0, so the array index plus 1.
+                          if(ii==cfg.xmesh) % At boundary setup vaccum boundary condition 
+                              xinflux(ii,jj,kk) = 0;
                           else
-                              fluxi = angflux(ii+1,jj,kk,iang,ieg);  %2*angflux(ii+1,jj,kk,iang,ieg)-fluxi_pre;
-                              if fluxi<0   %  Non negtive fix
-                                  fluxi = 0.0;
-                                  angflux(ii+1,jj,kk,iang,ieg) = 0.5*(fluxi+fluxi_pre);  % Update the angular flux
-                              end
-                              fluxi_pre = fluxi;
+                              xinflux(ii,jj,kk) = xoutflux(ii+1,jj,kk);
                           end                          
-                          if(jj==1) % At boundary setup vaccum boundary condition
-                              fluxj(ii) = 0;
-                              fluxj_pre(ii) =0;
+                          if(jj==cfg.ymesh) % At boundary setup vaccum boundary condition
+                              yinflux(ii,jj,kk) = 0;
                           else
-                              fluxj(ii) = angflux(ii,jj-1,kk,iang,ieg);  %2*angflux(ii,jj-1,kk,iang,ieg)-fluxj_pre(ii);
-                              if fluxj(ii)<0
-                                  fluxj(ii) = 0.0;
-                                  angflux(ii,jj-1,kk,iang,ieg) = 0.5*(fluxj(ii)+fluxj_pre(ii));
-                              end
-                              fluxj_pre(ii) = fluxj(ii);
+                              yinflux(ii,jj,kk) = youtflux(ii,jj+1,kk);
                           end
-                          if(kk==cfg.zmesh) % At boundary setup vaccum boundary condition
-                              fluxk(ii,jj) = 0;
-                              fluxk_pre(ii,jj) = 0;
+                          if(kk==1) % At boundary setup vaccum boundary condition
+                              zinflux(ii,jj,kk) = 0;
                           else
-                              fluxk(ii,jj) = angflux(ii,jj,kk+1,iang,ieg);  %2*angflux(ii,jj,kk+1,iang,ieg)-fluxk_pre(ii,jj);
-                              if fluxk(ii,jj)<0
-                                  fluxk(ii,jj) = 0.0;
-                                  angflux(ii,jj,kk+1,iang,ieg) = 0.5*(fluxk(ii,jj)+fluxk_pre(ii,jj));
-                              end
-                              fluxk_pre(ii,jj) = fluxk(ii,jj);
+                              zinflux(ii,jj,kk) = zoutflux(ii,jj,kk-1);
                           end
-                          angflux(ii,jj,kk,iang,ieg) = (totsource(ii,jj,kk)*vol(ii,jj,kk)+2*DA(jj,kk,iang)*fluxi+2*DB(ii,kk,iang)*fluxj(ii)+2*DC(ii,jj,iang)*fluxk(ii,jj))/ ...
+                          
+                          % Calculate the angular and total flux
+                          angflux(ii,jj,kk,iang,ieg) = (totsource(ii,jj,kk)*vol(ii,jj,kk) + ...
+                                                        2*DA(jj,kk,iang)*xinflux(ii,jj,kk) + ...
+                                                        2*DB(ii,kk,iang)*yinflux(ii,jj,kk) + ...
+                                                        2*DC(ii,jj,iang)*zinflux(ii,jj,kk)) / ...
                                    (vol(ii,jj,kk)*msig(ieg, zid,1,1)+2*(DA(jj,kk,iang)+DB(ii,kk,iang)+DC(ii,jj,iang)));
-%                           if angflux(ii,jj,kk,iang,ieg)<0 % Negtive flux fix
-%                               angflux(ii,jj,kk,iang,ieg)=0.0;
-%                           end
+                               
+                          % Now we calculate the outgoing flux 
+                          xoutflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - xinflux(ii,jj,kk);
+                          youtflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - yinflux(ii,jj,kk);
+                          zoutflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - zinflux(ii,jj,kk);
+                          
+                          % Flux fixup
+                          if xoutflux(ii,jj,kk) < 0
+                              xoutflux(ii,jj,kk) = 0;
+                          end
+                          if youtflux(ii,jj,kk) < 0
+                              youtflux(ii,jj,kk) = 0;
+                          end
+                          if zoutflux(ii,jj,kk) < 0
+                              zoutflux(ii,jj,kk) = 0;
+                          end
+                          
+                          angflux(ii,jj,kk,iang,ieg) = (xinflux(ii,jj,kk) + yinflux(ii,jj,kk) + zinflux(ii,jj,kk) + ...
+                                                        xoutflux(ii,jj,kk) + youtflux(ii,jj,kk) + zoutflux(ii,jj,kk))/6;
+                               
                           tempflux(ii,jj,kk) = tempflux(ii,jj,kk)+wt(iang)*angflux(ii,jj,kk,iang,ieg); % Scalar flux is the summation of angular flux
                       end
                   end
@@ -269,48 +297,52 @@ for ieg=1:cfg.igm  % Loop over energy groups
           
    
           if(emu(iang)>0 && eta(iang)>0 && xzi(iang)<0) % Octant #4
-              for kk=cfg.zmesh:-1:1       % Sweep through the 3D mesh from corner       
-                  for jj=1:1:cfg.ymesh
+              for kk=1:1:cfg.zmesh       % Sweep through the 3D mesh from corner       
+                  for jj=cfg.ymesh:-1:1
                       for ii=1:1:cfg.xmesh
-                          zid = zone_id(ii,jj,kk)+1;
-                          if(ii==1) % At boundary setup vaccum boundary condition
-                              fluxi = 0;
-                              fluxi_pre =0;
+                          zid = zone_id(ii,jj,kk)+1; %Note: zone id start at 0, so the array index plus 1.
+                          if(ii==1) % At boundary setup vaccum boundary condition 
+                              xinflux(ii,jj,kk) = 0;
                           else
-                              fluxi = angflux(ii-1,jj,kk,iang,ieg);  %2*angflux(ii-1,jj,kk,iang,ieg)-fluxi_pre;
-                              if fluxi<0   %  Non negtive fix
-                                  fluxi = 0.0;
-                                  angflux(ii-1,jj,kk,iang,ieg) = 0.5*(fluxi+fluxi_pre);  % Update the angular flux
-                              end
-                              fluxi_pre = fluxi;
+                              xinflux(ii,jj,kk) = xoutflux(ii-1,jj,kk);
                           end                          
-                          if(jj==1) % At boundary setup vaccum boundary condition
-                              fluxj(ii) = 0;
-                              fluxj_pre(ii) = 0;
+                          if(jj==cfg.ymesh) % At boundary setup vaccum boundary condition
+                              yinflux(ii,jj,kk) = 0;
                           else
-                              fluxj(ii) = angflux(ii,jj-1,kk,iang,ieg);  %2*angflux(ii,jj-1,kk,iang,ieg)-fluxj_pre(ii);
-                              if fluxj(ii)<0
-                                  fluxj(ii) = 0.0;
-                                  angflux(ii,jj-1,kk,iang,ieg) = 0.5*(fluxj(ii)+fluxj_pre(ii));
-                              end
-                              fluxj_pre(ii) = fluxj(ii);
+                              yinflux(ii,jj,kk) = youtflux(ii,jj+1,kk);
                           end
-                          if(kk==cfg.zmesh) % At boundary setup vaccum boundary condition
-                              fluxk(ii,jj) = 0;
-                              fluxk_pre(ii,jj) =0;
+                          if(kk==1) % At boundary setup vaccum boundary condition
+                              zinflux(ii,jj,kk) = 0;
                           else
-                              fluxk(ii,jj) = angflux(ii,jj,kk+1,iang,ieg);  %2*angflux(ii,jj,kk+1,iang,ieg)-fluxk_pre(ii,jj);
-                              if fluxk(ii,jj)<0
-                                  fluxk(ii,jj) = 0.0;
-                                  angflux(ii,jj,kk+1,iang,ieg) = 0.5*(fluxk(ii,jj)+fluxk_pre(ii,jj));
-                              end
-                              fluxk_pre(ii,jj) = fluxk(ii,jj);
+                              zinflux(ii,jj,kk) = zoutflux(ii,jj,kk-1);
                           end
-                          angflux(ii,jj,kk,iang,ieg) = (totsource(ii,jj,kk)*vol(ii,jj,kk)+2*DA(jj,kk,iang)*fluxi+2*DB(ii,kk,iang)*fluxj(ii)+2*DC(ii,jj,iang)*fluxk(ii,jj))/ ...
+                          
+                          % Calculate the angular and total flux
+                          angflux(ii,jj,kk,iang,ieg) = (totsource(ii,jj,kk)*vol(ii,jj,kk) + ...
+                                                        2*DA(jj,kk,iang)*xinflux(ii,jj,kk) + ...
+                                                        2*DB(ii,kk,iang)*yinflux(ii,jj,kk) + ...
+                                                        2*DC(ii,jj,iang)*zinflux(ii,jj,kk)) / ...
                                    (vol(ii,jj,kk)*msig(ieg, zid,1,1)+2*(DA(jj,kk,iang)+DB(ii,kk,iang)+DC(ii,jj,iang)));
-%                           if angflux(ii,jj,kk,iang,ieg)<0 % Negtive flux fix
-%                               angflux(ii,jj,kk,iang,ieg)=0.0;
-%                           end
+                               
+                          % Now we calculate the outgoing flux 
+                          xoutflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - xinflux(ii,jj,kk);
+                          youtflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - yinflux(ii,jj,kk);
+                          zoutflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - zinflux(ii,jj,kk);
+                          
+                          % Flux fixup
+                          if xoutflux(ii,jj,kk) < 0
+                              xoutflux(ii,jj,kk) = 0;
+                          end
+                          if youtflux(ii,jj,kk) < 0
+                              youtflux(ii,jj,kk) = 0;
+                          end
+                          if zoutflux(ii,jj,kk) < 0
+                              zoutflux(ii,jj,kk) = 0;
+                          end
+                          
+                          angflux(ii,jj,kk,iang,ieg) = (xinflux(ii,jj,kk) + yinflux(ii,jj,kk) + zinflux(ii,jj,kk) + ...
+                                                        xoutflux(ii,jj,kk) + youtflux(ii,jj,kk) + zoutflux(ii,jj,kk))/6;
+                               
                           tempflux(ii,jj,kk) = tempflux(ii,jj,kk)+wt(iang)*angflux(ii,jj,kk,iang,ieg); % Scalar flux is the summation of angular flux
                       end
                   end
@@ -318,48 +350,52 @@ for ieg=1:cfg.igm  % Loop over energy groups
           end % End of octant #4         
           
           if(emu(iang)<0 && eta(iang)<0 && xzi(iang)>0) % Octant #5
-              for kk=1:1:cfg.zmesh       % Sweep through the 3D mesh from corner       
-                  for jj=cfg.ymesh:-1:1
+              for kk=cfg.zmesh:-1:1       % Sweep through the 3D mesh from corner       
+                  for jj=1:1:cfg.ymesh
                       for ii=cfg.xmesh:-1:1
-                          zid = zone_id(ii,jj,kk)+1;
-                          if(ii==cfg.xmesh) % At boundary setup vaccum boundary condition
-                              fluxi = 0;
-                              fluxi_pre =0;
+                          zid = zone_id(ii,jj,kk)+1; %Note: zone id start at 0, so the array index plus 1.
+                          if(ii==cfg.xmesh) % At boundary setup vaccum boundary condition 
+                              xinflux(ii,jj,kk) = 0;
                           else
-                              fluxi = angflux(ii+1,jj,kk,iang,ieg);  %2*angflux(ii+1,jj,kk,iang,ieg)-fluxi_pre;
-                              if fluxi<0   %  Non negtive fix
-                                  fluxi = 0.0;
-                                  angflux(ii+1,jj,kk,iang,ieg) = 0.5*(fluxi+fluxi_pre);  % Update the angular flux
-                              end
-                              fluxi_pre = fluxi;
+                              xinflux(ii,jj,kk) = xoutflux(ii+1,jj,kk);
                           end                          
-                          if(jj==cfg.ymesh) % At boundary setup vaccum boundary condition
-                              fluxj(ii) = 0;
-                              fluxj_pre(ii) = 0;
+                          if(jj==1) % At boundary setup vaccum boundary condition
+                              yinflux(ii,jj,kk) = 0;
                           else
-                              fluxj(ii) = angflux(ii,jj+1,kk,iang,ieg);  %2*angflux(ii,jj+1,kk,iang,ieg)-fluxj_pre(ii);
-                              if fluxj(ii)<0
-                                  fluxj(ii) = 0.0;
-                                  angflux(ii,jj+1,kk,iang,ieg) = 0.5*(fluxj(ii)+fluxj_pre(ii));
-                              end
-                              fluxj_pre(ii) = fluxj(ii);
+                              yinflux(ii,jj,kk) = youtflux(ii,jj-1,kk);
                           end
-                          if(kk==1) % At boundary setup vaccum boundary condition
-                              fluxk(ii,jj) = 0;
-                              fluxk_pre(ii,jj) = 0;
+                          if(kk==cfg.zmesh) % At boundary setup vaccum boundary condition
+                              zinflux(ii,jj,kk) = 0;
                           else
-                              fluxk(ii,jj) = angflux(ii,jj,kk-1,iang,ieg);  %2*angflux(ii,jj,kk-1,iang,ieg)-fluxk_pre(ii,jj);
-                              if fluxk(ii,jj)<0
-                                  fluxk(ii,jj) = 0.0;
-                                  angflux(ii,jj,kk-1,iang,ieg) = 0.5*(fluxk(ii,jj)+fluxk_pre(ii,jj));
-                              end
-                              fluxk_pre(ii,jj) = fluxk(ii,jj);
+                              zinflux(ii,jj,kk) = zoutflux(ii,jj,kk+1);
                           end
-                          angflux(ii,jj,kk,iang,ieg) = (totsource(ii,jj,kk)*vol(ii,jj,kk)+2*DA(jj,kk,iang)*fluxi+2*DB(ii,kk,iang)*fluxj(ii)+2*DC(ii,jj,iang)*fluxk(ii,jj))/ ...
+                          
+                          % Calculate the angular and total flux
+                          angflux(ii,jj,kk,iang,ieg) = (totsource(ii,jj,kk)*vol(ii,jj,kk) + ...
+                                                        2*DA(jj,kk,iang)*xinflux(ii,jj,kk) + ...
+                                                        2*DB(ii,kk,iang)*yinflux(ii,jj,kk) + ...
+                                                        2*DC(ii,jj,iang)*zinflux(ii,jj,kk)) / ...
                                    (vol(ii,jj,kk)*msig(ieg, zid,1,1)+2*(DA(jj,kk,iang)+DB(ii,kk,iang)+DC(ii,jj,iang)));
-%                           if angflux(ii,jj,kk,iang,ieg)<0 % Negtive flux fix
-%                               angflux(ii,jj,kk,iang,ieg)=0.0;
-%                           end
+                               
+                          % Now we calculate the outgoing flux 
+                          xoutflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - xinflux(ii,jj,kk);
+                          youtflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - yinflux(ii,jj,kk);
+                          zoutflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - zinflux(ii,jj,kk);
+                          
+                          % Flux fixup
+                          if xoutflux(ii,jj,kk) < 0
+                              xoutflux(ii,jj,kk) = 0;
+                          end
+                          if youtflux(ii,jj,kk) < 0
+                              youtflux(ii,jj,kk) = 0;
+                          end
+                          if zoutflux(ii,jj,kk) < 0
+                              zoutflux(ii,jj,kk) = 0;
+                          end
+                          
+                          angflux(ii,jj,kk,iang,ieg) = (xinflux(ii,jj,kk) + yinflux(ii,jj,kk) + zinflux(ii,jj,kk) + ...
+                                                        xoutflux(ii,jj,kk) + youtflux(ii,jj,kk) + zoutflux(ii,jj,kk))/6;
+                               
                           tempflux(ii,jj,kk) = tempflux(ii,jj,kk)+wt(iang)*angflux(ii,jj,kk,iang,ieg); % Scalar flux is the summation of angular flux
                       end
                   end
@@ -367,48 +403,52 @@ for ieg=1:cfg.igm  % Loop over energy groups
           end % End of octant #5       
           
           if(emu(iang)>0 && eta(iang)<0 && xzi(iang)>0) % Octant #6
-              for kk=1:1:cfg.zmesh       % Sweep through the 3D mesh from corner       
-                  for jj=cfg.ymesh:-1:1
+              for kk=cfg.zmesh:-1:1       % Sweep through the 3D mesh from corner       
+                  for jj=1:1:cfg.ymesh
                       for ii=1:1:cfg.xmesh
-                          zid = zone_id(ii,jj,kk)+1;
-                          if(ii==1) % At boundary setup vaccum boundary condition
-                              fluxi = 0;
-                              fluxi_pre =0;
+                          zid = zone_id(ii,jj,kk)+1; %Note: zone id start at 0, so the array index plus 1.
+                          if(ii==1) % At boundary setup vaccum boundary condition 
+                              xinflux(ii,jj,kk) = 0;
                           else
-                              fluxi = angflux(ii-1,jj,kk,iang,ieg);  %2*angflux(ii-1,jj,kk,iang,ieg)-fluxi_pre;
-                              if fluxi<0   %  Non negtive fix
-                                  fluxi = 0.0;
-                                  angflux(ii-1,jj,kk,iang,ieg) = 0.5*(fluxi+fluxi_pre);  % Update the angular flux
-                              end
-                              fluxi_pre = fluxi;
+                              xinflux(ii,jj,kk) = xoutflux(ii-1,jj,kk);
                           end                          
-                          if(jj==cfg.ymesh) % At boundary setup vaccum boundary condition
-                              fluxj(ii) = 0;
-                              fluxj_pre(ii) = 0;
+                          if(jj==1) % At boundary setup vaccum boundary condition
+                              yinflux(ii,jj,kk) = 0;
                           else
-                              fluxj(ii) = angflux(ii,jj+1,kk,iang,ieg);  %2*angflux(ii,jj+1,kk,iang,ieg)-fluxj_pre(ii);
-                              if fluxj(ii)<0
-                                  fluxj(ii) = 0.0;
-                                  angflux(ii,jj+1,kk,iang,ieg) = 0.5*(fluxj(ii)+fluxj_pre(ii));
-                              end
-                              fluxj_pre(ii) = fluxj(ii);
+                              yinflux(ii,jj,kk) = youtflux(ii,jj-1,kk);
                           end
-                          if(kk==1) % At boundary setup vaccum boundary condition
-                              fluxk(ii,jj) = 0;
-                              fluxk_pre(ii,jj) =0;
+                          if(kk==cfg.zmesh) % At boundary setup vaccum boundary condition
+                              zinflux(ii,jj,kk) = 0;
                           else
-                              fluxk(ii,jj) = angflux(ii,jj,kk-1,iang,ieg);  %2*angflux(ii,jj,kk-1,iang,ieg)-fluxk_pre(ii,jj);
-                              if fluxk(ii,jj)<0
-                                  fluxk(ii,jj) = 0.0;
-                                  angflux(ii,jj,kk-1,iang,ieg) = 0.5*(fluxk(ii,jj)+fluxk_pre(ii,jj));
-                              end
-                              fluxk_pre(ii,jj) = fluxk(ii,jj);
+                              zinflux(ii,jj,kk) = zoutflux(ii,jj,kk+1);
                           end
-                          angflux(ii,jj,kk,iang,ieg) = (totsource(ii,jj,kk)*vol(ii,jj,kk)+2*DA(jj,kk,iang)*fluxi+2*DB(ii,kk,iang)*fluxj(ii)+2*DC(ii,jj,iang)*fluxk(ii,jj))/ ...
+                          
+                          % Calculate the angular and total flux
+                          angflux(ii,jj,kk,iang,ieg) = (totsource(ii,jj,kk)*vol(ii,jj,kk) + ...
+                                                        2*DA(jj,kk,iang)*xinflux(ii,jj,kk) + ...
+                                                        2*DB(ii,kk,iang)*yinflux(ii,jj,kk) + ...
+                                                        2*DC(ii,jj,iang)*zinflux(ii,jj,kk)) / ...
                                    (vol(ii,jj,kk)*msig(ieg, zid,1,1)+2*(DA(jj,kk,iang)+DB(ii,kk,iang)+DC(ii,jj,iang)));
-%                           if angflux(ii,jj,kk,iang,ieg)<0 % Negtive flux fix
-%                               angflux(ii,jj,kk,iang,ieg)=0.0;
-%                           end
+                               
+                          % Now we calculate the outgoing flux 
+                          xoutflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - xinflux(ii,jj,kk);
+                          youtflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - yinflux(ii,jj,kk);
+                          zoutflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - zinflux(ii,jj,kk);
+                          
+                          % Flux fixup
+                          if xoutflux(ii,jj,kk) < 0
+                              xoutflux(ii,jj,kk) = 0;
+                          end
+                          if youtflux(ii,jj,kk) < 0
+                              youtflux(ii,jj,kk) = 0;
+                          end
+                          if zoutflux(ii,jj,kk) < 0
+                              zoutflux(ii,jj,kk) = 0;
+                          end
+                          
+                          angflux(ii,jj,kk,iang,ieg) = (xinflux(ii,jj,kk) + yinflux(ii,jj,kk) + zinflux(ii,jj,kk) + ...
+                                                        xoutflux(ii,jj,kk) + youtflux(ii,jj,kk) + zoutflux(ii,jj,kk))/6;
+                               
                           tempflux(ii,jj,kk) = tempflux(ii,jj,kk)+wt(iang)*angflux(ii,jj,kk,iang,ieg); % Scalar flux is the summation of angular flux
                       end
                   end
@@ -419,45 +459,49 @@ for ieg=1:cfg.igm  % Loop over energy groups
               for kk=1:1:cfg.zmesh       % Sweep through the 3D mesh from corner       
                   for jj=1:1:cfg.ymesh
                       for ii=cfg.xmesh:-1:1
-                          zid = zone_id(ii,jj,kk)+1;
-                          if(ii==cfg.xmesh) % At boundary setup vaccum boundary condition
-                              fluxi = 0;
-                              fluxi_pre =0;
+                          zid = zone_id(ii,jj,kk)+1; %Note: zone id start at 0, so the array index plus 1.
+                          if(ii==cfg.xmesh) % At boundary setup vaccum boundary condition 
+                              xinflux(ii,jj,kk) = 0;
                           else
-                              fluxi = angflux(ii+1,jj,kk,iang,ieg);  %2*angflux(ii+1,jj,kk,iang,ieg)-fluxi_pre;
-                              if fluxi<0   %  Non negtive fix
-                                  fluxi = 0.0;
-                                  angflux(ii+1,jj,kk,iang,ieg) = 0.5*(fluxi+fluxi_pre);  % Update the angular flux
-                              end
-                              fluxi_pre = fluxi;
+                              xinflux(ii,jj,kk) = xoutflux(ii+1,jj,kk);
                           end                          
                           if(jj==1) % At boundary setup vaccum boundary condition
-                              fluxj(ii) = 0;
-                              fluxj_pre(ii) = 0;
+                              yinflux(ii,jj,kk) = 0;
                           else
-                              fluxj(ii) = angflux(ii,jj-1,kk,iang,ieg);  %2*angflux(ii,jj-1,kk,iang,ieg)-fluxj_pre(ii);
-                              if fluxj(ii)<0
-                                  fluxj(ii) = 0.0;
-                                  angflux(ii,jj-1,kk,iang,ieg) = 0.5*(fluxj(ii)+fluxj_pre(ii));
-                              end
-                              fluxj_pre(ii) = fluxj(ii);
+                              yinflux(ii,jj,kk) = youtflux(ii,jj-1,kk);
                           end
                           if(kk==1) % At boundary setup vaccum boundary condition
-                              fluxk(ii,jj) = 0;
-                              fluxk_pre(ii,jj) = 0;
+                              zinflux(ii,jj,kk) = 0;
                           else
-                              fluxk(ii,jj) = angflux(ii,jj,kk-1,iang,ieg);  %2*angflux(ii,jj,kk-1,iang,ieg)-fluxk_pre(ii,jj);
-                              if fluxk(ii,jj)<0
-                                  fluxk(ii,jj) = 0.0;
-                                  angflux(ii,jj,kk-1,iang,ieg) = 0.5*(fluxk(ii,jj)+fluxk_pre(ii,jj));
-                              end
-                              fluxk_pre(ii,jj) = fluxk(ii,jj);
+                              zinflux(ii,jj,kk) = zoutflux(ii,jj,kk-1);
                           end
-                          angflux(ii,jj,kk,iang,ieg) = (totsource(ii,jj,kk)*vol(ii,jj,kk)+2*DA(jj,kk,iang)*fluxi+2*DB(ii,kk,iang)*fluxj(ii)+2*DC(ii,jj,iang)*fluxk(ii,jj))/ ...
+                          
+                          % Calculate the angular and total flux
+                          angflux(ii,jj,kk,iang,ieg) = (totsource(ii,jj,kk)*vol(ii,jj,kk) + ...
+                                                        2*DA(jj,kk,iang)*xinflux(ii,jj,kk) + ...
+                                                        2*DB(ii,kk,iang)*yinflux(ii,jj,kk) + ...
+                                                        2*DC(ii,jj,iang)*zinflux(ii,jj,kk)) / ...
                                    (vol(ii,jj,kk)*msig(ieg, zid,1,1)+2*(DA(jj,kk,iang)+DB(ii,kk,iang)+DC(ii,jj,iang)));
-%                           if angflux(ii,jj,kk,iang,ieg)<0 % Negtive flux fix
-%                               angflux(ii,jj,kk,iang,ieg)=0.0;
-%                           end
+                               
+                          % Now we calculate the outgoing flux 
+                          xoutflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - xinflux(ii,jj,kk);
+                          youtflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - yinflux(ii,jj,kk);
+                          zoutflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - zinflux(ii,jj,kk);
+                          
+                          % Flux fixup
+                          if xoutflux(ii,jj,kk) < 0
+                              xoutflux(ii,jj,kk) = 0;
+                          end
+                          if youtflux(ii,jj,kk) < 0
+                              youtflux(ii,jj,kk) = 0;
+                          end
+                          if zoutflux(ii,jj,kk) < 0
+                              zoutflux(ii,jj,kk) = 0;
+                          end
+                          
+                          angflux(ii,jj,kk,iang,ieg) = (xinflux(ii,jj,kk) + yinflux(ii,jj,kk) + zinflux(ii,jj,kk) + ...
+                                                        xoutflux(ii,jj,kk) + youtflux(ii,jj,kk) + zoutflux(ii,jj,kk))/6;
+                               
                           tempflux(ii,jj,kk) = tempflux(ii,jj,kk)+wt(iang)*angflux(ii,jj,kk,iang,ieg); % Scalar flux is the summation of angular flux
                       end
                   end
@@ -468,45 +512,49 @@ for ieg=1:cfg.igm  % Loop over energy groups
               for kk=1:1:cfg.zmesh       % Sweep through the 3D mesh from corner       
                   for jj=1:1:cfg.ymesh
                       for ii=1:1:cfg.xmesh
-                          zid = zone_id(ii,jj,kk)+1;
-                          if(ii==1) % At boundary setup vaccum boundary condition
-                              fluxi = 0;
-                              fluxi_pre =0;
+                          zid = zone_id(ii,jj,kk)+1; %Note: zone id start at 0, so the array index plus 1.
+                          if(ii==1) % At boundary setup vaccum boundary condition 
+                              xinflux(ii,jj,kk) = 0;
                           else
-                              fluxi = angflux(ii-1,jj,kk,iang,ieg);  %2*angflux(ii-1,jj,kk,iang,ieg)-fluxi_pre;
-                              if fluxi<0   %  Non negtive fix
-                                  fluxi = 0.0;
-                                  angflux(ii-1,jj,kk,iang,ieg) = 0.5*(fluxi+fluxi_pre);  % Update the angular flux
-                              end
-                              fluxi_pre = fluxi;
+                              xinflux(ii,jj,kk) = xoutflux(ii-1,jj,kk);
                           end                          
                           if(jj==1) % At boundary setup vaccum boundary condition
-                              fluxj(ii) = 0;
-                              fluxj_pre(ii) = 0;
+                              yinflux(ii,jj,kk) = 0;
                           else
-                              fluxj(ii) = angflux(ii,jj-1,kk,iang,ieg);  %2*angflux(ii,jj-1,kk,iang,ieg)-fluxj_pre(ii);
-                              if fluxj(ii)<0
-                                  fluxj(ii) = 0.0;
-                                  angflux(ii,jj-1,kk,iang,ieg) = 0.5*(fluxj(ii)+fluxj_pre(ii));
-                              end
-                              fluxj_pre(ii) = fluxj(ii);
+                              yinflux(ii,jj,kk) = youtflux(ii,jj-1,kk);
                           end
                           if(kk==1) % At boundary setup vaccum boundary condition
-                              fluxk(ii,jj) = 0;
-                              fluxk_pre(ii,jj) = 0;
+                              zinflux(ii,jj,kk) = 0;
                           else
-                              fluxk(ii,jj) = angflux(ii,jj,kk-1,iang,ieg);  %2*angflux(ii,jj,kk-1,iang,ieg)-fluxk_pre(ii,jj);
-                              if fluxk(ii,jj)<0
-                                  fluxk(ii,jj) = 0.0;
-                                  angflux(ii,jj,kk-1,iang,ieg) = 0.5*(fluxk(ii,jj)+fluxk_pre(ii,jj));
-                              end
-                              fluxk_pre(ii,jj) = fluxk(ii,jj);
+                              zinflux(ii,jj,kk) = zoutflux(ii,jj,kk-1);
                           end
-                          angflux(ii,jj,kk,iang,ieg) = (totsource(ii,jj,kk)*vol(ii,jj,kk)+2*DA(jj,kk,iang)*fluxi+2*DB(ii,kk,iang)*fluxj(ii)+2*DC(ii,jj,iang)*fluxk(ii,jj))/ ...
+                          
+                          % Calculate the angular and total flux
+                          angflux(ii,jj,kk,iang,ieg) = (totsource(ii,jj,kk)*vol(ii,jj,kk) + ...
+                                                        2*DA(jj,kk,iang)*xinflux(ii,jj,kk) + ...
+                                                        2*DB(ii,kk,iang)*yinflux(ii,jj,kk) + ...
+                                                        2*DC(ii,jj,iang)*zinflux(ii,jj,kk)) / ...
                                    (vol(ii,jj,kk)*msig(ieg, zid,1,1)+2*(DA(jj,kk,iang)+DB(ii,kk,iang)+DC(ii,jj,iang)));
-%                           if angflux(ii,jj,kk,iang,ieg)<0 % Negtive flux fix
-%                               angflux(ii,jj,kk,iang,ieg)=0.0;
-%                           end
+                               
+                          % Now we calculate the outgoing flux 
+                          xoutflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - xinflux(ii,jj,kk);
+                          youtflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - yinflux(ii,jj,kk);
+                          zoutflux(ii,jj,kk) = 2*angflux(ii,jj,kk,iang,ieg) - zinflux(ii,jj,kk);
+                          
+                          % Flux fixup
+                          if xoutflux(ii,jj,kk) < 0
+                              xoutflux(ii,jj,kk) = 0;
+                          end
+                          if youtflux(ii,jj,kk) < 0
+                              youtflux(ii,jj,kk) = 0;
+                          end
+                          if zoutflux(ii,jj,kk) < 0
+                              zoutflux(ii,jj,kk) = 0;
+                          end
+                          
+                          angflux(ii,jj,kk,iang,ieg) = (xinflux(ii,jj,kk) + yinflux(ii,jj,kk) + zinflux(ii,jj,kk) + ...
+                                                        xoutflux(ii,jj,kk) + youtflux(ii,jj,kk) + zoutflux(ii,jj,kk))/6;
+                               
                           tempflux(ii,jj,kk) = tempflux(ii,jj,kk)+wt(iang)*angflux(ii,jj,kk,iang,ieg); % Scalar flux is the summation of angular flux
                       end
                   end
