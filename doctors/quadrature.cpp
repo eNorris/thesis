@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <string>
+#include <qmath.h>
 
 // Static allocators
 const Quadrature Quadrature::ms_sn2(2);

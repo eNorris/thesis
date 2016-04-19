@@ -1,12 +1,15 @@
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include "config.h"
 
 #include <QDebug>
 
-#include <cmath>
+
 
 // This project relies on libconfig++ being installed. To install it, download libconfig-X.X.tar.gz from http://www.hyperrealm.com/libconfig/  unzip.
 //   Follow the directions in the INSTALL file (./configure, make, make install). Then run "sudo ldconfig" to update the LD path variables so it can be found.
-#include <libconfig.h++>
+//#include <libconfig.h++>
 
 Config::Config() //: m_flatFilterThickness(NULL), m_flatFilterMat(NULL), m_xsection(NULL)
 {
@@ -69,29 +72,31 @@ void Config::loadDefaults()
     ms = 0;   // Cross section mixing table length (ms = 0 no mixing)
     mtm = 6;  // Total number of materials including al Pns (each Pn is considered a nuclide)
     isct = 1; // Maximum order of Legendre (ie scattering) expansion of the cross section (lowest is 0)
-    xsection = {0.0, 0.0,  0.0002, 0.0002,     // Air x-section at 60 keV nearly void P0
-                  0.0, 0.0,  0.0000, 0.0002,     // Air x-section P1 expansion
-                  0.0, 0.0,  0.2059, 0.1770,     // Water x-section at 60 keV  P0
-                  0.0, 0.0,  0.0000, 0.1770,     // Water x-section P1 expansion
-                  0.0, 0.0, 71.4753, 0.0000,     // Tunsgten x-section at 60 keV P0
-                  0.0, 0.0, 71.4753, 0.0000};    // Tunsgten x-section P1 expansion
+    xsection = {0.0f, 0.0f,    0.0002f, 0.0002f,     // Air x-section at 60 keV nearly void P0
+                  0.0f, 0.0f,  0.0000f, 0.0002f,     // Air x-section P1 expansion
+                  0.0f, 0.0f,  0.2059f, 0.1770f,     // Water x-section at 60 keV  P0
+                  0.0f, 0.0f,  0.0000f, 0.1770f,     // Water x-section P1 expansion
+                  0.0f, 0.0f, 71.4753f, 0.0000f,     // Tunsgten x-section at 60 keV P0
+                  0.0f, 0.0f, 71.4753f, 0.0000f};    // Tunsgten x-section P1 expansion
 
     // Total cross section
-    xsTot = {0.0002,      // Air
-             0.2059,      // Water
-             71.4753};    // Tungster
+    xsTot = {0.0002f,      // Air
+             0.2059f,      // Water
+             71.4753f};    // Tungster
     // Scattering cross section
-    xsScat = { 0.0002,    // Air
-               0.1770,    // Water
-               0.0001};   // Tungster
+    xsScat = { 0.0002f,    // Air
+               0.1770f,    // Water
+               0.0001f};   // Tungster
 
     // Source iteration data set
-    epsi = 5.0e-5;  // Convergence criteria
+    epsi = 5.0e-5f;  // Convergence criteria
     maxit = 20;  // Max number of inner iterations (default = 20)
 }
 
 void Config::loadFile(std::string filename)
 {
+    qDebug() << "LIBCONFIG DISABLED";
+    /*
     libconfig::Config cfg;
     try{
         cfg.readFile(filename.c_str());
@@ -110,6 +115,7 @@ void Config::loadFile(std::string filename)
         qDebug() << "No 'name' setting in config file";
         return;
     }
+    */
 
     //const libconfig::Setting &root = cfg.getRoot();
 
