@@ -1,5 +1,7 @@
 % --------------------------------------------------------------------------------------------------------------
 % Description   : Test configuration script for 3D discrete ordinate photon transport simulation
+% Update        : Add 'cfg.source_number' on 04/09/2016
+%                 Add 'cfg.source_activity' on 04/12/2016
 % Created       : Feb 2016
 % --------------------------------------------------------------------------------------------------------------
 
@@ -15,6 +17,8 @@ cfg.callback_output = 'WriteRawView';                              % output type
 cfg.callback_spectrum = 'GetSpectrum';                                 % Spectrum reader callback
 cfg.spectrum_filename = 'nsp_2.dat';                                   % Filename of spectrum to use (includes kVp) 
 % cfg.recompute_spectrum=0;                                            % Re-compute spectrum every view ?
+cfg.source_number = 1;                                                 % Number of sources
+cfg.source_activity = [1.0e6];                                         % Number of photons emitted per second; consponding to the source number
 cfg.source_fanangle = (50/180)*pi;                                     % X-ray fan angle in X-Y plane (degree)
 cfg.source_coneangle = (2/180)*pi;                                     % X-ray cone angel in Z direction (degree) determined by the Z collimation
 cfg.source_top_gap = 1;                                                % Air gap between x-ray source and collimator default=1 cm
@@ -32,8 +36,8 @@ cfg.col_zlen = 5;                                                         % Coll
 %%%%%%%%%%%%
 cfg.sid = 54;                                                      % Source-to-isocenter distance (cm)
 cfg.sdd = 95;                                                      % Source-to-detector distance (cm)
-cfg.xlen = 2*cfg.sdd*tan(cfg.source_fanangle/2);                     % Length in x direction
-cfg.ylen = cfg.sdd-cfg.source_bottom_gap+cfg.col_ylen;                            % Length in y direction assume the W thickness 5cm
+cfg.xlen = 2*cfg.sdd*tan(cfg.source_fanangle/2);                   % Length in x direction
+cfg.ylen = cfg.sdd-cfg.source_bottom_gap+cfg.col_ylen;             % Length in y direction assume the W thickness 5cm
 cfg.zlen = 5;                                                      % Length in z direction default=10cm
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -48,7 +52,7 @@ cfg.flat_filters = {'cu', 0.002};                                  % Material-de
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DIRECTONAL QUNDRATURE SET %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-cfg.sn = 6;                                                      % N in Sn - quadrature order
+cfg.sn = 2;                                                      % N in Sn - quadrature order
 cfg.m = cfg.sn*(cfg.sn+2);                                       % Total number of directions in all 8 octants
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -75,7 +79,7 @@ cfg.xsection = [0.0 0.0  0.0002 0.0002;                             % Air x-sect
 % SOURCE ITERATION DATA SET%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 cfg.epsi = 5.0e-5;                                                   % Convergence criterion on inner iterations (default = 5.e-5)
-cfg.maxit = 10;                                                     % Maximum number of inner iterations (default = 20)
+cfg.maxit = 100;                                                     % Maximum number of inner iterations (default = 20)
 
 
 

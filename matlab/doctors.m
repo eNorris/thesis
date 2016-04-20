@@ -73,8 +73,10 @@ close all;
     axis equal;
     
     gip;          % Setup group-organized x-section data
+
+    grtunc3d;     % Generate uncollided flux and first collision source in each cell
     
-    gssolver;     % Iterative solve flux by Gauss-Seidel method
+    %gssolver;     % Iterative solve flux by Gauss-Seidel method
     
 
 

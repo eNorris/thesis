@@ -1,14 +1,25 @@
 % --------------------------------------------------------------------------------------------------------------
 % Description   : Set space mesh array
+% Update        : Add source point setup on 04/09/2016
 % Created       : Feb 2016
 % --------------------------------------------------------------------------------------------------------------
 
 % Setup the mesh interval for x, y, z dimension
 % Use odd number to make sure the source is NOT on the mesh boundary
 display('Setup mesh ...');
-cfg.xmesh = 59;
+cfg.xmesh = 89;
 cfg.ymesh = 99;
 cfg.zmesh = ceil(5/(cfg.source_front_gap*2));
+
+% Setup the source point
+sx = zeros(cfg.source_number); % Initialize the source position in the grid
+sy = zeros(cfg.source_number);
+sz = zeros(cfg.source_number);
+for isource = 1:cfg.source_number  % Fix me: assume one source point at this moment
+    sx(isource) = (cfg.xmesh-1)/2+1;
+    sy(isource) = cfg.col_ylen/2;  % Fix me: assume mesh size in y directon is 1 cm 
+    sz(isource) = (cfg.zmesh-1)/2+1;
+end
 
 x_index = (0:cfg.xlen/cfg.xmesh:cfg.xlen);
 y_index = (0:cfg.ylen/cfg.ymesh:cfg.ylen);
