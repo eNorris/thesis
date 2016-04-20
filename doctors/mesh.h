@@ -15,26 +15,31 @@ public:
     Mesh();
     Mesh(const Config *config, const Quadrature *quad);
 
-    int xMesh;
-    int yMesh;
-    int zMesh;
+    unsigned int xElemCt;
+    unsigned int yElemCt;
+    unsigned int zElemCt;
 
-    std::vector<float> xIndex;
-    std::vector<float> yIndex;
-    std::vector<float> zIndex;
+    unsigned int xNodeCt;
+    unsigned int yNodeCt;
+    unsigned int zNodeCt;
+
+    std::vector<float> xNodes;
+    std::vector<float> yNodes;
+    std::vector<float> zNodes;
 
     std::vector<float> dx;
     std::vector<float> dy;
     std::vector<float> dz;
 
-    std::vector<float> DA;  // Area of the yz plane a ray sees
-    std::vector<float> DB;  // Area of the xz plane a ray sees
-    std::vector<float> DC;  // Area of the xy plane a ray sees
+    //std::vector<float> DA;  // Area of the yz plane a ray sees
+    //std::vector<float> DB;  // Area of the xz plane a ray sees
+    //std::vector<float> DC;  // Area of the xy plane a ray sees
 
     std::vector<float> Axy;  // Replaces DA (Alreadys has the x2 factored in
     std::vector<float> Ayz;  // Replaces DB
     std::vector<float> Axz;  // Replaces DC
 
+    /*
                                              // mu xi eta
     std::vector<unsigned int> orderOctant1;  // + + +
     std::vector<unsigned int> orderOctant2;  // - + +
@@ -44,6 +49,7 @@ public:
     std::vector<unsigned int> orderOctant6;  // - + -
     std::vector<unsigned int> orderOctant7;  // - - -
     std::vector<unsigned int> orderOctant8;  // + - -
+    */
 
     std::vector<float> vol;
 
@@ -51,11 +57,11 @@ public:
 
     void load(const Config *config, const Quadrature *quad);
 
-    int voxelCount() const;
+    unsigned int voxelCount() const;
     int xjmp() const;
     int yjmp() const;
 
-    std::vector<unsigned int> &getOctantOrder(const float mu, const float xi, const float eta);
+    //std::vector<unsigned int> &getOctantOrder(const float mu, const float xi, const float eta);
 
 public slots:
     void remesh(int xelems, int yelems, int zelems, const Config *config, const Quadrature *quad);

@@ -31,6 +31,11 @@ public:
     float colYLen;
     float colZLen;
 
+    std::vector<float> sourceX;
+    std::vector<float> sourceY;
+    std::vector<float> sourceZ;
+    std::vector<float> sourceIntensity;
+
     // Geometry
     float sourceToIsocenter;  // source to isocenter distance [cm]
     float sourceToDetector;  // source to detector distance [cm]

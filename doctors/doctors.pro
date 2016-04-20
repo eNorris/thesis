@@ -49,7 +49,8 @@ SOURCES += main.cpp\
     colormappable.cpp \
     zoomablepannablegraphicsview.cpp \
     quadglwidget.cpp \
-    outwriter.cpp
+    outwriter.cpp \
+    raytracer.cpp
 
 HEADERS  += mainwindow.h \
     config.h \

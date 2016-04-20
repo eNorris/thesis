@@ -50,6 +50,9 @@ private:
     // Implemented in solvers.cpp instead of mainwindow.cpp
     std::vector<float> gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config);
 
+    // Implemented in raytracer.cpp instead of mainwindow.cpp
+    std::vector<float> raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config);
+
 public:
     QMutex &getBlockingMutex();
 

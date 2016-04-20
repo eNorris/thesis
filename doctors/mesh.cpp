@@ -34,138 +34,144 @@ bool Mesh::insideTightBox(int x, int y, int z, int xmin, int xmax, int ymin, int
             z > zmin && z < zmax;
 }
 
-int Mesh::voxelCount() const
+unsigned int Mesh::voxelCount() const
 {
-    return xMesh * yMesh * zMesh;
+    return xElemCt * yElemCt * zElemCt;
 }
 
 int Mesh::xjmp() const
 {
-    return yMesh * zMesh;
+    return yElemCt * zElemCt;
 }
 
 int Mesh::yjmp() const
 {
-    return zMesh;
+    return zElemCt;
 }
 
 void Mesh::remesh(int xelems, int yelems, int zelems, const Config *config, const Quadrature *quad)
 {
     // these are the number of mesh elements
-    xMesh = xelems; //89;
-    yMesh = yelems; //99;
+    xElemCt = xelems; //89;
+    yElemCt = yelems; //99;
     if(zelems <= 0)
-        zMesh = ceil(5.0 / (2.0 * config->sourceFrontGap));
+        zElemCt = ceil(5.0 / (2.0 * config->sourceFrontGap));
     else
-        zMesh = zelems;
+        zElemCt = zelems;
+
+    // Calculate the number of nodes
+    xNodeCt = xElemCt + 1;
+    yNodeCt = yElemCt + 1;
+    zNodeCt = zElemCt + 1;
 
     // Allocate space
-    xIndex.resize(xMesh + 1);
-    yIndex.resize(yMesh + 1);
-    zIndex.resize(zMesh + 1);
+    xNodes.resize(xNodeCt);
+    yNodes.resize(yNodeCt);
+    zNodes.resize(zNodeCt);
 
-    dx.resize(xMesh);
-    dy.resize(yMesh);
-    dz.resize(zMesh);
+    dx.resize(xElemCt);
+    dy.resize(yElemCt);
+    dz.resize(zElemCt);
 
     //DA.resize(config->m * yMesh * zMesh);
     //DB.resize(config->m * xMesh * zMesh);
     //DC.resize(config->m * xMesh * yMesh);
 
-    DA.resize(quad->angleCount() * yMesh * zMesh);
-    DB.resize(quad->angleCount() * xMesh * zMesh);
-    DC.resize(quad->angleCount() * xMesh * yMesh);
+    //DA.resize(quad->angleCount() * yElemCt * zElemCt);
+    //DB.resize(quad->angleCount() * xElemCt * zElemCt);
+    //DC.resize(quad->angleCount() * xElemCt * yElemCt);
 
-    Axy.resize(quad->angleCount() * xMesh * yMesh);
-    Ayz.resize(quad->angleCount() * yMesh * zMesh);
-    Axz.resize(quad->angleCount() * xMesh * zMesh);
+    Axy.resize(quad->angleCount() * xElemCt * yElemCt);
+    Ayz.resize(quad->angleCount() * yElemCt * zElemCt);
+    Axz.resize(quad->angleCount() * xElemCt * zElemCt);
 
-                                                 // mu xi eta
-    orderOctant1.resize(xMesh * yMesh * zMesh);  // + + +
-    orderOctant2.resize(xMesh * yMesh * zMesh);  // - + +
-    orderOctant3.resize(xMesh * yMesh * zMesh);  // - - +
-    orderOctant4.resize(xMesh * yMesh * zMesh);  // + - +
-    orderOctant5.resize(xMesh * yMesh * zMesh);  // + + -
-    orderOctant6.resize(xMesh * yMesh * zMesh);  // - + -
-    orderOctant7.resize(xMesh * yMesh * zMesh);  // - - -
-    orderOctant8.resize(xMesh * yMesh * zMesh);  // + - -
+    /*
+                                                       // mu xi eta
+    orderOctant1.resize(xElemCt * yElemCt * zElemCt);  // + + +
+    orderOctant2.resize(xElemCt * yElemCt * zElemCt);  // - + +
+    orderOctant3.resize(xElemCt * yElemCt * zElemCt);  // - - +
+    orderOctant4.resize(xElemCt * yElemCt * zElemCt);  // + - +
+    orderOctant5.resize(xElemCt * yElemCt * zElemCt);  // + + -
+    orderOctant6.resize(xElemCt * yElemCt * zElemCt);  // - + -
+    orderOctant7.resize(xElemCt * yElemCt * zElemCt);  // - - -
+    orderOctant8.resize(xElemCt * yElemCt * zElemCt);  // + - -
 
     unsigned int indx = 0;  // Octant 1: + + +
-    for(int i = 0; i < xMesh; i++)
-        for(int j = 0; j < yMesh; j++)
-            for(int k = 0; k < zMesh; k++)
-                orderOctant1[indx++] = i*yMesh*zMesh + j*zMesh + k;
+    for(int i = 0; i < xElemCt; i++)
+        for(int j = 0; j < yElemCt; j++)
+            for(int k = 0; k < zElemCt; k++)
+                orderOctant1[indx++] = i*yElemCt*zElemCt + j*zElemCt + k;
 
     indx = 0;  // Octant 2: - + +
-    for(int i = xMesh-1; i >= 0; i--)
-        for(int j = 0; j < yMesh; j++)
-            for(int k = 0; k < zMesh; k++)
-                orderOctant1[indx++] = i*yMesh*zMesh + j*zMesh + k;
+    for(int i = xElemCt-1; i >= 0; i--)
+        for(int j = 0; j < yElemCt; j++)
+            for(int k = 0; k < zElemCt; k++)
+                orderOctant1[indx++] = i*yElemCt*zElemCt + j*zElemCt + k;
 
     indx = 0;  // Octant 3: - - +
-    for(int i = xMesh-1; i >= 0; i--)
-        for(int j = yMesh-1; j >= 0; j--)
-            for(int k = 0; k < zMesh; k++)
-                orderOctant1[indx++] = i*yMesh*zMesh + j*zMesh + k;
+    for(int i = xElemCt-1; i >= 0; i--)
+        for(int j = yElemCt-1; j >= 0; j--)
+            for(int k = 0; k < zElemCt; k++)
+                orderOctant1[indx++] = i*yElemCt*zElemCt + j*zElemCt + k;
 
     indx = 0;  // Octant 4: + - +
-    for(int i = 0; i < xMesh; i++)
-        for(int j = yMesh-1; j >= 0; j--)
-            for(int k = 0; k < zMesh; k++)
-                orderOctant1[indx++] = i*yMesh*zMesh + j*zMesh + k;
+    for(int i = 0; i < xElemCt; i++)
+        for(int j = yElemCt-1; j >= 0; j--)
+            for(int k = 0; k < zElemCt; k++)
+                orderOctant1[indx++] = i*yElemCt*zElemCt + j*zElemCt + k;
 
     indx = 0;  // Octant 5: + + -
-    for(int i = 0; i < xMesh; i++)
-        for(int j = 0; j < yMesh; j++)
-            for(int k = zMesh-1; k >= 0; k--)
-                orderOctant1[indx++] = i*yMesh*zMesh + j*zMesh + k;
+    for(int i = 0; i < xElemCt; i++)
+        for(int j = 0; j < yElemCt; j++)
+            for(int k = zElemCt-1; k >= 0; k--)
+                orderOctant1[indx++] = i*yElemCt*zElemCt + j*zElemCt + k;
 
     indx = 0;  // Octant 6: - + -
-    for(int i = xMesh-1; i >= 0; i--)
-        for(int j = 0; j < yMesh; j++)
-            for(int k = zMesh-1; k >= 0; k--)
-                orderOctant1[indx++] = i*yMesh*zMesh + j*zMesh + k;
+    for(int i = xElemCt-1; i >= 0; i--)
+        for(int j = 0; j < yElemCt; j++)
+            for(int k = zElemCt-1; k >= 0; k--)
+                orderOctant1[indx++] = i*yElemCt*zElemCt + j*zElemCt + k;
 
     indx = 0;  // Octant 7: - - -
-    for(int i = xMesh-1; i >= 0; i--)
-        for(int j = yMesh-1; j >= 0; j--)
-            for(int k = zMesh-1; k >= 0; k--)
-                orderOctant1[indx++] = i*yMesh*zMesh + j*zMesh + k;
+    for(int i = xElemCt-1; i >= 0; i--)
+        for(int j = yElemCt-1; j >= 0; j--)
+            for(int k = zElemCt-1; k >= 0; k--)
+                orderOctant1[indx++] = i*yElemCt*zElemCt + j*zElemCt + k;
 
     indx = 0;  // Octant 8: + - -
-    for(int i = 0; i < zMesh; i++)
-        for(int j = yMesh-1; j >= 0; j--)
-            for(int k = zMesh-1; k >= 0; k--)
-                orderOctant1[indx++] = i*yMesh*zMesh + j*zMesh + k;
+    for(int i = 0; i < zElemCt; i++)
+        for(int j = yElemCt-1; j >= 0; j--)
+            for(int k = zElemCt-1; k >= 0; k--)
+                orderOctant1[indx++] = i*yElemCt*zElemCt + j*zElemCt + k;
+    */
 
 
-
-    vol.resize(xMesh * yMesh * zMesh);
+    vol.resize(xElemCt * yElemCt * zElemCt);
 
     // The coordinates between mesh elements
-    for(int i = 0; i < xMesh+1; i++)  // iterate the xMesh+1 to get the last bin
-        xIndex[i] = i * (config->xLen / xMesh);
+    for(unsigned int i = 0; i < xElemCt+1; i++)  // iterate the xMesh+1 to get the last bin
+        xNodes[i] = i * (config->xLen / xElemCt);
 
-    for(int i = 0; i < yMesh+1; i++)
-        yIndex[i] = i * (config->yLen / yMesh);
+    for(unsigned int i = 0; i < yElemCt+1; i++)
+        yNodes[i] = i * (config->yLen / yElemCt);
 
-    for(int i = 0; i < zMesh+1; i++)
-        zIndex[i] = i * (config->zLen / zMesh);
+    for(unsigned int i = 0; i < zElemCt+1; i++)
+        zNodes[i] = i * (config->zLen / zElemCt);
 
     // Calculate the segment sizes
-    for(int i = 0; i < xMesh; i++)
-        dx[i] = xIndex[i+1] - xIndex[i];
+    for(unsigned int i = 0; i < xElemCt; i++)
+        dx[i] = xNodes[i+1] - xNodes[i];
 
-    for(int i = 0; i < yMesh; i++)
-        dy[i] = yIndex[i+1] - yIndex[i];
+    for(unsigned int i = 0; i < yElemCt; i++)
+        dy[i] = yNodes[i+1] - yNodes[i];
 
-    for(int i = 0; i < zMesh; i++)
-        dz[i] = zIndex[i+1] - zIndex[i];
+    for(unsigned int i = 0; i < zElemCt; i++)
+        dz[i] = zNodes[i+1] - zNodes[i];
 
-    for(int xIndx = 0; xIndx < xMesh; xIndx++)
-        for(int yIndx = 0; yIndx < yMesh; yIndx++)
-            for(int zIndx = 0; zIndx < zMesh; zIndx++)
-                vol[xIndx * yMesh*zMesh + yIndx * zMesh + zIndx] = dx[xIndx] * dy[yIndx] * dz[zIndx];
+    for(unsigned int xIndx = 0; xIndx < xElemCt; xIndx++)
+        for(unsigned int yIndx = 0; yIndx < yElemCt; yIndx++)
+            for(unsigned int zIndx = 0; zIndx < zElemCt; zIndx++)
+                vol[xIndx * yElemCt*zElemCt + yIndx * zElemCt + zIndx] = dx[xIndx] * dy[yIndx] * dz[zIndx];
 
     // Calculate the cell face area for each angle as well as volume
     for(int eIndx = 0; eIndx < config->m; eIndx++)
@@ -174,61 +180,61 @@ void Mesh::remesh(int xelems, int yelems, int zelems, const Config *config, cons
         float vEta = fabs(quad->eta[eIndx]);
         float vZi = fabs(quad->zi[eIndx]);
 
-        for(int yIndx = 0; yIndx < yMesh; yIndx++)
-            for(int zIndx = 0; zIndx < zMesh; zIndx++)
+        for(unsigned int yIndx = 0; yIndx < yElemCt; yIndx++)
+            for(unsigned int zIndx = 0; zIndx < zElemCt; zIndx++)
             {
-                DA[eIndx * yMesh*zMesh + yIndx * zMesh + zIndx] = vMu * dy[yIndx] * dz[zIndx];
-                Ayz[eIndx * yMesh*zMesh + yIndx * zMesh + zIndx] = 2 * vMu * dy[yIndx] * dz[zIndx];
+                //DA[eIndx * yElemCt*zElemCt + yIndx * zElemCt + zIndx] = vMu * dy[yIndx] * dz[zIndx];
+                Ayz[eIndx * yElemCt*zElemCt + yIndx * zElemCt + zIndx] = 2 * vMu * dy[yIndx] * dz[zIndx];
             }
 
-        for(int xIndx = 0; xIndx < xMesh; xIndx++)
-            for(int zIndx = 0; zIndx < zMesh; zIndx++)
+        for(unsigned int xIndx = 0; xIndx < xElemCt; xIndx++)
+            for(unsigned int zIndx = 0; zIndx < zElemCt; zIndx++)
             {
-                DB[eIndx * xMesh*zMesh + xIndx * zMesh + zIndx] = vEta * dx[xIndx] * dz[zIndx];
-                Axz[eIndx * xMesh*zMesh + xIndx * zMesh + zIndx] = 2 * vZi * dx[xIndx] * dz[zIndx];
+                //DB[eIndx * xElemCt*zElemCt + xIndx * zElemCt + zIndx] = vEta * dx[xIndx] * dz[zIndx];
+                Axz[eIndx * xElemCt*zElemCt + xIndx * zElemCt + zIndx] = 2 * vZi * dx[xIndx] * dz[zIndx];
             }
 
-        for(int xIndx = 0; xIndx < xMesh; xIndx++)
-            for(int yIndx = 0; yIndx < yMesh; yIndx++)
+        for(unsigned int xIndx = 0; xIndx < xElemCt; xIndx++)
+            for(unsigned int yIndx = 0; yIndx < yElemCt; yIndx++)
             {
-                DC[eIndx * xMesh*yMesh + xIndx * yMesh + yIndx] = vZi * dx[xIndx] * dy[yIndx];
-                Axy[eIndx * xMesh*yMesh + xIndx * yMesh + yIndx] = 2 * vEta * dx[xIndx] * dy[yIndx];
+                //DC[eIndx * xElemCt*yElemCt + xIndx * yElemCt + yIndx] = vZi * dx[xIndx] * dy[yIndx];
+                Axy[eIndx * xElemCt*yElemCt + xIndx * yElemCt + yIndx] = 2 * vEta * dx[xIndx] * dy[yIndx];
             }
     }
 
     // 0 = air, 1 = water, 2 = lead/tungsten
     //std::vector<unsigned short> zoneId;
-    zoneId.resize(xMesh * yMesh * zMesh, 0);  // Initialize to all zeros
+    zoneId.resize(xElemCt * yElemCt * zElemCt, 0);  // Initialize to all zeros
 
 
     // Do all of the +1 need to be removed?
-    int xLeftIndx  = (xMesh-1)/2 + 1 - round(config->colXLen/2/(config->xLen/xMesh));
-    int xRightIndx = (xMesh-1)/2 + 1 + round(config->colXLen/2/(config->xLen/xMesh));
-    int xLeftGapIndx = (xMesh-1)/2 + 1 - round(config->sourceLeftGap/(config->xLen/xMesh));
-    int xRightGapIndx = (xMesh-1)/2 + 1 + round(config->sourceLeftGap/(config->xLen/xMesh));
+    int xLeftIndx  = (xElemCt-1)/2 + 1 - round(config->colXLen/2/(config->xLen/xElemCt));
+    int xRightIndx = (xElemCt-1)/2 + 1 + round(config->colXLen/2/(config->xLen/xElemCt));
+    int xLeftGapIndx = (xElemCt-1)/2 + 1 - round(config->sourceLeftGap/(config->xLen/xElemCt));
+    int xRightGapIndx = (xElemCt-1)/2 + 1 + round(config->sourceLeftGap/(config->xLen/xElemCt));
 
     int yTopIndx = 0;
-    int yBottomIndx = round(config->colYLen/(config->yLen/yMesh));
-    int yTopGapIndx = round((config->colYLen/2 - config->sourceTopGap) / (config->yLen/yMesh));
+    int yBottomIndx = round(config->colYLen/(config->yLen/yElemCt));
+    int yTopGapIndx = round((config->colYLen/2 - config->sourceTopGap) / (config->yLen/yElemCt));
 
-    int zFrontIndx = (zMesh-1)/2 + 1 - round(config->colZLen/2/(config->zLen/zMesh));
-    int zBackIndx = (zMesh-1)/2 + 1 + round(config->colZLen/2/(config->zLen/zMesh));
-    int zFrontGapIndx = (zMesh-1)/2 + 1 - round(config->sourceFrontGap/(config->zLen/zMesh));
-    int zBackGapIndx = (zMesh-1)/2 + 1 + round(config->sourceFrontGap/(config->zLen/zMesh));
+    int zFrontIndx = (zElemCt-1)/2 + 1 - round(config->colZLen/2/(config->zLen/zElemCt));
+    int zBackIndx = (zElemCt-1)/2 + 1 + round(config->colZLen/2/(config->zLen/zElemCt));
+    int zFrontGapIndx = (zElemCt-1)/2 + 1 - round(config->sourceFrontGap/(config->zLen/zElemCt));
+    int zBackGapIndx = (zElemCt-1)/2 + 1 + round(config->sourceFrontGap/(config->zLen/zElemCt));
 
     qDebug() << "x in " << xLeftIndx <<", " << xRightIndx << "  and out " << xLeftGapIndx << ", " << xRightGapIndx;
     qDebug() << "y in " << yTopIndx <<", " << yBottomIndx << "  and out " << yTopGapIndx << ", _";
     qDebug() << "z in " << zFrontIndx <<", " << zBackIndx << "  and out " << zFrontGapIndx << ", " << zBackGapIndx;
 
 
-    for(int i = 0; i < xMesh; i++)
-        for(int j = 0; j < yMesh; j++)
-            for(int k = 0; k < zMesh; k++)
+    for(unsigned int i = 0; i < xElemCt; i++)
+        for(unsigned int j = 0; j < yElemCt; j++)
+            for(unsigned int k = 0; k < zElemCt; k++)
                 if(insideBox(i,j,k, xLeftIndx, xRightIndx, yTopIndx, yBottomIndx, zFrontIndx, zBackIndx) &&
                         !insideBox(i,j,k, xLeftGapIndx, xRightGapIndx, yTopGapIndx, 1000000, zFrontGapIndx, zBackGapIndx))
                 {
                     //qDebug() << "Setting to zone 2";
-                    zoneId[i*yMesh*zMesh + j*zMesh + k] = 2;
+                    zoneId[i*yElemCt*zElemCt + j*zElemCt + k] = 2;
                 }
                 // Not sure if these should be < or <=
                 //if(xLeftIndx <= i && i <= xRightIndx &&  // If inside collimator
@@ -266,17 +272,18 @@ void Mesh::remesh(int xelems, int yelems, int zelems, const Config *config, cons
     float yCenter = 50.0;  //config.yLen - config.so
 
     //TODO - The above yCenter should actually be calculated
-    for(int i = 0; i < xMesh; i++)
-        for(int j = 0; j < yMesh; j++)
-            for(int k = 0; k < zMesh; k++)
+    for(unsigned int i = 0; i < xElemCt; i++)
+        for(unsigned int j = 0; j < yElemCt; j++)
+            for(unsigned int k = 0; k < zElemCt; k++)
             {
-                float x = xIndex[i] + dx[i]/2.0;
-                float y = yIndex[j] + dy[j]/2.0;
+                float x = xNodes[i] + dx[i]/2.0;
+                float y = yNodes[j] + dy[j]/2.0;
                 if((x-xCenter)*(x-xCenter) + (y-yCenter)*(y-yCenter) <= (radius)*(radius))
-                    zoneId[i*yMesh*zMesh + j*zMesh + k] = 1;
+                    zoneId[i*yElemCt*zElemCt + j*zElemCt + k] = 1;
             }
 }
 
+/*
 std::vector<unsigned int> &Mesh::getOctantOrder(const float mu, const float xi, const float eta)
 {
     if(eta >= 0)
@@ -314,6 +321,7 @@ std::vector<unsigned int> &Mesh::getOctantOrder(const float mu, const float xi, 
         }
     }
 }
+*/
 
 
 

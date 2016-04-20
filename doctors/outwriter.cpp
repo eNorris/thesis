@@ -20,18 +20,18 @@ void OutWriter::writeScalarFlux(std::string filename, const Mesh& mesh, const st
     fout.open(filename.c_str());
 
     fout << 3 << '\n';
-    fout << mesh.xMesh << '\n';
-    fout << mesh.yMesh << '\n';
-    fout << mesh.zMesh << '\n';
+    fout << mesh.xElemCt << '\n';
+    fout << mesh.yElemCt << '\n';
+    fout << mesh.zElemCt << '\n';
 
-    for(int i = 0; i < mesh.xMesh; i++)
-        fout << mesh.xIndex[i] << '\n';
-    for(int i = 0; i < mesh.yMesh; i++)
-        fout << mesh.yIndex[i] << '\n';
-    for(int i = 0; i < mesh.zMesh; i++)
-        fout << mesh.zIndex[i] << '\n';
+    for(int i = 0; i < mesh.xElemCt; i++)
+        fout << mesh.xNodes[i] << '\n';
+    for(int i = 0; i < mesh.yElemCt; i++)
+        fout << mesh.yNodes[i] << '\n';
+    for(int i = 0; i < mesh.zElemCt; i++)
+        fout << mesh.zNodes[i] << '\n';
 
-    if(mesh.xMesh * mesh.yMesh * mesh.zMesh != flux.size())
+    if(mesh.voxelCount() != flux.size())
         qDebug() << "WARNING: OutWriter::writeScalarFlux: the mesh size did not match the data size";
 
     for(int i = 0; i < flux.size(); i++)
@@ -46,17 +46,17 @@ void OutWriter::writeScalarFluxMesh(std::string filename, const Mesh& mesh, cons
     std::ofstream fout;
     fout.open(filename.c_str());
 
-    if(mesh.xMesh * mesh.yMesh * mesh.zMesh != flux.size())
+    if(mesh.xElemCt * mesh.yElemCt * mesh.zElemCt != flux.size())
         qDebug() << "WARNING: OutWriter::writeScalarFlux: the mesh size did not match the data size";
 
-    for(int iz = 0; iz < mesh.zMesh; iz++)
+    for(int iz = 0; iz < mesh.zElemCt; iz++)
     {
         fout << "\nz = " << iz << '\n';
-        for(int iy = 0; iy < mesh.yMesh; iy++)
+        for(int iy = 0; iy < mesh.yElemCt; iy++)
         {
-            for(int ix = 0; ix < mesh.xMesh; ix++)
+            for(int ix = 0; ix < mesh.xElemCt; ix++)
             {
-                fout << flux[ix*mesh.yMesh*mesh.zMesh + iy*mesh.zMesh + iz] << '\t';
+                fout << flux[ix*mesh.yElemCt*mesh.zElemCt + iy*mesh.zElemCt + iz] << '\t';
             }
             fout << '\n';
         }

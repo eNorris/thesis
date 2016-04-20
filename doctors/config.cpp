@@ -39,6 +39,11 @@ void Config::loadDefaults()
     colYLen = 10.0;
     colZLen = 5.0;
 
+    sourceX.push_back(45.0);
+    sourceY.push_back(2.0);
+    sourceZ.push_back(5.0);
+    sourceIntensity.push_back(1.0E6);
+
     // Geometry
     sourceToIsocenter = 54.0;  // source to isocenter distance [cm]
     sourceToDetector = 95.0;  // source to detector distance [cm]

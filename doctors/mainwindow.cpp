@@ -69,7 +69,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Mesh *mesh = new Mesh(config, quad);
     m_mesh = new Mesh(m_config, m_quad);
-    qDebug() << "Here the zslice = " << m_mesh->zMesh;
+    qDebug() << "Here the zslice = " << m_mesh->zElemCt;
     geomDialog->updateMesh(m_mesh);
 
     //XSection *xs = new XSection(config);
