@@ -29,6 +29,8 @@ e2 = 1.0e-30; % a very small number
 e3 = 1.0e-8;
 e4 = 2.5e-9;
 
+tic;
+
 % Initialize mesh boundaries
 % Fix me: only uniform mesh size used
 rp = (0.0:cfg.xlen/cfg.xmesh:cfg.xlen);           % X direction
@@ -189,6 +191,8 @@ for kk=1:cfg.zmesh
         end % End of X direction
     end % End of Y direction
 end % End of Z direction
+
+toc
 
 figure;
 imagesc(log10(uflux(:,:,15,1))); 

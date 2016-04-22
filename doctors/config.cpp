@@ -39,9 +39,9 @@ void Config::loadDefaults()
     colYLen = 10.0;
     colZLen = 5.0;
 
-    sourceX.push_back(45.0);
-    sourceY.push_back(2.0);
-    sourceZ.push_back(5.0);
+    sourceX.push_back(44.30);
+    sourceY.push_back(4.55);
+    sourceZ.push_back(2.5);
     sourceIntensity.push_back(1.0E6);
 
     // Geometry

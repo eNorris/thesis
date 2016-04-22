@@ -222,9 +222,18 @@ void OutputDialog::setSliceLevel(int level)
                 {
                     qDebug() << "WARNING: fid > 63!";
                     qDebug() << "flux = " << flux << "  maxvalLevel = " << maxvalLevel << "  maxvalGlobal = " << m_maxvalGlobal << "  log(maxvalGlobal) = " << m_maxvalGlobalLog;
-                    fid = 63;
+                    fid = -1;
                 }
-                rects[i*m_mesh->yElemCt + j]->setBrush(brushes[fid]);
+                if(fid < 0)
+                {
+                    qDebug() << "WARNING: fid < 0!";
+                    qDebug() << "flux = " << flux << "  maxvalLevel = " << maxvalLevel << "  maxvalGlobal = " << m_maxvalGlobal << "  log(maxvalGlobal) = " << m_maxvalGlobalLog;
+                    fid = -1;
+                }
+                if(fid == -1)
+                    rects[i*m_mesh->yElemCt + j]->setBrush(errBrush);
+                else
+                    rects[i*m_mesh->yElemCt + j]->setBrush(brushes[fid]);
                 datastring += "   " + QString::number(flux);
                 fidstring += "   " + QString::number(fid);
             }

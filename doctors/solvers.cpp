@@ -216,7 +216,7 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
 }
 */
 
-std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config)
+std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config, const std::vector<float> *uflux)
 {
 
     std::clock_t startMoment = std::clock();
@@ -256,46 +256,55 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
 
     extSource.resize(mesh->voxelCount(), 0.0f);
 
-    // Calcualte the external source mesh
-    for(int is = 0; is < config->sourceIntensity.size(); is++)
+    if(uflux != NULL)
     {
-        // Make sure the source is inside the mesh
-        if(config->sourceX[is] < mesh->xNodes[0] || config->sourceX[is] > mesh->xNodes[mesh->xNodeCt-1])
-            qDebug() << "WARNING: Source " << is << " is outside the x mesh(" << mesh->xNodes[0] << ", " << mesh->xNodes[mesh->xNodeCt-1] << ")!";
-        if(config->sourceY[is] < mesh->yNodes[0] || config->sourceY[is] > mesh->yNodes[mesh->yNodeCt-1])
-            qDebug() << "WARNING: Source " << is << " is outside the y mesh(" << mesh->yNodes[0] << ", " << mesh->yNodes[mesh->yNodeCt-1] << ")!";
-        if(config->sourceZ[is] < mesh->zNodes[0] || config->sourceZ[is] > mesh->zNodes[mesh->zNodeCt-1])
-            qDebug() << "WARNING: Source " << is << " is outside the z mesh(" << mesh->zNodes[0] << ", " << mesh->zNodes[mesh->zNodeCt-1] << ")!";
+        // If there is an uncollided flux provided, use it, otherwise, calculate the external source
+        for(unsigned int i = 0; i < uflux->size(); i++)
+            extSource[i] = (*uflux)[i] * mesh->vol[i] * xs->scatXs(mesh->zoneId[i], 0, 0);
+    }
+    else
+    {
+        // Calcualte the external source mesh
+        for(int is = 0; is < config->sourceIntensity.size(); is++)
+        {
+            // Make sure the source is inside the mesh
+            if(config->sourceX[is] < mesh->xNodes[0] || config->sourceX[is] > mesh->xNodes[mesh->xNodeCt-1])
+                qDebug() << "WARNING: Source " << is << " is outside the x mesh(" << mesh->xNodes[0] << ", " << mesh->xNodes[mesh->xNodeCt-1] << ")!";
+            if(config->sourceY[is] < mesh->yNodes[0] || config->sourceY[is] > mesh->yNodes[mesh->yNodeCt-1])
+                qDebug() << "WARNING: Source " << is << " is outside the y mesh(" << mesh->yNodes[0] << ", " << mesh->yNodes[mesh->yNodeCt-1] << ")!";
+            if(config->sourceZ[is] < mesh->zNodes[0] || config->sourceZ[is] > mesh->zNodes[mesh->zNodeCt-1])
+                qDebug() << "WARNING: Source " << is << " is outside the z mesh(" << mesh->zNodes[0] << ", " << mesh->zNodes[mesh->zNodeCt-1] << ")!";
 
-        int srcIndxX = -1;
-        int srcIndxY = -1;
-        int srcIndxZ = -1;
+            int srcIndxX = -1;
+            int srcIndxY = -1;
+            int srcIndxZ = -1;
 
-        for(unsigned int ix = 1; ix < mesh->xNodeCt; ix++)
-            if(mesh->xNodes[ix] > config->sourceX[is])
-            {
-                srcIndxX = ix-1;  // Subtract 1 to go from node to element
-                break;
-            }
+            for(unsigned int ix = 1; ix < mesh->xNodeCt; ix++)
+                if(mesh->xNodes[ix] > config->sourceX[is])
+                {
+                    srcIndxX = ix-1;  // Subtract 1 to go from node to element
+                    break;
+                }
 
-        for(unsigned int iy = 1; iy < mesh->yNodeCt; iy++)
-            if(mesh->yNodes[iy] > config->sourceY[is])
-            {
-                srcIndxY = iy-1;
-                break;
-            }
+            for(unsigned int iy = 1; iy < mesh->yNodeCt; iy++)
+                if(mesh->yNodes[iy] > config->sourceY[is])
+                {
+                    srcIndxY = iy-1;
+                    break;
+                }
 
-        for(unsigned int iz = 1; iz < mesh->zNodeCt; iz++)
-            if(mesh->zNodes[iz] > config->sourceZ[is])
-            {
-                srcIndxZ = iz-1;
-                break;
-            }
+            for(unsigned int iz = 1; iz < mesh->zNodeCt; iz++)
+                if(mesh->zNodes[iz] > config->sourceZ[is])
+                {
+                    srcIndxZ = iz-1;
+                    break;
+                }
 
-        if(srcIndxX == -1 || srcIndxY == -1 || srcIndxZ == -1)
-            qDebug() << "ERROR: Illegal source location!";
+            if(srcIndxX == -1 || srcIndxY == -1 || srcIndxZ == -1)
+                qDebug() << "ERROR: Illegal source location!";
 
-        extSource[srcIndxX*xjmp + srcIndxY*yjmp + srcIndxZ] = config->sourceIntensity[is];
+            extSource[srcIndxX*xjmp + srcIndxY*yjmp + srcIndxZ] = config->sourceIntensity[is];
+        }
     }
 
     //extSource[((mesh->xMesh - 1)/2)*xjmp + ((mesh->yMesh-1)/2)*yjmp + ((mesh->zMesh-1)/2)] = 1E6;  // [gammas / sec]
