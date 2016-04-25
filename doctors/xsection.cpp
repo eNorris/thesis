@@ -81,7 +81,7 @@ int XSection::operator()(int grp, int d2, int d3, int d4) const
     return msig[grp*m_dim1 + d2*m_dim2 + d3*m_dim3 + d4];
 }
 
-int XSection::groupCount() const
+unsigned int XSection::groupCount() const
 {
     return m_groups;
 }

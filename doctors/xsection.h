@@ -24,7 +24,7 @@ public:
 
     void load(const Config *config);
 
-    int groupCount() const;
+    unsigned int groupCount() const;
 
     float scatXs(const int zid, const int Esrc, const int Etar) const;
     float totXs(const int zid, const int E) const;

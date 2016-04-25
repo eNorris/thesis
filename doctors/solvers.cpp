@@ -312,7 +312,7 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
 
     qDebug() << "Solving " << mesh->voxelCount() * quad->angleCount() * xs->groupCount() << " elements in phase space";
 
-    for(int ie = 0; ie < xs->groupCount(); ie++)
+    for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
     {
         qDebug() << "Energy group #" << ie;
         // Do the solving...
@@ -402,14 +402,32 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                     diz = -1;
                 }
 
+                int iy = 0;
+                int diy = 1;
+                if(quad->zi[iang] < 0)
+                {
+                    iy = mesh->yElemCt - 1;
+                    diy = -1;
+                }
+
+                int ix = 0;
+                int dix = 1;
+                if(quad->mu[iang] < 0)
+                {
+                    ix = mesh->xElemCt - 1;
+                    dix = -1;
+                }
+
                 //for(int iz = 0; iz < mesh->zMesh; iz++)  // Start at origin and sweep towards corner
                 for(iz; iz < (signed) mesh->zElemCt && iz >= 0; iz += diz)
                 {
                     //for(int iy = 0; iy < mesh->yMesh; iy++)
-                    for(int iy = quad->zi[iang] >= 0 ? 0 : mesh->yElemCt-1; quad->zi[iang] >= 0 ? iy < mesh->yElemCt : iy >= 0; iy += (quad->zi[iang] >= 0 ? 1 : -1))
+                    for(iy; iy < (signed) mesh->yElemCt && iy >= 0; iy += diy)
+                    //for(int iy = quad->zi[iang] >= 0 ? 0 : mesh->yElemCt-1; quad->zi[iang] >= 0 ? iy < mesh->yElemCt : iy >= 0; iy += (quad->zi[iang] >= 0 ? 1 : -1))
                     {
                         //for(int ix = 0; ix < mesh->xMesh; ix++)
-                        for(int ix = quad->mu[iang] >= 0 ? 0 : mesh->xElemCt-1; quad->mu[iang] >= 0 ? ix < mesh->xElemCt : ix >= 0; ix += (quad->mu[iang] >= 0 ? 1 : -1))
+                        for(ix; ix < (signed) mesh->xElemCt && ix >= 0; ix += dix)
+                        //for(int ix = quad->mu[iang] >= 0 ? 0 : mesh->xElemCt-1; quad->mu[iang] >= 0 ? ix < mesh->xElemCt : ix >= 0; ix += (quad->mu[iang] >= 0 ? 1 : -1))
                         {
                             int zid = mesh->zoneId[ix*xjmp + iy*yjmp + iz];
 

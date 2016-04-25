@@ -27,17 +27,17 @@ void Config::loadDefaults()
 
     // Source and collimator
     spectrumFile = "nsp_2.dat";
-    sourceFanAngle = 50.0/180.0 * M_PI;
-    sourceConeAngle = 2.0/180.0 * M_PI;
-    sourceTopGap = 1.0;  // [cm]
-    sourceBottomGap = 5.0; // [cm]
-    sourceLeftGap = sourceBottomGap * tan(sourceFanAngle / 2.0);
+    sourceFanAngle = (float) 50.0/180.0 * M_PI;
+    sourceConeAngle = (float) 2.0/180.0 * M_PI;
+    sourceTopGap = 1.0f;  // [cm]
+    sourceBottomGap = 5.0f; // [cm]
+    sourceLeftGap = sourceBottomGap * tan(sourceFanAngle / 2.0f);
     sourceRightGap = sourceLeftGap;
-    sourceFrontGap = sourceBottomGap * tan(sourceConeAngle / 2.0);
+    sourceFrontGap = sourceBottomGap * tan(sourceConeAngle / 2.0f);
     sourceBackGap = sourceFrontGap;
-    colXLen = 10.0;  // [cm]  Collimator x length
-    colYLen = 10.0;
-    colZLen = 5.0;
+    colXLen = 10.0f;  // [cm]  Collimator x length
+    colYLen = 10.0f;
+    colZLen = 5.0f;
 
     sourceX.push_back(44.30);
     sourceY.push_back(4.55);
@@ -45,11 +45,11 @@ void Config::loadDefaults()
     sourceIntensity.push_back(1.0E6);
 
     // Geometry
-    sourceToIsocenter = 54.0;  // source to isocenter distance [cm]
-    sourceToDetector = 95.0;  // source to detector distance [cm]
-    xLen = 2.0 * sourceToDetector * tan(sourceFanAngle / 2.0);  // length in x direction [cm]
+    sourceToIsocenter = 54.0f;  // source to isocenter distance [cm]
+    sourceToDetector = 95.0f;  // source to detector distance [cm]
+    xLen = 2.0f * sourceToDetector * tan(sourceFanAngle / 2.0f);  // length in x direction [cm]
     yLen = sourceToDetector - sourceBottomGap + colYLen;  // length in y direction assuming the W thickness is 5cm [cm]
-    zLen = 5.0;  // length in z direction default = 10cm
+    zLen = 5.0f;  // length in z direction default = 10cm
 
     // Bowtie and flat filter
     bowtieType = "medium";  // Bowtie type: small, medium, large
