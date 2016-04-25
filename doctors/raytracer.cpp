@@ -14,6 +14,11 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
 {
     std::clock_t startMoment = std::clock();
 
+    const unsigned short DIRECTION_NONE = 0;
+    const unsigned short DIRECTION_X = 1;
+    const unsigned short DIRECTION_Y = 2;
+    const unsigned short DIRECTION_Z = 3;
+
     std::vector<float> uflux;
     uflux.resize(xs->groupCount() * mesh->voxelCount());
 
@@ -37,22 +42,40 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
         float sz = config->sourceZ[is];
         float srcStrength = config->sourceIntensity[is];
 
-        for(unsigned int iz = 0; iz < mesh->zElemCt; iz++)
-            for(unsigned int iy = 0; iy < mesh->yElemCt; iy++)
-                for(unsigned int ix = 0; ix < mesh->xElemCt; ix++)
-                {
-                    float x = mesh->xNodes[ix] + mesh->dx[ix]/2;
-                    float y = mesh->yNodes[iy] + mesh->dy[iy]/2;
-                    float z = mesh->zNodes[iz] + mesh->dz[iz]/2;
+        unsigned int srcIndxX = int(sx / mesh->dx[0]);  // TODO: This will only work for evenly spaced grids
+        unsigned int srcIndxY = int(sy / mesh->dy[0]);
+        unsigned int srcIndxZ = int(sz / mesh->dz[0]);
 
-                    int xIndx = ix;
-                    int yIndx = iy;
-                    int zIndx = iz;
+        for(unsigned int zIndxStart = 0; zIndxStart < mesh->zElemCt; zIndxStart++)
+            for(unsigned int yIndxStart = 0; yIndxStart < mesh->yElemCt; yIndxStart++)
+                for(unsigned int xIndxStart = 0; xIndxStart < mesh->xElemCt; xIndxStart++)
+                {
+
+                    float x = mesh->xNodes[xIndxStart] + mesh->dx[xIndxStart]/2;
+                    float y = mesh->yNodes[yIndxStart] + mesh->dy[yIndxStart]/2;
+                    float z = mesh->zNodes[zIndxStart] + mesh->dz[zIndxStart]/2;
+
+                    if(xIndxStart == srcIndxX && yIndxStart == srcIndxY && zIndxStart == srcIndxZ)
+                    {
+                        // TODO: Calculate
+                        float srcToCellDist = sqrt((x-sx)*(x-sx) + (y-sy)*(y-sy) + (z-sz)*(z-sz));
+                        unsigned int zid = mesh->zoneId[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
+                        float xsval = xs->xsTot[zid];
+                        for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
+                            uflux[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = srcStrength * exp(-xsval*srcToCellDist) / (4 * M_PI * srcToCellDist * srcToCellDist);
+                        continue;
+                    }
+
+
+
+                    int xIndx = xIndxStart;
+                    int yIndx = yIndxStart;
+                    int zIndx = zIndxStart;
 
                     // TODO: Do these need to reverse direction? Right now it's source -> cell
-                    float srcToCellX = sx - x;
-                    float srcToCellY = sy - y;
-                    float srcToCellZ = sz - z;
+                    float srcToCellX = x - sx;
+                    float srcToCellY = y - sy;
+                    float srcToCellZ = z - sz;
 
                     float srcToCellDist = sqrt(srcToCellX*srcToCellX + srcToCellY*srcToCellY + srcToCellZ*srcToCellZ);
 
@@ -60,12 +83,16 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
                     float ycos = srcToCellY/srcToCellDist;
                     float zcos = srcToCellZ/srcToCellDist;
 
-                    int xBoundIndx = (xcos >= 0 ? ix+1 : ix);
-                    int yBoundIndx = (ycos >= 0 ? iy+1 : iy);
-                    int zBoundIndx = (zcos >= 0 ? iz+1 : iz);
+                    int xBoundIndx = (xcos >= 0 ? xIndx+1 : xIndx);
+                    int yBoundIndx = (ycos >= 0 ? yIndx+1 : yIndx);
+                    int zBoundIndx = (zcos >= 0 ? zIndx+1 : zIndx);
 
-                    int mchk = 1;
-                    while(mchk > 0)
+                    for(unsigned int i = 0; i < xs->groupCount(); i++)
+                        meanFreePaths[i] = 0.0f;
+
+                    //int mchk = 1;
+                    bool exhaustedRay = false;
+                    while(!exhaustedRay)
                     {
                         // Determine the distance to cell boundaries
                         //float zz = fabs(xcos);
@@ -75,45 +102,50 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
 
                         // Determine the shortest distance in 3 directions
                         float tmin;
-                        int dirIndx;
+                        unsigned short dirHitFirst;
 
                         if(tx < ty && tx < tz)
                         {
                             tmin = tx;
-                            dirIndx = 1;
+                            dirHitFirst = DIRECTION_X;
                         }
                         else if(ty < tz)
                         {
                             tmin = ty;
-                            dirIndx = 2;
+                            dirHitFirst = DIRECTION_Y;
                         }
                         else
                         {
                             tmin = tz;
-                            dirIndx = 3;
+                            dirHitFirst = DIRECTION_Z;
                         }
 
                         // Calculate distance from cell to source
-                        srcToCellX = sx - x;
-                        srcToCellY = sy - y;
-                        srcToCellZ = sz - z;
+                        /*
+                        srcToCellX = x - sx;
+                        srcToCellY = y - sy;
+                        srcToCellZ = z - sz;
 
                         float newdist = sqrt(srcToCellX*srcToCellX + srcToCellY*srcToCellY + srcToCellZ*srcToCellZ);
 
                         if(newdist < tmin)
                         {
                             tmin = newdist;
-                            mchk = 0;
-                            dirIndx = 0;
+                            //mchk = 0;
+                            exhaustedRay = true;
+                            dirHitFirst = DIRECTION_NONE;
                         }
+                        */
 
                         // Update mpf array
-                        unsigned int zid = mesh->zoneId[ix*xjmp + iy*yjmp + iz];
-                        for(int ie = 0; ie < xs->groupCount(); ie++)
+                        unsigned int zid = mesh->zoneId[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
+                        for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
+                        {
                             meanFreePaths[ie] += tmin * xs->xsTot[zid];
+                        }
 
                         // Update cell indices and positions
-                        if(dirIndx == 1) // x direction
+                        if(dirHitFirst == DIRECTION_X) // x direction
                         {
                             x = mesh->xNodes[xBoundIndx];
                             y += tmin*ycos;
@@ -128,10 +160,11 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
                                 xIndx--;
                                 xBoundIndx--;
                             }
-                            if(xIndx < 0 || xIndx >= mesh->xElemCt)  // The u denotes unsigned
-                                mchk = 0;
+                            if(xIndx < 0 || xIndx >= (signed) mesh->xElemCt)  // The u denotes unsigned
+                                exhaustedRay = true;
+                                //mchk = 0;
                         }
-                        else if(dirIndx == 2) // y direction
+                        else if(dirHitFirst == DIRECTION_Y) // y direction
                         {
                             x += tmin*xcos;
                             y = mesh->yNodes[yBoundIndx];
@@ -146,10 +179,11 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
                                 yIndx--;
                                 yBoundIndx--;
                             }
-                            if(yIndx < 0 || yIndx >= mesh->yElemCt)
-                                mchk = 0;
+                            if(yIndx < 0 || yIndx >= (signed) mesh->yElemCt)
+                                exhaustedRay = true;
+                                //mchk = 0;
                         }
-                        else if(dirIndx == 3) // z direction
+                        else if(dirHitFirst == DIRECTION_Z) // z direction
                         {
                             x += tmin*xcos;
                             y += tmin*ycos;
@@ -164,15 +198,21 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
                                 zIndx--;
                                 zBoundIndx--;
                             }
-                            if(zIndx < 0 || zIndx >= mesh->zElemCt)
-                                mchk = 0;
+                            if(zIndx < 0 || zIndx >= (signed) mesh->zElemCt)
+                                exhaustedRay = true;
+                                //mchk = 0;
                         }
                     } // End of while loop
 
-                    for(int ie = 0; ie < xs->groupCount(); ie++)
+                    for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
                     {
                         // TODO - For now all sources emit the same strength for all energies
-                        uflux[ie*ejmp + ix*xjmp + iy*yjmp + iz] = srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
+                        //unsigned short zid = mesh->zoneId[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
+                        //float optical = meanFreePaths[ie];
+                        //float mfp = meanFreePaths[ie];
+                        //float r2 = 4 * M_PI * srcToCellDist * srcToCellDist;
+                        //float uf = srcStrength * exp(-optical) / r2;
+                        uflux[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
                     }
 
                 } // End of each voxel

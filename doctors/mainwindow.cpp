@@ -78,8 +78,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     outputDialog->updateMesh(m_mesh);
     //std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, m_config);
-    std::vector<float> solution = raytrace(m_quad, m_mesh, m_xs, m_config);
-    outputDialog->updateSolution(solution);
+    std::vector<float> raysolution = raytrace(m_quad, m_mesh, m_xs, m_config);
+    //std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, m_config, raysolution);
+    outputDialog->updateSolution(raysolution);
 }
 
 MainWindow::~MainWindow()
@@ -101,7 +102,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::launchSolver()
 {
-    std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, m_config);
+    std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, m_config, NULL);
     outputDialog->updateSolution(solution);
 }
 
