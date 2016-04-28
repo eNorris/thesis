@@ -116,6 +116,10 @@ for kk=1:cfg.zmesh
                         idx =3;
                     end
                     
+                    if dis < 0
+                        disp('wrong!');
+                    end
+                    
                     % Calculate distance from cell to source
                     csds = (xc-xs)*(xc-xs);
                     csds = csds+(yc-ys)*(yc-ys);
@@ -195,6 +199,11 @@ end % End of Z direction
 toc
 
 figure;
+t = uflux(:,:,15,1);
+ufluxLevelMax = max(t(:))
+ufluxLevelMin = min(t(:))
+ufluxGlobalMax = max(uflux(:))
+ufluxGlobalMin = min(uflux(:))
 imagesc(log10(uflux(:,:,15,1))); 
 caxis([-10, 6]);
 title(['Uncollided Flux']); 

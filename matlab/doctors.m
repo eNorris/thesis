@@ -66,6 +66,7 @@ close all;
     quad;         % Setup directional quandrature
     
     geom;         % Setup mesh, zone id, cell face area, cell volume
+    writeGeom(zone_id, cfg, 'zonefile.dat');
     
     t = zone_id(:,:,15);
     figure();
