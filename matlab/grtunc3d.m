@@ -185,6 +185,10 @@ for kk=1:cfg.zmesh
                 
                 % Calculate uncollided flux in cell 
                 for ig=1:cfg.igm
+                    flx = cfg.source_activity(ig).*exp(-dmfp(ig))/ds2;
+                    if flx > 1E6
+                        disp('Too big');
+                    end
                     uflux(ii,jj,kk,ig) = cfg.source_activity(ig).*exp(-dmfp(ig))/ds2;    
                 end               
                 % Force the uncollided flux in the source cell to be equal
