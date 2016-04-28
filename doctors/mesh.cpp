@@ -73,14 +73,6 @@ void Mesh::remesh(int xelems, int yelems, int zelems, const Config *config, cons
     dy.resize(yElemCt);
     dz.resize(zElemCt);
 
-    //DA.resize(config->m * yMesh * zMesh);
-    //DB.resize(config->m * xMesh * zMesh);
-    //DC.resize(config->m * xMesh * yMesh);
-
-    //DA.resize(quad->angleCount() * yElemCt * zElemCt);
-    //DB.resize(quad->angleCount() * xElemCt * zElemCt);
-    //DC.resize(quad->angleCount() * xElemCt * yElemCt);
-
     Axy.resize(quad->angleCount() * xElemCt * yElemCt);
     Ayz.resize(quad->angleCount() * yElemCt * zElemCt);
     Axz.resize(quad->angleCount() * xElemCt * zElemCt);
@@ -203,24 +195,23 @@ void Mesh::remesh(int xelems, int yelems, int zelems, const Config *config, cons
     }
 
     // 0 = air, 1 = water, 2 = lead/tungsten
-    //std::vector<unsigned short> zoneId;
     zoneId.resize(xElemCt * yElemCt * zElemCt, 0);  // Initialize to all zeros
 
 
     // Do all of the +1 need to be removed?
-    int xLeftIndx  = (xElemCt-1)/2 + 1 - round(config->colXLen/2/(config->xLen/xElemCt));
-    int xRightIndx = (xElemCt-1)/2 + 1 + round(config->colXLen/2/(config->xLen/xElemCt));
-    int xLeftGapIndx = (xElemCt-1)/2 + 1 - round(config->sourceLeftGap/(config->xLen/xElemCt));
-    int xRightGapIndx = (xElemCt-1)/2 + 1 + round(config->sourceLeftGap/(config->xLen/xElemCt));
+    int xLeftIndx  = (xElemCt-1)/2 - round(config->colXLen/2/(config->xLen/xElemCt));
+    int xRightIndx = (xElemCt-1)/2 + round(config->colXLen/2/(config->xLen/xElemCt));
+    int xLeftGapIndx = (xElemCt-1)/2 - round(config->sourceLeftGap/(config->xLen/xElemCt));
+    int xRightGapIndx = (xElemCt-1)/2 + round(config->sourceLeftGap/(config->xLen/xElemCt));
 
     int yTopIndx = 0;
-    int yBottomIndx = round(config->colYLen/(config->yLen/yElemCt));
-    int yTopGapIndx = round((config->colYLen/2 - config->sourceTopGap) / (config->yLen/yElemCt));
+    int yBottomIndx = round(config->colYLen/(config->yLen/yElemCt)) - 1;
+    int yTopGapIndx = round((config->colYLen/2 - config->sourceTopGap) / (config->yLen/yElemCt)) - 1;
 
     int zFrontIndx = (zElemCt-1)/2 + 1 - round(config->colZLen/2/(config->zLen/zElemCt));
-    int zBackIndx = (zElemCt-1)/2 + 1 + round(config->colZLen/2/(config->zLen/zElemCt));
-    int zFrontGapIndx = (zElemCt-1)/2 + 1 - round(config->sourceFrontGap/(config->zLen/zElemCt));
-    int zBackGapIndx = (zElemCt-1)/2 + 1 + round(config->sourceFrontGap/(config->zLen/zElemCt));
+    int zBackIndx = (zElemCt-1)/2 + round(config->colZLen/2/(config->zLen/zElemCt)) - 1;
+    int zFrontGapIndx = (zElemCt-1)/2 - round(config->sourceFrontGap/(config->zLen/zElemCt));
+    int zBackGapIndx = (zElemCt-1)/2 + round(config->sourceFrontGap/(config->zLen/zElemCt));
 
     qDebug() << "x in " << xLeftIndx <<", " << xRightIndx << "  and out " << xLeftGapIndx << ", " << xRightGapIndx;
     qDebug() << "y in " << yTopIndx <<", " << yBottomIndx << "  and out " << yTopGapIndx << ", _";
@@ -233,39 +224,8 @@ void Mesh::remesh(int xelems, int yelems, int zelems, const Config *config, cons
                 if(insideBox(i,j,k, xLeftIndx, xRightIndx, yTopIndx, yBottomIndx, zFrontIndx, zBackIndx) &&
                         !insideBox(i,j,k, xLeftGapIndx, xRightGapIndx, yTopGapIndx, 1000000, zFrontGapIndx, zBackGapIndx))
                 {
-                    //qDebug() << "Setting to zone 2";
                     zoneId[i*yElemCt*zElemCt + j*zElemCt + k] = 2;
                 }
-                // Not sure if these should be < or <=
-                //if(xLeftIndx <= i && i <= xRightIndx &&  // If inside collimator
-                //   yTopIndx <= j && j <= yBottomIndx &&
-                //   zFrontIndx <= k && k <= zBackIndx  &&
-                //   (xLeftGapIndx >= i && i >= xRightGapIndx &&  // and outside gap
-                //   yTopGapIndx >= j &&  // Not bottom gap
-                //   zFrontGapIndx >= k && k >= zBackGapIndx))
-                //{
-                //    qDebug() << "Setting to zone 2";
-                //    zoneId[i*yMesh*zMesh + j*zMesh + k] = 2;
-                //}
-
-
-    //left_x = (cfg.xmesh-1)/2+1-round(cfg.col_xlen/2/(cfg.xlen/cfg.xmesh));             % collimator x left index
-    //right_x = (cfg.xmesh-1)/2+1+round(cfg.col_xlen/2/(cfg.xlen/cfg.xmesh));            % collimator x right index
-    //left_gap_x = (cfg.xmesh-1)/2+1-round(cfg.source_left_gap/(cfg.xlen/cfg.xmesh));    % collimator x gap left index
-    //right_gap_x = (cfg.xmesh-1)/2+1+round(cfg.source_right_gap/(cfg.xlen/cfg.xmesh));  % collimator x gap right index
-
-    //top_y = 1;                                                                         % collimator y direction
-    //bottom_y = round(cfg.col_ylen/(cfg.ylen/cfg.ymesh));
-    //top_gap_y = round((cfg.col_ylen/2-cfg.source_top_gap)/(cfg.ylen/cfg.ymesh));       % the source is at the center of the collimator
-
-    //front_z = (cfg.zmesh-1)/2+1-round(cfg.col_zlen/2/(cfg.zlen/cfg.zmesh));            % collimator z front index
-    //back_z = (cfg.zmesh-1)/2+1+round(cfg.col_zlen/2/(cfg.zlen/cfg.zmesh));             % collimator x right index
-    //front_gap_z = (cfg.zmesh-1)/2+1-round(cfg.source_front_gap/(cfg.zlen/cfg.zmesh));  % collimator x gap left index
-    //back_gap_z = (cfg.zmesh-1)/2+1+round(cfg.source_back_gap/(cfg.zlen/cfg.zmesh));    % collimator x gap right index
-
-    //zone_id(left_x:right_x, top_y:bottom_y, front_z:back_z) = 2;                       % set collimator zone as 2
-
-    //zone_id(left_gap_x:right_gap_x, top_gap_y:bottom_y, front_gap_z:back_gap_z) = 0;   % set the hole in collimator zone 0
 
     float radius = 17.5;
     float xCenter = config->xLen/2.0;

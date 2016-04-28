@@ -13,11 +13,12 @@
 #include "geomdialog.h"
 #include "quaddialog.h"
 #include "xsectiondialog.h"
+#include "outwriter.h"
 
 #include "config.h"
 //#include "solvers.h"
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent):
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     m_config(NULL),
@@ -75,6 +76,8 @@ MainWindow::MainWindow(QWidget *parent) :
     //XSection *xs = new XSection(config);
     m_xs = new XSection(m_config);
     xsDialog->updateXs(m_xs);
+
+    OutWriter::writeZoneId(std::string("zoneid.dat"), *m_mesh);
 
     outputDialog->updateMesh(m_mesh);
     //std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, m_config);

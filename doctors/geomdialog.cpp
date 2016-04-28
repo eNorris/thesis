@@ -63,15 +63,15 @@ void GeomDialog::setSliceLevel(int level)
 
     if(ui->xyRadioButton->isChecked())
     {
-        if(level >= m_mesh->zElemCt)
+        if(level >= (signed) m_mesh->zElemCt)
         {
             qDebug() << "level is too high! z-slices = " << m_mesh->zElemCt;
             return;
         }
 
 
-        for(int i = 0; i < m_mesh->xElemCt; i++)
-            for(int j = 0; j < m_mesh->yElemCt; j++)
+        for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
+            for(unsigned int j = 0; j < m_mesh->yElemCt; j++)
             {
                 int zid = m_mesh->zoneId[i*m_mesh->yElemCt*m_mesh->zElemCt + j*m_mesh->zElemCt + level];
                 //int rindx = i*m_mesh->xMesh + j;
@@ -80,15 +80,15 @@ void GeomDialog::setSliceLevel(int level)
     }
     else if(ui->xzRadioButton->isChecked())
     {
-        if(level >= m_mesh->yElemCt)
+        if(level >= (signed) m_mesh->yElemCt)
         {
             qDebug() << "level is too high! y-slices = " << m_mesh->yElemCt;
             return;
         }
 
         //loadUniqueBrush();
-        for(int i = 0; i < m_mesh->xElemCt; i++)
-            for(int j = 0; j < m_mesh->zElemCt; j++)
+        for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
+            for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
             {
                 int zid = m_mesh->zoneId[i*m_mesh->yElemCt*m_mesh->zElemCt + level*m_mesh->zElemCt + j];
                 rects[i*m_mesh->zElemCt + j]->setBrush(brushes[zid]);
@@ -96,15 +96,15 @@ void GeomDialog::setSliceLevel(int level)
     }
     else if(ui->yzRadioButton->isChecked())
     {
-        if(level >= m_mesh->xElemCt)
+        if(level >= (signed) m_mesh->xElemCt)
         {
             qDebug() << "level is too high! x-slices = " << m_mesh->xElemCt;
             return;
         }
 
         //loadUniqueBrush();
-        for(int i = 0; i < m_mesh->yElemCt; i++)
-            for(int j = 0; j < m_mesh->zElemCt; j++)
+        for(unsigned int i = 0; i < m_mesh->yElemCt; i++)
+            for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
             {
                 int zid = m_mesh->zoneId[level*m_mesh->yElemCt*m_mesh->zElemCt + i*m_mesh->zElemCt + j];
                 rects[i*m_mesh->zElemCt + j]->setBrush(brushes[zid]);
@@ -129,8 +129,8 @@ void GeomDialog::updateMeshSlicePlane()
 
 
         QBrush greenBrush(Qt::green);
-        for(int i = 0; i < m_mesh->xElemCt; i++)
-            for(int j = 0; j < m_mesh->yElemCt; j++)
+        for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
+            for(unsigned int j = 0; j < m_mesh->yElemCt; j++)
             {
                 //qreal x = m_mesh->xIndex[i];
                 //qreal y = m_mesh->yIndex[j];
@@ -147,8 +147,8 @@ void GeomDialog::updateMeshSlicePlane()
 
 
         QBrush greenBrush(Qt::green);
-        for(int i = 0; i < m_mesh->xElemCt; i++)
-            for(int j = 0; j < m_mesh->zElemCt; j++)
+        for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
+            for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
             {
                 //qreal x = m_mesh->xIndex[i];
                 //qreal z = m_mesh->zIndex[j];
@@ -165,8 +165,8 @@ void GeomDialog::updateMeshSlicePlane()
 
 
         QBrush greenBrush(Qt::green);
-        for(int i = 0; i < m_mesh->yElemCt; i++)
-            for(int j = 0; j < m_mesh->zElemCt; j++)
+        for(unsigned int i = 0; i < m_mesh->yElemCt; i++)
+            for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
             {
                 //qreal y = m_mesh->yIndex[i];
                 //qreal z = m_mesh->zIndex[j];

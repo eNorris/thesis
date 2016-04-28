@@ -46,11 +46,13 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
         unsigned int srcIndxY = int(sy / mesh->dy[0]);
         unsigned int srcIndxZ = int(sz / mesh->dz[0]);
 
+        //for(unsigned int xIndxStart = 0; xIndxStart < mesh->xElemCt; xIndxStart++)
+        //    for(unsigned int yIndxStart = 0; yIndxStart < mesh->yElemCt; yIndxStart++)
+        //        for(unsigned int zIndxStart = 0; zIndxStart < mesh->zElemCt; zIndxStart++)
         for(unsigned int zIndxStart = 0; zIndxStart < mesh->zElemCt; zIndxStart++)
             for(unsigned int yIndxStart = 0; yIndxStart < mesh->yElemCt; yIndxStart++)
                 for(unsigned int xIndxStart = 0; xIndxStart < mesh->xElemCt; xIndxStart++)
                 {
-
                     float x = mesh->xNodes[xIndxStart] + mesh->dx[xIndxStart]/2;
                     float y = mesh->yNodes[yIndxStart] + mesh->dy[yIndxStart]/2;
                     float z = mesh->zNodes[zIndxStart] + mesh->dz[zIndxStart]/2;
@@ -66,16 +68,14 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
                         continue;
                     }
 
-
-
                     int xIndx = xIndxStart;
                     int yIndx = yIndxStart;
                     int zIndx = zIndxStart;
 
                     // TODO: Do these need to reverse direction? Right now it's source -> cell
-                    float srcToCellX = x - sx;
-                    float srcToCellY = y - sy;
-                    float srcToCellZ = z - sz;
+                    float srcToCellX = sx - x;
+                    float srcToCellY = sy - y;
+                    float srcToCellZ = sz - z;
 
                     float srcToCellDist = sqrt(srcToCellX*srcToCellX + srcToCellY*srcToCellY + srcToCellZ*srcToCellZ);
 
@@ -120,6 +120,9 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
                             dirHitFirst = DIRECTION_Z;
                         }
 
+                        if(tmin < 0)
+                            qDebug() << "Reversed space!";
+
                         // Calculate distance from cell to source
                         /*
                         srcToCellX = x - sx;
@@ -160,7 +163,7 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
                                 xIndx--;
                                 xBoundIndx--;
                             }
-                            if(xIndx < 0 || xIndx >= (signed) mesh->xElemCt)  // The u denotes unsigned
+                            if(xIndx < 0 || xIndx >= (signed) mesh->xElemCt)
                                 exhaustedRay = true;
                                 //mchk = 0;
                         }
@@ -187,7 +190,7 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
                         {
                             x += tmin*xcos;
                             y += tmin*ycos;
-                            z += mesh->zNodes[zBoundIndx];
+                            z = mesh->zNodes[zBoundIndx];
                             if(zcos >= 0)
                             {
                                 zIndx++;
@@ -212,6 +215,16 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
                         //float mfp = meanFreePaths[ie];
                         //float r2 = 4 * M_PI * srcToCellDist * srcToCellDist;
                         //float uf = srcStrength * exp(-optical) / r2;
+
+                        float mfp = meanFreePaths[ie];
+                        float flx = srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
+
+                        if(flx < 0)
+                            qDebug() << "Negative?";
+
+                        if(flx > 1E6)
+                            qDebug() << "Too big!";
+
                         uflux[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
                     }
 
