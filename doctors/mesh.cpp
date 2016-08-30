@@ -1,4 +1,5 @@
 #include "mesh.h"
+#include "xsection.h"
 
 #include <cmath>
 
@@ -49,6 +50,59 @@ int Mesh::yjmp() const
     return zElemCt;
 }
 
+void Mesh::uniform(const int xelems, const int yelems, const int zelems, const float xLen, const float yLen, const float zLen, const int eGroups, const Quadrature *quad)
+{
+    xElemCt = xelems;
+    yElemCt = yelems;
+    zElemCt = zelems;
+
+    // Calculate the number of nodes
+    xNodeCt = xElemCt + 1;
+    yNodeCt = yElemCt + 1;
+    zNodeCt = zElemCt + 1;
+
+    // Allocate space
+    xNodes.resize(xNodeCt);
+    yNodes.resize(yNodeCt);
+    zNodes.resize(zNodeCt);
+
+    dx.resize(xElemCt);
+    dy.resize(yElemCt);
+    dz.resize(zElemCt);
+
+    vol.resize(xElemCt * yElemCt * zElemCt);
+
+    // The coordinates between mesh elements
+    for(unsigned int i = 0; i < xElemCt+1; i++)  // iterate the xMesh+1 to get the last bin
+        xNodes[i] = i * (xLen / xElemCt);
+
+    for(unsigned int i = 0; i < yElemCt+1; i++)
+        yNodes[i] = i * (yLen / yElemCt);
+
+    for(unsigned int i = 0; i < zElemCt+1; i++)
+        zNodes[i] = i * (zLen / zElemCt);
+
+    // Calculate the segment sizes
+    for(unsigned int i = 0; i < xElemCt; i++)
+        dx[i] = xNodes[i+1] - xNodes[i];
+
+    for(unsigned int i = 0; i < yElemCt; i++)
+        dy[i] = yNodes[i+1] - yNodes[i];
+
+    for(unsigned int i = 0; i < zElemCt; i++)
+        dz[i] = zNodes[i+1] - zNodes[i];
+
+    for(unsigned int xIndx = 0; xIndx < xElemCt; xIndx++)
+        for(unsigned int yIndx = 0; yIndx < yElemCt; yIndx++)
+            for(unsigned int zIndx = 0; zIndx < zElemCt; zIndx++)
+                vol[xIndx * yElemCt*zElemCt + yIndx * zElemCt + zIndx] = dx[xIndx] * dy[yIndx] * dz[zIndx];
+
+    calcAreas(quad, eGroups);
+
+    zoneId.resize(xElemCt * yElemCt * zElemCt, 0);  // Initialize to all zeros
+
+}
+
 void Mesh::remesh(int xelems, int yelems, int zelems, const Config *config, const Quadrature *quad)
 {
     // these are the number of mesh elements
@@ -73,9 +127,9 @@ void Mesh::remesh(int xelems, int yelems, int zelems, const Config *config, cons
     dy.resize(yElemCt);
     dz.resize(zElemCt);
 
-    Axy.resize(quad->angleCount() * xElemCt * yElemCt);
-    Ayz.resize(quad->angleCount() * yElemCt * zElemCt);
-    Axz.resize(quad->angleCount() * xElemCt * zElemCt);
+    //Axy.resize(quad->angleCount() * xElemCt * yElemCt);
+    //Ayz.resize(quad->angleCount() * yElemCt * zElemCt);
+    //Axz.resize(quad->angleCount() * xElemCt * zElemCt);
 
     /*
                                                        // mu xi eta
@@ -165,7 +219,10 @@ void Mesh::remesh(int xelems, int yelems, int zelems, const Config *config, cons
             for(unsigned int zIndx = 0; zIndx < zElemCt; zIndx++)
                 vol[xIndx * yElemCt*zElemCt + yIndx * zElemCt + zIndx] = dx[xIndx] * dy[yIndx] * dz[zIndx];
 
+    calcAreas(quad, config->m);
+
     // Calculate the cell face area for each angle as well as volume
+    /*
     for(int eIndx = 0; eIndx < config->m; eIndx++)
     {
         float vMu = fabs(quad->mu[eIndx]);
@@ -193,6 +250,7 @@ void Mesh::remesh(int xelems, int yelems, int zelems, const Config *config, cons
                 Axy[eIndx * xElemCt*yElemCt + xIndx * yElemCt + yIndx] = 2 * vEta * dx[xIndx] * dy[yIndx];
             }
     }
+    */
 
     // 0 = air, 1 = water, 2 = lead/tungsten
     zoneId.resize(xElemCt * yElemCt * zElemCt, 0);  // Initialize to all zeros
@@ -213,9 +271,9 @@ void Mesh::remesh(int xelems, int yelems, int zelems, const Config *config, cons
     int zFrontGapIndx = (zElemCt-1)/2 - round(config->sourceFrontGap/(config->zLen/zElemCt));
     int zBackGapIndx = (zElemCt-1)/2 + round(config->sourceFrontGap/(config->zLen/zElemCt));
 
-    qDebug() << "x in " << xLeftIndx <<", " << xRightIndx << "  and out " << xLeftGapIndx << ", " << xRightGapIndx;
-    qDebug() << "y in " << yTopIndx <<", " << yBottomIndx << "  and out " << yTopGapIndx << ", _";
-    qDebug() << "z in " << zFrontIndx <<", " << zBackIndx << "  and out " << zFrontGapIndx << ", " << zBackGapIndx;
+    //qDebug() << "x in " << xLeftIndx <<", " << xRightIndx << "  and out " << xLeftGapIndx << ", " << xRightGapIndx;
+    //qDebug() << "y in " << yTopIndx <<", " << yBottomIndx << "  and out " << yTopGapIndx << ", _";
+    //qDebug() << "z in " << zFrontIndx <<", " << zBackIndx << "  and out " << zFrontGapIndx << ", " << zBackGapIndx;
 
 
     for(unsigned int i = 0; i < xElemCt; i++)
@@ -241,6 +299,50 @@ void Mesh::remesh(int xelems, int yelems, int zelems, const Config *config, cons
                 if((x-xCenter)*(x-xCenter) + (y-yCenter)*(y-yCenter) <= (radius)*(radius))
                     zoneId[i*yElemCt*zElemCt + j*zElemCt + k] = 1;
             }
+}
+
+void Mesh::calcAreas(const Quadrature *quad, const int eGroups)
+{
+    Axy.resize(quad->angleCount() * xElemCt * yElemCt);
+    Ayz.resize(quad->angleCount() * yElemCt * zElemCt);
+    Axz.resize(quad->angleCount() * xElemCt * zElemCt);
+
+    // Calculate the cell face area for each angle as well as volume
+    for(int eIndx = 0; eIndx < eGroups; eIndx++)
+    {
+        float vMu = fabs(quad->mu[eIndx]);
+        float vEta = fabs(quad->eta[eIndx]);
+        float vZi = fabs(quad->zi[eIndx]);
+
+        for(unsigned int yIndx = 0; yIndx < yElemCt; yIndx++)
+            for(unsigned int zIndx = 0; zIndx < zElemCt; zIndx++)
+            {
+                //DA[eIndx * yElemCt*zElemCt + yIndx * zElemCt + zIndx] = vMu * dy[yIndx] * dz[zIndx];
+                Ayz[eIndx * yElemCt*zElemCt + yIndx * zElemCt + zIndx] = 2 * vMu * dy[yIndx] * dz[zIndx];
+            }
+
+        for(unsigned int xIndx = 0; xIndx < xElemCt; xIndx++)
+            for(unsigned int zIndx = 0; zIndx < zElemCt; zIndx++)
+            {
+                //DB[eIndx * xElemCt*zElemCt + xIndx * zElemCt + zIndx] = vEta * dx[xIndx] * dz[zIndx];
+                Axz[eIndx * xElemCt*zElemCt + xIndx * zElemCt + zIndx] = 2 * vZi * dx[xIndx] * dz[zIndx];
+            }
+
+        for(unsigned int xIndx = 0; xIndx < xElemCt; xIndx++)
+            for(unsigned int yIndx = 0; yIndx < yElemCt; yIndx++)
+            {
+                //DC[eIndx * xElemCt*yElemCt + xIndx * yElemCt + yIndx] = vZi * dx[xIndx] * dy[yIndx];
+                Axy[eIndx * xElemCt*yElemCt + xIndx * yElemCt + yIndx] = 2 * vEta * dx[xIndx] * dy[yIndx];
+            }
+    }
+}
+
+void Mesh::initCtVariables()
+{
+    if(vol.size() < 1)
+        throw "Cannot initialize CT variables before volume data!";
+    ct.resize(vol.size());
+    density.resize(vol.size());
 }
 
 /*
