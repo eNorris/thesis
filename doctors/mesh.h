@@ -59,8 +59,6 @@ public:
     std::vector<u_int16_t> ct;
     std::vector<float> density;
 
-
-
     void load(const Config *config, const Quadrature *quad);
 
     unsigned int voxelCount() const;
@@ -72,7 +70,7 @@ public:
 public slots:
     void remesh(int xelems, int yelems, int zelems, const Config *config, const Quadrature *quad);
 
-    void uniform(const int xelems, const int yelems, const int zelems, const float xLen, const float yLen, const float zLen, const int eGroups, const Quadrature *quad);
+    void uniform(const int xelems, const int yelems, const int zelems, const float xLen, const float yLen, const float zLen);
 
 public:
     void calcAreas(const Quadrature *quad, const int eGroups);

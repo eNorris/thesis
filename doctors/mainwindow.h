@@ -42,6 +42,10 @@ private:
     QuadDialog *quadDialog;
     XSectionDialog *xsDialog;
 
+    bool m_geomLoaded, m_xsLoaded, m_quadLoaded, m_paramsLoaded;
+
+    static QPalette *m_goodPalette, *m_badPalette;
+
     QFileDialog *m_configSelectDialog;
 
     QWaitCondition m_pendingUserContinue;
@@ -61,6 +65,9 @@ protected slots:
     void userDebugNext();
     void userDebugAbort();
     void slotLoadConfigClicked();
+    void slotOpenCtData();
+
+    void updateLaunchButton();
 
 signals:
     void signalNewIteration(std::vector<float>);

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>349</height>
+    <height>756</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -54,14 +54,73 @@
     </item>
     <item row="1" column="0">
      <layout class="QGridLayout" name="gridLayout">
-      <item row="6" column="0">
-       <widget class="QPushButton" name="pushButton">
-        <property name="text">
-         <string>GO!</string>
+      <item row="0" column="0">
+       <widget class="QGroupBox" name="geometryGroupBox">
+        <property name="title">
+         <string>Geometry</string>
         </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QComboBox" name="geometryComboBox">
+           <item>
+            <property name="text">
+             <string>Load from CT binary file</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QPushButton" name="geometryOpenPushButton">
+             <property name="text">
+              <string>Open</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="geometryFileLineEdit"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QPushButton" name="geometryExplorePushButton">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Explore</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="geometryHSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="geometryHelpPushButton">
+             <property name="text">
+              <string>Help</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </widget>
       </item>
-      <item row="0" column="0">
+      <item row="4" column="0">
        <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -74,42 +133,261 @@
         </property>
        </spacer>
       </item>
-      <item row="3" column="0">
-       <widget class="QPushButton" name="buildGeomPushButton">
-        <property name="text">
-         <string>Build Geometry</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QPushButton" name="loadInputPushButton">
-        <property name="text">
-         <string>Load Input</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QPushButton" name="selectQuadPushButton">
-        <property name="text">
-         <string>Select Quadrature</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QPushButton" name="loadXsPushButton">
-        <property name="text">
-         <string>Load Cross Sections</string>
-        </property>
-       </widget>
-      </item>
       <item row="5" column="0">
        <widget class="QPushButton" name="launchSolverPushButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Launch Solver</string>
         </property>
        </widget>
       </item>
+      <item row="1" column="0">
+       <widget class="QGroupBox" name="xsGroupBox">
+        <property name="title">
+         <string>Cross Section</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QComboBox" name="xsComboBox">
+           <item>
+            <property name="text">
+             <string>Load AMPX formatted binary</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QPushButton" name="xsOpenPushButton">
+             <property name="text">
+              <string>Open</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="xsFileLineEdit"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QPushButton" name="xsExplorePushButton">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Explore</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="xsHelpPushButton">
+             <property name="text">
+              <string>Help</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QGroupBox" name="quadGroupBox">
+        <property name="title">
+         <string>Quadrature</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_7">
+           <item>
+            <widget class="QComboBox" name="quadTypecomboBox">
+             <item>
+              <property name="text">
+               <string>SN</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Custom</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="quadData1ComboBox">
+             <item>
+              <property name="text">
+               <string>N</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>2</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>4</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>8</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="quadData2ComboBox">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <widget class="QPushButton" name="quadOpenPushButton">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Open</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="quadFileLineEdit">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QPushButton" name="quadExplorePushButton">
+             <property name="text">
+              <string>Explore</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="quadHelpPushButton">
+             <property name="text">
+              <string>Help</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QGroupBox" name="paramsGroupBox">
+        <property name="title">
+         <string>Solver Parameters</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_8">
+           <item>
+            <widget class="QPushButton" name="paramsOpenPushButton">
+             <property name="text">
+              <string>Open</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="paramsFileLineEdit"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_9">
+           <item>
+            <widget class="QPushButton" name="paramsExplorePushButton">
+             <property name="text">
+              <string>Explore</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="paramsHelpPushButton">
+             <property name="text">
+              <string>Help</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
      </layout>
+    </item>
+    <item row="2" column="0">
+     <widget class="QProgressBar" name="mainProgressBar">
+      <property name="value">
+       <number>24</number>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QProgressBar" name="mainProgressBar2">
+      <property name="value">
+       <number>24</number>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -136,8 +414,42 @@
     <addaction name="actionProblem_Explorer"/>
     <addaction name="actionLoad_Balancer"/>
    </widget>
+   <widget class="QMenu" name="menuAnalysis">
+    <property name="title">
+     <string>Analysis</string>
+    </property>
+    <addaction name="actionDistributions"/>
+   </widget>
+   <widget class="QMenu" name="menuLogs">
+    <property name="title">
+     <string>Logs</string>
+    </property>
+    <widget class="QMenu" name="menuMaster">
+     <property name="title">
+      <string>Master</string>
+     </property>
+     <addaction name="actionCritical_Only"/>
+     <addaction name="actionWarnings_Only"/>
+     <addaction name="actionInfo"/>
+     <addaction name="actionDebug"/>
+     <addaction name="actionDetailed_Debug"/>
+    </widget>
+    <widget class="QMenu" name="menuSolution_Logger">
+     <property name="title">
+      <string>Solution Logger</string>
+     </property>
+     <addaction name="actionOff"/>
+     <addaction name="actionOuter_Iterations"/>
+     <addaction name="actionInner_Iterations"/>
+     <addaction name="actionDetails"/>
+    </widget>
+    <addaction name="menuMaster"/>
+    <addaction name="menuSolution_Logger"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuViewers"/>
+   <addaction name="menuAnalysis"/>
+   <addaction name="menuLogs"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionExit">
@@ -158,6 +470,56 @@
   <action name="actionLoad_Balancer">
    <property name="text">
     <string>Load Balancer</string>
+   </property>
+  </action>
+  <action name="actionCritical_Only">
+   <property name="text">
+    <string>Critical Only</string>
+   </property>
+  </action>
+  <action name="actionWarnings_Only">
+   <property name="text">
+    <string>Warnings Only</string>
+   </property>
+  </action>
+  <action name="actionInfo">
+   <property name="text">
+    <string>Info</string>
+   </property>
+  </action>
+  <action name="actionDebug">
+   <property name="text">
+    <string>Debug</string>
+   </property>
+  </action>
+  <action name="actionDetailed_Debug">
+   <property name="text">
+    <string>Detailed Debug</string>
+   </property>
+  </action>
+  <action name="actionOff">
+   <property name="text">
+    <string>Off</string>
+   </property>
+  </action>
+  <action name="actionOuter_Iterations">
+   <property name="text">
+    <string>Outer Iterations</string>
+   </property>
+  </action>
+  <action name="actionInner_Iterations">
+   <property name="text">
+    <string>Inner Iterations</string>
+   </property>
+  </action>
+  <action name="actionDetails">
+   <property name="text">
+    <string>Details</string>
+   </property>
+  </action>
+  <action name="actionDistributions">
+   <property name="text">
+    <string>Distributions</string>
    </property>
   </action>
  </widget>

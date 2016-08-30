@@ -50,7 +50,7 @@ int Mesh::yjmp() const
     return zElemCt;
 }
 
-void Mesh::uniform(const int xelems, const int yelems, const int zelems, const float xLen, const float yLen, const float zLen, const int eGroups, const Quadrature *quad)
+void Mesh::uniform(const int xelems, const int yelems, const int zelems, const float xLen, const float yLen, const float zLen)
 {
     xElemCt = xelems;
     yElemCt = yelems;
@@ -97,7 +97,7 @@ void Mesh::uniform(const int xelems, const int yelems, const int zelems, const f
             for(unsigned int zIndx = 0; zIndx < zElemCt; zIndx++)
                 vol[xIndx * yElemCt*zElemCt + yIndx * zElemCt + zIndx] = dx[xIndx] * dy[yIndx] * dz[zIndx];
 
-    calcAreas(quad, eGroups);
+    //calcAreas(quad, eGroups);
 
     zoneId.resize(xElemCt * yElemCt * zElemCt, 0);  // Initialize to all zeros
 
@@ -126,70 +126,6 @@ void Mesh::remesh(int xelems, int yelems, int zelems, const Config *config, cons
     dx.resize(xElemCt);
     dy.resize(yElemCt);
     dz.resize(zElemCt);
-
-    //Axy.resize(quad->angleCount() * xElemCt * yElemCt);
-    //Ayz.resize(quad->angleCount() * yElemCt * zElemCt);
-    //Axz.resize(quad->angleCount() * xElemCt * zElemCt);
-
-    /*
-                                                       // mu xi eta
-    orderOctant1.resize(xElemCt * yElemCt * zElemCt);  // + + +
-    orderOctant2.resize(xElemCt * yElemCt * zElemCt);  // - + +
-    orderOctant3.resize(xElemCt * yElemCt * zElemCt);  // - - +
-    orderOctant4.resize(xElemCt * yElemCt * zElemCt);  // + - +
-    orderOctant5.resize(xElemCt * yElemCt * zElemCt);  // + + -
-    orderOctant6.resize(xElemCt * yElemCt * zElemCt);  // - + -
-    orderOctant7.resize(xElemCt * yElemCt * zElemCt);  // - - -
-    orderOctant8.resize(xElemCt * yElemCt * zElemCt);  // + - -
-
-    unsigned int indx = 0;  // Octant 1: + + +
-    for(int i = 0; i < xElemCt; i++)
-        for(int j = 0; j < yElemCt; j++)
-            for(int k = 0; k < zElemCt; k++)
-                orderOctant1[indx++] = i*yElemCt*zElemCt + j*zElemCt + k;
-
-    indx = 0;  // Octant 2: - + +
-    for(int i = xElemCt-1; i >= 0; i--)
-        for(int j = 0; j < yElemCt; j++)
-            for(int k = 0; k < zElemCt; k++)
-                orderOctant1[indx++] = i*yElemCt*zElemCt + j*zElemCt + k;
-
-    indx = 0;  // Octant 3: - - +
-    for(int i = xElemCt-1; i >= 0; i--)
-        for(int j = yElemCt-1; j >= 0; j--)
-            for(int k = 0; k < zElemCt; k++)
-                orderOctant1[indx++] = i*yElemCt*zElemCt + j*zElemCt + k;
-
-    indx = 0;  // Octant 4: + - +
-    for(int i = 0; i < xElemCt; i++)
-        for(int j = yElemCt-1; j >= 0; j--)
-            for(int k = 0; k < zElemCt; k++)
-                orderOctant1[indx++] = i*yElemCt*zElemCt + j*zElemCt + k;
-
-    indx = 0;  // Octant 5: + + -
-    for(int i = 0; i < xElemCt; i++)
-        for(int j = 0; j < yElemCt; j++)
-            for(int k = zElemCt-1; k >= 0; k--)
-                orderOctant1[indx++] = i*yElemCt*zElemCt + j*zElemCt + k;
-
-    indx = 0;  // Octant 6: - + -
-    for(int i = xElemCt-1; i >= 0; i--)
-        for(int j = 0; j < yElemCt; j++)
-            for(int k = zElemCt-1; k >= 0; k--)
-                orderOctant1[indx++] = i*yElemCt*zElemCt + j*zElemCt + k;
-
-    indx = 0;  // Octant 7: - - -
-    for(int i = xElemCt-1; i >= 0; i--)
-        for(int j = yElemCt-1; j >= 0; j--)
-            for(int k = zElemCt-1; k >= 0; k--)
-                orderOctant1[indx++] = i*yElemCt*zElemCt + j*zElemCt + k;
-
-    indx = 0;  // Octant 8: + - -
-    for(int i = 0; i < zElemCt; i++)
-        for(int j = yElemCt-1; j >= 0; j--)
-            for(int k = zElemCt-1; k >= 0; k--)
-                orderOctant1[indx++] = i*yElemCt*zElemCt + j*zElemCt + k;
-    */
 
 
     vol.resize(xElemCt * yElemCt * zElemCt);
@@ -221,37 +157,6 @@ void Mesh::remesh(int xelems, int yelems, int zelems, const Config *config, cons
 
     calcAreas(quad, config->m);
 
-    // Calculate the cell face area for each angle as well as volume
-    /*
-    for(int eIndx = 0; eIndx < config->m; eIndx++)
-    {
-        float vMu = fabs(quad->mu[eIndx]);
-        float vEta = fabs(quad->eta[eIndx]);
-        float vZi = fabs(quad->zi[eIndx]);
-
-        for(unsigned int yIndx = 0; yIndx < yElemCt; yIndx++)
-            for(unsigned int zIndx = 0; zIndx < zElemCt; zIndx++)
-            {
-                //DA[eIndx * yElemCt*zElemCt + yIndx * zElemCt + zIndx] = vMu * dy[yIndx] * dz[zIndx];
-                Ayz[eIndx * yElemCt*zElemCt + yIndx * zElemCt + zIndx] = 2 * vMu * dy[yIndx] * dz[zIndx];
-            }
-
-        for(unsigned int xIndx = 0; xIndx < xElemCt; xIndx++)
-            for(unsigned int zIndx = 0; zIndx < zElemCt; zIndx++)
-            {
-                //DB[eIndx * xElemCt*zElemCt + xIndx * zElemCt + zIndx] = vEta * dx[xIndx] * dz[zIndx];
-                Axz[eIndx * xElemCt*zElemCt + xIndx * zElemCt + zIndx] = 2 * vZi * dx[xIndx] * dz[zIndx];
-            }
-
-        for(unsigned int xIndx = 0; xIndx < xElemCt; xIndx++)
-            for(unsigned int yIndx = 0; yIndx < yElemCt; yIndx++)
-            {
-                //DC[eIndx * xElemCt*yElemCt + xIndx * yElemCt + yIndx] = vZi * dx[xIndx] * dy[yIndx];
-                Axy[eIndx * xElemCt*yElemCt + xIndx * yElemCt + yIndx] = 2 * vEta * dx[xIndx] * dy[yIndx];
-            }
-    }
-    */
-
     // 0 = air, 1 = water, 2 = lead/tungsten
     zoneId.resize(xElemCt * yElemCt * zElemCt, 0);  // Initialize to all zeros
 
@@ -274,7 +179,6 @@ void Mesh::remesh(int xelems, int yelems, int zelems, const Config *config, cons
     //qDebug() << "x in " << xLeftIndx <<", " << xRightIndx << "  and out " << xLeftGapIndx << ", " << xRightGapIndx;
     //qDebug() << "y in " << yTopIndx <<", " << yBottomIndx << "  and out " << yTopGapIndx << ", _";
     //qDebug() << "z in " << zFrontIndx <<", " << zBackIndx << "  and out " << zFrontGapIndx << ", " << zBackGapIndx;
-
 
     for(unsigned int i = 0; i < xElemCt; i++)
         for(unsigned int j = 0; j < yElemCt; j++)

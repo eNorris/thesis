@@ -14,7 +14,7 @@ public:
     CtDataManager();
     ~CtDataManager();
 
-    Mesh *parse(int xbins, int ybins, int zbins, int bits, std::string filename, const int eGroups, const Quadrature *quad);
+    Mesh *parse16(int xbins, int ybins, int zbins, std::string filename);
     Mesh *ctNumberToHumanPhantom(Mesh *mesh);
     Mesh *ctNumberToQuickCheck(Mesh *mesh);
     //Mesh parse_256_256_64_16(std::string filename);

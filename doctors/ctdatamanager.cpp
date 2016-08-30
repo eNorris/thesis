@@ -16,12 +16,12 @@ CtDataManager::~CtDataManager()
 }
 
 //Mesh CtDataReader::parse_256_256_64_16(std::string filename)
-Mesh *CtDataManager::parse(int xbins, int ybins, int zbins, int bits, std::string filename, const int eGroups, const Quadrature *quad)
+Mesh *CtDataManager::parse16(int xbins, int ybins, int zbins, std::string filename)
 {
     Mesh *m = new Mesh;
     long tbins = xbins * ybins * zbins;
 
-    m->uniform(xbins, ybins, zbins, 50.0, 50.0, 12.5, eGroups, quad);
+    m->uniform(xbins, ybins, zbins, 50.0, 50.0, 12.5);
     m->initCtVariables();
 
     std::vector<u_int16_t> zoneIds;
@@ -39,6 +39,10 @@ Mesh *CtDataManager::parse(int xbins, int ybins, int zbins, int bits, std::strin
         {
             fin.read((char*)&zoneIds[i], 2);
         }
+    }
+    else
+    {
+        return NULL;
     }
 
     int gindx = 0;
@@ -76,7 +80,7 @@ Mesh *CtDataManager::ctNumberToQuickCheck(Mesh *mesh)
             mini = mesh->density[i];
 
         // Determine the material
-        mesh->zoneId[i] = mesh->density[i]*30;
+        mesh->zoneId[i] = mesh->density[i]*1.68;
         if(mesh->zoneId[i] > 63)
             mesh->zoneId[i] = 63;
     }

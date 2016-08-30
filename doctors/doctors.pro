@@ -51,7 +51,9 @@ SOURCES += main.cpp\
     quadglwidget.cpp \
     outwriter.cpp \
     raytracer.cpp \
-    ctdatamanager.cpp
+    ctdatamanager.cpp \
+    solverparams.cpp \
+    solverparamsdialog.cpp
 
 HEADERS  += mainwindow.h \
     config.h \
@@ -66,13 +68,16 @@ HEADERS  += mainwindow.h \
     zoomablepannablegraphicsview.h \
     quadglwidget.h \
     outwriter.h \
-    ctdatamanager.h
+    ctdatamanager.h \
+    solverparams.h \
+    solverparamsdialog.h
 
 FORMS    += mainwindow.ui \
     outputdialog.ui \
     geomdialog.ui \
     quaddialog.ui \
-    xsectiondialog.ui
+    xsectiondialog.ui \
+    solverparamsdialog.ui
 
 DISTFILES += \
     testinput.cfg
