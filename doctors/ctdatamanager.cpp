@@ -56,8 +56,8 @@ Mesh *CtDataManager::parse16(int xbins, int ybins, int zbins, std::string filena
                 gindx++;
             }
 
-    return ctNumberToQuickCheck(m);
-    //return ctNumberToHumanPhantom(m);
+    //return ctNumberToQuickCheck(m);
+    return ctNumberToHumanPhantom(m);
 }
 
 Mesh *CtDataManager::ctNumberToQuickCheck(Mesh *mesh)

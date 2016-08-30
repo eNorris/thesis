@@ -8,7 +8,8 @@
 GeomDialog::GeomDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::GeomDialog),
-    m_mesh(NULL)
+    m_mesh(NULL),
+    m_rendertype(0)
 {
     ui->setupUi(this);
 
@@ -32,6 +33,10 @@ GeomDialog::GeomDialog(QWidget *parent) :
     connect(ui->xzRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
     connect(ui->yzRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
 
+    connect(ui->materialRadioButton, SIGNAL(clicked()), this, SLOT(updateRenderType()));
+    connect(ui->densityRadioButton, SIGNAL(clicked()), this, SLOT(updateRenderType()));
+    connect(ui->ctRadioButton, SIGNAL(clicked()), this, SLOT(updateRenderType()));
+
     //connect(ui->xyRadioButton, SIGNAL())
 
     // TODO updateMeshSlicePlane when a radio button is selected
@@ -49,6 +54,7 @@ void GeomDialog::updateMesh(Mesh *mesh)
     updateMeshSlicePlane();
 }
 
+// Negative level will not change level
 void GeomDialog::setSliceLevel(int level)
 {
     qDebug() << "Set the slice to " << level;
@@ -59,10 +65,27 @@ void GeomDialog::setSliceLevel(int level)
         return;
     }
 
+    if(level < 0)
+        level = ui->sliceSpinBox->value();
+
     //loadUniqueBrush();
-    loadParulaBrush();
+    //loadParulaBrush();
     //loadViridis256Brush();
     //loadPhantom19Brush();
+
+    if(m_rendertype == 0)
+        loadPhantom19Brush();
+    else if(m_rendertype == 1)
+        loadViridis256Brush();
+    else if(m_rendertype == 2)
+        loadViridis256Brush();
+    else
+    {
+        qDebug() << "geomdialog: 84: rendertype was illegal";
+        return;
+    }
+
+    int zid;
 
     if(ui->xyRadioButton->isChecked())
     {
@@ -72,12 +95,27 @@ void GeomDialog::setSliceLevel(int level)
             return;
         }
 
-
         for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
             for(unsigned int j = 0; j < m_mesh->yElemCt; j++)
             {
-                int zid = m_mesh->zoneId[i*m_mesh->yElemCt*m_mesh->zElemCt + j*m_mesh->zElemCt + level];
-                //int rindx = i*m_mesh->xMesh + j;
+                if(m_rendertype == 0)
+                {
+                    zid = m_mesh->zoneId[i*m_mesh->yElemCt*m_mesh->zElemCt + j*m_mesh->zElemCt + level];
+                }
+                else if(m_rendertype == 1)
+                {
+                    zid = m_mesh->density[i*m_mesh->yElemCt*m_mesh->zElemCt + j*m_mesh->zElemCt + level] * 200;
+                    if(zid > 255)
+                        zid = 255;
+                    if(zid < 0)
+                        zid = 0;
+                }
+                else if(m_rendertype == 2)
+                {
+                    zid = (m_mesh->ct[i*m_mesh->yElemCt*m_mesh->zElemCt + j*m_mesh->zElemCt + level] + 1024) / 12.0;
+                    if(zid > 255)
+                        zid = 255;
+                }
                 rects[i*m_mesh->yElemCt + j]->setBrush(brushes[zid]);
             }
     }
@@ -89,11 +127,27 @@ void GeomDialog::setSliceLevel(int level)
             return;
         }
 
-        //loadUniqueBrush();
         for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
             for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
             {
-                int zid = m_mesh->zoneId[i*m_mesh->yElemCt*m_mesh->zElemCt + level*m_mesh->zElemCt + j];
+                if(m_rendertype == 0)
+                {
+                    zid = m_mesh->zoneId[i*m_mesh->yElemCt*m_mesh->zElemCt + level*m_mesh->zElemCt + j];
+                }
+                else if(m_rendertype == 1)
+                {
+                    zid = m_mesh->density[i*m_mesh->yElemCt*m_mesh->zElemCt + level*m_mesh->zElemCt + j] * 200;
+                    if(zid > 255)
+                        zid = 255;
+                    if(zid < 0)
+                        zid = 0;
+                }
+                else if(m_rendertype == 2)
+                {
+                    zid = (m_mesh->ct[i*m_mesh->yElemCt*m_mesh->zElemCt + level*m_mesh->zElemCt + j] + 1024) / 12.0;
+                    if(zid > 255)
+                        zid = 255;
+                }
                 rects[i*m_mesh->zElemCt + j]->setBrush(brushes[zid]);
             }
     }
@@ -109,7 +163,24 @@ void GeomDialog::setSliceLevel(int level)
         for(unsigned int i = 0; i < m_mesh->yElemCt; i++)
             for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
             {
-                int zid = m_mesh->zoneId[level*m_mesh->yElemCt*m_mesh->zElemCt + i*m_mesh->zElemCt + j];
+                if(m_rendertype == 0)
+                {
+                    zid = m_mesh->zoneId[level*m_mesh->yElemCt*m_mesh->zElemCt + i*m_mesh->zElemCt + j];
+                }
+                else if(m_rendertype == 1)
+                {
+                    zid = m_mesh->density[level*m_mesh->yElemCt*m_mesh->zElemCt + i*m_mesh->zElemCt + j] * 200;
+                    if(zid > 255)
+                        zid = 255;
+                    if(zid < 0)
+                        zid = 0;
+                }
+                else if(m_rendertype == 2)
+                {
+                    zid = (m_mesh->ct[level*m_mesh->yElemCt*m_mesh->zElemCt + i*m_mesh->zElemCt + j] + 1024) / 12.0;
+                    if(zid > 255)
+                        zid = 255;
+                }
                 rects[i*m_mesh->zElemCt + j]->setBrush(brushes[zid]);
             }
     }
@@ -135,9 +206,6 @@ void GeomDialog::updateMeshSlicePlane()
         for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
             for(unsigned int j = 0; j < m_mesh->yElemCt; j++)
             {
-                //qreal x = m_mesh->xIndex[i];
-                //qreal y = m_mesh->yIndex[j];
-                //qDebug() << "x,y = " << x << ", " << y;
                 rects.push_back(scene->addRect(m_mesh->xNodes[i], m_mesh->yNodes[j], m_mesh->dx[i], m_mesh->dy[j], Qt::NoPen, greenBrush));
             }
 
@@ -153,9 +221,6 @@ void GeomDialog::updateMeshSlicePlane()
         for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
             for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
             {
-                //qreal x = m_mesh->xIndex[i];
-                //qreal z = m_mesh->zIndex[j];
-                //qDebug() << "x,y = " << x << ", " << z;
                 rects.push_back(scene->addRect(m_mesh->xNodes[i], m_mesh->zNodes[j], m_mesh->dx[i], m_mesh->dz[j], Qt::NoPen, greenBrush));
             }
 
@@ -171,9 +236,6 @@ void GeomDialog::updateMeshSlicePlane()
         for(unsigned int i = 0; i < m_mesh->yElemCt; i++)
             for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
             {
-                //qreal y = m_mesh->yIndex[i];
-                //qreal z = m_mesh->zIndex[j];
-                //qDebug() << "x,y = " << y << ", " << z;
                 rects.push_back(scene->addRect(m_mesh->yNodes[i], m_mesh->zNodes[j], m_mesh->dy[i], m_mesh->dz[j], Qt::NoPen, greenBrush));
             }
 
@@ -192,7 +254,24 @@ void GeomDialog::updateMeshSlicePlane()
 }
 
 
-
+void GeomDialog::updateRenderType()
+{
+    if(ui->materialRadioButton->isChecked())
+    {
+        m_rendertype = 0;
+        setSliceLevel(-1);
+    }
+    else if(ui->densityRadioButton->isChecked())
+    {
+        m_rendertype = 1;
+        setSliceLevel(-1);
+    }
+    else if(ui->ctRadioButton->isChecked())
+    {
+        m_rendertype = 2;
+        setSliceLevel(-1);
+    }
+}
 
 
 

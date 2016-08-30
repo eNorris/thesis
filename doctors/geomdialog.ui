@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>563</width>
-    <height>300</height>
+    <width>731</width>
+    <height>418</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -116,21 +116,24 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QRadioButton" name="radioButton">
+         <widget class="QRadioButton" name="materialRadioButton">
           <property name="text">
            <string>Material</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="radioButton_2">
+         <widget class="QRadioButton" name="densityRadioButton">
           <property name="text">
            <string>Density</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="radioButton_3">
+         <widget class="QRadioButton" name="ctRadioButton">
           <property name="text">
            <string>CT Number</string>
           </property>

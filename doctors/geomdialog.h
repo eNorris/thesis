@@ -29,10 +29,12 @@ public:
 private:
     Ui::GeomDialog *ui;
     Mesh *m_mesh;
+    int m_rendertype;
 
 protected slots:
     void setSliceLevel(int level);
     void updateMeshSlicePlane();
+    void updateRenderType();
 };
 
 #endif // GEOMDIALOG_H
