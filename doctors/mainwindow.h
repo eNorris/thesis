@@ -66,6 +66,7 @@ protected slots:
     void userDebugAbort();
     void slotLoadConfigClicked();
     void slotOpenCtData();
+    void slotQuadSelected(int);
 
     void updateLaunchButton();
 

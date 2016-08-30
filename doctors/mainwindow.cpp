@@ -70,6 +70,10 @@ MainWindow::MainWindow(QWidget *parent):
     // TODO - Update like above at some point
     connect(this, SIGNAL(signalNewIteration(std::vector<float>)), outputDialog, SLOT(reRender(std::vector<float>)));
 
+    connect(ui->quadTypecomboBox, SIGNAL(activated(int)), this, SLOT(slotQuadSelected(int)));
+    connect(ui->quadData1ComboBox, SIGNAL(activated(int)), this, SLOT(slotQuadSelected(int)));
+    connect(ui->quadData2ComboBox, SIGNAL(activated(int)), this, SLOT(slotQuadSelected(int)));
+
     // Add the tooltips
     //ui->launchSolverPushButton->setToolTip("");
     updateLaunchButton();  // Sets the tooltip
@@ -263,16 +267,36 @@ void MainWindow::updateLaunchButton()
 
     ui->geometryGroupBox->update();
 
+}
 
-    /*
-    QString tooltip = "";
-    if(!m_geomLoaded)
-        tooltip += "Geometry not yet loaded\n";
-    if(!m_quadLoaded)
-        tooltip += "Quadrature not yet selected\n";
-    if(!m_xsLoaded)
-        tooltip += "Cross Section Data not yet loaded\n";
-    if(!m_paramsLoaded)
-        tooltip += "Solver parameters not yet selected\n";
-        */
+void MainWindow::slotQuadSelected(int x)
+{
+    int type = ui->quadTypecomboBox->currentIndex();
+    int d1 = ui->quadData1ComboBox->currentIndex();
+    int d2 = ui->quadData2ComboBox->currentIndex();
+
+    if(type == 0)  // Sn
+    {
+        ui->quadData1ComboBox->setEnabled(true);
+        ui->quadData1ComboBox->clear();
+        ui->quadData1ComboBox->addItem("N");
+        ui->quadData1ComboBox->addItem("2");
+        ui->quadData1ComboBox->addItem("4");
+        ui->quadData1ComboBox->addItem("8");
+        ui->quadData2ComboBox->clear();
+        ui->quadData2ComboBox->setEnabled(false);
+        ui->quadOpenPushButton->setEnabled(false);
+        ui->quadFileLineEdit->setEnabled(false);
+    }
+    else if(type == 1)  // Custom
+    {
+        ui->quadOpenPushButton->setEnabled(true);
+        ui->quadFileLineEdit->setEnabled(true);
+    }
+    else
+    {
+        qDebug() << "Illegal combo box (type = " << type << ")selection";
+    }
+
+    qDebug() << "type = " << type << "  d1 = " << d1 << "   d2 = " << d2;
 }
