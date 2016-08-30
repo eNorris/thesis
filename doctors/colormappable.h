@@ -15,9 +15,12 @@ public:
 
     void loadParulaBrush();
     void loadUniqueBrush();
+    void loadPhantom19Brush();
+
+    void loadViridis256Brush();
 
 protected:
-    enum ColorId {NONE, PARULA, UNIQUE};
+    enum ColorId {NONE, PARULA, UNIQUE, PHANTOM19, VIRIDIS256};
     ColorId m_colorId;
 };
 
