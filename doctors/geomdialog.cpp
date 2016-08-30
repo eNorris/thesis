@@ -59,7 +59,10 @@ void GeomDialog::setSliceLevel(int level)
         return;
     }
 
-    loadUniqueBrush();
+    //loadUniqueBrush();
+    loadParulaBrush();
+    //loadViridis256Brush();
+    //loadPhantom19Brush();
 
     if(ui->xyRadioButton->isChecked())
     {

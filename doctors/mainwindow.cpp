@@ -14,6 +14,7 @@
 #include "quaddialog.h"
 #include "xsectiondialog.h"
 #include "outwriter.h"
+#include "ctdatamanager.h"
 
 #include "config.h"
 //#include "solvers.h"
@@ -69,7 +70,10 @@ MainWindow::MainWindow(QWidget *parent):
     quadDialog->updateQuad(m_quad);
 
     //Mesh *mesh = new Mesh(config, quad);
-    m_mesh = new Mesh(m_config, m_quad);
+    //m_mesh = new Mesh(m_config, m_quad);
+    CtDataManager datareader;
+    m_mesh = datareader.parse(256, 256, 64, 16, "/media/Storage/thesis/doctors/liver_volume.bin", m_config->m, m_quad);
+    m_mesh->calcAreas(m_quad, m_config->m);
     qDebug() << "Here the zslice = " << m_mesh->zElemCt;
     geomDialog->updateMesh(m_mesh);
 
