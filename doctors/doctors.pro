@@ -50,7 +50,8 @@ SOURCES += main.cpp\
     zoomablepannablegraphicsview.cpp \
     quadglwidget.cpp \
     outwriter.cpp \
-    raytracer.cpp
+    raytracer.cpp \
+    ctdatamanager.cpp
 
 HEADERS  += mainwindow.h \
     config.h \
@@ -64,7 +65,8 @@ HEADERS  += mainwindow.h \
     colormappable.h \
     zoomablepannablegraphicsview.h \
     quadglwidget.h \
-    outwriter.h
+    outwriter.h \
+    ctdatamanager.h
 
 FORMS    += mainwindow.ui \
     outputdialog.ui \
