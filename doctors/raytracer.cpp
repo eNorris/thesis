@@ -220,10 +220,10 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
                         float flx = srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
 
                         if(flx < 0)
-                            qDebug() << "Negative?";
+                            qDebug() << "raytracer.cpp: (223): Negative?";
 
                         if(flx > 1E6)
-                            qDebug() << "Too big!";
+                            qDebug() << "raytracer.cpp: (226): Too big!";
 
                         uflux[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
                     }

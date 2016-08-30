@@ -264,7 +264,7 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
     }
     else
     {
-        // Calcualte the external source mesh
+        // Calculate the external source mesh
         for(int is = 0; is < config->sourceIntensity.size(); is++)
         {
             // Make sure the source is inside the mesh
