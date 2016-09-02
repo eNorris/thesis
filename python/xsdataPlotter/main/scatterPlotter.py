@@ -77,6 +77,21 @@ def parse_matmsh3(filename):
     return numpy.array(dim1), numpy.array(dim2), numpy.array(dim3), ndata
 
 
+def diracdelta(x, y):
+    if x == y:
+        return 1.0
+    return 0.0
+
+
+def factorial(x):
+    if x <= 2:
+        return x
+    return x * factorial(x-1)
+
+
+def clm(l, m):
+    return numpy.sqrt((2 - diracdelta(2, 0)) * factorial(l-abs(m)) / factorial(l+abs(m)))
+
 e, eprime, nl, vals = parse_matmsh3("/media/Storage/thesis/python/xsdataPlotter/be9scatter504.dat")
 
 #e = e[::-1]
@@ -136,7 +151,6 @@ for i in range(angles):
     s = 0
     for l, sigma_l in enumerate(sigma_ls):
         plfun = scipy.special.legendre(l)
-        y = plfun(xx)
         s += ((2 * l + 1) / (4 * numpy.pi)) * sigma_l * plfun(xx)
 
     sigma.append(s)
@@ -154,14 +168,25 @@ ax.set_title("3-D Group " + str(eIndex) + "(" + str(e[eIndex]/1E6) + " - " + str
              "MeV )$\\rightarrow$ Group " + str(eprimeIndex) + "(" + str(e[eprimeIndex]/1E6) + " - " + str(e[eprimeIndex+1]/1E6) + " MeV)")
 set_axes_equal(ax)
 
-mu1d = numpy.linspace(-1.0, 1.0, 1000)
+#mu1d = numpy.linspace(-1.0, 1.0, 1000)
+mu1d = [1.0]
 sigma1d = []
 for i in range(len(mu1d)):
     s = 0
+    p = []
+    pp = []
+    peval = []
+    pl = []
     for l, sigma_l in enumerate(sigma_ls[:]):
         plfun = scipy.special.legendre(l)
+        p.append(mu1d[i])
+        peval.append(plfun(mu1d[i]))
+        pp.append(((2 * l + 1) / (4 * numpy.pi)) * sigma_l * plfun(mu1d[i]))
+        pl.append(sigma_l)
         s += ((2 * l + 1) / (4 * numpy.pi)) * sigma_l * plfun(mu1d[i])
     sigma1d.append(s)
+
+    print(s)
 
 pyplot.figure()
 pyplot.plot(mu1d, sigma1d, 'b', [-1, 1], [0, 0], 'k--')
