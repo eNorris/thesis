@@ -96,35 +96,25 @@ def clm(l, m):
 
 
 def plm(mu, l, m):
-    #lpmv(m, v, x) 	Associated legendre function of integer order.
-    #sph_harm(m, n, theta, phi) 	Compute spherical harmonics.
     return scipy.special.lpmv(abs(m), l, mu)
-
-
-def spherical(theta, phi, sigmas):
-
-    s = 0
-    for l in range(len(sigmas)):
-        coeff = (2*l + 1) / (4 * numpy.pi)
-        ss = 0
-        for m in range(-l, l+1):
-            ss += ylm(theta, phi, l, m)
-        s += coeff * sigmas[l] * ss
-    return s
 
 
 def ylm(theta, phi, l, m):
     mu = numpy.cos(theta)
     mphi = abs(m) * phi
-    if m >= 0:
-        return clm(l, m) * plm(mu, l, m) * numpy.cos(mphi)
-    else:
-        return clm(l, m) * plm(mu, l, m) * numpy.sin(mphi)
+
+    real = numpy.sqrt((2*l + 1)/(4*numpy.pi) * factorial(l-m)/factorial(l+m)) * plm(mu, l, m) * numpy.cos(mphi)
+    img = numpy.sqrt((2*l + 1)/(4*numpy.pi) * factorial(l-m)/factorial(l+m)) * plm(mu, l, m) * numpy.sin(mphi)
+
+    return real, img
+
+
+def ylm_conj(theta, phi, l, m):
+    rl, im = ylm(theta, phi, l, m)
+    return rl, -im
+
 
 e, eprime, nl, vals = parse_matmsh3("/media/Storage/thesis/python/xsdataPlotter/be9scatter504.dat")
-
-#e = e[::-1]
-#eprime = eprime[::-1]
 
 sh = vals.shape
 nls = sh[2]
@@ -133,21 +123,6 @@ minv = vals.min()
 maxv = vals.max()
 
 pyplot.close("all")
-
-indexes = numpy.linspace(1, 19, 19)
-
-for i in range(nls):
-    pyplot.figure()
-    pyplot.contourf(e/1E6, eprime/1E6, vals[:, :, i], 64, cmap='viridis', vmin=minv, vmax=maxv)
-    caxis = pyplot.colorbar()
-    pyplot.contour(e/1E6, eprime/1E6, vals[:, :, i], [0], colors='k')
-    #ax.set_yscale('log')
-    #ax.set_xscale('log')
-    pyplot.yscale('log')
-    pyplot.xscale('log')
-    pyplot.xlabel("E")
-    pyplot.ylabel("E'")
-    pyplot.title("Scatter XS, Nl = " + str(i))
 
 eIndex = 30
 eValue = e[eIndex]
@@ -161,12 +136,16 @@ ys = []
 zs = []
 thetas = []
 phis = []
-mus = []
-sigmas = []
+#mus = []
+sigma_reals = []
+sigma_imgs = []
 angles = 1000
 ref_dir = (1, 0, 0)
 
-for i in range(angles):
+ref_theta = 0
+ref_phi = 0
+
+for _ in range(angles):
     xi = random.random() * 2 * numpy.pi
     u = random.random() * 2 - 1
     x = numpy.sqrt(1 - u**2) * numpy.cos(xi)
@@ -181,20 +160,31 @@ for i in range(angles):
     thetas.append(theta)
     phis.append(phi)
 
-    mus.append(numpy.dot(ref_dir, (x, y, z)))
+    #mus.append(numpy.dot(ref_dir, (x, y, z)))
 
-    s = spherical(theta, phi, sigma_ls)
+for i in range(angles):
+    #s = spherical(theta, phi, sigma_ls)
+    sr = 0
+    si = 0
 
-    #print("theta = " + str(theta/numpy.pi) + " pi")
-    #print("phi = " + str(phi/numpy.pi) + " pi")
+    for l in range(len(sigma_ls)):
+        for m in range(-l, l+1):
+            ylm_real_ref, ylm_img_ref = ylm(ref_theta, ref_phi, l, m)
+            ylm_real, ylm_img = ylm(thetas[i], phis[i], l, m)
 
-    sigmas.append(s)
+            real = ylm_real_ref * ylm_real - ylm_img_ref * ylm_img
+            img = ylm_img_ref * ylm_real + ylm_img * ylm_real_ref
+
+            sr += sigma_ls[l] * real
+            si += sigma_ls[l] * img
+
+    sigma_reals.append(sr)
+    sigma_imgs.append(si)
 
 fig = pyplot.figure()
 ax = fig.add_subplot(111, projection='3d')
-
 ax.plot([0, 2*ref_dir[0]], [0, 2*ref_dir[1]], [0, 2*ref_dir[2]])
-p = ax.scatter(xs, ys, zs, c=sigmas, cmap='jet')
+p = ax.scatter(xs, ys, zs, c=sigma_reals, cmap='jet')
 fig.colorbar(p)
 
 ax.set_xlabel('x')
@@ -204,6 +194,9 @@ ax.set_title("3-D Group " + str(eIndex) + "(" + str(e[eIndex]/1E6) + " - " + str
              "MeV )$\\rightarrow$ Group " + str(eprimeIndex) + "(" + str(e[eprimeIndex]/1E6) + " - " + str(e[eprimeIndex+1]/1E6) + " MeV)")
 set_axes_equal(ax)
 
+
+
+'''
 mu1d = numpy.linspace(-1.0, 1.0, 1000)
 sigma1d = []
 for i in range(len(mu1d)):
@@ -217,5 +210,5 @@ pyplot.xlabel('$\\mu$')
 pyplot.ylabel('$\\sigma(\\mu)$')
 pyplot.title("1-D Group " + str(eIndex) + "(" + str(e[eIndex]/1E6) + " - " + str(e[eIndex+1]/1E6) +
              "MeV )$\\rightarrow$ Group " + str(eprimeIndex) + "(" + str(e[eprimeIndex]/1E6) + " - " + str(e[eprimeIndex+1]/1E6) + " MeV)")
-
+'''
 pyplot.show()

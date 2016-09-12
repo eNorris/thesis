@@ -90,36 +90,14 @@ def factorial(x):
         return x
     return x * factorial(x-1)
 
-
-def clm(l, m):
-    return numpy.sqrt((2 - diracdelta(m, 0)) * factorial(l-abs(m)) / factorial(l+abs(m)))
-
+def pl(mu, l):
+    legendre_function = scipy.special.legendre(l)
+    return legendre_function(mu)
 
 def plm(mu, l, m):
     #lpmv(m, v, x) 	Associated legendre function of integer order.
     #sph_harm(m, n, theta, phi) 	Compute spherical harmonics.
     return scipy.special.lpmv(abs(m), l, mu)
-
-
-def spherical(theta, phi, sigmas):
-
-    s = 0
-    for l in range(len(sigmas)):
-        coeff = (2*l + 1) / (4 * numpy.pi)
-        ss = 0
-        for m in range(-l, l+1):
-            ss += ylm(theta, phi, l, m)
-        s += coeff * sigmas[l] * ss
-    return s
-
-
-def ylm(theta, phi, l, m):
-    mu = numpy.cos(theta)
-    mphi = abs(m) * phi
-    if m >= 0:
-        return clm(l, m) * plm(mu, l, m) * numpy.cos(mphi)
-    else:
-        return clm(l, m) * plm(mu, l, m) * numpy.sin(mphi)
 
 e, eprime, nl, vals = parse_matmsh3("/media/Storage/thesis/python/xsdataPlotter/be9scatter504.dat")
 
@@ -129,29 +107,15 @@ e, eprime, nl, vals = parse_matmsh3("/media/Storage/thesis/python/xsdataPlotter/
 sh = vals.shape
 nls = sh[2]
 
-minv = vals.min()
-maxv = vals.max()
+#print("plm = " + str(plm(.6, 2, 1)))  # Expect -1.44
 
 pyplot.close("all")
 
 indexes = numpy.linspace(1, 19, 19)
 
-for i in range(nls):
-    pyplot.figure()
-    pyplot.contourf(e/1E6, eprime/1E6, vals[:, :, i], 64, cmap='viridis', vmin=minv, vmax=maxv)
-    caxis = pyplot.colorbar()
-    pyplot.contour(e/1E6, eprime/1E6, vals[:, :, i], [0], colors='k')
-    #ax.set_yscale('log')
-    #ax.set_xscale('log')
-    pyplot.yscale('log')
-    pyplot.xscale('log')
-    pyplot.xlabel("E")
-    pyplot.ylabel("E'")
-    pyplot.title("Scatter XS, Nl = " + str(i))
-
-eIndex = 30
+eIndex = 20
 eValue = e[eIndex]
-eprimeIndex = 30
+eprimeIndex = 22
 eprimeValue = e[eprimeIndex]
 
 sigma_ls = vals[eIndex, eprimeIndex, :]
@@ -183,10 +147,12 @@ for i in range(angles):
 
     mus.append(numpy.dot(ref_dir, (x, y, z)))
 
-    s = spherical(theta, phi, sigma_ls)
+for i in range(angles):
+    s = 0
 
-    #print("theta = " + str(theta/numpy.pi) + " pi")
-    #print("phi = " + str(phi/numpy.pi) + " pi")
+    for l in range(len(sigma_ls)):
+        c = (2*l + 1)/(4 * numpy.pi)
+        s += c * sigma_ls[l] * pl(mus[i], l)
 
     sigmas.append(s)
 
@@ -207,7 +173,14 @@ set_axes_equal(ax)
 mu1d = numpy.linspace(-1.0, 1.0, 1000)
 sigma1d = []
 for i in range(len(mu1d)):
-    s = spherical(0.0, mu1d[i], sigma_ls)
+    s = 0
+
+    for l in range(len(sigma_ls)-3):
+        c = (2*l + 1)/(4 * numpy.pi)
+        q = c * sigma_ls[l] * pl(mu1d[i], l)
+        if q < 0:
+            s += c * sigma_ls[l] * pl(mu1d[i], l)
+
     sigma1d.append(s)
 
 

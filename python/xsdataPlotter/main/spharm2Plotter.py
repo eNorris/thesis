@@ -76,13 +76,6 @@ def parse_matmsh3(filename):
 
     return numpy.array(dim1), numpy.array(dim2), numpy.array(dim3), ndata
 
-
-def diracdelta(x, y):
-    if x == y:
-        return 1.0
-    return 0.0
-
-
 def factorial(x):
     if x == 0:
         return 1.0
@@ -91,40 +84,42 @@ def factorial(x):
     return x * factorial(x-1)
 
 
-def clm(l, m):
-    return numpy.sqrt((2 - diracdelta(m, 0)) * factorial(l-abs(m)) / factorial(l+abs(m)))
-
-
 def plm(mu, l, m):
-    #lpmv(m, v, x) 	Associated legendre function of integer order.
-    #sph_harm(m, n, theta, phi) 	Compute spherical harmonics.
-    return scipy.special.lpmv(abs(m), l, mu)
+    return scipy.special.lpmv(m, l, mu)
 
 
-def spherical(theta, phi, sigmas):
-
-    s = 0
-    for l in range(len(sigmas)):
-        coeff = (2*l + 1) / (4 * numpy.pi)
-        ss = 0
-        for m in range(-l, l+1):
-            ss += ylm(theta, phi, l, m)
-        s += coeff * sigmas[l] * ss
-    return s
+#def ylm(theta, phi, l, m):
+#    mu = numpy.cos(theta)
+#    mphi = abs(m) * phi
+#    real = numpy.sqrt((2*l + 1)/(4*numpy.pi) * factorial(l-m)/factorial(l+m)) * plm(mu, l, m) * numpy.cos(mphi)
+#    img = numpy.sqrt((2*l + 1)/(4*numpy.pi) * factorial(l-m)/factorial(l+m)) * plm(mu, l, m) * numpy.sin(mphi)
+#    return real, img
 
 
-def ylm(theta, phi, l, m):
+#def ylm_conj(theta, phi, l, m):
+#    rl, im = ylm(theta, phi, l, m)
+#    return rl, -im
+
+
+def ylm_e(theta, phi, l, m):
     mu = numpy.cos(theta)
-    mphi = abs(m) * phi
-    if m >= 0:
-        return clm(l, m) * plm(mu, l, m) * numpy.cos(mphi)
-    else:
-        return clm(l, m) * plm(mu, l, m) * numpy.sin(mphi)
+    c = (-1.0)**m * numpy.sqrt((2l+1)/(2*numpy.pi) * factorial(l-m)/factorial(l+m))
+    return c * plm(mu, l, m) * numpy.cos(m * phi)
 
+
+def ylm_o(theta, phi, l, m):
+    mu = numpy.cos(theta)
+    c = (-1.0)**m * numpy.sqrt((2l+1)/(2*numpy.pi) * factorial(l-m)/factorial(l+m))
+    return c * plm(mu, l, m) * numpy.sin(m * phi)
+
+
+def ylm_0(theta, phi, l, m):
+    mu = numpy.cos(theta)
+    c = numpy.sqrt((2l+1)/(4*numpy.pi) * factorial(l-m)/factorial(l+m))
+    return c * plm(mu, l, m) * numpy.cos(m * phi)
+
+pyplot.close("all")
 e, eprime, nl, vals = parse_matmsh3("/media/Storage/thesis/python/xsdataPlotter/be9scatter504.dat")
-
-#e = e[::-1]
-#eprime = eprime[::-1]
 
 sh = vals.shape
 nls = sh[2]
@@ -134,67 +129,69 @@ maxv = vals.max()
 
 pyplot.close("all")
 
-indexes = numpy.linspace(1, 19, 19)
-
-for i in range(nls):
-    pyplot.figure()
-    pyplot.contourf(e/1E6, eprime/1E6, vals[:, :, i], 64, cmap='viridis', vmin=minv, vmax=maxv)
-    caxis = pyplot.colorbar()
-    pyplot.contour(e/1E6, eprime/1E6, vals[:, :, i], [0], colors='k')
-    #ax.set_yscale('log')
-    #ax.set_xscale('log')
-    pyplot.yscale('log')
-    pyplot.xscale('log')
-    pyplot.xlabel("E")
-    pyplot.ylabel("E'")
-    pyplot.title("Scatter XS, Nl = " + str(i))
-
-eIndex = 30
+eIndex = 35
 eValue = e[eIndex]
-eprimeIndex = 30
+eprimeIndex = 35
 eprimeValue = e[eprimeIndex]
 
 sigma_ls = vals[eIndex, eprimeIndex, :]
+sigma_ls = sigma_ls[::-1]
 
 xs = []
 ys = []
 zs = []
 thetas = []
 phis = []
-mus = []
+#mus = []
 sigmas = []
-angles = 1000
+#sigma_imgs = []
+angles = 10000
 ref_dir = (1, 0, 0)
 
-for i in range(angles):
-    xi = random.random() * 2 * numpy.pi
-    u = random.random() * 2 - 1
-    x = numpy.sqrt(1 - u**2) * numpy.cos(xi)
-    y = numpy.sqrt(1 - u**2) * numpy.sin(xi)
-    z = u
+ref_theta = numpy.pi/2
+ref_phi = 0
+
+for _ in range(angles):
+    phi = random.random() * 2 * numpy.pi
+    mu = random.random() * 2 - 1
+    x = numpy.sqrt(1 - mu**2) * numpy.cos(phi)
+    y = numpy.sqrt(1 - mu**2) * numpy.sin(phi)
+    z = mu
     xs.append(x)
     ys.append(y)
     zs.append(z)
 
-    theta = xi
-    phi = numpy.arccos(z)
+    theta = numpy.arccos(mu)  # [0, pi]
     thetas.append(theta)
     phis.append(phi)
 
-    mus.append(numpy.dot(ref_dir, (x, y, z)))
+    #mus.append(numpy.dot(ref_dir, (x, y, z)))
 
-    s = spherical(theta, phi, sigma_ls)
+for i in range(angles):
+    s = 0
 
-    #print("theta = " + str(theta/numpy.pi) + " pi")
-    #print("phi = " + str(phi/numpy.pi) + " pi")
+    for l in range(len(sigma_ls)):
+        sigma_l = sigma_ls[l]
+        ylm_sum = ylm_0(thetas[i], phis[i], l, 0)*ylm_0(ref_theta, ref_phi, l, 0)
+        for m in range(1, l+1):
+            ylm_sum += ylm_e(thetas[i], phis[i], l, m)*ylm_e(ref_theta, ref_phi, l, m) + ylm_o(thetas[i], phis[i], l, m)*ylm_o(ref_theta, ref_phi, l, m)
+
+        s += sigma_l * ylm_sum
 
     sigmas.append(s)
 
+#q, r = numpy.mgrid[0:2*numpy.pi:20j, 0:numpy.pi:10j]
+#X=numpy.cos(thetas)*numpy.sin(phis)
+#Y=numpy.sin(thetas)*numpy.sin(phis)
+#Z=numpy.cos(phis)
+
 fig = pyplot.figure()
 ax = fig.add_subplot(111, projection='3d')
-
 ax.plot([0, 2*ref_dir[0]], [0, 2*ref_dir[1]], [0, 2*ref_dir[2]])
-p = ax.scatter(xs, ys, zs, c=sigmas, cmap='jet')
+p = ax.scatter(xs, ys, zs, marker=".", lw=0, c=sigmas, cmap='viridis')
+# X, Y, Z = numpy.meshgrid(xs, ys, zs)
+#p = ax.plot_wireframe(X, Y, Z, color='r')
+#p = ax.plot_surface(xs, ys, zs, color='r')
 fig.colorbar(p)
 
 ax.set_xlabel('x')
@@ -204,18 +201,31 @@ ax.set_title("3-D Group " + str(eIndex) + "(" + str(e[eIndex]/1E6) + " - " + str
              "MeV )$\\rightarrow$ Group " + str(eprimeIndex) + "(" + str(e[eprimeIndex]/1E6) + " - " + str(e[eprimeIndex+1]/1E6) + " MeV)")
 set_axes_equal(ax)
 
-mu1d = numpy.linspace(-1.0, 1.0, 1000)
-sigma1d = []
-for i in range(len(mu1d)):
-    s = spherical(0.0, mu1d[i], sigma_ls)
-    sigma1d.append(s)
+#print("xs size = " + str(len(xs)))
+#print("sig size = " + str(len(sigmas)))
+
+# Comparison to a legendre poly
+mu = numpy.linspace(-1, 1, 1000)
+s1d = numpy.zeros(1000)
+for i in range(len(mu)):
+    s = 0
+
+    for l in range(len(sigma_ls)):
+        sigma_l = sigma_ls[l]
+        plm = scipy.special.legendre(l)
+        s += sigma_l * (2*l+1)/(4*numpy.pi) * plm(numpy.cos(mu[i]))
+
+    s1d[i] = s
 
 
 pyplot.figure()
-pyplot.plot(mu1d, sigma1d, 'b', [-1, 1], [0, 0], 'k--')
+pyplot.scatter(xs, sigmas)
+pyplot.plot(mu, s1d)
+pyplot.plot([-1, 1], [0, 0], 'k--')
 pyplot.xlabel('$\\mu$')
 pyplot.ylabel('$\\sigma(\\mu)$')
 pyplot.title("1-D Group " + str(eIndex) + "(" + str(e[eIndex]/1E6) + " - " + str(e[eIndex+1]/1E6) +
              "MeV )$\\rightarrow$ Group " + str(eprimeIndex) + "(" + str(e[eprimeIndex]/1E6) + " - " + str(e[eprimeIndex+1]/1E6) + " MeV)")
+
 
 pyplot.show()
