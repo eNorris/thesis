@@ -7,6 +7,7 @@
 \usepackage{listings}
 \usepackage{color}
 \usepackage{listings}
+\usepackage{fullpage}
 
 \numberwithin{equation}{subsection}
 
@@ -546,9 +547,45 @@ TODO - Discontinuous
 
 It can be shown that the solution is stated
 
-\begin{equation}
-Y_l^m(\theta, \phi) = \sqrt{\frac{2l+1}{4 \pi}
-\frac{(l-m)!}{(l+m)!}} P_l^m(\cos \theta) e^{im\phi}
+\begin{equation}\label{eq:spherical_harmonic}
+Y_l^m(\theta, \varphi) = (-1)^{l}\sqrt{\frac{2l+1}{4 \pi}
+\frac{(l-m)!}{(l+m)!}} P_l^m(\cos \theta) e^{im \varphi}
+\end{equation}
+
+Using Euler's Equation (Eq. \ref{eq:euler}) to compute the imaginary exponent, the spherical harmonic can be expanded to Eq. \ref{eq:spherical_harmonic_exp}.
+
+\begin{equation}\label{eq:euler}
+e^{i \theta} = \cos(\theta) + i \sin(\theta)
+\end{equation}
+
+\begin{equation}\label{eq:spherical_harmonic_exp}
+Y_l^m(\theta, \varphi) = (-1)^{l}\sqrt{\frac{2l+1}{4 \pi}
+\frac{(l-m)!}{(l+m)!}} P_l^m(\cos \theta) \left[ \cos(m \varphi) + i \sin(m \varphi) \right]
+\end{equation}
+
+\begin{equation}\label{eq:spherical_harmonic_xs}
+\Sigma_s(\Omega \cdot \Omega') \approx \sum_{l=0}^L \sigma_l \sum_{m=-l}^l Y_l^m(\Omega)\bar{Y}_l^m(\Omega')
+\end{equation}
+
+where the over-bar denotes the complex conjugate defined by Eq.~\ref{eq:spherical_harmonic_conj}.
+
+\begin{equation}\label{eq:spherical_harmonic_conj}
+\bar{Y}_l^m(\theta, \varphi) = (-1)^{l}\sqrt{\frac{2l+1}{4 \pi}
+\frac{(l-m)!}{(l+m)!}} P_l^m(\cos \theta) \left[ \cos(m \varphi) - i \sin(m \varphi) \right]
+\end{equation}
+
+Expanding the inner summation of \ref{eq:spherical_harmonic_xs} with Eq.~\ref{eq:spherical_harmonic_exp} and \ref{eq:spherical_harmonic_conj} yields:
+
+\begin{equation}\label{eq:spherical_harmonic_xs_inner}
+\begin{split}
+Y_l^m(\theta, \varphi)\bar{Y}_l^m(\theta', \varphi') & = 
+(-1)^{2l}\frac{2l+1}{4 \pi}
+\frac{(l-m)!}{(l+m)!} P_l^m(\cos \theta) P_l^m(\cos \theta') \times \\
+&\left[ \cos(m \varphi) + i \sin(m \varphi) \right] \left[ \cos(m \varphi') - i \sin(m \varphi') \right] \\
+& = \frac{2l+1}{4 \pi}
+\frac{(l-m)!}{(l+m)!} P_l^m(\cos \theta) P_l^m(\cos \theta') \times \\
+& \left[ \cos(m \varphi) \cos(m \varphi') + i \sin(m \varphi)\cos(m \varphi') - i \sin(m \varphi') \cos(m \varphi) - i^2\sin(m \varphi) \sin(m \varphi') \right]
+\end{split}
 \end{equation}
 
 whose real part can be expanded to
