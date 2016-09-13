@@ -151,7 +151,7 @@ for i in range(angles):
     s = 0
 
     for l in range(len(sigma_ls)):
-        c = (2*l + 1)/(4 * numpy.pi)
+        c = 1/(4 * numpy.pi)
         s += c * sigma_ls[l] * pl(mus[i], l)
 
     sigmas.append(s)
@@ -175,8 +175,8 @@ sigma1d = []
 for i in range(len(mu1d)):
     s = 0
 
-    for l in range(len(sigma_ls)-3):
-        c = (2*l + 1)/(4 * numpy.pi)
+    for l in range(len(sigma_ls)-0):
+        c = 1/(4 * numpy.pi)
         q = c * sigma_ls[l] * pl(mu1d[i], l)
         if q < 0:
             s += c * sigma_ls[l] * pl(mu1d[i], l)
