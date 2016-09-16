@@ -71,8 +71,15 @@ def parse_matmsh3(filename):
         data.append(float(lines[lindx]))
         lindx += 1
 
-    ndata = numpy.array(data)
-    ndata = ndata.reshape((dim1size, dim2size, dim3size))
+    ndata = numpy.zeros((dim1size, dim2size, dim3size))
+
+    for i in range(dim1size):
+        for j in range(dim2size):
+            for k in range(dim3size):
+                ndata[i,j,k] = data[i*dim2size*dim3size + j*dim3size + k]
+
+    #ndata = numpy.array(data)
+    #ndata = ndata.reshape((dim1size, dim2size, dim3size))
 
     return numpy.array(dim1), numpy.array(dim2), numpy.array(dim3), ndata
 
@@ -99,13 +106,14 @@ def plm(mu, l, m):
     #sph_harm(m, n, theta, phi) 	Compute spherical harmonics.
     return scipy.special.lpmv(abs(m), l, mu)
 
-e, eprime, nl, vals = parse_matmsh3("/media/Storage/thesis/python/xsdataPlotter/be9scatter504.dat")
+e, eprime, nl, vals = parse_matmsh3("/media/Storage/thesis/python/xsdataPlotter/cscatter502.dat")
 
 #e = e[::-1]
 #eprime = eprime[::-1]
 
 sh = vals.shape
 nls = sh[2]
+print("Shape: " + str(sh))
 
 #print("plm = " + str(plm(.6, 2, 1)))  # Expect -1.44
 
@@ -113,9 +121,9 @@ pyplot.close("all")
 
 indexes = numpy.linspace(1, 19, 19)
 
-eIndex = 20
+eIndex = 13
 eValue = e[eIndex]
-eprimeIndex = 22
+eprimeIndex = 13
 eprimeValue = e[eprimeIndex]
 
 sigma_ls = vals[eIndex, eprimeIndex, :]
@@ -155,6 +163,15 @@ for i in range(angles):
         s += c * sigma_ls[l] * pl(mus[i], l)
 
     sigmas.append(s)
+
+#print(vals[:, :, 1])
+pyplot.figure()
+pyplot.contourf(vals[:, :, 2], 64)
+pyplot.title("My $\\sigma_0$")
+pyplot.colorbar()
+
+pyplot.figure()
+pyplot.hist(vals[:,:,0].tolist(), 50, facecolor='green')
 
 fig = pyplot.figure()
 ax = fig.add_subplot(111, projection='3d')

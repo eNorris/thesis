@@ -10,19 +10,36 @@ with h5py.File(filename, 'r') as hf:
     #print("List of arrays in this file:\n", hf.keys())
 
     print(hf.items())
-    data = hf.get('mat1')
+    data = hf.get('mat3')
     print(data.items())
-    dataa = data.get('P0')
+    dataa = data.get('total')
+    scatdata = data.get('P0')
+    gscatdata = scatdata[27:, 27:]
     print(dataa)
     #print(data)
     #print(data.items())
     np_data = np.array(data)
     #print("Shape: ", np_data.shape)
 
-    gdata = dataa[27:, 27:]
+    gdata = dataa[27:]
     print(gdata.shape)
-    print(gdata[-1,-1])
+    print(gdata[-1])
+
+    print("18, 18: " + str(gdata[18]))
+    print("0, 0: " + str(gdata[0]))
+    print("Ratio: " + str(gdata[0]/gdata[18]))
 
     pyplot.figure()
-    pyplot.contourf(gdata, 64)
+    pyplot.semilogy(gdata)
+
+
+    pyplot.figure()
+    pyplot.contourf(gscatdata, 64)
+    pyplot.colorbar()
+    pyplot.title("True $\\sigma_0$")
+
+    pyplot.figure()
+    pyplot.hist(gscatdata.tolist(), 50, facecolor='green')
+
+
     pyplot.show()
