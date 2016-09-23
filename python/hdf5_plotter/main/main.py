@@ -10,10 +10,10 @@ with h5py.File(filename, 'r') as hf:
     #print("List of arrays in this file:\n", hf.keys())
 
     print(hf.items())
-    data = hf.get('mat3')
+    data = hf.get('mat2')
     print(data.items())
     dataa = data.get('total')
-    scatdata = data.get('P0')
+    scatdata = data.get('P1')
     gscatdata = scatdata[27:, 27:]
     print(dataa)
     #print(data)
@@ -29,9 +29,17 @@ with h5py.File(filename, 'r') as hf:
     print("0, 0: " + str(gdata[0]))
     print("Ratio: " + str(gdata[0]/gdata[18]))
 
+    for i in range(19):
+        ln = "\t".join([str(3*x*.0210801/.00243374425918) for x in gscatdata[i,:]])
+        print(ln)
+    #print(gscatdata)
+
+    for i in range(19):
+        ln = "\t".join(["1 " if x != 0 else "0 " for x in gscatdata[i,:]])
+        print(ln)
+
     pyplot.figure()
     pyplot.semilogy(gdata)
-
 
     pyplot.figure()
     pyplot.contourf(gscatdata, 64)

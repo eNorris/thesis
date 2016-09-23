@@ -164,14 +164,20 @@ for i in range(angles):
 
     sigmas.append(s)
 
+# Print the vals of P0
+#p0 = vals[:, :, 0]
+#for e in range(19):
+#    print("\t".join([str(x) for x in p0[:,e]]))
+
+
 #print(vals[:, :, 1])
 pyplot.figure()
-pyplot.contourf(vals[:, :, 2], 64)
+pyplot.contourf(vals[:, :, 0], 64)
 pyplot.title("My $\\sigma_0$")
 pyplot.colorbar()
 
 pyplot.figure()
-pyplot.hist(vals[:,:,0].tolist(), 50, facecolor='green')
+pyplot.hist(vals[:,:,1].tolist(), 50, facecolor='green')
 
 fig = pyplot.figure()
 ax = fig.add_subplot(111, projection='3d')
