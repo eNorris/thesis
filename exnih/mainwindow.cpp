@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     CrossSection2d *xs = nuc->getGamma2dDataByMt(504);
 
-    qDebug() << "Legendre Order for MT=502: " << xs->getLegendreOrder();
+    qDebug() << "Legendre Order for MT=504: " << xs->getLegendreOrder();
 
     qDebug() << "Temperatures: " << xs->getNumberTemperatures();
     for(int i = 0; i < xs->getNumberTemperatures(); i++)
@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     qDebug() << "Size of scats: " << scats->size();
 
-    ScatterMatrix *scat = (*scats)[1];
+    ScatterMatrix *scat = (*scats)[0];
     SinkGroup *g = scat->getSinkGroup(0);
 
     float x = g->get(19);

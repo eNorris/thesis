@@ -1010,6 +1010,7 @@ bool AmpxReader::readNuclideData(fstream &file, AmpxLibrary & library)
 
     for( int i = 0; i < numNuclides; i++ )
     {
+        std::cout << "Reading nuclide " << i << std::endl;
         LibraryNuclide * nuclide = readLibraryNuclide(file, NULL, verbose);
         if( nuclide == NULL ){
             if(this->printErrors)cerr<<"***Error: unable to read the nuclide at index "<<i+1<<"!"<<endl;
