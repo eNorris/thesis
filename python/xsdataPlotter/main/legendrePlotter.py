@@ -106,10 +106,19 @@ def plm(mu, l, m):
     #sph_harm(m, n, theta, phi) 	Compute spherical harmonics.
     return scipy.special.lpmv(abs(m), l, mu)
 
+def fetch_ebin(energy, index):
+    if index < 0:
+        return 1E300
+    if index >= len(energy):
+        return 0.0
+    return energy[index]
+
 e, eprime, nl, vals = parse_matmsh3("/media/Storage/thesis/python/xsdataPlotter/cscatter502.dat")
 
 #e = e[::-1]
 #eprime = eprime[::-1]
+
+print(e)
 
 sh = vals.shape
 nls = sh[2]
@@ -121,9 +130,9 @@ pyplot.close("all")
 
 indexes = numpy.linspace(1, 19, 19)
 
-eIndex = 13
+eIndex = 11
 eValue = e[eIndex]
-eprimeIndex = 13
+eprimeIndex = 15
 eprimeValue = e[eprimeIndex]
 
 sigma_ls = vals[eIndex, eprimeIndex, :]
@@ -158,26 +167,26 @@ for i in range(angles):
 for i in range(angles):
     s = 0
 
-    for l in range(len(sigma_ls)):
+    for l in range(len(sigma_ls)-0):
         c = 1/(4 * numpy.pi)
         s += c * sigma_ls[l] * pl(mus[i], l)
 
     sigmas.append(s)
 
 # Print the vals of P0
-#p0 = vals[:, :, 0]
-#for e in range(19):
-#    print("\t".join([str(x) for x in p0[:,e]]))
+p0 = vals[:, :, 0]
+for ei in range(19):
+    print("\t".join([str(x) for x in p0[:, ei]]))
 
 
 #print(vals[:, :, 1])
 pyplot.figure()
-pyplot.contourf(vals[:, :, 0], 64)
+pyplot.contourf(p0, 64)
 pyplot.title("My $\\sigma_0$")
 pyplot.colorbar()
 
 pyplot.figure()
-pyplot.hist(vals[:,:,1].tolist(), 50, facecolor='green')
+pyplot.hist(p0.tolist(), 50, facecolor='green')
 
 fig = pyplot.figure()
 ax = fig.add_subplot(111, projection='3d')
@@ -189,8 +198,8 @@ fig.colorbar(p)
 ax.set_xlabel('x')
 ax.set_ylabel('y')
 ax.set_zlabel('z')
-ax.set_title("3-D Group " + str(eIndex) + "(" + str(e[eIndex]/1E6) + " - " + str(e[eIndex+1]/1E6) +
-             "MeV )$\\rightarrow$ Group " + str(eprimeIndex) + "(" + str(e[eprimeIndex]/1E6) + " - " + str(e[eprimeIndex+1]/1E6) + " MeV)")
+ax.set_title("3-D Group " + str(eIndex) + "(" + str(fetch_ebin(e, eprimeIndex)/1E6) + " - " + str(fetch_ebin(e, eprimeIndex+1)/1E6) +
+             "MeV )$\\rightarrow$ Group " + str(eprimeIndex) + "(" + str(e[eprimeIndex]/1E6) + " - " + str(fetch_ebin(e, eprimeIndex+1)/1E6) + " MeV)")
 set_axes_equal(ax)
 
 mu1d = numpy.linspace(-1.0, 1.0, 1000)
@@ -201,8 +210,8 @@ for i in range(len(mu1d)):
     for l in range(len(sigma_ls)-0):
         c = 1/(4 * numpy.pi)
         q = c * sigma_ls[l] * pl(mu1d[i], l)
-        if q < 0:
-            s += c * sigma_ls[l] * pl(mu1d[i], l)
+        #if q < 0:
+        s += q  #c * sigma_ls[l] * pl(mu1d[i], l)
 
     sigma1d.append(s)
 
@@ -211,7 +220,7 @@ pyplot.figure()
 pyplot.plot(mu1d, sigma1d, 'b', [-1, 1], [0, 0], 'k--')
 pyplot.xlabel('$\\mu$')
 pyplot.ylabel('$\\sigma(\\mu)$')
-pyplot.title("1-D Group " + str(eIndex) + "(" + str(e[eIndex]/1E6) + " - " + str(e[eIndex+1]/1E6) +
-             "MeV )$\\rightarrow$ Group " + str(eprimeIndex) + "(" + str(e[eprimeIndex]/1E6) + " - " + str(e[eprimeIndex+1]/1E6) + " MeV)")
+pyplot.title("1-D Group " + str(eIndex) + "(" + str(fetch_ebin(e,eIndex)/1E6) + " - " + str(fetch_ebin(e, eIndex+1)/1E6) +
+             "MeV )$\\rightarrow$ Group " + str(eprimeIndex) + "(" + str(e[eprimeIndex]/1E6) + " - " + str(fetch_ebin(e, eprimeIndex+1)/1E6) + " MeV)")
 
 pyplot.show()

@@ -13,7 +13,7 @@ with h5py.File(filename, 'r') as hf:
     data = hf.get('mat2')
     print(data.items())
     dataa = data.get('total')
-    scatdata = data.get('P1')
+    scatdata = data.get('P0')
     gscatdata = scatdata[27:, 27:]
     print(dataa)
     #print(data)
@@ -30,7 +30,7 @@ with h5py.File(filename, 'r') as hf:
     print("Ratio: " + str(gdata[0]/gdata[18]))
 
     for i in range(19):
-        ln = "\t".join([str(3*x*.0210801/.00243374425918) for x in gscatdata[i,:]])
+        ln = "\t".join([str(x) for x in gscatdata[i,:]])
         print(ln)
     #print(gscatdata)
 
