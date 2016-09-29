@@ -604,6 +604,28 @@ Y_l^{m, even} = (-1)^m\sqrt{\frac{2l+1}{2 \pi} \frac{(l-m)!}{(l+m)!}}P_l^m(\cos(
 Y_l^{m,odd} = (-1)^m \sqrt{\frac{2l+1}{2 \pi} \frac{(l-m)!}{(l+m)!}}P_l^m(\sin(m \phi))
 \end{equation}
 
+Some useful recurrence relations used to calculate the Associated Legendre Polynomials are:
+
+\begin{equation}
+P_l^l(x) = (-1)^l(2l-1)!!(1-x^2)^(l/2)
+\end{equation}
+
+\begin{equation}
+P_{l+1}^l(x) = x(2l+1)P_l^l(x)
+\end{equation}
+
+\begin{equation}
+P_l^l(x) = (-1)^l(2l-1)!!(1-x^2)^(l/2)
+\end{equation}
+
+where $(\cdot!!)$ is the double factorial function defined by:
+
+\begin{equation}
+x!! = \prod_{k=0}^{\lceil x/2 \rceil - 1} x-2k
+\end{equation}
+
+For example, $5!! = 5 \times 3 \times 1 = 15$.
+
 \subsection{Klein-Nishina Formula}
 
 The Klein-Nishina formula gives the differential scattering cross section of photon incident on a single free electron.
