@@ -97,11 +97,11 @@ void Config::loadDefaults()
     epsi = 5.0e-5f;  // Convergence criteria
     maxit = 20;  // Max number of inner iterations (default = 20)
 }
-
+/*
 void Config::loadFile(std::string filename)
 {
     qDebug() << "LIBCONFIG DISABLED";
-    /*
+
     libconfig::Config cfg;
     try{
         cfg.readFile(filename.c_str());
@@ -120,13 +120,13 @@ void Config::loadFile(std::string filename)
         qDebug() << "No 'name' setting in config file";
         return;
     }
-    */
+
 
     //const libconfig::Setting &root = cfg.getRoot();
 
     return;
 }
-
+*/
 
 
 

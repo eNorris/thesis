@@ -157,6 +157,7 @@ QMutex &MainWindow::getBlockingMutex()
     return m_mutex;
 }
 
+/*
 void MainWindow::slotLoadConfigClicked()
 {
     //QString filename = QFileDialog::getOpenFileName(this, "Open Config File", QDir::homePath(), "Config Files(*.cfg);;All Files (*)");
@@ -165,6 +166,7 @@ void MainWindow::slotLoadConfigClicked()
     if(!filename.isEmpty())
         m_config->loadFile(filename.toStdString());
 }
+*/
 
 void MainWindow::slotOpenCtData()
 {
@@ -269,7 +271,7 @@ void MainWindow::updateLaunchButton()
 
 }
 
-void MainWindow::slotQuadSelected(int x)
+void MainWindow::slotQuadSelected(int)
 {
     int type = ui->quadTypecomboBox->currentIndex();
     int d1 = ui->quadData1ComboBox->currentIndex();

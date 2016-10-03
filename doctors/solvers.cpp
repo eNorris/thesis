@@ -265,7 +265,7 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
     else
     {
         // Calculate the external source mesh
-        for(int is = 0; is < config->sourceIntensity.size(); is++)
+        for(unsigned int is = 0; is < config->sourceIntensity.size(); is++)
         {
             // Make sure the source is inside the mesh
             if(config->sourceX[is] < mesh->xNodes[0] || config->sourceX[is] > mesh->xNodes[mesh->xNodeCt-1])
@@ -330,7 +330,7 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                 isocaSource[i] = 0;
 
             // Calculate the scattering source
-            for(int iie = 0; iie <= ie; iie++)
+            for(unsigned int iie = 0; iie <= ie; iie++)
                 for(int iik = 0; iik < (signed) mesh->zElemCt; iik++)
                     for(int iij = 0; iij < (signed)mesh->yElemCt; iij++)
                         for(int iii = 0; iii < (signed)mesh->xElemCt; iii++)
@@ -419,14 +419,14 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                 }
 
                 //for(int iz = 0; iz < mesh->zMesh; iz++)  // Start at origin and sweep towards corner
-                for(iz; iz < (signed) mesh->zElemCt && iz >= 0; iz += diz)
+                for(; iz < (signed) mesh->zElemCt && iz >= 0; iz += diz)
                 {
                     //for(int iy = 0; iy < mesh->yMesh; iy++)
-                    for(iy; iy < (signed) mesh->yElemCt && iy >= 0; iy += diy)
+                    for(; iy < (signed) mesh->yElemCt && iy >= 0; iy += diy)
                     //for(int iy = quad->zi[iang] >= 0 ? 0 : mesh->yElemCt-1; quad->zi[iang] >= 0 ? iy < mesh->yElemCt : iy >= 0; iy += (quad->zi[iang] >= 0 ? 1 : -1))
                     {
                         //for(int ix = 0; ix < mesh->xMesh; ix++)
-                        for(ix; ix < (signed) mesh->xElemCt && ix >= 0; ix += dix)
+                        for(; ix < (signed) mesh->xElemCt && ix >= 0; ix += dix)
                         //for(int ix = quad->mu[iang] >= 0 ? 0 : mesh->xElemCt-1; quad->mu[iang] >= 0 ? ix < mesh->xElemCt : ix >= 0; ix += (quad->mu[iang] >= 0 ? 1 : -1))
                         {
                             int zid = mesh->zoneId[ix*xjmp + iy*yjmp + iz];

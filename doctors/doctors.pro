@@ -53,7 +53,8 @@ SOURCES += main.cpp\
     raytracer.cpp \
     ctdatamanager.cpp \
     solverparams.cpp \
-    solverparamsdialog.cpp
+    solverparamsdialog.cpp \
+    legendre.cpp
 
 HEADERS  += mainwindow.h \
     config.h \
@@ -70,14 +71,15 @@ HEADERS  += mainwindow.h \
     outwriter.h \
     ctdatamanager.h \
     solverparams.h \
-    solverparamsdialog.h
+    solverparamsdialog.h \
+    legendre.h
 
 FORMS    += mainwindow.ui \
     outputdialog.ui \
     geomdialog.ui \
     quaddialog.ui \
     xsectiondialog.ui \
-    solverparamsdialog.ui
+    solverparamsdialog.ui \
 
 DISTFILES += \
     testinput.cfg

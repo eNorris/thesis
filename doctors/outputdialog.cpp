@@ -131,7 +131,7 @@ void OutputDialog::setSliceLevel(int level)
 
     if(ui->xyRadioButton->isChecked())
     {
-        if(level >= m_mesh->zElemCt)
+        if(level >= (signed) m_mesh->zElemCt)
         {
             qDebug() << "level is too high! z-slices = " << m_mesh->zElemCt;
             dispErrMap();
@@ -139,8 +139,8 @@ void OutputDialog::setSliceLevel(int level)
         }
 
         // Get the min/max for this slice level
-        for(int ix = 0; ix < m_mesh->xElemCt; ix++)
-            for(int iy = 0; iy < m_mesh->yElemCt; iy++)
+        for(unsigned int ix = 0; ix < m_mesh->xElemCt; ix++)
+            for(unsigned int iy = 0; iy < m_mesh->yElemCt; iy++)
             {
                 float val = m_data[ix*m_mesh->yElemCt*m_mesh->zElemCt + iy*m_mesh->zElemCt + level];
                 if(val < minvalLevel)
@@ -183,9 +183,9 @@ void OutputDialog::setSliceLevel(int level)
         QStringList list;
         QString datastring = "";
         QString fidstring = "";
-        for(int i = 0; i < m_mesh->xElemCt; i++)
+        for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
         {
-            for(int j = 0; j < m_mesh->yElemCt; j++)
+            for(unsigned int j = 0; j < m_mesh->yElemCt; j++)
             {
                 float flux = m_data[i*m_mesh->yElemCt*m_mesh->zElemCt + j*m_mesh->zElemCt + level];
 
@@ -255,8 +255,8 @@ void OutputDialog::setSliceLevel(int level)
             return;
         }
 
-        for(int i = 0; i < m_mesh->xElemCt; i++)
-            for(int j = 0; j < m_mesh->zElemCt; j++)
+        for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
+            for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
             {
                 int zid = m_mesh->zoneId[i*m_mesh->yElemCt*m_mesh->zElemCt + level*m_mesh->zElemCt + j];
                 rects[i*m_mesh->zElemCt + j]->setBrush(brushes[zid]);
@@ -264,14 +264,14 @@ void OutputDialog::setSliceLevel(int level)
     }
     else if(ui->yzRadioButton->isChecked())
     {
-        if(level >= m_mesh->xElemCt)
+        if(level >= (signed) m_mesh->xElemCt)
         {
             qDebug() << "level is too high! x-slices = " << m_mesh->xElemCt;
             return;
         }
 
-        for(int i = 0; i < m_mesh->yElemCt; i++)
-            for(int j = 0; j < m_mesh->zElemCt; j++)
+        for(unsigned int i = 0; i < m_mesh->yElemCt; i++)
+            for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
             {
                 int zid = m_mesh->zoneId[level*m_mesh->yElemCt*m_mesh->zElemCt + i*m_mesh->zElemCt + j];
                 rects[i*m_mesh->zElemCt + j]->setBrush(brushes[zid]);
@@ -297,8 +297,8 @@ void OutputDialog::updateMeshSlicePlane()
         qDebug() << "Setting to XY slice";
 
         QBrush greenBrush(Qt::green);
-        for(int i = 0; i < m_mesh->xElemCt; i++)
-            for(int j = 0; j < m_mesh->yElemCt; j++)
+        for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
+            for(unsigned int j = 0; j < m_mesh->yElemCt; j++)
             {
                 rects.push_back(scene->addRect(m_mesh->xNodes[i], m_mesh->yNodes[j], m_mesh->dx[i], m_mesh->dy[j], Qt::NoPen, greenBrush));
             }
@@ -312,8 +312,8 @@ void OutputDialog::updateMeshSlicePlane()
 
 
         QBrush greenBrush(Qt::green);
-        for(int i = 0; i < m_mesh->xElemCt; i++)
-            for(int j = 0; j < m_mesh->zElemCt; j++)
+        for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
+            for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
             {
                 rects.push_back(scene->addRect(m_mesh->xNodes[i], m_mesh->zNodes[j], m_mesh->dx[i], m_mesh->dz[j], Qt::NoPen, greenBrush));
             }
@@ -327,8 +327,8 @@ void OutputDialog::updateMeshSlicePlane()
 
 
         QBrush greenBrush(Qt::green);
-        for(int i = 0; i < m_mesh->yElemCt; i++)
-            for(int j = 0; j < m_mesh->zElemCt; j++)
+        for(unsigned int i = 0; i < m_mesh->yElemCt; i++)
+            for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
             {
                 rects.push_back(scene->addRect(m_mesh->yNodes[i], m_mesh->zNodes[j], m_mesh->dy[i], m_mesh->dz[j], Qt::NoPen, greenBrush));
             }

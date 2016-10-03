@@ -11,7 +11,7 @@ public:
     ~Config();
 
     void loadDefaults();
-    void loadFile(std::string filename);
+    //void loadFile(std::string filename);
 
     std::string resultsBasename;
     // callback output
