@@ -42,10 +42,10 @@ SOURCES += main.cpp\
     mesh.cpp \
     xsection.cpp \
     solvers.cpp \
-    outputdialog.cpp \
-    geomdialog.cpp \
-    quaddialog.cpp \
-    xsectiondialog.cpp \
+    gui/outputdialog.cpp \
+    gui/geomdialog.cpp \
+    gui/quaddialog.cpp \
+    gui/xsectiondialog.cpp \
     colormappable.cpp \
     zoomablepannablegraphicsview.cpp \
     quadglwidget.cpp \
@@ -54,17 +54,20 @@ SOURCES += main.cpp\
     ctdatamanager.cpp \
     solverparams.cpp \
     solverparamsdialog.cpp \
-    legendre.cpp
+    legendre.cpp \
+    xs_reader/ampxparser.cpp \
+    xs_reader/ampxrecordparsers.cpp \
+    xs_reader/nuclidedata.cpp
 
 HEADERS  += mainwindow.h \
     config.h \
     quadrature.h \
     mesh.h \
     xsection.h \
-    outputdialog.h \
-    geomdialog.h \
-    quaddialog.h \
-    xsectiondialog.h \
+    gui/outputdialog.h \
+    gui/geomdialog.h \
+    gui/quaddialog.h \
+    gui/xsectiondialog.h \
     colormappable.h \
     zoomablepannablegraphicsview.h \
     quadglwidget.h \
@@ -72,13 +75,16 @@ HEADERS  += mainwindow.h \
     ctdatamanager.h \
     solverparams.h \
     solverparamsdialog.h \
-    legendre.h
+    legendre.h \
+    xs_reader/ampxparser.h \
+    xs_reader/ampxrecordparsers.h \
+    xs_reader/nuclidedata.h
 
 FORMS    += mainwindow.ui \
-    outputdialog.ui \
-    geomdialog.ui \
-    quaddialog.ui \
-    xsectiondialog.ui \
+    gui/outputdialog.ui \
+    gui/geomdialog.ui \
+    gui/quaddialog.ui \
+    gui/xsectiondialog.ui \
     solverparamsdialog.ui \
 
 DISTFILES += \

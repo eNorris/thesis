@@ -14,7 +14,7 @@
 #include "config.h"
 #include "outwriter.h"
 
-#include "outputdialog.h"
+#include "gui/outputdialog.h"
 /*
 std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config)
 {

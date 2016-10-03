@@ -6,6 +6,8 @@
 #include <QMutex>
 #include <QFileDialog>
 
+#include "xs_reader/ampxparser.h"
+
 class OutputDialog;
 class GeomDialog;
 class QuadDialog;
@@ -51,11 +53,15 @@ private:
     QWaitCondition m_pendingUserContinue;
     QMutex m_mutex;
 
+    AmpxParser parser;
+
     // Implemented in solvers.cpp instead of mainwindow.cpp
     std::vector<float> gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config, const std::vector<float> *uflux);
 
     // Implemented in raytracer.cpp instead of mainwindow.cpp
     std::vector<float> raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config);
+
+    void launchXsReader();
 
 public:
     QMutex &getBlockingMutex();
@@ -67,6 +73,8 @@ protected slots:
     //void slotLoadConfigClicked();
     void slotOpenCtData();
     void slotQuadSelected(int);
+    void on_xsOpenPushButton_clicked();
+    void on_xsExplorePushButton_clicked();
 
     void updateLaunchButton();
 

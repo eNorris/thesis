@@ -9,10 +9,10 @@
 #include "mesh.h"
 #include "xsection.h"
 
-#include "outputdialog.h"
-#include "geomdialog.h"
-#include "quaddialog.h"
-#include "xsectiondialog.h"
+#include "gui/outputdialog.h"
+#include "gui/geomdialog.h"
+#include "gui/quaddialog.h"
+#include "gui/xsectiondialog.h"
 #include "outwriter.h"
 #include "ctdatamanager.h"
 
@@ -63,6 +63,9 @@ MainWindow::MainWindow(QWidget *parent):
     //connect(ui->loadXsPushButton, SIGNAL(clicked()), xsDialog, SLOT(show()));
 
     connect(ui->launchSolverPushButton, SIGNAL(clicked()), this, SLOT(launchSolver()));
+
+    //connect(ui->xsOpenPushButton, SIGNAL(clicked()), this, SLOT(on_xsOpenPushButton_clicked()));
+    //connect(ui->xsExplorePushButton, SIGNAL(clicked()), this, SLOT(on_xsExplorePushButton_clicked()));
 
     //connect(ui->loadInputPushButton, SIGNAL(clicked()), this, SLOT(slotLoadConfigClicked()));
 
@@ -301,4 +304,39 @@ void MainWindow::slotQuadSelected(int)
     }
 
     qDebug() << "type = " << type << "  d1 = " << d1 << "   d2 = " << d2;
+}
+
+void MainWindow::on_xsOpenPushButton_clicked()
+{
+    QString filename = QFileDialog::getOpenFileName(this, "Open CT Data File", "/media/data/thesis/doctors/data/", "AMPX (*.ampx);;All Files (*)");
+
+    //if(!filename.isEmpty())
+    //    m_config->loadFile(filename.toStdString());
+
+    if(filename.isEmpty())
+    {
+        qDebug() << "Error, failed to load cross section Data file";
+        m_xsLoaded = false;
+        updateLaunchButton();
+        return;
+    }
+
+    ui->xsFileLineEdit->setText(filename);
+
+    m_xsLoaded = true;
+
+    updateLaunchButton();
+
+    launchXsReader();
+}
+
+void MainWindow::on_xsExplorePushButton_clicked()
+{
+    xsDialog->setXs(&parser);
+    xsDialog->show();
+}
+
+void MainWindow::launchXsReader()
+{
+    qDebug() << "MainWindow.cpp: 341: Yeah... not implemented yet...";
 }
