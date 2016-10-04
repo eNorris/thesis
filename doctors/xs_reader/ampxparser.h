@@ -25,11 +25,11 @@ public:
     explicit AmpxParser(QObject *parent = NULL);
     virtual ~AmpxParser();
 
-    bool openFile(QString filename);
+    //bool openFile(QString filename);
     void closeFile();
 
-    bool parseHeader();
-    bool parseData();
+    //bool parseHeader();
+    //bool parseData();
 
     std::vector<int> getZaids();
     int getNumberNuclides() const;
@@ -53,8 +53,15 @@ public:
 
     NuclideData *getData(unsigned int indx);
 
+public slots:
+    bool parseFile(QString filename);
+    bool openFile(QString filename);
+    bool parseHeader();
+    bool parseData();
+
 signals:
     void error(QString msg);
+    void signalXsUpdate(int);
 
 };
 

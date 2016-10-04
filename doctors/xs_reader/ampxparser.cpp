@@ -10,6 +10,8 @@ AmpxParser::AmpxParser(QObject *parent) : QObject(parent)
 
 AmpxParser::~AmpxParser()
 {
+    closeFile();
+
     for(unsigned int i = 0; i < directories.size(); i++)
         if(directories[i] != NULL)
             delete directories[i];
@@ -27,14 +29,28 @@ bool AmpxParser::openFile(QString filename)
     {
         emit error("File was not opened!");
         return false;
-        //qDebug() << "Failed to open file!";
     }
     return true;
 }
 
+bool AmpxParser::parseFile(QString filename)
+{
+    qDebug() << "Parsing begins...";
+    if(openFile(filename))
+    {
+        if(parseHeader())
+        {
+            if(parseData())
+                return true;
+        }
+    }
+    return false;
+}
+
 void AmpxParser::closeFile()
 {
-     binfile.close();
+    if(binfile.is_open())
+        binfile.close();
 }
 
 bool AmpxParser::parseHeader()
@@ -74,10 +90,12 @@ bool AmpxParser::parseData()
     for(int i = 0; i < header.getNumberNuclides(); i++)
     {
         // output the current nuclide
+
         qDebug() << "Reading nuclide " << (i+1) << "/" << header.getNumberNuclides();
         NuclideData *nextData = new NuclideData;
         nextData->parse(binfile, header.getGroupCountNeutron(), header.getGroupCountGamma());
         data.push_back(nextData);
+        emit signalXsUpdate(i);
     }
 
     qDebug() << "Time: " << (std::clock() - start)/(double)(CLOCKS_PER_SEC/1000) << " ms";
