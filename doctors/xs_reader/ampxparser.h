@@ -62,6 +62,7 @@ public slots:
 signals:
     void error(QString msg);
     void signalXsUpdate(int);
+    void signalNotifyNumberNuclides(int);
 
 };
 

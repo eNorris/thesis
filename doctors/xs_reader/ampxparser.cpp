@@ -35,11 +35,12 @@ bool AmpxParser::openFile(QString filename)
 
 bool AmpxParser::parseFile(QString filename)
 {
-    qDebug() << "Parsing begins...";
+    //qDebug() << "Parsing begins...";
     if(openFile(filename))
     {
         if(parseHeader())
         {
+            emit signalNotifyNumberNuclides(getNumberNuclides());
             if(parseData())
                 return true;
         }
@@ -61,17 +62,33 @@ bool AmpxParser::parseHeader()
         return false;
     }
 
-    header.parse(binfile);
+    if(!header.parse(binfile))
+    {
+        emit error("AMPX Parse Header: Could not read the main header");
+        return false;
+    }
 
     for(int i = 0; i < header.getNumberNuclides(); i++)
     {
         AmpxRecordParserType3 *dir = new AmpxRecordParserType3;
-        dir->parse(binfile);
+        if(!dir->parse(binfile))
+        {
+            emit error("AMPX Parse Header: Failed to read directory for nuclide #" + QString::number(i));
+            return false;
+        }
         directories.push_back(dir);
     }
 
-    nBounds.parse(binfile, header.getGroupCountNeutron());
-    gBounds.parse(binfile, header.getGroupCountGamma());
+    if(!nBounds.parse(binfile, header.getGroupCountNeutron()))
+    {
+        emit error("AMPX Parse Header: Failed to read neutron energy bounds");
+        return false;
+    }
+    if(!gBounds.parse(binfile, header.getGroupCountGamma()))
+    {
+        emit error("AMPX Parse Header: Failed to read gamma energy bounds");
+        return false;
+    }
 
     return true;
 }
@@ -91,7 +108,7 @@ bool AmpxParser::parseData()
     {
         // output the current nuclide
 
-        qDebug() << "Reading nuclide " << (i+1) << "/" << header.getNumberNuclides();
+        //qDebug() << "Reading nuclide " << (i+1) << "/" << header.getNumberNuclides();
         NuclideData *nextData = new NuclideData;
         nextData->parse(binfile, header.getGroupCountNeutron(), header.getGroupCountGamma());
         data.push_back(nextData);
