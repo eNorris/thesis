@@ -216,7 +216,7 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
 }
 */
 
-std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config, const std::vector<float> *uflux)
+std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh, const std::vector<XSection *> &mats, const Config *config, const std::vector<float> *uflux)
 {
 
     std::clock_t startMoment = std::clock();
@@ -234,7 +234,8 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
 
     std::vector<float> extSource;
 
-    const XSection &xsref = *xs;
+    //const XSection &xsref = *xs;
+    unsigned int groups = mats[0]->groupCount();
 
     float influxX = 0.0f;
     float influxY = 0.0f;
@@ -245,12 +246,12 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
     int xjmp = mesh->xjmp();
     int yjmp = mesh->yjmp();
 
-    scalarFlux.resize(xs->groupCount() * mesh->voxelCount(), 0.0f);
+    scalarFlux.resize(groups * mesh->voxelCount(), 0.0f);
     tempFlux.resize(mesh->voxelCount());
     outboundFluxX.resize(mesh->voxelCount(), 0.0f);
     outboundFluxY.resize(mesh->voxelCount(), 0.0f);
     outboundFluxZ.resize(mesh->voxelCount(), 0.0f);
-    angularFlux.resize(xs->groupCount() * quad->angleCount() * mesh->voxelCount());
+    angularFlux.resize(groups * quad->angleCount() * mesh->voxelCount());
     totalSource.resize(mesh->voxelCount(), 0.0f);
     isocaSource.resize(mesh->voxelCount(), 0.0f);
 
@@ -260,7 +261,9 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
     {
         // If there is an uncollided flux provided, use it, otherwise, calculate the external source
         for(unsigned int i = 0; i < uflux->size(); i++)
-            extSource[i] = (*uflux)[i] * mesh->vol[i] * xs->scatXs(mesh->zoneId[i], 0, 0);
+            // TODO - Fix using mat
+            //extSource[i] = (*uflux)[i] * mesh->vol[i] * xs->scatXs(mesh->zoneId[i], 0, 0);
+            extSource[i] = (*uflux)[i] * mesh->vol[i] * 1.0;
     }
     else
     {
@@ -310,9 +313,9 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
     //extSource[((mesh->xMesh - 1)/2)*xjmp + ((mesh->yMesh-1)/2)*yjmp + ((mesh->zMesh-1)/2)] = 1E6;  // [gammas / sec]
     //extSource[((mesh->xElemCt - 1)/2)*xjmp + (config->colYLen/2)*yjmp + ((mesh->zElemCt-1)/2)] = 1E6;
 
-    qDebug() << "Solving " << mesh->voxelCount() * quad->angleCount() * xs->groupCount() << " elements in phase space";
+    qDebug() << "Solving " << mesh->voxelCount() * quad->angleCount() * groups << " elements in phase space";
 
-    for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
+    for(unsigned int ie = 0; ie < groups; ie++)
     {
         qDebug() << "Energy group #" << ie;
         // Do the solving...
@@ -339,7 +342,9 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                             int zidIndx = mesh->zoneId[indx];
                             //float xsval = xsref.scatXs(zidIndx, iie, ie);
                             //qDebug() << xsval;
-                            isocaSource[indx] += 1.0/(4.0*M_PI)*scalarFlux[iie*mesh->voxelCount() + indx] * xsref.scatXs(zidIndx, iie, ie) * mesh->vol[indx]; //xsref(ie-1, zidIndx, 0, iie));
+                            // TODO - Update with mat
+                            //isocaSource[indx] += 1.0/(4.0*M_PI)*scalarFlux[iie*mesh->voxelCount() + indx] * xsref.scatXs(zidIndx, iie, ie) * mesh->vol[indx]; //xsref(ie-1, zidIndx, 0, iie));
+                            isocaSource[indx] += 1.0/(4.0*M_PI)*scalarFlux[iie*mesh->voxelCount() + indx] * 1.0 * mesh->vol[indx];
                         }
 
 
@@ -496,7 +501,9 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                                     mesh->Ayz[iang*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz] * influxX +  // The 2x is already factored in
                                     mesh->Axz[iang*mesh->xElemCt*mesh->zElemCt + ix*mesh->zElemCt + iz] * influxY +
                                     mesh->Axy[iang*mesh->xElemCt*mesh->yElemCt + ix*mesh->yElemCt + iy] * influxZ;
-                            float denom = mesh->vol[ix*xjmp+iy*yjmp+iz]*xsref.totXs(zid, ie) +   //xsref(ie, zid, 0, 0) +  //xs->operator()(ie, zid, 0, 0) +
+                            // TODO - use mat instead of 1.0
+                            //float denom = mesh->vol[ix*xjmp+iy*yjmp+iz]*xsref.totXs(zid, ie) +   //xsref(ie, zid, 0, 0) +  //xs->operator()(ie, zid, 0, 0) +
+                            float denom = mesh->vol[ix*xjmp+iy*yjmp+iz]*1.0 +
                                     mesh->Ayz[iang*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz] +  // The 2x is already factored in
                                     mesh->Axz[iang*mesh->xElemCt*mesh->zElemCt + ix*mesh->zElemCt + iz] +
                                     mesh->Axy[iang*mesh->xElemCt*mesh->yElemCt + ix*mesh->yElemCt + iy];

@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QDir>
+#include <QThread>
 
 #include "quadrature.h"
 #include "mesh.h"
@@ -15,6 +16,7 @@
 #include "gui/xsectiondialog.h"
 #include "outwriter.h"
 #include "ctdatamanager.h"
+#include "legendre.h"
 
 #include "config.h"
 
@@ -26,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent):
     ui(new Ui::MainWindow),
     m_config(NULL),
     m_mesh(NULL),
-    m_xs(NULL),
+    //m_xs(NULL),
     m_quad(NULL),
     m_configSelectDialog(NULL),
     m_geomLoaded(false),
@@ -51,34 +53,35 @@ MainWindow::MainWindow(QWidget *parent):
     m_configSelectDialog->setAcceptMode(QFileDialog::AcceptOpen);
     m_configSelectDialog->setFileMode(QFileDialog::ExistingFile);
 
+    m_parser = new AmpxParser;
+
+    // Connect explore buttons
     connect(ui->actionSolution_Explorer, SIGNAL(triggered()), outputDialog, SLOT(show()));
-
-    //connect(ui->selectQuadPushButton, SIGNAL(clicked()), quadDialog, SLOT(show()));
     connect(ui->quadExplorePushButton, SIGNAL(clicked()), quadDialog, SLOT(show()));
-
-    //connect(ui->buildGeomPushButton, SIGNAL(clicked()), geomDialog, SLOT(show()));
     connect(ui->geometryExplorePushButton, SIGNAL(clicked()), geomDialog, SLOT(show()));
+
+    // Connect open buttons
     connect(ui->geometryOpenPushButton, SIGNAL(clicked()), this, SLOT(slotOpenCtData()));
 
-    //connect(ui->loadXsPushButton, SIGNAL(clicked()), xsDialog, SLOT(show()));
-
+    // Connect solver launch button
     connect(ui->launchSolverPushButton, SIGNAL(clicked()), this, SLOT(launchSolver()));
 
-    //connect(ui->xsOpenPushButton, SIGNAL(clicked()), this, SLOT(on_xsOpenPushButton_clicked()));
-    //connect(ui->xsExplorePushButton, SIGNAL(clicked()), this, SLOT(on_xsExplorePushButton_clicked()));
-
-    //connect(ui->loadInputPushButton, SIGNAL(clicked()), this, SLOT(slotLoadConfigClicked()));
-
-    //connect(this, SIGNAL(signalNewIteration(std::vector<float>)), outputDialog, SLOT(disp(std::vector<float>)));
-    // TODO - Update like above at some point
     connect(this, SIGNAL(signalNewIteration(std::vector<float>)), outputDialog, SLOT(reRender(std::vector<float>)));
 
-    connect(ui->quadTypecomboBox, SIGNAL(activated(int)), this, SLOT(slotQuadSelected(int)));
-    connect(ui->quadData1ComboBox, SIGNAL(activated(int)), this, SLOT(slotQuadSelected(int)));
-    connect(ui->quadData2ComboBox, SIGNAL(activated(int)), this, SLOT(slotQuadSelected(int)));
+    //connect(ui->quadTypecomboBox, SIGNAL(activated(int)), this, SLOT(slotQuadSelected(int)));
+    //connect(ui->quadData1ComboBox, SIGNAL(activated(int)), this, SLOT(slotQuadSelected(int)));
+    //connect(ui->quadData2ComboBox, SIGNAL(activated(int)), this, SLOT(slotQuadSelected(int)));
+
+    connect(m_parser, SIGNAL(signalNotifyNumberNuclides(int)), ui->mainProgressBar, SLOT(setMaximum(int)));
+
+    // Set up xs reader threads
+    m_parser->moveToThread(&m_xsWorkerThread);
+    connect(&m_xsWorkerThread, SIGNAL(finished()), m_parser, SLOT(deleteLater()));
+    connect(this, SIGNAL(signalBeginXsParse(QString)), m_parser, SLOT(parseFile(QString)));
+    connect(m_parser, SIGNAL(signalXsUpdate(int)), this, SLOT(xsParseUpdateHandler(int)));
+    m_xsWorkerThread.start();
 
     // Add the tooltips
-    //ui->launchSolverPushButton->setToolTip("");
     updateLaunchButton();  // Sets the tooltip
 
     ui->geometryOpenPushButton->setToolTip("Opens a dialog box to import a CT data file");
@@ -106,8 +109,13 @@ MainWindow::MainWindow(QWidget *parent):
 
 
     //XSection *xs = new XSection(config);
-    m_xs = new XSection(m_config);
-    xsDialog->updateXs(m_xs);
+    //m_xs = new XSection(m_config);
+    //xsDialog->updateXs(m_xs);
+
+    AssocLegendre a;
+    int l = 5;
+    for(int m = 0; m <= l; m++)
+        std::cout << a(l, m, 0.75) << std::endl;
 
     //OutWriter::writeZoneId(std::string("zoneid.dat"), *m_mesh);
 
@@ -128,20 +136,26 @@ MainWindow::~MainWindow()
     if(m_mesh != NULL)
         delete m_mesh;
 
-    if(m_xs != NULL)
-        delete m_xs;
+    //if(m_xs != NULL)
+    //    delete m_xs;
 
     if(m_quad != NULL)
         delete m_quad;
 
     delete m_goodPalette;
     delete m_badPalette;
+
+    for(int i = 0; i < m_mats.size(); i++)
+        delete m_mats[i];
+
+    m_xsWorkerThread.quit();
+    m_xsWorkerThread.wait();
 }
 
 void MainWindow::launchSolver()
 {
-    m_mesh->calcAreas(m_quad, m_xs->groupCount());
-    std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, m_config, NULL);
+    m_mesh->calcAreas(m_quad, m_parser->getGammaEnergyGroups());  //m_xs->groupCount());
+    std::vector<float> solution = gssolver(m_quad, m_mesh, m_mats, m_config, NULL);
     outputDialog->updateSolution(solution);
 }
 
@@ -173,7 +187,7 @@ void MainWindow::slotLoadConfigClicked()
 
 void MainWindow::slotOpenCtData()
 {
-    QString filename = QFileDialog::getOpenFileName(this, "Open CT Data File", "/media/data/thesis/doctors/", "Binary Files(*.bin);;All Files (*)");
+    QString filename = QFileDialog::getOpenFileName(this, "Open CT Data File", "/media/data/thesis/doctors/data/", "Binary Files(*.bin);;All Files (*)");
 
     //if(!filename.isEmpty())
     //    m_config->loadFile(filename.toStdString());
@@ -210,7 +224,9 @@ void MainWindow::slotOpenCtData()
 
 void MainWindow::updateLaunchButton()
 {
-    if(m_geomLoaded && m_quadLoaded && m_xsLoaded && m_paramsLoaded)
+    // TODO - temporarily removed the dependence on the solver params since I'm hard coding them for now
+    //if(m_geomLoaded && m_quadLoaded && m_xsLoaded && m_paramsLoaded)
+    if(m_geomLoaded && m_quadLoaded && m_xsLoaded)
     {
         ui->launchSolverPushButton->setEnabled(true);
         //ui->launchSolverPushButton->setToolTip("Ready to launch solver!");
@@ -274,14 +290,11 @@ void MainWindow::updateLaunchButton()
 
 }
 
-void MainWindow::slotQuadSelected(int)
+void MainWindow::on_quadTypeComboBox_activated(int type)
 {
-    int type = ui->quadTypecomboBox->currentIndex();
-    int d1 = ui->quadData1ComboBox->currentIndex();
-    int d2 = ui->quadData2ComboBox->currentIndex();
-
-    if(type == 0)  // Sn
+    switch(type)
     {
+    case 0:  // Sn
         ui->quadData1ComboBox->setEnabled(true);
         ui->quadData1ComboBox->clear();
         ui->quadData1ComboBox->addItem("N");
@@ -292,26 +305,52 @@ void MainWindow::slotQuadSelected(int)
         ui->quadData2ComboBox->setEnabled(false);
         ui->quadOpenPushButton->setEnabled(false);
         ui->quadFileLineEdit->setEnabled(false);
-    }
-    else if(type == 1)  // Custom
-    {
+        break;
+    case 1:  // Custom
         ui->quadOpenPushButton->setEnabled(true);
         ui->quadFileLineEdit->setEnabled(true);
-    }
-    else
-    {
+        ui->quadData1ComboBox->clear();
+        ui->quadData1ComboBox->setEnabled(false);
+        ui->quadData2ComboBox->clear();
+        ui->quadData2ComboBox->setEnabled(false);
+        m_quadLoaded = false;
+        updateLaunchButton();
+        break;
+    default:
         qDebug() << "Illegal combo box (type = " << type << ")selection";
     }
-
-    qDebug() << "type = " << type << "  d1 = " << d1 << "   d2 = " << d2;
 }
+
+void MainWindow::on_quadData1ComboBox_activated(int d1)
+{
+    switch(ui->quadTypeComboBox->currentIndex())
+    {
+    case 0:
+        if(d1 == 0)
+        {
+            m_quadLoaded = false;
+            updateLaunchButton();
+        }
+        else
+        {
+            m_quadLoaded = true;
+            updateLaunchButton();
+        }
+        break;
+    default:
+        qDebug() << "Illegal combo box combination, Quad type cannot have data1 values";
+    }
+}
+
+void MainWindow::on_quadData2ComboBox_activated(int)
+{
+
+}
+
 
 void MainWindow::on_xsOpenPushButton_clicked()
 {
-    QString filename = QFileDialog::getOpenFileName(this, "Open CT Data File", "/media/data/thesis/doctors/data/", "AMPX (*.ampx);;All Files (*)");
-
-    //if(!filename.isEmpty())
-    //    m_config->loadFile(filename.toStdString());
+    QString filename = QFileDialog::getOpenFileName(this, "Open AMPX Formatted Data File", "/media/data/thesis/doctors/data/", "AMPX (*.ampx);;All Files (*)");
 
     if(filename.isEmpty())
     {
@@ -327,16 +366,70 @@ void MainWindow::on_xsOpenPushButton_clicked()
 
     updateLaunchButton();
 
-    launchXsReader();
+    emit signalBeginXsParse(filename);
 }
 
 void MainWindow::on_xsExplorePushButton_clicked()
 {
-    xsDialog->setXs(&parser);
+    xsDialog->setXs(m_parser);
     xsDialog->show();
 }
 
+void MainWindow::xsParseErrorHandler(QString msg)
+{
+    qDebug() << "Error: " << msg;
+}
+
+void MainWindow::xsParseUpdateHandler(int x)
+{
+    //qDebug() << x << "/" << m_parser->getNumberNuclides();
+    //ui->mainProgressBar->setMaximum(m_parser->getNumberNuclides());
+    ui->mainProgressBar->setValue(x+1);
+    // TODO: should catch signal emitted from the AmpxParser
+}
+
+bool MainWindow::buildMaterials(AmpxParser *parser)
+{
+    // 1 - air
+    // Carbon: 0.000124, N: 0.755267, O: 0.231781, Ar: 0.012827
+    std::vector<int> air_z = {6, 7, 8, 18};
+    std::vector<float> air_w = {0.000124, 0.755267, 0.231781, 0.012827};
+    m_mats.push_back(makeMaterial(air_z, air_w, parser));
+
+    // 2 - lung
+    std::vector<int> lung_z = {1, 6, 7, 8, 11,
+                               12, 15, 16, 17, 19,
+                               20, 26, 30};
+    std::vector<float> lung_w = {0.101278, 0.102310, 0.028650, 0.757072, 0.001840,
+                                 0.000730, 0.000800, 0.002250, 0.002660, 0.001940,
+                                 0.000090, 0.000370, 0.000010};
+
+    // 3 - adipose/adrenal tissue
+
+    // 4 - intestine/connective tissue
+
+    // 5 - bone
+
+    return true;
+}
+
+XSection *MainWindow::makeMaterial(std::vector<int> z, std::vector<float> w, AmpxParser *ampxParser)
+{
+    if(z.size() != w.size())
+    {
+        qDebug() << "XSection::makeMaterial";
+    }
+
+    XSection *mat = new XSection;
+
+    return mat;
+}
+
+/*
 void MainWindow::launchXsReader()
 {
     qDebug() << "MainWindow.cpp: 341: Yeah... not implemented yet...";
+
+    //QThread q;
 }
+*/

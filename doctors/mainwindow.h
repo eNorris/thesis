@@ -5,6 +5,7 @@
 #include <QWaitCondition>
 #include <QMutex>
 #include <QFileDialog>
+#include <QThread>
 
 #include "xs_reader/ampxparser.h"
 
@@ -36,7 +37,8 @@ private:
 
     Config *m_config;
     Mesh *m_mesh;
-    XSection *m_xs;
+    //XSection *m_xs;
+    std::vector<XSection *> m_mats;
     Quadrature *m_quad;
 
     OutputDialog *outputDialog;
@@ -53,13 +55,17 @@ private:
     QWaitCondition m_pendingUserContinue;
     QMutex m_mutex;
 
-    AmpxParser parser;
+    AmpxParser *m_parser;
+    QThread m_xsWorkerThread;
 
     // Implemented in solvers.cpp instead of mainwindow.cpp
-    std::vector<float> gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config, const std::vector<float> *uflux);
+    std::vector<float> gssolver(const Quadrature *quad, const Mesh *mesh, const std::vector<XSection *> &mats, const Config *config, const std::vector<float> *uflux);
 
     // Implemented in raytracer.cpp instead of mainwindow.cpp
     std::vector<float> raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config);
+
+    bool buildMaterials(AmpxParser *parser);
+    XSection *makeMaterial(std::vector<int> z, std::vector<float> w, AmpxParser *ampxParser);
 
     void launchXsReader();
 
@@ -72,15 +78,23 @@ protected slots:
     void userDebugAbort();
     //void slotLoadConfigClicked();
     void slotOpenCtData();
-    void slotQuadSelected(int);
+    void on_quadTypeComboBox_activated(int);
+    void on_quadData1ComboBox_activated(int);
+    void on_quadData2ComboBox_activated(int);
+    //void slotQuadSelected(int);
+    //void slotQuadSelected(int);
     void on_xsOpenPushButton_clicked();
     void on_xsExplorePushButton_clicked();
 
     void updateLaunchButton();
+    void xsParseErrorHandler(QString);
+    void xsParseUpdateHandler(int x);
 
 signals:
     void signalNewIteration(std::vector<float>);
     void signalDebugHalt(std::vector<float>);
+    void signalBeginXsParse(QString);
+
 };
 
 #endif // MAINWINDOW_H
