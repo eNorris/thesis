@@ -4,6 +4,8 @@
 
 #include <QDebug>
 
+#include "xs_reader/ampxparser.h"
+
 XSection::XSection() : m_groups(0)
 {
 
@@ -95,6 +97,17 @@ float XSection::totXs(const int zid, const int E) const
 {
     return xsTot[zid*m_groups + E];
 }
+
+bool XSection::allocateMemory(const unsigned int materialCount, const unsigned int groupCount, const unsigned int PnCount)
+{
+
+}
+
+bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &w, const AmpxParser *p)
+{
+
+}
+
 /*
 int XSection::dim1() const
 {

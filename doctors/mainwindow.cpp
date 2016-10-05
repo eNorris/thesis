@@ -136,8 +136,8 @@ MainWindow::~MainWindow()
     if(m_mesh != NULL)
         delete m_mesh;
 
-    //if(m_xs != NULL)
-    //    delete m_xs;
+    if(m_xs != NULL)
+        delete m_xs;
 
     if(m_quad != NULL)
         delete m_quad;
@@ -145,8 +145,8 @@ MainWindow::~MainWindow()
     delete m_goodPalette;
     delete m_badPalette;
 
-    for(int i = 0; i < m_mats.size(); i++)
-        delete m_mats[i];
+    //for(int i = 0; i < m_mats.size(); i++)
+    //    delete m_mats[i];
 
     m_xsWorkerThread.quit();
     m_xsWorkerThread.wait();
@@ -155,7 +155,7 @@ MainWindow::~MainWindow()
 void MainWindow::launchSolver()
 {
     m_mesh->calcAreas(m_quad, m_parser->getGammaEnergyGroups());  //m_xs->groupCount());
-    std::vector<float> solution = gssolver(m_quad, m_mesh, m_mats, m_config, NULL);
+    std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, m_config, NULL);
     outputDialog->updateSolution(solution);
 }
 
@@ -394,7 +394,7 @@ bool MainWindow::buildMaterials(AmpxParser *parser)
     // Carbon: 0.000124, N: 0.755267, O: 0.231781, Ar: 0.012827
     std::vector<int> air_z = {6, 7, 8, 18};
     std::vector<float> air_w = {0.000124, 0.755267, 0.231781, 0.012827};
-    m_mats.push_back(makeMaterial(air_z, air_w, parser));
+    //m_mats.push_back(makeMaterial(air_z, air_w, parser));
 
     // 2 - lung
     std::vector<int> lung_z = {1, 6, 7, 8, 11,

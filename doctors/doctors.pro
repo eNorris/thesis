@@ -57,7 +57,8 @@ SOURCES += main.cpp\
     legendre.cpp \
     xs_reader/ampxparser.cpp \
     xs_reader/ampxrecordparsers.cpp \
-    xs_reader/nuclidedata.cpp
+    xs_reader/nuclidedata.cpp \
+    materialutils.cpp
 
 HEADERS  += mainwindow.h \
     config.h \
@@ -78,7 +79,8 @@ HEADERS  += mainwindow.h \
     legendre.h \
     xs_reader/ampxparser.h \
     xs_reader/ampxrecordparsers.h \
-    xs_reader/nuclidedata.h
+    xs_reader/nuclidedata.h \
+    materialutils.h
 
 FORMS    += mainwindow.ui \
     gui/outputdialog.ui \

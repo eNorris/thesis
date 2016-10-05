@@ -37,8 +37,8 @@ private:
 
     Config *m_config;
     Mesh *m_mesh;
-    //XSection *m_xs;
-    std::vector<XSection *> m_mats;
+    XSection *m_xs;
+    //std::vector<XSection *> m_mats;
     Quadrature *m_quad;
 
     OutputDialog *outputDialog;
@@ -59,7 +59,7 @@ private:
     QThread m_xsWorkerThread;
 
     // Implemented in solvers.cpp instead of mainwindow.cpp
-    std::vector<float> gssolver(const Quadrature *quad, const Mesh *mesh, const std::vector<XSection *> &mats, const Config *config, const std::vector<float> *uflux);
+    std::vector<float> gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config, const std::vector<float> *uflux);
 
     // Implemented in raytracer.cpp instead of mainwindow.cpp
     std::vector<float> raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config);

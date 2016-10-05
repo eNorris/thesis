@@ -5,6 +5,8 @@
 
 #include "config.h"
 
+class AmpxParser;
+
 
 class XSection
 {
@@ -28,6 +30,9 @@ public:
 
     float scatXs(const int zid, const int Esrc, const int Etar) const;
     float totXs(const int zid, const int E) const;
+
+    bool allocateMemory(const unsigned int materialCount, const unsigned int groupCount, const unsigned int PnCount);
+    bool addMaterial(const std::vector<int> &z, const std::vector<float> &w, const AmpxParser *p);
 
     //int dim1() const;
     //int dim2() const;
