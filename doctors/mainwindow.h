@@ -65,7 +65,7 @@ private:
     std::vector<float> raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config);
 
     bool buildMaterials(AmpxParser *parser);
-    XSection *makeMaterial(std::vector<int> z, std::vector<float> w, AmpxParser *ampxParser);
+    void addMaterial(std::vector<int> z, std::vector<float> w, XSection *xs, AmpxParser *ampxParser);
 
     void launchXsReader();
 

@@ -18,6 +18,8 @@
 #include "ctdatamanager.h"
 #include "legendre.h"
 
+#include "materialutils.h"  // TODO - Delete, not needed, just for testing
+
 #include "config.h"
 
 QPalette *MainWindow::m_goodPalette = NULL;
@@ -116,6 +118,8 @@ MainWindow::MainWindow(QWidget *parent):
     int l = 5;
     for(int m = 0; m <= l; m++)
         std::cout << a(l, m, 0.75) << std::endl;
+
+
 
     //OutWriter::writeZoneId(std::string("zoneid.dat"), *m_mesh);
 
@@ -413,16 +417,14 @@ bool MainWindow::buildMaterials(AmpxParser *parser)
     return true;
 }
 
-XSection *MainWindow::makeMaterial(std::vector<int> z, std::vector<float> w, AmpxParser *ampxParser)
+void MainWindow::addMaterial(std::vector<int> z, std::vector<float> w, XSection *xs, AmpxParser *ampxParser)
 {
     if(z.size() != w.size())
     {
-        qDebug() << "XSection::makeMaterial";
+        qDebug() << "XSection::makeMaterial: 424: z and w sizes do not match";
     }
 
-    XSection *mat = new XSection;
 
-    return mat;
 }
 
 /*

@@ -62,7 +62,7 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
                         // TODO: Calculate
                         float srcToCellDist = sqrt((x-sx)*(x-sx) + (y-sy)*(y-sy) + (z-sz)*(z-sz));
                         unsigned int zid = mesh->zoneId[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
-                        float xsval = xs->xsTot[zid];
+                        float xsval = xs->m_tot1d[zid];
                         for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
                             uflux[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = srcStrength * exp(-xsval*srcToCellDist) / (4 * M_PI * srcToCellDist * srcToCellDist);
                         continue;
@@ -144,7 +144,7 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
                         unsigned int zid = mesh->zoneId[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
                         for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
                         {
-                            meanFreePaths[ie] += tmin * xs->xsTot[zid];
+                            meanFreePaths[ie] += tmin * xs->m_tot1d[zid];
                         }
 
                         // Update cell indices and positions
