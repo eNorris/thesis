@@ -394,20 +394,35 @@ void MainWindow::xsParseUpdateHandler(int x)
 
 bool MainWindow::buildMaterials(AmpxParser *parser)
 {
+    m_xs->allocateMemory(20, 19, 6);
     // 1 - air
     // Carbon: 0.000124, N: 0.755267, O: 0.231781, Ar: 0.012827
-    std::vector<int> air_z = {6, 7, 8, 18};
-    std::vector<float> air_w = {0.000124, 0.755267, 0.231781, 0.012827};
-    m_xs->addMaterial(air_z, air_w, parser);
-    //m_mats.push_back(makeMaterial(air_z, air_w, parser));
+    //std::vector<int> air_z = {6, 7, 8, 18};  // NIST
+    //std::vector<float> air_w = {0.000124, 0.755267, 0.231781, 0.012827};  // NIST
+    // Air
+    std::vector<int> hu1_z = {7, 8, 18};
+    std::vector<float> hu1_w = {0.757, 0.232, 0.013};
+
 
     // 2 - lung
-    std::vector<int> lung_z = {1, 6, 7, 8, 11,
-                               12, 15, 16, 17, 19,
-                               20, 26, 30};
-    std::vector<float> lung_w = {0.101278, 0.102310, 0.028650, 0.757072, 0.001840,
-                                 0.000730, 0.000800, 0.002250, 0.002660, 0.001940,
-                                 0.000090, 0.000370, 0.000010};
+    //std::vector<int> lung_z = {1, 6, 7, 8, 11,
+    //                           12, 15, 16, 17, 19,
+    //                           20, 26, 30};  // NIST
+    //std::vector<float> lung_w = {0.101278, 0.102310, 0.028650, 0.757072, 0.001840,
+    //                             0.000730, 0.000800, 0.002250, 0.002660, 0.001940,
+    //                             0.000090, 0.000370, 0.000010}; // NIST
+    // Lung
+    std::vector<int> hu2_z   = {1,     6,     7,     8,     11,    12,    15,    16,    17,    18,    19,    20};
+    std::vector<float> hu2_w = {0.103, 0.105, 0.031, 0.749, 0.002, 0.000, 0.002, 0.003, 0.003, 0.000, 0.002, 0.000};
+
+    std::vector<int> magic_z = {};
+    std::vector<float> magic_w = {};
+
+    // Add the materials to the xs library
+    m_xs->addMaterial(hu1_z, hu1_w, parser);
+    m_xs->addMaterial(hu2_z, hu2_w, parser);
+
+    //m_xs->addMaterial(hu2_z, hu2_w, parser);
 
     // 3 - adipose/adrenal tissue
 

@@ -159,17 +159,17 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
     std::vector<float> atom_frac;
 
     float totalWeight = 0.0f;
-    for(int i = 0; i < z.size(); i++)
+    for(unsigned int i = 0; i < z.size(); i++)
     {
         atom_frac.push_back(w[i]/MaterialUtils::atomicMass[z[i]]);
         totalWeight += atom_frac[i];
     }
 
-    for(int i = 0; i < atom_frac.size(); i++)
+    for(unsigned int i = 0; i < atom_frac.size(); i++)
         atom_frac[i] /= totalWeight;
 
     // For each z
-    for(int i = 0; i < z.size(); i++)
+    for(unsigned int i = 0; i < z.size(); i++)
     {
         // If there is a natural isotope in the library, use it
         int naturalZAID = z[i]*1000;
@@ -178,11 +178,33 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
 
         if(naturalIndx >= 0)
         {
-
+            // Add the natrual composition to the material
+            m_tot1d;
+            m_scat1d;
+            m_scat2d;
         }
         else
         {
+            float weightCovered = 0.0f;
+            // Iterate through all known isotopes
+            for(unsigned int j = 0; j < MaterialUtils::naturalIsotopes[z[i]].size(); j++)
+            {
+                int isotopeZaid = MaterialUtils::naturalIsotopes[z[i]][j] + z[i]*1000;
+                int isotopeIndex = p->getIndexByZaid(isotopeZaid);
+                if(isotopeIndex >= 0)
+                {
+                    weightCovered += MaterialUtils::naturalAbundances[z[i]][j];
+                }
 
+                //weightCovered += 1.0;
+
+            }
+            if(weightCovered < 1E-6)
+            {
+                qDebug() << "No isotopes of element " << z[i] << " found in data library";
+                //qDebug() << "No isotopes of element " << z[i] << "(" << qPrintable(MaterialUtils::elementNames[z[i]]) << ")" << " found in data library";
+            }
+            // Divide by the weight covered
         }
     }
 
