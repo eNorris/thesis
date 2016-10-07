@@ -144,7 +144,7 @@ int AmpxParser::getNumberNuclides() const
     return header.getNumberNuclides();
 }
 
-int AmpxParser::findIndexByZaid(int zaid)
+int AmpxParser::getIndexByZaid(int zaid) const
 {
     int indx = -1;
     for(unsigned int i = 0; i < directories.size(); i++)
@@ -157,12 +157,12 @@ int AmpxParser::findIndexByZaid(int zaid)
             }
             else
             {
-                emit error("Multiple indices!");
+                emit error("AmpxParser::getIndexByZaid(): Multiple indices!");
             }
         }
     }
     if(indx == -1)
-        emit error("No index!");
+        emit error("AmpxParser::getIndexByZaid(): No index!");
 
     return indx;
 }

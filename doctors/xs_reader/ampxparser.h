@@ -49,7 +49,7 @@ public:
     void debugGammaEnergies();
     void debugAllEnergies();
 
-    int findIndexByZaid(int zaid);
+    int getIndexByZaid(int zaid) const;
 
     NuclideData *getData(unsigned int indx);
 
@@ -60,7 +60,7 @@ public slots:
     bool parseData();
 
 signals:
-    void error(QString msg);
+    void error(QString msg) const;
     void signalXsUpdate(int);
     void signalNotifyNumberNuclides(int);
 
