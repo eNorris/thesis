@@ -5,16 +5,17 @@
 #include <QDebug>
 
 #include "xs_reader/ampxparser.h"
+#include "materialutils.h"
 
-XSection::XSection() : m_groups(0)
+XSection::XSection() : m_groups(0), m_matsLoaded(0)
 {
 
 }
 
-XSection::XSection(const Config *config) : m_groups(0)
-{
-    //load(config);
-}
+//XSection::XSection(const Config *config) : m_groups(0)
+//{
+//    //load(config);
+//}
 
 XSection::~XSection()
 {
@@ -76,6 +77,7 @@ void XSection::load(const Config *config)
 }
 */
 
+/*
 int XSection::operator()(int grp, int d2, int d3, int d4) const
 {
     unsigned int indx = grp*m_dim1 + d2*m_dim2 + d3*m_dim3 + d4;
@@ -83,6 +85,7 @@ int XSection::operator()(int grp, int d2, int d3, int d4) const
         qDebug() << "XSection indexing error: Accessed " << (indx+1) << "/" << m_scat2d.size();
     return m_scat2d[grp*m_dim1 + d2*m_dim2 + d3*m_dim3 + d4];
 }
+*/
 
 unsigned int XSection::groupCount() const
 {
@@ -94,19 +97,96 @@ float XSection::scatXs1d(const int zid, const int Esrc, const int Etar) const
     return m_scat1d[zid*m_groups*m_groups + Esrc*m_groups + Etar];
 }
 
-float XSection::totXs(const int zid, const int E) const
+float XSection::totXs1d(const int zid, const int E) const
 {
     return m_tot1d[zid*m_groups + E];
 }
 
-bool XSection::allocateMemory(const unsigned int materialCount, const unsigned int groupCount, const unsigned int PnCount)
+bool XSection::allocateMemory(const unsigned int materialCount, const unsigned int groupCount, const unsigned int pnCount)
 {
+    m_mats = materialCount;
+    m_groups = groupCount;
+    m_pns = pnCount;
+    size_t bytes1d = materialCount * groupCount * sizeof(float);
+    size_t bytes2d = materialCount * groupCount * groupCount * pnCount * sizeof(float);
 
+    qDebug() << "Total 1d bytes: " << (2*bytes1d);
+    qDebug() << "Total 2d bytes: " << bytes2d;
+
+    try{
+        m_tot1d.resize(bytes1d);
+    }
+    catch(std::bad_alloc &bad)
+    {
+        qDebug() << "bad_alloc caught during XS initialization of the 1d total xs data, requested " << bytes1d << " bytes: ";
+        qDebug() << "Reported error: " << bad.what(); ;
+        return false;
+    }
+
+    try{m_scat1d.resize(bytes1d);m_tot1d.resize(bytes1d);
+    }
+    catch(std::bad_alloc &bad)
+    {
+        qDebug() << "bad_alloc caught during XS initialization of the 1d scatter xs data, requested " << bytes1d << " bytes: ";
+        qDebug() << "Reported error: " << bad.what(); ;
+        return false;
+    }
+
+    try{
+        m_scat2d.resize(bytes2d);
+    }
+    catch(std::bad_alloc &bad)
+    {
+        qDebug() << "bad_alloc caught during XS initialization of the 2d scatter xs data, requested " << bytes2d << " bytes: ";
+        qDebug() << "Reported error: " << bad.what(); ;
+        return false;
+    }
+
+    return true;
 }
 
 bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &w, const AmpxParser *p)
 {
+    if(m_matsLoaded >= m_mats)
+    {
+        qDebug() << "XSection::addMaterial(): 156: Tried to add another cross section to a full table";
+        qDebug() << "Max size = " << m_mats;
+        return false;
+    }
+    m_matsLoaded++;
 
+    // First convert atom weight to atom fraction
+    std::vector<float> atom_frac;
+
+    float totalWeight = 0.0f;
+    for(int i = 0; i < z.size(); i++)
+    {
+        atom_frac.push_back(w[i]/MaterialUtils::atomicMass[z[i]]);
+        totalWeight += atom_frac[i];
+    }
+
+    for(int i = 0; i < atom_frac.size(); i++)
+        atom_frac[i] /= totalWeight;
+
+    // For each z
+    for(int i = 0; i < z.size(); i++)
+    {
+        // If there is a natural isotope in the library, use it
+        int naturalZAID = z[i]*1000;
+
+        int naturalIndx = p->getIndexByZaid(naturalZAID);
+
+        if(naturalIndx >= 0)
+        {
+
+        }
+        else
+        {
+
+        }
+    }
+
+    return true;
 }
 
 /*

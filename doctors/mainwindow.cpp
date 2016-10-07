@@ -398,6 +398,7 @@ bool MainWindow::buildMaterials(AmpxParser *parser)
     // Carbon: 0.000124, N: 0.755267, O: 0.231781, Ar: 0.012827
     std::vector<int> air_z = {6, 7, 8, 18};
     std::vector<float> air_w = {0.000124, 0.755267, 0.231781, 0.012827};
+    m_xs->addMaterial(air_z, air_w, parser);
     //m_mats.push_back(makeMaterial(air_z, air_w, parser));
 
     // 2 - lung
@@ -417,15 +418,7 @@ bool MainWindow::buildMaterials(AmpxParser *parser)
     return true;
 }
 
-void MainWindow::addMaterial(std::vector<int> z, std::vector<float> w, XSection *xs, AmpxParser *ampxParser)
-{
-    if(z.size() != w.size())
-    {
-        qDebug() << "XSection::makeMaterial: 424: z and w sizes do not match";
-    }
 
-
-}
 
 /*
 void MainWindow::launchXsReader()
