@@ -31,7 +31,7 @@ public:
     //bool parseHeader();
     //bool parseData();
 
-    std::vector<int> getZaids();
+    std::vector<int> getZaids() const;
     int getNumberNuclides() const;
 
     int getNeutronEnergyGroups() const { return header.getGroupCountNeutron(); }
@@ -51,7 +51,7 @@ public:
 
     int getIndexByZaid(int zaid) const;
 
-    NuclideData *getData(unsigned int indx);
+    NuclideData *getData(unsigned int indx) const;
 
 public slots:
     bool parseFile(QString filename);
@@ -61,6 +61,7 @@ public slots:
 
 signals:
     void error(QString msg) const;
+    void finishedParsing(AmpxParser*) const;
     void signalXsUpdate(int);
     void signalNotifyNumberNuclides(int);
 

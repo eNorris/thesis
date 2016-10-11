@@ -42,7 +42,10 @@ bool AmpxParser::parseFile(QString filename)
         {
             emit signalNotifyNumberNuclides(getNumberNuclides());
             if(parseData())
+            {
+                emit finishedParsing(this);
                 return true;
+            }
         }
     }
     return false;
@@ -122,7 +125,7 @@ bool AmpxParser::parseData()
     return true;
 }
 
-std::vector<int> AmpxParser::getZaids()
+std::vector<int> AmpxParser::getZaids() const
 {
     std::vector<int> zaids;
 
@@ -167,7 +170,7 @@ int AmpxParser::getIndexByZaid(int zaid) const
     return indx;
 }
 
-NuclideData *AmpxParser::getData(unsigned int indx)
+NuclideData *AmpxParser::getData(unsigned int indx) const
 {
     if(indx < data.size())
         return data[indx];
