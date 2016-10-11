@@ -28,22 +28,24 @@ public:
 
     unsigned int groupCount() const;
 
-    float scatXs1d(const int zid, const int Esrc, const int Etar) const;
-    float totXs1d(const int zid, const int E) const;
+    float scatXs1d(const int matid, const int g) const;
+    float totXs1d(const int matid, const int g) const;
+    float scatxs2d(const int matid, const int gSource, const int gSink, const int n) const;
 
     bool allocateMemory(const unsigned int materialCount, const unsigned int groupCount, const unsigned int PnCount);
     bool addMaterial(const std::vector<int> &z, const std::vector<float> &w, const AmpxParser *p);
 
 private:
     int m_groups;
-    //int m_zids;
     int m_mats;
     int m_pns;
-
-    //int m_dim1;
-    //int m_dim2;
-    //int m_dim3;
     int m_matsLoaded;
+
+    const static unsigned int MT_GAMMA_TOTAL_INTERACTION = 501;
+    const static unsigned int MT_GAMMA_COHERENT_SCATTER = 502;
+    const static unsigned int MT_GAMMA_INCOHERENT_SCATTER = 504;
+    const static unsigned int MT_GAMMA_PAIR_PRODUCTION = 516;
+    const static unsigned int MT_GAMMA_PHOTOELEC_ABSORPTION = 516;
 };
 
 #endif // XSECTION_H

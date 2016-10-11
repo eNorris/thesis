@@ -64,8 +64,7 @@ private:
     // Implemented in raytracer.cpp instead of mainwindow.cpp
     std::vector<float> raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config);
 
-    bool buildMaterials(AmpxParser *parser);
-    //void addMaterial(std::vector<int> z, std::vector<float> w, XSection *xs, AmpxParser *ampxParser);
+
 
     void launchXsReader();
 
@@ -89,6 +88,9 @@ protected slots:
     void updateLaunchButton();
     void xsParseErrorHandler(QString);
     void xsParseUpdateHandler(int x);
+
+    bool buildMaterials(AmpxParser *parser);
+    //void addMaterial(std::vector<int> z, std::vector<float> w, XSection *xs, AmpxParser *ampxParser);
 
 signals:
     void signalNewIteration(std::vector<float>);

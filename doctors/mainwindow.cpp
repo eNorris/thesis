@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent):
     ui(new Ui::MainWindow),
     m_config(NULL),
     m_mesh(NULL),
-    //m_xs(NULL),
+    m_xs(NULL),
     m_quad(NULL),
     m_configSelectDialog(NULL),
     m_geomLoaded(false),
@@ -81,6 +81,7 @@ MainWindow::MainWindow(QWidget *parent):
     connect(&m_xsWorkerThread, SIGNAL(finished()), m_parser, SLOT(deleteLater()));
     connect(this, SIGNAL(signalBeginXsParse(QString)), m_parser, SLOT(parseFile(QString)));
     connect(m_parser, SIGNAL(signalXsUpdate(int)), this, SLOT(xsParseUpdateHandler(int)));
+    connect(m_parser, SIGNAL(finishedParsing(AmpxParser*)), this, SLOT(buildMaterials(AmpxParser*)));
     m_xsWorkerThread.start();
 
     // Add the tooltips
@@ -111,7 +112,7 @@ MainWindow::MainWindow(QWidget *parent):
 
 
     //XSection *xs = new XSection(config);
-    //m_xs = new XSection(m_config);
+    m_xs = new XSection();
     //xsDialog->updateXs(m_xs);
 
     AssocLegendre a;
@@ -394,43 +395,60 @@ void MainWindow::xsParseUpdateHandler(int x)
 
 bool MainWindow::buildMaterials(AmpxParser *parser)
 {
+    qDebug() << "Generating materials";
+
     m_xs->allocateMemory(20, 19, 6);
-    // 1 - air
-    // Carbon: 0.000124, N: 0.755267, O: 0.231781, Ar: 0.012827
-    //std::vector<int> air_z = {6, 7, 8, 18};  // NIST
-    //std::vector<float> air_w = {0.000124, 0.755267, 0.231781, 0.012827};  // NIST
-    // Air
-    std::vector<int> hu1_z = {7, 8, 18};
-    std::vector<float> hu1_w = {0.757, 0.232, 0.013};
 
+    const std::vector<int>   hu_z   = {1,     6,     7,     8,     11,    12,    15,    16,    17,    18,    19,    20};
+    const std::vector<float> hu1_w  = {0.000, 0.000, 0.757, 0.232, 0.000, 0.000, 0.000, 0.000, 0.000, 0.013, 0.000, 0.000}; // Air
+    const std::vector<float> hu2_w  = {0.103, 0.105, 0.031, 0.749, 0.002, 0.000, 0.002, 0.003, 0.003, 0.000, 0.002, 0.000}; // Lung
+    const std::vector<float> hu3_w  = {0.112, 0.508, 0.012, 0.364, 0.001, 0.000, 0.000, 0.001, 0.001, 0.000, 0.000, 0.000}; // Adipose/adrenal
+    const std::vector<float> hu4_w  = {0.100, 0.163, 0.043, 0.684, 0.004, 0.000, 0.000, 0.004, 0.003, 0.000, 0.000, 0.000}; // Small intestine
+    const std::vector<float> hu5_w  = {0.097, 0.447, 0.025, 0.359, 0.000, 0.000, 0.023, 0.002, 0.001, 0.000, 0.001, 0.045}; // Bone
+    const std::vector<float> hu6_w  = {0.091, 0.414, 0.027, 0.368, 0.000, 0.001, 0.032, 0.002, 0.001, 0.000, 0.001, 0.063}; // Bone
+    const std::vector<float> hu7_w  = {0.085, 0.378, 0.029, 0.379, 0.000, 0.001, 0.041, 0.002, 0.001, 0.000, 0.001, 0.082}; // Bone
+    const std::vector<float> hu8_w  = {0.080, 0.345, 0.031, 0.388, 0.000, 0.001, 0.050, 0.002, 0.001, 0.000, 0.001, 0.010}; // Bone
+    const std::vector<float> hu9_w  = {0.075, 0.316, 0.032, 0.397, 0.000, 0.001, 0.058, 0.002, 0.001, 0.000, 0.000, 0.116}; // Bone
+    const std::vector<float> hu10_w = {0.071, 0.289, 0.034, 0.404, 0.000, 0.001, 0.066, 0.002, 0.001, 0.000, 0.000, 0.131}; // Bone
+    const std::vector<float> hu11_w = {0.067, 0.264, 0.035, 0.412, 0.000, 0.002, 0.072, 0.003, 0.000, 0.000, 0.000, 0.144}; // Bone
+    const std::vector<float> hu12_w = {0.063, 0.242, 0.037, 0.418, 0.000, 0.002, 0.078, 0.003, 0.000, 0.000, 0.000, 0.157}; // Bone
+    const std::vector<float> hu13_w = {0.060, 0.221, 0.038, 0.424, 0.000, 0.002, 0.084, 0.003, 0.000, 0.000, 0.000, 0.168}; // Bone
+    const std::vector<float> hu14_w = {0.056, 0.201, 0.039, 0.430, 0.000, 0.002, 0.089, 0.003, 0.000, 0.000, 0.000, 0.179}; // Bone
+    const std::vector<float> hu15_w = {0.053, 0.183, 0.040, 0.435, 0.000, 0.002, 0.094, 0.003, 0.000, 0.000, 0.000, 0.189}; // Bone
+    const std::vector<float> hu16_w = {0.051, 0.166, 0.041, 0.440, 0.000, 0.002, 0.099, 0.003, 0.000, 0.000, 0.000, 0.198}; // Bone
+    const std::vector<float> hu17_w = {0.048, 0.150, 0.042, 0.444, 0.000, 0.002, 0.103, 0.003, 0.000, 0.000, 0.000, 0.207}; // Bone
+    const std::vector<float> hu18_w = {0.046, 0.136, 0.042, 0.449, 0.000, 0.002, 0.107, 0.003, 0.000, 0.000, 0.000, 0.215}; // Bone
+    const std::vector<float> hu19_w = {0.043, 0.122, 0.043, 0.453, 0.000, 0.002, 0.111, 0.003, 0.000, 0.000, 0.000, 0.222}; // Bone
 
-    // 2 - lung
-    //std::vector<int> lung_z = {1, 6, 7, 8, 11,
-    //                           12, 15, 16, 17, 19,
-    //                           20, 26, 30};  // NIST
-    //std::vector<float> lung_w = {0.101278, 0.102310, 0.028650, 0.757072, 0.001840,
-    //                             0.000730, 0.000800, 0.002250, 0.002660, 0.001940,
-    //                             0.000090, 0.000370, 0.000010}; // NIST
-    // Lung
-    std::vector<int> hu2_z   = {1,     6,     7,     8,     11,    12,    15,    16,    17,    18,    19,    20};
-    std::vector<float> hu2_w = {0.103, 0.105, 0.031, 0.749, 0.002, 0.000, 0.002, 0.003, 0.003, 0.000, 0.002, 0.000};
+    const std::vector<int> magic_z = {};
+    const std::vector<float> magic_w = {};
 
-    std::vector<int> magic_z = {};
-    std::vector<float> magic_w = {};
+    bool allPassed = true;
 
     // Add the materials to the xs library
-    m_xs->addMaterial(hu1_z, hu1_w, parser);
-    m_xs->addMaterial(hu2_z, hu2_w, parser);
+    allPassed &= m_xs->addMaterial(hu_z, hu1_w, parser);
+    allPassed &= m_xs->addMaterial(hu_z, hu2_w, parser);
+    allPassed &= m_xs->addMaterial(hu_z, hu3_w, parser);
+    allPassed &= m_xs->addMaterial(hu_z, hu4_w, parser);
+    allPassed &= m_xs->addMaterial(hu_z, hu5_w, parser);
+    allPassed &= m_xs->addMaterial(hu_z, hu6_w, parser);
+    allPassed &= m_xs->addMaterial(hu_z, hu7_w, parser);
+    allPassed &= m_xs->addMaterial(hu_z, hu8_w, parser);
+    allPassed &= m_xs->addMaterial(hu_z, hu9_w, parser);
+    allPassed &= m_xs->addMaterial(hu_z, hu10_w, parser);
+    allPassed &= m_xs->addMaterial(hu_z, hu11_w, parser);
+    allPassed &= m_xs->addMaterial(hu_z, hu12_w, parser);
+    allPassed &= m_xs->addMaterial(hu_z, hu13_w, parser);
+    allPassed &= m_xs->addMaterial(hu_z, hu14_w, parser);
+    allPassed &= m_xs->addMaterial(hu_z, hu15_w, parser);
+    allPassed &= m_xs->addMaterial(hu_z, hu16_w, parser);
+    allPassed &= m_xs->addMaterial(hu_z, hu17_w, parser);
+    allPassed &= m_xs->addMaterial(hu_z, hu18_w, parser);
+    allPassed &= m_xs->addMaterial(hu_z, hu19_w, parser);
 
-    //m_xs->addMaterial(hu2_z, hu2_w, parser);
+    allPassed &= m_xs->addMaterial(magic_z, magic_w, parser);
 
-    // 3 - adipose/adrenal tissue
-
-    // 4 - intestine/connective tissue
-
-    // 5 - bone
-
-    return true;
+    return allPassed;
 }
 
 

@@ -260,7 +260,7 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
     {
         // If there is an uncollided flux provided, use it, otherwise, calculate the external source
         for(unsigned int i = 0; i < uflux->size(); i++)
-            extSource[i] = (*uflux)[i] * mesh->vol[i] * xs->scatXs1d(mesh->zoneId[i], 0, 0);
+            extSource[i] = (*uflux)[i] * mesh->vol[i] * xs->scatXs1d(mesh->zoneId[i], 0);
     }
     else
     {
@@ -339,7 +339,7 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                             int zidIndx = mesh->zoneId[indx];
                             //float xsval = xsref.scatXs(zidIndx, iie, ie);
                             //qDebug() << xsval;
-                            isocaSource[indx] += 1.0/(4.0*M_PI)*scalarFlux[iie*mesh->voxelCount() + indx] * xsref.scatXs1d(zidIndx, iie, ie) * mesh->vol[indx]; //xsref(ie-1, zidIndx, 0, iie));
+                            isocaSource[indx] += 1.0/(4.0*M_PI)*scalarFlux[iie*mesh->voxelCount() + indx] * xsref.scatXs1d(zidIndx, iie) * mesh->vol[indx]; //xsref(ie-1, zidIndx, 0, iie));
                         }
 
 
