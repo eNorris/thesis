@@ -130,9 +130,9 @@ pyplot.close("all")
 
 indexes = numpy.linspace(1, 19, 19)
 
-eIndex = 11
+eIndex = 17
 eValue = e[eIndex]
-eprimeIndex = 15
+eprimeIndex = 18
 eprimeValue = e[eprimeIndex]
 
 sigma_ls = vals[eIndex, eprimeIndex, :]
@@ -182,7 +182,9 @@ for ei in range(19):
 #print(vals[:, :, 1])
 pyplot.figure()
 pyplot.contourf(p0, 64)
-pyplot.title("My $\\sigma_0$")
+pyplot.title("$\\sigma_0 [b]$")
+pyplot.xlabel("Sink Group")
+pyplot.ylabel("Source Group")
 pyplot.colorbar()
 
 pyplot.figure()
