@@ -35,6 +35,7 @@ GeomDialog::GeomDialog(QWidget *parent) :
 
     connect(ui->materialRadioButton, SIGNAL(clicked()), this, SLOT(updateRenderType()));
     connect(ui->densityRadioButton, SIGNAL(clicked()), this, SLOT(updateRenderType()));
+    connect(ui->atomDensityRadioButton, SIGNAL(clicked()), this, SLOT(updateRenderType()));
     connect(ui->ctRadioButton, SIGNAL(clicked()), this, SLOT(updateRenderType()));
 
     //connect(ui->xyRadioButton, SIGNAL())
@@ -79,9 +80,11 @@ void GeomDialog::setSliceLevel(int level)
         loadViridis256Brush();
     else if(m_rendertype == 2)
         loadViridis256Brush();
+    else if(m_rendertype == 3)
+        loadViridis256Brush();
     else
     {
-        qDebug() << "geomdialog: 84: rendertype was illegal";
+        qDebug() << "Geomdialog::setSliceLevel(): 87: rendertype was illegal";
         return;
     }
 
@@ -105,6 +108,14 @@ void GeomDialog::setSliceLevel(int level)
                 else if(m_rendertype == 1)
                 {
                     zid = m_mesh->density[i*m_mesh->yElemCt*m_mesh->zElemCt + j*m_mesh->zElemCt + level] * 200;
+                    if(zid > 255)
+                        zid = 255;
+                    if(zid < 0)
+                        zid = 0;
+                }
+                else if(m_rendertype == 3)
+                {
+                    zid = m_mesh->atomDensity[i*m_mesh->yElemCt*m_mesh->zElemCt + j*m_mesh->zElemCt + level];
                     if(zid > 255)
                         zid = 255;
                     if(zid < 0)
@@ -142,6 +153,14 @@ void GeomDialog::setSliceLevel(int level)
                     if(zid < 0)
                         zid = 0;
                 }
+                else if(m_rendertype == 3)
+                {
+                    zid = m_mesh->atomDensity[i*m_mesh->yElemCt*m_mesh->zElemCt + level*m_mesh->zElemCt + j];
+                    if(zid > 255)
+                        zid = 255;
+                    if(zid < 0)
+                        zid = 0;
+                }
                 else if(m_rendertype == 2)
                 {
                     zid = (m_mesh->ct[i*m_mesh->yElemCt*m_mesh->zElemCt + level*m_mesh->zElemCt + j] + 1024) / 12.0;
@@ -170,6 +189,14 @@ void GeomDialog::setSliceLevel(int level)
                 else if(m_rendertype == 1)
                 {
                     zid = m_mesh->density[level*m_mesh->yElemCt*m_mesh->zElemCt + i*m_mesh->zElemCt + j] * 200;
+                    if(zid > 255)
+                        zid = 255;
+                    if(zid < 0)
+                        zid = 0;
+                }
+                else if(m_rendertype == 3)
+                {
+                    zid = m_mesh->atomDensity[level*m_mesh->yElemCt*m_mesh->zElemCt + i*m_mesh->zElemCt + j];
                     if(zid > 255)
                         zid = 255;
                     if(zid < 0)
@@ -264,6 +291,11 @@ void GeomDialog::updateRenderType()
     else if(ui->densityRadioButton->isChecked())
     {
         m_rendertype = 1;
+        setSliceLevel(-1);
+    }
+    else if(ui->atomDensityRadioButton->isChecked())
+    {
+        m_rendertype = 3;
         setSliceLevel(-1);
     }
     else if(ui->ctRadioButton->isChecked())

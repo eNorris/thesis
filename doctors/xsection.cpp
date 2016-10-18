@@ -90,32 +90,19 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
 
     if(m_matsLoaded >= m_mats)
     {
-        qDebug() << "XSection::addMaterial(): 152: Tried to add another cross section to a full table";
-        qDebug() << "Max size = " << m_mats;
+        qDebug() << "XSection::addMaterial(): 93: Tried to add another cross section to a full table";
+        qDebug() << "XSection::addMaterial(): 94: Max size = " << m_mats;
         return false;
     }
-    m_matsLoaded++;
 
-    //int groups = p->getGammaEnergyGroups();
-
-    // First convert atom weight to atom fraction
-    std::vector<float> atom_frac;
-
-    float totalWeight = 0.0f;
-    for(unsigned int i = 0; i < z.size(); i++)
-    {
-        atom_frac.push_back(w[i]/MaterialUtils::atomicMass[z[i]]);
-        totalWeight += atom_frac[i];
-    }
-
-    for(unsigned int i = 0; i < atom_frac.size(); i++)
-        atom_frac[i] /= totalWeight;
+    std::vector<float> atom_frac = MaterialUtils::weightFracToAtomFrac(z, w);
 
     // For each z
     for(unsigned int i = 0; i < z.size(); i++)
     {
 
         float afrac = atom_frac[i];
+        unsigned int elemIndx = z[i] - 1;
 
         // If there is a natural isotope in the library, use it
         int naturalZAID = z[i]*1000;
@@ -134,14 +121,14 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
             if(scat1dIndexInc >= 0)
             {
                 std::vector<float> scat1dArrayInc = gxs.getSigmaMt(scat1dIndexInc);
-                for(int ei = 0; i < m_groups; i++)
+                for(int ei = 0; ei < m_groups; ei++)
                     m_scat1d[m_matsLoaded*m_groups + ei] += scat1dArrayInc[ei]*afrac;
             }
 
             if(scat1dIndexCoh >= 0)
             {
                 std::vector<float> scat1dArrayCoh = gxs.getSigmaMt(scat1dIndexCoh);
-                for(int ei = 0; i < m_groups; i++)
+                for(int ei = 0; ei < m_groups; ei++)
                     m_scat1d[m_matsLoaded*m_groups + ei] += scat1dArrayCoh[ei]*afrac;
             }
 
@@ -160,13 +147,24 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
             for(int n = 0; n < m_pns; n++)
             {
                 AmpxRecordParserType12 *gxsc = d->getGammaScatterMatrix(MT_GAMMA_COHERENT_SCATTER, n);
-                for(int iesrc = 0; iesrc < m_groups; iesrc++)
-                {
-                    for(int iesnk = 0; iesnk < m_groups; iesnk++)
+                if(gxsc != NULL)
+                    for(int iesrc = 0; iesrc < m_groups; iesrc++)
                     {
-                        m_scat2d[m_matsLoaded*m_groups*m_groups*m_pns + iesrc*m_groups*m_pns + iesnk*m_pns + n] += gxsc->getXs(iesrc, iesnk)*afrac;
+                        for(int iesnk = 0; iesnk < m_groups; iesnk++)
+                        {
+                            m_scat2d[m_matsLoaded*m_groups*m_groups*m_pns + iesrc*m_groups*m_pns + iesnk*m_pns + n] += gxsc->getXs(iesrc, iesnk)*afrac;
+                        }
                     }
-                }
+
+                gxsc = d->getGammaScatterMatrix(MT_GAMMA_INCOHERENT_SCATTER, n);
+                if(gxsc != NULL)
+                    for(int iesrc = 0; iesrc < m_groups; iesrc++)
+                    {
+                        for(int iesnk = 0; iesnk < m_groups; iesnk++)
+                        {
+                            m_scat2d[m_matsLoaded*m_groups*m_groups*m_pns + iesrc*m_groups*m_pns + iesnk*m_pns + n] += gxsc->getXs(iesrc, iesnk)*afrac;
+                        }
+                    }
             }
         }
         else  // Look at all isitopes of z[i]
@@ -175,13 +173,13 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
             float weightCovered = 0.0f;
 
             // Iterate through all known isotopes
-            for(unsigned int j = 0; j < MaterialUtils::naturalIsotopes[z[i]].size(); j++)
+            for(unsigned int j = 0; j < MaterialUtils::naturalIsotopes[elemIndx].size(); j++)
             {
-                int isotopeZaid = MaterialUtils::naturalIsotopes[z[i]][j] + z[i]*1000;
+                int isotopeZaid = MaterialUtils::naturalIsotopes[elemIndx][j] + z[i]*1000;
                 int isotopeIndex = p->getIndexByZaid(isotopeZaid);
                 if(isotopeIndex >= 0)
                 {
-                    weightCovered += MaterialUtils::naturalAbundances[z[i]][j];
+                    weightCovered += MaterialUtils::naturalAbundances[elemIndx][j];
 
                     // Handle the scatter 1d xs
                     NuclideData *d = p->getData(isotopeIndex);
@@ -192,20 +190,20 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
                     // Scatter is the sum of coherent and incoherent
                     if(scat1dIndexInc >= 0)
                     {
-                        std::vector<float> scat1dArrayInc = gxs.getSigmaMt(scat1dIndexInc);
-                        for(unsigned int ei = 0; ei < m_groups; ei++)
+                        const std::vector<float> &scat1dArrayInc = gxs.getSigmaMt(scat1dIndexInc);
+                        for(int ei = 0; ei < m_groups; ei++)
                         {
-                            int indx = m_matsLoaded*m_groups + ei;
-                            int oindx = z[i];
-                            m_scat1d[m_matsLoaded*m_groups + ei] += scat1dArrayInc[ei]*afrac*MaterialUtils::naturalAbundances[z[i]][j];
+                            //int indx = m_matsLoaded*m_groups + ei;
+                            //int oindx = z[i];
+                            m_scat1d[m_matsLoaded*m_groups + ei] += scat1dArrayInc[ei]*afrac*MaterialUtils::naturalAbundances[elemIndx][j];
                         }
                     }
 
                     if(scat1dIndexCoh >= 0)
                     {
-                        std::vector<float> scat1dArrayCoh = gxs.getSigmaMt(scat1dIndexCoh);
-                        for(unsigned int ei = 0; ei < m_groups; ei++)
-                            m_scat1d[m_matsLoaded*m_groups + ei] += scat1dArrayCoh[ei]*afrac*MaterialUtils::naturalAbundances[z[i]][j];
+                        const std::vector<float> &scat1dArrayCoh = gxs.getSigmaMt(scat1dIndexCoh);
+                        for(int ei = 0; ei < m_groups; ei++)
+                            m_scat1d[m_matsLoaded*m_groups + ei] += scat1dArrayCoh[ei]*afrac*MaterialUtils::naturalAbundances[elemIndx][j];
                     }
 
                     // Handle the total 1d xs
@@ -214,22 +212,33 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
                     int tot1dIndex = gxs.getMtIndex(MT_GAMMA_TOTAL_INTERACTION);
                     if(tot1dIndex >= 0)
                     {
-                        std::vector<float> tot1dArray = gxs.getSigmaMt(tot1dIndex);
-                        for(unsigned int ei = 0; ei < m_groups; ei++)
-                            m_tot1d[m_matsLoaded*m_groups + ei] += tot1dArray[ei]*afrac*MaterialUtils::naturalAbundances[z[i]][j];
+                        const std::vector<float> &tot1dArray = gxs.getSigmaMt(tot1dIndex);
+                        for(int ei = 0; ei < m_groups; ei++)
+                            m_tot1d[m_matsLoaded*m_groups + ei] += tot1dArray[ei]*afrac*MaterialUtils::naturalAbundances[elemIndx][j];
                     }
 
                     // Handle the scatter 2d xs
                     for(int n = 0; n < m_pns; n++)
                     {
                         AmpxRecordParserType12 *gxsc = d->getGammaScatterMatrix(MT_GAMMA_COHERENT_SCATTER, n);
-                        for(int iesrc = 0; iesrc < m_groups; iesrc++)
-                        {
-                            for(int iesnk = 0; iesnk < m_groups; iesnk++)
+                        if(gxsc != NULL)
+                            for(int iesrc = 0; iesrc < m_groups; iesrc++)
                             {
-                                m_scat2d[m_matsLoaded*m_groups*m_groups*m_pns + iesrc*m_groups*m_pns + iesnk*m_pns + n] += gxsc->getXs(iesrc, iesnk)*afrac*MaterialUtils::naturalAbundances[z[i]][j];
+                                for(int iesnk = 0; iesnk < m_groups; iesnk++)
+                                {
+                                    m_scat2d[m_matsLoaded*m_groups*m_groups*m_pns + iesrc*m_groups*m_pns + iesnk*m_pns + n] += gxsc->getXs(iesrc, iesnk)*afrac*MaterialUtils::naturalAbundances[elemIndx][j];
+                                }
                             }
-                        }
+
+                        gxsc = d->getGammaScatterMatrix(MT_GAMMA_INCOHERENT_SCATTER, n);
+                        if(gxsc != NULL)
+                            for(int iesrc = 0; iesrc < m_groups; iesrc++)
+                            {
+                                for(int iesnk = 0; iesnk < m_groups; iesnk++)
+                                {
+                                    m_scat2d[m_matsLoaded*m_groups*m_groups*m_pns + iesrc*m_groups*m_pns + iesnk*m_pns + n] += gxsc->getXs(iesrc, iesnk)*afrac*MaterialUtils::naturalAbundances[elemIndx][j];
+                                }
+                            }
                     }
                 } // if the isotope was found
             } // for every isotope
@@ -261,6 +270,9 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
             }
         }  // if natural not in library
     } // for each z[i]
+
+    // This material is now loaded
+    m_matsLoaded++;
 
     return true;
 }

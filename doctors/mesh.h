@@ -57,7 +57,12 @@ public:
 
     // Only initialized when reading CT data
     std::vector<u_int16_t> ct;
+
+    /** density in [1/cm^3] */
     std::vector<float> density;
+
+    /** atom density in [1/b-cm] */
+    std::vector<float> atomDensity;
 
     void load(const Config *config, const Quadrature *quad);
 

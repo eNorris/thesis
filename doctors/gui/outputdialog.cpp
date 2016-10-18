@@ -51,6 +51,9 @@ OutputDialog::OutputDialog(QWidget *parent) :
 
     MainWindow *mainWinParent = static_cast<MainWindow*>(parent);
     connect(ui->debugNextPushButton, SIGNAL(clicked()), mainWinParent, SLOT(userDebugNext()));
+
+    for(int i = 0; i < 19; i++)
+        ui->groupComboBox->addItem(QString::number(i+1));
 }
 
 OutputDialog::~OutputDialog()
@@ -100,6 +103,9 @@ void OutputDialog::reRender(std::vector<float> data)
 
 void OutputDialog::setSliceLevel(int level)
 {
+    // TODO - this should be dynamic!
+    const int energyGroup = ui->groupComboBox->currentIndex();  // = 5;
+
     //qDebug() << "Set the slice to " << level;
 
     if(m_mesh == NULL)
@@ -142,7 +148,7 @@ void OutputDialog::setSliceLevel(int level)
         for(unsigned int ix = 0; ix < m_mesh->xElemCt; ix++)
             for(unsigned int iy = 0; iy < m_mesh->yElemCt; iy++)
             {
-                float val = m_data[ix*m_mesh->yElemCt*m_mesh->zElemCt + iy*m_mesh->zElemCt + level];
+                float val = m_data[energyGroup*m_mesh->voxelCount() + ix*m_mesh->yElemCt*m_mesh->zElemCt + iy*m_mesh->zElemCt + level];
                 if(val < minvalLevel)
                 {
                     if(!m_logInterp || val > 0)  // Don't count 0 on log scale
@@ -187,7 +193,7 @@ void OutputDialog::setSliceLevel(int level)
         {
             for(unsigned int j = 0; j < m_mesh->yElemCt; j++)
             {
-                float flux = m_data[i*m_mesh->yElemCt*m_mesh->zElemCt + j*m_mesh->zElemCt + level];
+                float flux = m_data[energyGroup*m_mesh->voxelCount() + i*m_mesh->yElemCt*m_mesh->zElemCt + j*m_mesh->zElemCt + level];
 
                 if(m_logInterp)
                 {
@@ -248,7 +254,7 @@ void OutputDialog::setSliceLevel(int level)
     }
     else if(ui->xzRadioButton->isChecked())
     {
-        if(level >= m_mesh->yElemCt)
+        if(level >= (signed) m_mesh->yElemCt)
         {
             qDebug() << "level is too high! y-slices = " << m_mesh->yElemCt;
             dispErrMap();

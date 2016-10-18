@@ -113,6 +113,20 @@
       </widget>
      </item>
      <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Group</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="groupComboBox"/>
+       </item>
+      </layout>
+     </item>
+     <item>
       <widget class="QPushButton" name="debugNextPushButton">
        <property name="enabled">
         <bool>false</bool>

@@ -247,6 +247,7 @@ void Mesh::initCtVariables()
         throw "Cannot initialize CT variables before volume data!";
     ct.resize(vol.size());
     density.resize(vol.size());
+    atomDensity.resize(vol.size());
 }
 
 /*

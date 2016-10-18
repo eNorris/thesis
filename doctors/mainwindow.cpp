@@ -63,10 +63,10 @@ MainWindow::MainWindow(QWidget *parent):
     connect(ui->geometryExplorePushButton, SIGNAL(clicked()), geomDialog, SLOT(show()));
 
     // Connect open buttons
-    connect(ui->geometryOpenPushButton, SIGNAL(clicked()), this, SLOT(slotOpenCtData()));
+    //connect(ui->geometryOpenPushButton, SIGNAL(clicked()), this, SLOT(slotOpenCtData()));
 
     // Connect solver launch button
-    connect(ui->launchSolverPushButton, SIGNAL(clicked()), this, SLOT(launchSolver()));
+    //connect(ui->launchSolverPushButton, SIGNAL(clicked()), this, SLOT(launchSolver()));
 
     connect(this, SIGNAL(signalNewIteration(std::vector<float>)), outputDialog, SLOT(reRender(std::vector<float>)));
 
@@ -157,10 +157,19 @@ MainWindow::~MainWindow()
     m_xsWorkerThread.wait();
 }
 
-void MainWindow::launchSolver()
+//void MainWindow::launchSolver()
+void MainWindow::on_launchSolverPushButton_clicked()
 {
-    m_mesh->calcAreas(m_quad, m_parser->getGammaEnergyGroups());  //m_xs->groupCount());
-    std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, m_config, NULL);
+    outputDialog->show();
+
+    // This can't be done without the energy group information
+    m_mesh->calcAreas(m_quad, m_parser->getGammaEnergyGroups());
+
+    // First collision source
+    //std::vector<float> raytraced = raytrace(m_quad, m_mesh, m_xs);
+
+    // Run the raytracer
+    std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, NULL);
     outputDialog->updateSolution(solution);
 }
 
@@ -190,7 +199,7 @@ void MainWindow::slotLoadConfigClicked()
 }
 */
 
-void MainWindow::slotOpenCtData()
+void MainWindow::on_geometryOpenPushButton_clicked() //slotOpenCtData()
 {
     QString filename = QFileDialog::getOpenFileName(this, "Open CT Data File", "/media/data/thesis/doctors/data/", "Binary Files(*.bin);;All Files (*)");
 
@@ -397,35 +406,41 @@ bool MainWindow::buildMaterials(AmpxParser *parser)
 {
     qDebug() << "Generating materials";
 
-    m_xs->allocateMemory(20, 19, 6);
+    // One extra material for the empty material at the end
+    m_xs->allocateMemory(MaterialUtils::hounsfieldRangePhantom19Elements.size()+1, parser->getGammaEnergyGroups(), 6);
 
+    /*
     const std::vector<int>   hu_z   = {1,     6,     7,     8,     11,    12,    15,    16,    17,    18,    19,    20};
     const std::vector<float> hu1_w  = {0.000, 0.000, 0.757, 0.232, 0.000, 0.000, 0.000, 0.000, 0.000, 0.013, 0.000, 0.000}; // Air
     const std::vector<float> hu2_w  = {0.103, 0.105, 0.031, 0.749, 0.002, 0.000, 0.002, 0.003, 0.003, 0.000, 0.002, 0.000}; // Lung
     const std::vector<float> hu3_w  = {0.112, 0.508, 0.012, 0.364, 0.001, 0.000, 0.000, 0.001, 0.001, 0.000, 0.000, 0.000}; // Adipose/adrenal
     const std::vector<float> hu4_w  = {0.100, 0.163, 0.043, 0.684, 0.004, 0.000, 0.000, 0.004, 0.003, 0.000, 0.000, 0.000}; // Small intestine
-    const std::vector<float> hu5_w  = {0.097, 0.447, 0.025, 0.359, 0.000, 0.000, 0.023, 0.002, 0.001, 0.000, 0.001, 0.045}; // Bone
+    const std::vector<float> hu5_w  = {0.097, 0.447, 0.025, 0.359, 0.000, 0.000, 0.023, 0.002, 0.001, 0.000, 0.001, 0.045}; // Bone 5
     const std::vector<float> hu6_w  = {0.091, 0.414, 0.027, 0.368, 0.000, 0.001, 0.032, 0.002, 0.001, 0.000, 0.001, 0.063}; // Bone
     const std::vector<float> hu7_w  = {0.085, 0.378, 0.029, 0.379, 0.000, 0.001, 0.041, 0.002, 0.001, 0.000, 0.001, 0.082}; // Bone
     const std::vector<float> hu8_w  = {0.080, 0.345, 0.031, 0.388, 0.000, 0.001, 0.050, 0.002, 0.001, 0.000, 0.001, 0.010}; // Bone
     const std::vector<float> hu9_w  = {0.075, 0.316, 0.032, 0.397, 0.000, 0.001, 0.058, 0.002, 0.001, 0.000, 0.000, 0.116}; // Bone
-    const std::vector<float> hu10_w = {0.071, 0.289, 0.034, 0.404, 0.000, 0.001, 0.066, 0.002, 0.001, 0.000, 0.000, 0.131}; // Bone
+    const std::vector<float> hu10_w = {0.071, 0.289, 0.034, 0.404, 0.000, 0.001, 0.066, 0.002, 0.001, 0.000, 0.000, 0.131}; // Bone 10
     const std::vector<float> hu11_w = {0.067, 0.264, 0.035, 0.412, 0.000, 0.002, 0.072, 0.003, 0.000, 0.000, 0.000, 0.144}; // Bone
     const std::vector<float> hu12_w = {0.063, 0.242, 0.037, 0.418, 0.000, 0.002, 0.078, 0.003, 0.000, 0.000, 0.000, 0.157}; // Bone
     const std::vector<float> hu13_w = {0.060, 0.221, 0.038, 0.424, 0.000, 0.002, 0.084, 0.003, 0.000, 0.000, 0.000, 0.168}; // Bone
     const std::vector<float> hu14_w = {0.056, 0.201, 0.039, 0.430, 0.000, 0.002, 0.089, 0.003, 0.000, 0.000, 0.000, 0.179}; // Bone
-    const std::vector<float> hu15_w = {0.053, 0.183, 0.040, 0.435, 0.000, 0.002, 0.094, 0.003, 0.000, 0.000, 0.000, 0.189}; // Bone
+    const std::vector<float> hu15_w = {0.053, 0.183, 0.040, 0.435, 0.000, 0.002, 0.094, 0.003, 0.000, 0.000, 0.000, 0.189}; // Bone 15
     const std::vector<float> hu16_w = {0.051, 0.166, 0.041, 0.440, 0.000, 0.002, 0.099, 0.003, 0.000, 0.000, 0.000, 0.198}; // Bone
     const std::vector<float> hu17_w = {0.048, 0.150, 0.042, 0.444, 0.000, 0.002, 0.103, 0.003, 0.000, 0.000, 0.000, 0.207}; // Bone
     const std::vector<float> hu18_w = {0.046, 0.136, 0.042, 0.449, 0.000, 0.002, 0.107, 0.003, 0.000, 0.000, 0.000, 0.215}; // Bone
-    const std::vector<float> hu19_w = {0.043, 0.122, 0.043, 0.453, 0.000, 0.002, 0.111, 0.003, 0.000, 0.000, 0.000, 0.222}; // Bone
+    const std::vector<float> hu19_w = {0.043, 0.122, 0.043, 0.453, 0.000, 0.002, 0.111, 0.003, 0.000, 0.000, 0.000, 0.222}; // Bone 19
+    */
 
-    const std::vector<int> magic_z = {};
-    const std::vector<float> magic_w = {};
+    //const std::vector<int> magic_z = {};
+    //const std::vector<float> magic_w = {};
 
     bool allPassed = true;
 
     // Add the materials to the xs library
+    for(int i = 0; i < MaterialUtils::hounsfieldRangePhantom19Elements.size(); i++)
+        allPassed &= m_xs->addMaterial(MaterialUtils::hounsfieldRangePhantom19Elements, MaterialUtils::hounsfieldRangePhantom19Weights[i], parser);
+    /*
     allPassed &= m_xs->addMaterial(hu_z, hu1_w, parser);
     allPassed &= m_xs->addMaterial(hu_z, hu2_w, parser);
     allPassed &= m_xs->addMaterial(hu_z, hu3_w, parser);
@@ -445,8 +460,10 @@ bool MainWindow::buildMaterials(AmpxParser *parser)
     allPassed &= m_xs->addMaterial(hu_z, hu17_w, parser);
     allPassed &= m_xs->addMaterial(hu_z, hu18_w, parser);
     allPassed &= m_xs->addMaterial(hu_z, hu19_w, parser);
+    */
 
-    allPassed &= m_xs->addMaterial(magic_z, magic_w, parser);
+    // The last material is empty and should never be used
+    allPassed &= m_xs->addMaterial(std::vector<int>{}, std::vector<float>{}, parser);
 
     return allPassed;
 }

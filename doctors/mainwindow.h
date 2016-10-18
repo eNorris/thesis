@@ -59,10 +59,10 @@ private:
     QThread m_xsWorkerThread;
 
     // Implemented in solvers.cpp instead of mainwindow.cpp
-    std::vector<float> gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config, const std::vector<float> *uflux);
+    std::vector<float> gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<float> *uflux);
 
     // Implemented in raytracer.cpp instead of mainwindow.cpp
-    std::vector<float> raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const Config *config);
+    std::vector<float> raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs);
 
 
 
@@ -72,14 +72,16 @@ public:
     QMutex &getBlockingMutex();
 
 protected slots:
-    void launchSolver();
+    //void launchSolver();
     void userDebugNext();
     void userDebugAbort();
     //void slotLoadConfigClicked();
-    void slotOpenCtData();
+    //void slotOpenCtData();
+    void on_geometryOpenPushButton_clicked();
     void on_quadTypeComboBox_activated(int);
     void on_quadData1ComboBox_activated(int);
     void on_quadData2ComboBox_activated(int);
+    void on_launchSolverPushButton_clicked();
     //void slotQuadSelected(int);
     //void slotQuadSelected(int);
     void on_xsOpenPushButton_clicked();

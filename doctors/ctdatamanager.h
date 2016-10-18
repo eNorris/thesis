@@ -8,7 +8,9 @@ class CtDataManager
 {
 protected:
     bool m_valid;
-    std::vector<int> hounsfieldRangePhantom19;
+    //const static std::vector<int> hounsfieldRangePhantom19;
+    //const static std::vector<int> hounsfieldRangePhantom19Elements;
+    //const static std::vector<std::vector<float> > hounsfieldRangePhantom19Weights;
 
 public:
     CtDataManager();
@@ -19,7 +21,7 @@ public:
     Mesh *ctNumberToQuickCheck(Mesh *mesh);
     //Mesh parse_256_256_64_16(std::string filename);
 
-    void setup();
+    //void setup();
 };
 
 #endif // CTDATAREADER_H
