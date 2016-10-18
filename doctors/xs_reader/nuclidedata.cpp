@@ -157,41 +157,6 @@ bool NuclideData::parse(ifstream &binfile, int nGroups, int gGroups)
 
     return true;
 }
-/*
-std::vector<AmpxRecordParserType12*> NuclideData::getGammaScatterMatricesMt(int mt) const
-{
-    std::vector<AmpxRecordParserType12*> v;
-
-    const AmpxRecordParserType10 &scatdir = getGammaScatterDirectory();
-
-    int mtindx = scatdir.getMtIndex(mt);
-    if(mtindx < 0)
-    {
-        qDebug() << "Requested an invalid MT number!";
-        return NULL;
-    }
-
-    int indx = 0;
-    for(int i = 0; i < mtindx; i++)  // Iterate through all MT processes before the one of interest
-    {
-        indx += scatdir.getNlList()[i] + 1;  // Add the Legendre expansions in that process
-    }
-
-    int nlindx = nl;
-    if(nl > (scatdir.getNlList()[mtindx]-1))
-    {
-        qDebug() << "Requested Legendre expansion is too large (" << nl << "/" << (scatdir.getNlList()[mtindx]-1) << ")";
-        nlindx = scatdir.getNlList()[mtindx]-1;
-    }
-
-    indx += nlindx;  // Add the legendre expansions before the one of interest
-
-    qDebug() << "nuclidedata: 200: indx = " << indx;
-
-    return v;
-    //return getGammaScatterMatrices()[indx];
-}
-*/
 
 AmpxRecordParserType12 *NuclideData::getGammaScatterMatrix(const int mt, const int nl_index) const
 {
@@ -214,7 +179,8 @@ AmpxRecordParserType12 *NuclideData::getGammaScatterMatrix(const int mt, const i
     if(nl_index > (scatdir.getNlList()[mtindx]))
     {
         qDebug() << "Requested Legendre expansion is too large (" << nl_index << "/" << (scatdir.getNlList()[mtindx]-1) << ")";
-        nlindx = scatdir.getNlList()[mtindx]-1;
+        //nlindx = scatdir.getNlList()[mtindx]-1;
+        return NULL;
     }
 
     indx += nlindx;  // Add the legendre expansions before the one of interest
