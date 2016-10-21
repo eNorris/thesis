@@ -1,4 +1,5 @@
 
+/*
 #include "mainwindow.h"
 
 #include "quadrature.h"
@@ -49,9 +50,6 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
     unsigned int srcIndxY = int(sy / mesh->dy[0]);
     unsigned int srcIndxZ = int(sz / mesh->dz[0]);
 
-    //for(unsigned int xIndxStart = 0; xIndxStart < mesh->xElemCt; xIndxStart++)
-    //    for(unsigned int yIndxStart = 0; yIndxStart < mesh->yElemCt; yIndxStart++)
-    //        for(unsigned int zIndxStart = 0; zIndxStart < mesh->zElemCt; zIndxStart++)
     for(unsigned int zIndxStart = 0; zIndxStart < mesh->zElemCt; zIndxStart++)
         for(unsigned int yIndxStart = 0; yIndxStart < mesh->yElemCt; yIndxStart++)
             for(unsigned int xIndxStart = 0; xIndxStart < mesh->xElemCt; xIndxStart++)
@@ -223,12 +221,6 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
 
                 for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
                 {
-                    // TODO - For now all sources emit the same strength for all energies
-                    //unsigned short zid = mesh->zoneId[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
-                    //float optical = meanFreePaths[ie];
-                    //float mfp = meanFreePaths[ie];
-                    //float r2 = 4 * M_PI * srcToCellDist * srcToCellDist;
-                    //float uf = srcStrength * exp(-optical) / r2;
 
                     //float mfp = meanFreePaths[ie];
                     float flx = srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
@@ -253,7 +245,7 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
 }
 
 
-
+*/
 
 
 

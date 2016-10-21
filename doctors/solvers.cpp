@@ -1,4 +1,5 @@
 //#include "solvers.h"
+/*
 #define _USE_MATH_DEFINES
 #include <cmath>
 
@@ -45,19 +46,6 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
     errList.resize(xs->groupCount());
     converganceIters.resize(xs->groupCount());
 
-    /*
-    std::vector<float> angularFlux;
-    std::vector<float> scalarFlux;
-    std::vector<float> tempFlux;
-    std::vector<float> preFlux;
-    std::vector<float> totalSource;
-    std::vector<float> errList;
-    std::vector<float> outboundFluxX;
-    std::vector<float> outboundFluxY;
-    std::vector<float> outboundFluxZ;
-    std::vector<float> extSource;
-    */
-
     const XSection &xsref = *xs;
 
     float influxX = 0.0f;
@@ -69,16 +57,6 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
     int xjmp = mesh->xjmp();
     int yjmp = mesh->yjmp();
 
-    /*
-    angularFlux.resize(xs->groupCount() * quad->angleCount() * mesh->voxelCount());
-    scalarFlux.resize(xs->groupCount() * mesh->voxelCount(), 0.0f);
-    tempFlux.resize(mesh->voxelCount());
-    outboundFluxX.resize(mesh->voxelCount(), 0.0f);
-    outboundFluxY.resize(mesh->voxelCount(), 0.0f);
-    outboundFluxZ.resize(mesh->voxelCount(), 0.0f);
-    totalSource.resize(mesh->voxelCount(), 0.0f);
-    isocaSource.resize(mesh->voxelCount(), 0.0f);
-    */
 
     //extSource.resize(xs->groupCount() * mesh->voxelCount(), 0.0f);
 
@@ -141,17 +119,6 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                             //isocaSource[indx] += 1.0/(4.0*M_PI)*scalarFlux[iie*mesh->voxelCount() + indx] * xsref.scatXs1d(zidIndx, iie) * mesh->vol[indx]; //xsref(ie-1, zidIndx, 0, iie));
                         }
 
-
-
-            //float isomax = -1;
-            //for(unsigned int ti = 0; ti < isocaSource.size(); ti++)
-            //    if(isocaSource[ti] > isomax)
-            //        isomax = isocaSource[ti];
-
-            //float scamax = -1;
-            //for(unsigned int ti = 0; ti < scalarFlux.size(); ti++)
-            //    if(scalarFlux[ti] > scamax)
-            //        scamax = scalarFlux[ti];
 
             // Calculate the total source
             for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
@@ -278,7 +245,7 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
 
                             // I don't think the *vol should be here
                             // I'm pretty sure totalSource isn't normalized by volume...
-                            float numer = totalSource[ix*xjmp+iy*yjmp+iz] + //* mesh->vol[ix*xjmp+iy*yjmp+iz] +
+                            float numer = totalSource[ix*xjmp+iy*yjmp+iz] + // * mesh->vol[ix*xjmp+iy*yjmp+iz] +
                                     mesh->Ayz[ie*quad->angleCount()*mesh->yElemCt*mesh->zElemCt + iang*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz] * influxX +  // The 2x is already factored in
                                     mesh->Axz[ie*quad->angleCount()*mesh->xElemCt*mesh->zElemCt + iang*mesh->xElemCt*mesh->zElemCt + ix*mesh->zElemCt + iz] * influxY +
                                     mesh->Axy[ie*quad->angleCount()*mesh->xElemCt*mesh->yElemCt + iang*mesh->xElemCt*mesh->yElemCt + ix*mesh->yElemCt + iy] * influxZ;
@@ -313,10 +280,6 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
                             outboundFluxY[ix*xjmp + iy*yjmp + iz] = 2*angFlux - influxY;
                             outboundFluxZ[ix*xjmp + iy*yjmp + iz] = 2*angFlux - influxZ;
 
-                            //float outX = 2*angFlux - influxX;
-                            //float outY = 2*angFlux - influxY;
-                            //float outZ = 2*angFlux - influxZ;
-
 
                             if(outboundFluxX[ix*xjmp + iy*yjmp + iz] < 0)
                                 outboundFluxX[ix*xjmp + iy*yjmp + iz] = 0;
@@ -326,14 +289,6 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
 
                             if(outboundFluxZ[ix*xjmp + iy*yjmp + iz] < 0)
                                 outboundFluxZ[ix*xjmp + iy*yjmp + iz] = 0;
-
-
-
-                            //if(denom == 0)
-                            //    qDebug() << "All life is over!";
-
-                            //if(numer != 0)
-                            //    qDebug() << "Got a fish!";
 
                             // Sum all the angular fluxes
                             tempFlux[ix*xjmp + iy*yjmp + iz] += quad->wt[iang]*angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz];
@@ -402,3 +357,4 @@ std::vector<float> MainWindow::gssolver(const Quadrature *quad, const Mesh *mesh
 
     return *scalarFlux;
 }
+*/

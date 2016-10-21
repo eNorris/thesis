@@ -17,6 +17,7 @@
 #include "outwriter.h"
 #include "ctdatamanager.h"
 #include "legendre.h"
+#include "solver.h"
 
 #include "materialutils.h"  // TODO - Delete, not needed, just for testing
 
@@ -57,6 +58,8 @@ MainWindow::MainWindow(QWidget *parent):
 
     m_parser = new AmpxParser;
 
+    m_solver = new Solver;
+
     // Connect explore buttons
     connect(ui->actionSolution_Explorer, SIGNAL(triggered()), outputDialog, SLOT(show()));
     connect(ui->quadExplorePushButton, SIGNAL(clicked()), quadDialog, SLOT(show()));
@@ -68,7 +71,7 @@ MainWindow::MainWindow(QWidget *parent):
     // Connect solver launch button
     //connect(ui->launchSolverPushButton, SIGNAL(clicked()), this, SLOT(launchSolver()));
 
-    connect(this, SIGNAL(signalNewIteration(std::vector<float>*)), outputDialog, SLOT(reRender(std::vector<float>*)));
+    //connect(this, SIGNAL(signalNewIteration(std::vector<float>*)), outputDialog, SLOT(reRender(std::vector<float>*)));
 
     //connect(ui->quadTypecomboBox, SIGNAL(activated(int)), this, SLOT(slotQuadSelected(int)));
     //connect(ui->quadData1ComboBox, SIGNAL(activated(int)), this, SLOT(slotQuadSelected(int)));
@@ -83,6 +86,17 @@ MainWindow::MainWindow(QWidget *parent):
     connect(m_parser, SIGNAL(signalXsUpdate(int)), this, SLOT(xsParseUpdateHandler(int)));
     connect(m_parser, SIGNAL(finishedParsing(AmpxParser*)), this, SLOT(buildMaterials(AmpxParser*)));
     m_xsWorkerThread.start();
+
+    // Set up the solver thread
+    m_solver->moveToThread(&m_solverWorkerThread);
+    connect(&m_xsWorkerThread, SIGNAL(finished()), m_solver, SLOT(deleteLater()));
+    connect(this, SIGNAL(signalLaunchRaytracer(const Quadrature*,const Mesh*,const XSection*)), m_solver, SLOT(raytrace(const Quadrature*,const Mesh*,const XSection*)));
+    connect(this, SIGNAL(signalLaunchSolver(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)), m_solver, SLOT(gssolver(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)));
+    connect(m_solver, SIGNAL(signalNewIteration(std::vector<float>*)), outputDialog, SLOT(reRender(std::vector<float>*)));
+    //connect(this, SIGNAL(signalBeginXsParse(QString)), m_parser, SLOT(parseFile(QString)));
+    //connect(m_parser, SIGNAL(signalXsUpdate(int)), this, SLOT(xsParseUpdateHandler(int)));
+    //connect(m_parser, SIGNAL(finishedParsing(AmpxParser*)), this, SLOT(buildMaterials(AmpxParser*)));
+    m_solverWorkerThread.start();
 
     // Add the tooltips
     updateLaunchButton();  // Sets the tooltip
@@ -169,7 +183,8 @@ void MainWindow::on_launchSolverPushButton_clicked()
     //std::vector<float> raytraced = raytrace(m_quad, m_mesh, m_xs);
 
     // Run the raytracer
-    std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, NULL);
+    //std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, NULL);
+    emit signalLaunchSolver(m_quad, m_mesh, m_xs, NULL);
     //outputDialog->updateSolution(solution);
 }
 

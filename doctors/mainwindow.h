@@ -13,6 +13,7 @@ class OutputDialog;
 class GeomDialog;
 class QuadDialog;
 class XSectionDialog;
+class Solver;
 
 //#include "config.h"
 class Quadrature;
@@ -58,11 +59,14 @@ private:
     AmpxParser *m_parser;
     QThread m_xsWorkerThread;
 
+    Solver *m_solver;
+    QThread m_solverWorkerThread;
+
     // Implemented in solvers.cpp instead of mainwindow.cpp
-    std::vector<float> gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<float> *uflux);
+    //std::vector<float> gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<float> *uflux);
 
     // Implemented in raytracer.cpp instead of mainwindow.cpp
-    std::vector<float> raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs);
+    //std::vector<float> raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs);
 
 
 
@@ -95,7 +99,9 @@ protected slots:
     //void addMaterial(std::vector<int> z, std::vector<float> w, XSection *xs, AmpxParser *ampxParser);
 
 signals:
-    void signalNewIteration(std::vector<float>*);
+    //void signalNewIteration(std::vector<float>*);
+    void signalLaunchRaytracer(const Quadrature *quad, const Mesh *mesh, const XSection *xs);
+    void signalLaunchSolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<float> *uflux);
     void signalDebugHalt(std::vector<float>);
     void signalBeginXsParse(QString);
 

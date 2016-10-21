@@ -114,7 +114,14 @@ void OutputDialog::setSliceLevel(int level)
 
     if(m_mesh == NULL)
     {
-        qDebug() << "ERROR: setSliceLevel on a NULL pointer!";
+        qDebug() << "ERROR: setSliceLevel on a NULL mesh pointer!";
+        dispErrMap();
+        return;
+    }
+
+    if(m_data == NULL)
+    {
+        qDebug() << "ERROR: setSliceLevel on a NULL data pointer!";
         dispErrMap();
         return;
     }
