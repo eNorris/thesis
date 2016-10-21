@@ -207,37 +207,40 @@ void Mesh::remesh(int xelems, int yelems, int zelems, const Config *config, cons
 
 void Mesh::calcAreas(const Quadrature *quad, const int eGroups)
 {
-    Axy.resize(quad->angleCount() * xElemCt * yElemCt);
-    Ayz.resize(quad->angleCount() * yElemCt * zElemCt);
-    Axz.resize(quad->angleCount() * xElemCt * zElemCt);
+    Axy.resize(eGroups * quad->angleCount() * xElemCt * yElemCt);
+    Ayz.resize(eGroups * quad->angleCount() * yElemCt * zElemCt);
+    Axz.resize(eGroups * quad->angleCount() * xElemCt * zElemCt);
 
     // Calculate the cell face area for each angle as well as volume
     for(int eIndx = 0; eIndx < eGroups; eIndx++)
     {
-        float vMu = fabs(quad->mu[eIndx]);
-        float vEta = fabs(quad->eta[eIndx]);
-        float vZi = fabs(quad->zi[eIndx]);
+        for(int qIndx = 0; qIndx < quad->angleCount(); qIndx++)
+        {
+            float vMu = fabs(quad->mu[qIndx]);
+            float vEta = fabs(quad->eta[qIndx]);
+            float vZi = fabs(quad->zi[qIndx]);
 
-        for(unsigned int yIndx = 0; yIndx < yElemCt; yIndx++)
-            for(unsigned int zIndx = 0; zIndx < zElemCt; zIndx++)
-            {
-                //DA[eIndx * yElemCt*zElemCt + yIndx * zElemCt + zIndx] = vMu * dy[yIndx] * dz[zIndx];
-                Ayz[eIndx * yElemCt*zElemCt + yIndx * zElemCt + zIndx] = 2 * vMu * dy[yIndx] * dz[zIndx];
-            }
-
-        for(unsigned int xIndx = 0; xIndx < xElemCt; xIndx++)
-            for(unsigned int zIndx = 0; zIndx < zElemCt; zIndx++)
-            {
-                //DB[eIndx * xElemCt*zElemCt + xIndx * zElemCt + zIndx] = vEta * dx[xIndx] * dz[zIndx];
-                Axz[eIndx * xElemCt*zElemCt + xIndx * zElemCt + zIndx] = 2 * vZi * dx[xIndx] * dz[zIndx];
-            }
-
-        for(unsigned int xIndx = 0; xIndx < xElemCt; xIndx++)
             for(unsigned int yIndx = 0; yIndx < yElemCt; yIndx++)
-            {
-                //DC[eIndx * xElemCt*yElemCt + xIndx * yElemCt + yIndx] = vZi * dx[xIndx] * dy[yIndx];
-                Axy[eIndx * xElemCt*yElemCt + xIndx * yElemCt + yIndx] = 2 * vEta * dx[xIndx] * dy[yIndx];
-            }
+                for(unsigned int zIndx = 0; zIndx < zElemCt; zIndx++)
+                {
+                    //DA[eIndx * yElemCt*zElemCt + yIndx * zElemCt + zIndx] = vMu * dy[yIndx] * dz[zIndx];
+                    Ayz[eIndx*quad->angleCount()*yElemCt*zElemCt + qIndx*yElemCt*zElemCt + yIndx*zElemCt + zIndx] = 2 * vMu * dy[yIndx] * dz[zIndx];
+                }
+
+            for(unsigned int xIndx = 0; xIndx < xElemCt; xIndx++)
+                for(unsigned int zIndx = 0; zIndx < zElemCt; zIndx++)
+                {
+                    //DB[eIndx * xElemCt*zElemCt + xIndx * zElemCt + zIndx] = vEta * dx[xIndx] * dz[zIndx];
+                    Axz[eIndx*quad->angleCount()*xElemCt*zElemCt + qIndx*xElemCt*zElemCt + xIndx*zElemCt + zIndx] = 2 * vZi * dx[xIndx] * dz[zIndx];
+                }
+
+            for(unsigned int xIndx = 0; xIndx < xElemCt; xIndx++)
+                for(unsigned int yIndx = 0; yIndx < yElemCt; yIndx++)
+                {
+                    //DC[eIndx * xElemCt*yElemCt + xIndx * yElemCt + yIndx] = vZi * dx[xIndx] * dy[yIndx];
+                    Axy[eIndx*quad->angleCount()*xElemCt*yElemCt * qIndx*xElemCt*yElemCt + xIndx*yElemCt + yIndx] = 2 * vEta * dx[xIndx] * dy[yIndx];
+                }
+        }
     }
 }
 

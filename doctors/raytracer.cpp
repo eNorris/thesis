@@ -247,7 +247,8 @@ std::vector<float> MainWindow::raytrace(const Quadrature *quad, const Mesh *mesh
 
     qDebug() << "Time to complete raytracer: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
-    emit signalNewIteration(uflux);
+    // TODO - should return a pointer!
+    emit signalNewIteration(&uflux);
     return uflux;
 }
 

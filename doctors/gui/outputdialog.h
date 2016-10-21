@@ -26,7 +26,7 @@ public:
     ~OutputDialog();
 
     void updateMesh(Mesh *mesh);
-    void updateSolution(std::vector<float> data);
+    void updateSolution(std::vector<float> *data);
     void dispErrMap();
 
     bool debuggingEnabled();
@@ -40,7 +40,7 @@ private:
 
     std::vector<QGraphicsRectItem*> rects;
 
-    std::vector<float> m_data;
+    std::vector<float> *m_data;
     Mesh *m_mesh;
 
     float m_minvalGlobal, m_maxvalGlobal;
@@ -51,7 +51,7 @@ protected slots:
     //void disp(std::vector<float>);
     void setSliceLevel(int level);
     void updateMeshSlicePlane();
-    void reRender(std::vector<float>);
+    void reRender(std::vector<float>*);
     void setLinearInterp();
     void setLogInterp();
     void refresh();

@@ -15,7 +15,8 @@ OutputDialog::OutputDialog(QWidget *parent) :
     ui(new Ui::OutputDialog),
     m_listModel(NULL),
     m_minvalGlobal(1E35),
-    m_maxvalGlobal(-1E35)
+    m_maxvalGlobal(-1E35),
+    m_data(NULL)
 {
     ui->setupUi(this);
 
@@ -61,6 +62,9 @@ OutputDialog::~OutputDialog()
     delete ui;
     if(m_listModel != NULL)
         delete m_listModel;
+
+    if(m_data != NULL)
+        delete m_data;
 }
 
 void OutputDialog::updateMesh(Mesh *mesh)
@@ -71,7 +75,7 @@ void OutputDialog::updateMesh(Mesh *mesh)
     //updateMeshSlicePlane();
 }
 
-void OutputDialog::updateSolution(std::vector<float> data)
+void OutputDialog::updateSolution(std::vector<float> *data)
 {
     m_data = data;
 
@@ -79,21 +83,21 @@ void OutputDialog::updateSolution(std::vector<float> data)
     m_maxvalGlobal = -1E35;
     float minGtZero = 1E35;
 
-    for(unsigned int i = 0; i < m_data.size(); i++)
+    for(unsigned int i = 0; i < m_data->size(); i++)
     {
-        if(m_data[i] > m_maxvalGlobal)
-            m_maxvalGlobal = m_data[i];
-        if(m_data[i] < m_minvalGlobal)
-            m_minvalGlobal = m_data[i];
-        if(m_data[i] < minGtZero && m_data[i] > 0)  // Don't allow zero in log scale
-            minGtZero = m_data[i];
+        if((*m_data)[i] > m_maxvalGlobal)
+            m_maxvalGlobal = (*m_data)[i];
+        if((*m_data)[i] < m_minvalGlobal)
+            m_minvalGlobal = (*m_data)[i];
+        if((*m_data)[i] < minGtZero && (*m_data)[i] > 0)  // Don't allow zero in log scale
+            minGtZero = (*m_data)[i];
     }
     m_minvalGlobalLog = log10(minGtZero);
     m_maxvalGlobalLog = log10(m_maxvalGlobal);
 }
 
 
-void OutputDialog::reRender(std::vector<float> data)
+void OutputDialog::reRender(std::vector<float> *data)
 {
     updateSolution(data);
     updateMeshSlicePlane();
@@ -115,7 +119,7 @@ void OutputDialog::setSliceLevel(int level)
         return;
     }
 
-    if(m_data.size() == 0)
+    if(m_data->size() == 0)
     {
         qDebug() << "ERROR: Setting level slice with no solution data";
         dispErrMap();
@@ -148,7 +152,7 @@ void OutputDialog::setSliceLevel(int level)
         for(unsigned int ix = 0; ix < m_mesh->xElemCt; ix++)
             for(unsigned int iy = 0; iy < m_mesh->yElemCt; iy++)
             {
-                float val = m_data[energyGroup*m_mesh->voxelCount() + ix*m_mesh->yElemCt*m_mesh->zElemCt + iy*m_mesh->zElemCt + level];
+                float val = (*m_data)[energyGroup*m_mesh->voxelCount() + ix*m_mesh->yElemCt*m_mesh->zElemCt + iy*m_mesh->zElemCt + level];
                 if(val < minvalLevel)
                 {
                     if(!m_logInterp || val > 0)  // Don't count 0 on log scale
@@ -193,7 +197,7 @@ void OutputDialog::setSliceLevel(int level)
         {
             for(unsigned int j = 0; j < m_mesh->yElemCt; j++)
             {
-                float flux = m_data[energyGroup*m_mesh->voxelCount() + i*m_mesh->yElemCt*m_mesh->zElemCt + j*m_mesh->zElemCt + level];
+                float flux = (*m_data)[energyGroup*m_mesh->voxelCount() + i*m_mesh->yElemCt*m_mesh->zElemCt + j*m_mesh->zElemCt + level];
 
                 if(m_logInterp)
                 {

@@ -95,7 +95,7 @@ protected slots:
     //void addMaterial(std::vector<int> z, std::vector<float> w, XSection *xs, AmpxParser *ampxParser);
 
 signals:
-    void signalNewIteration(std::vector<float>);
+    void signalNewIteration(std::vector<float>*);
     void signalDebugHalt(std::vector<float>);
     void signalBeginXsParse(QString);
 
