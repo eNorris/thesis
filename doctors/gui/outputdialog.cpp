@@ -100,7 +100,7 @@ void OutputDialog::updateSolution(std::vector<float> *data)
 void OutputDialog::reRender(std::vector<float> *data)
 {
     updateSolution(data);
-    updateMeshSlicePlane();
+    //updateMeshSlicePlane();
     setSliceLevel(ui->sliceVerticalSlider->value());
 }
 
@@ -137,8 +137,9 @@ void OutputDialog::setSliceLevel(int level)
     {
         qDebug() << "ERROR: There are no rectangles in the drawing pipeline!";
         qDebug() << "Did you call the mesher?";
-        dispErrMap();
-        return;
+        updateMeshSlicePlane();
+        //dispErrMap();
+        //return;
     }
 
     loadParulaBrush();
