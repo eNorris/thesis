@@ -43,8 +43,8 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
     const unsigned short DIRECTION_Y = 2;
     const unsigned short DIRECTION_Z = 3;
 
-    std::vector<float> uflux;
-    uflux.resize(groups * mesh->voxelCount());
+    std::vector<float> *uflux = new std::vector<float>;
+    uflux->resize(groups * mesh->voxelCount());
 
     unsigned int ejmp = mesh->voxelCount();
     unsigned int xjmp = mesh->xjmp();
@@ -82,10 +82,15 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                 float y = mesh->yNodes[yIndxStart] + mesh->dy[yIndxStart]/2;
                 float z = mesh->zNodes[zIndxStart] + mesh->dz[zIndxStart]/2;
 
-                if(xIndxStart == 5 && yIndxStart == 52 && zIndxStart == 13)
-                {
-                    qDebug() << "Halt!!!!";
-                }
+                //float tmpdist = 0.0f;
+                std::vector<float> tmpdistv;
+                std::vector<float> tmpxsv;
+                std::vector<float> mfpv;
+
+                //if(xIndxStart == 5 && yIndxStart == 52 && zIndxStart == 13)
+                //{
+                //    qDebug() << "Halt!!!!";
+                //}
 
 
                 if(xIndxStart == srcIndxX && yIndxStart == srcIndxY && zIndxStart == srcIndxZ)
@@ -97,8 +102,9 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                     for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
                     {
                         xsval = xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
-                        uflux[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = srcStrength * exp(-xsval*srcToCellDist) / (4 * M_PI * srcToCellDist * srcToCellDist);
+                        (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = srcStrength * exp(-xsval*srcToCellDist) / (4 * M_PI * srcToCellDist * srcToCellDist);
                     }
+                    //tmpdist += srcToCellDist;
                     continue;
                 }
 
@@ -159,14 +165,24 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                     if(tmin < -3E-8)  // Include a little padding for hitting an edge
                         qDebug() << "Reversed space!";
 
+                    //tmpdist += tmin;
+
                     // Update mpf array
-                    unsigned int zid = mesh->zoneId[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
+                    unsigned int zid = mesh->zoneId[xIndx*xjmp + yIndx*yjmp + zIndx];
                     for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
                     {
                         //xsval = xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
                         //                   [cm] * [b] * [atom/b-cm]
                         meanFreePaths[ie] += tmin * xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
+
+
+
                     }
+                    tmpdistv.push_back(tmin);
+                    tmpxsv.push_back(xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx]);
+                    float gain = tmin * xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
+                    float current = mfpv.size() == 0 ? 0.0f : mfpv[mfpv.size()-1];
+                    mfpv.push_back(gain);
 
                     // Update cell indices and positions
                     if(dirHitFirst == DIRECTION_X) // x direction
@@ -226,16 +242,32 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
 
                     if(xIndx == srcIndxX && yIndx == srcIndxY && zIndx == srcIndxZ)
                     {
-                        //meanFreePaths[ie] += tmin * xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
-
                         float finalDist = sqrt((x-sx)*(x-sx) + (y-sy)*(y-sy) + (z-sz)*(z-sz));
-                        //unsigned int zid = mesh->zoneId[xIndx*xjmp + yIndx*yjmp + zIndx];
-                        //float xsval;
+
                         for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
                         {
                             meanFreePaths[ie] += finalDist * xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
                             //xsval = xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
                             //uflux[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = srcStrength * exp(-xsval*srcToCellDist) / (4 * M_PI * srcToCellDist * srcToCellDist);
+                        }
+
+                        tmpdistv.push_back(finalDist);
+                        tmpxsv.push_back(xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx]);
+
+                        float gain = finalDist * xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
+                        mfpv.push_back(gain);
+
+
+                        //tmpdist += finalDist;
+
+                        //if(abs(tmpdist - srcToCellDist) > 1E-6)
+                        //{
+                        //    qDebug() << "Caught a hookey";
+                        //}
+
+                        if(xIndxStart == 180 && yIndxStart == 193 && zIndxStart == srcIndxZ)
+                        {
+                            qDebug() << "Caught a fishy";
                         }
 
                         exhaustedRay = true;
@@ -261,7 +293,7 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                     if(flx > 1E6)
                         qDebug() << "raytracer.cpp: (226): Too big!";
 
-                    uflux[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = flx;  //srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
+                    (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = flx;  //srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
                 }
 
             } // End of each voxel
@@ -270,7 +302,7 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
     qDebug() << "Time to complete raytracer: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
     // TODO - should return a pointer!
-    emit signalNewIteration(&uflux);
+    emit signalNewIteration(uflux);
     //return uflux;
 }
 
@@ -487,8 +519,8 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
 
                             //qDebug() << ix << "   " << iy << "   " << iz;
 
-                            if(ix == 128 && iy == 128 && iz == 33 && iang == 12)
-                                qDebug() << "Found the one data point!";
+                            //if(ix == 128 && iy == 128 && iz == 33 && iang == 12)
+                            //    qDebug() << "Found the one data point!";
 
                             int zid = mesh->zoneId[ix*xjmp + iy*yjmp + iz];
 

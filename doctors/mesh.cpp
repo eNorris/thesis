@@ -211,7 +211,7 @@ void Mesh::calcAreas(const Quadrature *quad, const int eGroups)
     Ayz.resize(eGroups * quad->angleCount() * yElemCt * zElemCt);
     Axz.resize(eGroups * quad->angleCount() * xElemCt * zElemCt);
 
-    int tmptick = 0;
+    //int tmptick = 0;
 
     // Calculate the cell face area for each angle as well as volume
     for(int eIndx = 0; eIndx < eGroups; eIndx++)
@@ -265,16 +265,16 @@ void Mesh::calcAreas(const Quadrature *quad, const int eGroups)
                     //qDebug() << qqv;
                     Axy[eIndx*quad->angleCount()*xElemCt*yElemCt + qIndx*xElemCt*yElemCt + xIndx*yElemCt + yIndx] = 2 * vEta * dx[xIndx] * dy[yIndx];
 
-                    tmptick++;
+                    //tmptick++;
                 }
         }
     }
 
-    for(int chk = 0; chk < Axy.size(); chk++)
-    {
-        if(Axy[chk] <= 1E-6)
-            qDebug() << "EXPLODE NOW!";
-    }
+    //for(int chk = 0; chk < Axy.size(); chk++)
+    //{
+    //    if(Axy[chk] <= 1E-6)
+    //        qDebug() << "EXPLODE NOW!";
+    //}
 
 }
 

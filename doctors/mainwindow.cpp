@@ -181,10 +181,10 @@ void MainWindow::on_launchSolverPushButton_clicked()
 
     // First collision source
     //std::vector<float> raytraced = raytrace(m_quad, m_mesh, m_xs);
-
+    emit signalLaunchRaytracer(m_quad, m_mesh, m_xs);
     // Run the raytracer
     //std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, NULL);
-    emit signalLaunchSolver(m_quad, m_mesh, m_xs, NULL);
+    //emit signalLaunchSolver(m_quad, m_mesh, m_xs, NULL);
     //outputDialog->updateSolution(solution);
 }
 
