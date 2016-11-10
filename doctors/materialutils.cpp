@@ -509,33 +509,45 @@ const std::vector<int> MaterialUtils::hounsfieldRangePhantom19{
     1400,
     1500,
     3000,  // 19
-    3000,  // 20
+    1000000,  // 20
 };
 
 const std::vector<int> MaterialUtils::hounsfieldRangePhantom19Elements{
-    1,     6,     7,     8,     11,    12,    15,    16,    17,    18,    19,    20
+    1,     // Hydrogen
+    6,     // Carbon
+    7,     // Nitrogen
+    8,     // Oxygen
+    11,    // Sodium
+    12,    // Magnesium
+    15,    // Phosphorus
+    16,    // Sulfur
+    17,    // Chlorine
+    18,    // Argon
+    19,    // Potassium
+    20     // Calcium
 };
 
 const std::vector<std::vector<float> > MaterialUtils::hounsfieldRangePhantom19Weights{
-    std::vector<float> {0.000, 0.000, 0.757, 0.232, 0.000, 0.000, 0.000, 0.000, 0.000, 0.013, 0.000, 0.000}, // Air
-    std::vector<float> {0.103, 0.105, 0.031, 0.749, 0.002, 0.000, 0.002, 0.003, 0.003, 0.000, 0.002, 0.000}, // Lung
-    std::vector<float> {0.112, 0.508, 0.012, 0.364, 0.001, 0.000, 0.000, 0.001, 0.001, 0.000, 0.000, 0.000}, // Adipose/adrenal
-    std::vector<float> {0.100, 0.163, 0.043, 0.684, 0.004, 0.000, 0.000, 0.004, 0.003, 0.000, 0.000, 0.000}, // Small intestine
-    std::vector<float> {0.097, 0.447, 0.025, 0.359, 0.000, 0.000, 0.023, 0.002, 0.001, 0.000, 0.001, 0.045}, // Bone
-    std::vector<float> {0.091, 0.414, 0.027, 0.368, 0.000, 0.001, 0.032, 0.002, 0.001, 0.000, 0.001, 0.063}, // Bone
-    std::vector<float> {0.085, 0.378, 0.029, 0.379, 0.000, 0.001, 0.041, 0.002, 0.001, 0.000, 0.001, 0.082}, // Bone
-    std::vector<float> {0.080, 0.345, 0.031, 0.388, 0.000, 0.001, 0.050, 0.002, 0.001, 0.000, 0.001, 0.010}, // Bone
-    std::vector<float> {0.075, 0.316, 0.032, 0.397, 0.000, 0.001, 0.058, 0.002, 0.001, 0.000, 0.000, 0.116}, // Bone
-    std::vector<float> {0.071, 0.289, 0.034, 0.404, 0.000, 0.001, 0.066, 0.002, 0.001, 0.000, 0.000, 0.131}, // Bone
-    std::vector<float> {0.067, 0.264, 0.035, 0.412, 0.000, 0.002, 0.072, 0.003, 0.000, 0.000, 0.000, 0.144}, // Bone
-    std::vector<float> {0.063, 0.242, 0.037, 0.418, 0.000, 0.002, 0.078, 0.003, 0.000, 0.000, 0.000, 0.157}, // Bone
-    std::vector<float> {0.060, 0.221, 0.038, 0.424, 0.000, 0.002, 0.084, 0.003, 0.000, 0.000, 0.000, 0.168}, // Bone
-    std::vector<float> {0.056, 0.201, 0.039, 0.430, 0.000, 0.002, 0.089, 0.003, 0.000, 0.000, 0.000, 0.179}, // Bone
-    std::vector<float> {0.053, 0.183, 0.040, 0.435, 0.000, 0.002, 0.094, 0.003, 0.000, 0.000, 0.000, 0.189}, // Bone
-    std::vector<float> {0.051, 0.166, 0.041, 0.440, 0.000, 0.002, 0.099, 0.003, 0.000, 0.000, 0.000, 0.198}, // Bone
-    std::vector<float> {0.048, 0.150, 0.042, 0.444, 0.000, 0.002, 0.103, 0.003, 0.000, 0.000, 0.000, 0.207}, // Bone
-    std::vector<float> {0.046, 0.136, 0.042, 0.449, 0.000, 0.002, 0.107, 0.003, 0.000, 0.000, 0.000, 0.215}, // Bone
-    std::vector<float> {0.043, 0.122, 0.043, 0.453, 0.000, 0.002, 0.111, 0.003, 0.000, 0.000, 0.000, 0.222}, // Bone
+    std::vector<float> {0.000, 0.000, 0.757, 0.232, 0.000, 0.000, 0.000, 0.000, 0.000, 0.013, 0.000, 0.000}, // Air 1
+    std::vector<float> {0.103, 0.105, 0.031, 0.749, 0.002, 0.000, 0.002, 0.003, 0.003, 0.000, 0.002, 0.000}, // Lung 2
+    std::vector<float> {0.112, 0.508, 0.012, 0.364, 0.001, 0.000, 0.000, 0.001, 0.001, 0.000, 0.000, 0.000}, // Adipose/adrenal 3
+    std::vector<float> {0.100, 0.163, 0.043, 0.684, 0.004, 0.000, 0.000, 0.004, 0.003, 0.000, 0.000, 0.000}, // Small intestine 4
+    std::vector<float> {0.097, 0.447, 0.025, 0.359, 0.000, 0.000, 0.023, 0.002, 0.001, 0.000, 0.001, 0.045}, // Bone 5
+    std::vector<float> {0.091, 0.414, 0.027, 0.368, 0.000, 0.001, 0.032, 0.002, 0.001, 0.000, 0.001, 0.063}, // Bone 6
+    std::vector<float> {0.085, 0.378, 0.029, 0.379, 0.000, 0.001, 0.041, 0.002, 0.001, 0.000, 0.001, 0.082}, // Bone 7
+    std::vector<float> {0.080, 0.345, 0.031, 0.388, 0.000, 0.001, 0.050, 0.002, 0.001, 0.000, 0.001, 0.010}, // Bone 8
+    std::vector<float> {0.075, 0.316, 0.032, 0.397, 0.000, 0.001, 0.058, 0.002, 0.001, 0.000, 0.000, 0.116}, // Bone 9
+    std::vector<float> {0.071, 0.289, 0.034, 0.404, 0.000, 0.001, 0.066, 0.002, 0.001, 0.000, 0.000, 0.131}, // Bone 10
+    std::vector<float> {0.067, 0.264, 0.035, 0.412, 0.000, 0.002, 0.072, 0.003, 0.000, 0.000, 0.000, 0.144}, // Bone 11
+    std::vector<float> {0.063, 0.242, 0.037, 0.418, 0.000, 0.002, 0.078, 0.003, 0.000, 0.000, 0.000, 0.157}, // Bone 12
+    std::vector<float> {0.060, 0.221, 0.038, 0.424, 0.000, 0.002, 0.084, 0.003, 0.000, 0.000, 0.000, 0.168}, // Bone 13
+    std::vector<float> {0.056, 0.201, 0.039, 0.430, 0.000, 0.002, 0.089, 0.003, 0.000, 0.000, 0.000, 0.179}, // Bone 14
+    std::vector<float> {0.053, 0.183, 0.040, 0.435, 0.000, 0.002, 0.094, 0.003, 0.000, 0.000, 0.000, 0.189}, // Bone 15
+    std::vector<float> {0.051, 0.166, 0.041, 0.440, 0.000, 0.002, 0.099, 0.003, 0.000, 0.000, 0.000, 0.198}, // Bone 16
+    std::vector<float> {0.048, 0.150, 0.042, 0.444, 0.000, 0.002, 0.103, 0.003, 0.000, 0.000, 0.000, 0.207}, // Bone 17
+    std::vector<float> {0.046, 0.136, 0.042, 0.449, 0.000, 0.002, 0.107, 0.003, 0.000, 0.000, 0.000, 0.215}, // Bone 18
+    std::vector<float> {0.043, 0.122, 0.043, 0.453, 0.000, 0.002, 0.111, 0.003, 0.000, 0.000, 0.000, 0.222}, // Bone 19
+    std::vector<float> {1.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000}  // Empty 20
 };
 
 MaterialUtils::MaterialUtils()
@@ -573,17 +585,22 @@ std::vector<float> MaterialUtils::weightFracToAtomFrac(std::vector<int> elements
 
 float MaterialUtils::atomsPerGram(std::vector<int> elements, std::vector<float> atomFractions)
 {
+    if(elements.size() != atomFractions.size())
+    {
+        qDebug() << "MaterialUtils::atomsPerGram(): 589: vector sizes don't match!";
+    }
+
     float s = 0.0f;
-    for(int i = 0; i < atomFractions.size(); i++)
+    for(unsigned int i = 0; i < atomFractions.size(); i++)
         s += atomFractions[i];
     if(abs(s - 1.0) > 1E-6)
     {
-        qDebug() << "MaterialUtils::atomsPerGram(): 578: atom fractions didn't add to 1.0, they added to " << s;
+        qDebug() << "MaterialUtils::atomsPerGram(): 597: atom fractions didn't add to 1.0, they added to " << s;
     }
 
     float gpm = 0.0f;
 
-    for(int i = 0; i < atomFractions.size(); i++)
+    for(unsigned int i = 0; i < atomFractions.size(); i++)
     {
         gpm += MaterialUtils::atomicMass[elements[i]] * atomFractions[i];  // grams per mol
     }
