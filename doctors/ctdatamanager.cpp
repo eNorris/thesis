@@ -4,8 +4,10 @@
 #include <cstdint>
 #include <QDebug>
 #include <fstream>
+//#include <iostream>
 
 #include "materialutils.h"
+//#include "histogram.h"
 
 /*
 const std::vector<int> CtDataManager::hounsfieldRangePhantom19{
@@ -146,15 +148,16 @@ Mesh *CtDataManager::ctNumberToQuickCheck(Mesh *mesh)
 Mesh *CtDataManager::ctNumberToHumanPhantom(Mesh *mesh)
 {
     std::vector<float> atomPerG;
+    //Histogram tstHist(0.0, 0.1, 200.0);
 
     std::vector<std::vector<float> > hounsfieldRangePhantom19Fractions;
 
-    // Convert the weight fractions to atom fractions
-    for(unsigned int i = 0; i < MaterialUtils::hounsfieldRangePhantom19Elements.size(); i++)
+    // Convert the weight fractions to atom fractions for each material
+    for(unsigned int i = 0; i < MaterialUtils::hounsfieldRangePhantom19.size(); i++)
         hounsfieldRangePhantom19Fractions.push_back(MaterialUtils::weightFracToAtomFrac(MaterialUtils::hounsfieldRangePhantom19Elements, MaterialUtils::hounsfieldRangePhantom19Weights[i]));
 
-    // Convert atom fraction to atom density
-    for(unsigned int i = 0; i < MaterialUtils::hounsfieldRangePhantom19Elements.size(); i++)
+    // Convert atom fraction to atom density for each material
+    for(unsigned int i = 0; i < MaterialUtils::hounsfieldRangePhantom19.size(); i++)
         atomPerG.push_back(MaterialUtils::atomsPerGram(MaterialUtils::hounsfieldRangePhantom19Elements, hounsfieldRangePhantom19Fractions[i]));
 
     for(unsigned int i = 0; i < mesh->voxelCount(); i++)
@@ -162,10 +165,13 @@ Mesh *CtDataManager::ctNumberToHumanPhantom(Mesh *mesh)
         int ctv = mesh->ct[i];
 
         // Determine the density (atom density is after the zoneId calculation)
-        if(ctv <= 55)
-            mesh->density[i] = 0.001 * (1.02 * ctv - 7.65);
+        //if(ctv <= 55)
+        if(ctv <= 0)
+            mesh->density[i] = 0.001 * (ctv + 1000);
+            //mesh->density[i] = 0.001 * (1.02 * ctv - 7.65);
         else
-            mesh->density[i] = 0.001 * (0.58 * ctv + 467.79);
+            mesh->density[i] = 0.001 * (0.6 * ctv + 1000);
+            //mesh->density[i] = 0.001 * (0.58 * ctv + 467.79);
 
         // Determine the material
         mesh->zoneId[i] = MaterialUtils::hounsfieldRangePhantom19.size() - 1;  // Last bin is "illegal"
@@ -177,12 +183,30 @@ Mesh *CtDataManager::ctNumberToHumanPhantom(Mesh *mesh)
             if(ctv - 1024 < MaterialUtils::hounsfieldRangePhantom19[j])
             {
                 mesh->zoneId[i] = j;
+
+                /*
+                if(j == 8)
+                {
+                    qDebug() << "CtDataManager: 189: got a high density";
+                }
+                */
+
                 break;
             }
         }
 
+        //float den = mesh->density[i];
+        //float apg = atomPerG[mesh->zoneId[i]];
+        //float sol = mesh->density[i] * atomPerG[mesh->zoneId[i]] * 1E-24;
+        //tstHist.insert(sol);
+        if(mesh->zoneId[i] >= atomPerG.size())
+        {
+            qDebug() << "EXPLODE!";
+        }
         mesh->atomDensity[i] = mesh->density[i] * atomPerG[mesh->zoneId[i]] * 1E-24;  // g/cc * @/g * cm^2/b = @/cm-b
     }
+
+    //std::cout << tstHist << std::endl;
 
     return mesh;
 }
