@@ -59,7 +59,8 @@ SOURCES += main.cpp\
     xs_reader/ampxrecordparsers.cpp \
     xs_reader/nuclidedata.cpp \
     materialutils.cpp \
-    solver.cpp
+    solver.cpp \
+    histogram.cpp
 
 HEADERS  += mainwindow.h \
     config.h \
@@ -82,7 +83,8 @@ HEADERS  += mainwindow.h \
     xs_reader/ampxrecordparsers.h \
     xs_reader/nuclidedata.h \
     materialutils.h \
-    solver.h
+    solver.h \
+    histogram.h
 
 FORMS    += mainwindow.ui \
     gui/outputdialog.ui \
