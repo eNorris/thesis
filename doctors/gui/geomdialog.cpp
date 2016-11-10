@@ -107,7 +107,7 @@ void GeomDialog::setSliceLevel(int level)
                 }
                 else if(m_rendertype == 1)
                 {
-                    zid = m_mesh->density[i*m_mesh->yElemCt*m_mesh->zElemCt + j*m_mesh->zElemCt + level] * 200;
+                    zid = 50 * m_mesh->density[i*m_mesh->yElemCt*m_mesh->zElemCt + j*m_mesh->zElemCt + level];
                     if(zid > 255)
                         zid = 255;
                     if(zid < 0)
@@ -115,7 +115,7 @@ void GeomDialog::setSliceLevel(int level)
                 }
                 else if(m_rendertype == 3)
                 {
-                    zid = m_mesh->atomDensity[i*m_mesh->yElemCt*m_mesh->zElemCt + j*m_mesh->zElemCt + level];
+                    zid = 2500 * m_mesh->atomDensity[i*m_mesh->yElemCt*m_mesh->zElemCt + j*m_mesh->zElemCt + level];
                     if(zid > 255)
                         zid = 255;
                     if(zid < 0)
@@ -155,7 +155,7 @@ void GeomDialog::setSliceLevel(int level)
                 }
                 else if(m_rendertype == 3)
                 {
-                    zid = m_mesh->atomDensity[i*m_mesh->yElemCt*m_mesh->zElemCt + level*m_mesh->zElemCt + j];
+                    zid = 2500 * m_mesh->atomDensity[i*m_mesh->yElemCt*m_mesh->zElemCt + level*m_mesh->zElemCt + j];
                     if(zid > 255)
                         zid = 255;
                     if(zid < 0)
@@ -196,7 +196,7 @@ void GeomDialog::setSliceLevel(int level)
                 }
                 else if(m_rendertype == 3)
                 {
-                    zid = m_mesh->atomDensity[level*m_mesh->yElemCt*m_mesh->zElemCt + i*m_mesh->zElemCt + j];
+                    zid = 2500 * m_mesh->atomDensity[level*m_mesh->yElemCt*m_mesh->zElemCt + i*m_mesh->zElemCt + j];
                     if(zid > 255)
                         zid = 255;
                     if(zid < 0)
