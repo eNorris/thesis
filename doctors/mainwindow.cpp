@@ -181,10 +181,10 @@ void MainWindow::on_launchSolverPushButton_clicked()
 
     // First collision source
     //std::vector<float> raytraced = raytrace(m_quad, m_mesh, m_xs);
-    emit signalLaunchRaytracer(m_quad, m_mesh, m_xs);
+    //emit signalLaunchRaytracer(m_quad, m_mesh, m_xs);
     // Run the raytracer
     //std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, NULL);
-    //emit signalLaunchSolver(m_quad, m_mesh, m_xs, NULL);
+    emit signalLaunchSolver(m_quad, m_mesh, m_xs, NULL);
     //outputDialog->updateSolution(solution);
 }
 
@@ -334,6 +334,18 @@ void MainWindow::on_quadTypeComboBox_activated(int type)
         m_quadLoaded = false;
         updateLaunchButton();
         break;
+    case 2:
+        ui->quadOpenPushButton->setEnabled(false);
+        ui->quadFileLineEdit->setEnabled(false);
+        ui->quadData1ComboBox->clear();
+        ui->quadData1ComboBox->setEnabled(true);
+        ui->quadData1ComboBox->addItem("Select...");
+        ui->quadData1ComboBox->addItem("Unidirectional");
+        ui->quadData2ComboBox->clear();
+        ui->quadData2ComboBox->setEnabled(false);
+        m_quadLoaded = false;
+        updateLaunchButton();
+        break;
     default:
         qDebug() << "Illegal combo box (type = " << type << ")selection";
     }
@@ -343,7 +355,7 @@ void MainWindow::on_quadData1ComboBox_activated(int d1)
 {
     switch(ui->quadTypeComboBox->currentIndex())
     {
-    case 0:
+    case 0: // Sn
         if(d1 == 0)
         {
             m_quadLoaded = false;
@@ -353,6 +365,24 @@ void MainWindow::on_quadData1ComboBox_activated(int d1)
         {
             m_quadLoaded = true;
             m_quad = new Quadrature(ui->quadData1ComboBox->itemText(d1).toInt());
+            updateLaunchButton();
+        }
+        break;
+    case 1: // Custom
+        break;
+    case 2: // Debug
+        if(d1 == 0)  // Unidirectional
+        {
+            m_quadLoaded = false;
+            updateLaunchButton();
+        }
+        else
+        {
+            if(m_quad != NULL)
+                delete m_quad;
+            m_quad = new Quadrature;
+            m_quad->loadSpecial(3);
+            m_quadLoaded = true;
             updateLaunchButton();
         }
         break;
