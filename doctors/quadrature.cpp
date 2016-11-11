@@ -72,6 +72,14 @@ void Quadrature::loadSpecial(const int special)
             lng += dlong;
         }
     }
+    else if(special == 3)  // Unidirectional
+    {
+        m_angles = 1;
+        mu.push_back(1.0);
+        zi.push_back(0.0);
+        eta.push_back(0.0);
+        wt.push_back(1.0);
+    }
     else
         qDebug() << "Unknown sqecial quadrature type: " << QString::number(special);
 }
