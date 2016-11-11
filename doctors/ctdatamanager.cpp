@@ -4,10 +4,11 @@
 #include <cstdint>
 #include <QDebug>
 #include <fstream>
-//#include <iostream>
 
 #include "materialutils.h"
-//#include "histogram.h"
+
+#include <iostream>
+#include "histogram.h"
 
 /*
 const std::vector<int> CtDataManager::hounsfieldRangePhantom19{
@@ -148,7 +149,7 @@ Mesh *CtDataManager::ctNumberToQuickCheck(Mesh *mesh)
 Mesh *CtDataManager::ctNumberToHumanPhantom(Mesh *mesh)
 {
     std::vector<float> atomPerG;
-    //Histogram tstHist(0.0, 0.1, 200.0);
+    //Histogram tstHist(-1000, 3000, 400.0);
 
     std::vector<std::vector<float> > hounsfieldRangePhantom19Fractions;
 
@@ -162,15 +163,22 @@ Mesh *CtDataManager::ctNumberToHumanPhantom(Mesh *mesh)
 
     for(unsigned int i = 0; i < mesh->voxelCount(); i++)
     {
-        int ctv = mesh->ct[i];
+        // Raw data minus offset
+        int offset = 1000;
+        int ctv = mesh->ct[i] - offset;
+
+        if(i == 2121760)
+        {
+            qDebug() << "stop here";
+        }
 
         // Determine the density (atom density is after the zoneId calculation)
         //if(ctv <= 55)
         if(ctv <= 0)
-            mesh->density[i] = 0.001 * (ctv + 1000);
+            mesh->density[i] = 0.001 * (ctv + offset);
             //mesh->density[i] = 0.001 * (1.02 * ctv - 7.65);
         else
-            mesh->density[i] = 0.001 * (0.6 * ctv + 1000);
+            mesh->density[i] = 0.001 * (0.6 * ctv + offset);
             //mesh->density[i] = 0.001 * (0.58 * ctv + 467.79);
 
         // Determine the material
@@ -180,7 +188,7 @@ Mesh *CtDataManager::ctNumberToHumanPhantom(Mesh *mesh)
             //int ctvm = ctv - 1024;
             //int hsf = hounsfieldRangePhantom19[j];
             //bool truth = ctvm < hsf;
-            if(ctv - 1024 < MaterialUtils::hounsfieldRangePhantom19[j])
+            if(ctv < MaterialUtils::hounsfieldRangePhantom19[j])
             {
                 mesh->zoneId[i] = j;
 
@@ -198,7 +206,7 @@ Mesh *CtDataManager::ctNumberToHumanPhantom(Mesh *mesh)
         //float den = mesh->density[i];
         //float apg = atomPerG[mesh->zoneId[i]];
         //float sol = mesh->density[i] * atomPerG[mesh->zoneId[i]] * 1E-24;
-        //tstHist.insert(sol);
+        //tstHist.insert(ctv);
         if(mesh->zoneId[i] >= atomPerG.size())
         {
             qDebug() << "EXPLODE!";
