@@ -55,6 +55,7 @@ protected slots:
     void setLinearInterp();
     void setLogInterp();
     void refresh();
+    void setEnergy(int g);
 };
 
 #endif // OUTPUTDIALOG_H

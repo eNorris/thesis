@@ -42,6 +42,7 @@ OutputDialog::OutputDialog(QWidget *parent) :
     connect(ui->xyRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
     connect(ui->xzRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
     connect(ui->yzRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
+    connect(ui->energyComboBox, SIGNAL(activated(int)), this, SLOT(setEnergy(int)));
 
     connect(ui->linearInterpRadioButton, SIGNAL(clicked()), this, SLOT(setLinearInterp()));
     connect(ui->logInterpRadioButton, SIGNAL(clicked()), this, SLOT(setLogInterp()));
@@ -111,6 +112,11 @@ void OutputDialog::setSliceLevel(int level)
     const int energyGroup = ui->groupComboBox->currentIndex();  // = 5;
 
     //qDebug() << "Set the slice to " << level;
+
+    if(level < 0)
+    {
+        level = ui->sliceVerticalSlider->value();
+    }
 
     if(m_mesh == NULL)
     {
@@ -395,7 +401,10 @@ void OutputDialog::refresh()
     setSliceLevel(ui->sliceVerticalSlider->value());
 }
 
-
+void OutputDialog::setEnergy(int g)
+{
+    setSliceLevel(-1);
+}
 
 
 

@@ -122,7 +122,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="groupComboBox"/>
+        <widget class="QComboBox" name="energyComboBox"/>
        </item>
       </layout>
      </item>
