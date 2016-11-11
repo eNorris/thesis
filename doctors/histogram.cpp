@@ -9,7 +9,7 @@ Histogram::Histogram(float min, float max, float bins) : m_min(min), m_max(max),
     }
 
     const float dx = (m_max-m_min)/m_bins;
-    float v = dx;
+    float v = m_min + dx;
     int indx = 0;
 
     while(v < m_max)
