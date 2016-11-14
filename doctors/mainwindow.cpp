@@ -252,7 +252,7 @@ void MainWindow::updateLaunchButton()
         //ui->launchSolverPushButton->setToolTip("Ready to launch solver!");
 
         McnpWriter mcnpwriter;
-        mcnpwriter.writeMcnp("./mcnp_out.inp", m_mesh);
+        mcnpwriter.writeMcnp("../mcnp.gitignore/mcnp_out.inp", m_mesh);
     }
     else
     {

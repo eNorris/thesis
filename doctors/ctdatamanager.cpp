@@ -167,19 +167,34 @@ Mesh *CtDataManager::ctNumberToHumanPhantom(Mesh *mesh)
         int offset = 1000;
         int ctv = mesh->ct[i] - offset;
 
-        if(i == 2121760)
-        {
-            qDebug() << "stop here";
-        }
+        //if(i == 208361)
+        //{
+        //    qDebug() << "stop here";
+        //}
 
         // Determine the density (atom density is after the zoneId calculation)
         //if(ctv <= 55)
         if(ctv <= 0)
-            mesh->density[i] = 0.001 * (ctv + offset);
+        {
+            if(ctv == -1000)
+            {
+                mesh->density[i] = 0.001;
+            }
+            else
+            {
+                mesh->density[i] = 0.001 * (ctv + offset);
+                //float tt = 0.001 * (ctv + offset);
+                //int x = 5;
+            }
             //mesh->density[i] = 0.001 * (1.02 * ctv - 7.65);
+        }
         else
+        {
             mesh->density[i] = 0.001 * (0.6 * ctv + offset);
+            //float tt = 0.001 * (0.6 * ctv + offset);
+            //int x = 5;
             //mesh->density[i] = 0.001 * (0.58 * ctv + 467.79);
+        }
 
         // Determine the material
         mesh->zoneId[i] = MaterialUtils::hounsfieldRangePhantom19.size() - 1;  // Last bin is "illegal"
@@ -211,7 +226,16 @@ Mesh *CtDataManager::ctNumberToHumanPhantom(Mesh *mesh)
         {
             qDebug() << "EXPLODE!";
         }
+
+        float aperg = atomPerG[mesh->zoneId[i]];
+        float pden = mesh->density[i];
+
         mesh->atomDensity[i] = mesh->density[i] * atomPerG[mesh->zoneId[i]] * 1E-24;  // g/cc * @/g * cm^2/b = @/cm-b
+
+        if(mesh->atomDensity[i] <= 1E-10)
+        {
+            qDebug() << "Got zero density";
+        }
     }
 
     //std::cout << tstHist << std::endl;

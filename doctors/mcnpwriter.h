@@ -24,7 +24,7 @@ protected:
     bool m_failFlag;
 
     std::string padFourDigitsZero(int v);
-    std::string padFiveDigitsSpace(int v);
+    std::string padFourDigitsSpace(int v);
     std::string xsurf(int xindx);
     std::string ysurf(int yindx);
     std::string zsurf(int zindx);

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <QDebug>
 
 #include "mesh.h"
 #include "materialutils.h"
@@ -75,6 +76,9 @@ std::string McnpWriter::generateCellString(Mesh *m)
                 int mindx = xi * m->yElemCt * m->zElemCt + yi * m->zElemCt + zi;
                 //std::string cellString = "";
 
+                if(mindx == 208311)
+                    qDebug() << "stop";
+
                 if(mindx >= m->zoneId.size())
                 {
                     std::cerr << "ERROR: mindx=" << mindx << " > zoneId.size=" << m->zoneId.size() << std::endl;
@@ -93,8 +97,24 @@ std::string McnpWriter::generateCellString(Mesh *m)
                     continue;
                 }
 
+                if(mindx == 208311)
+                    qDebug() << "halt";
+
+                std::string matstr = "";
+
+                // Illegal cells are just void
+                if(m->zoneId[mindx] == MaterialUtils::hounsfieldRangePhantom19.size()-1)
+                {
+                    matstr = "0";
+                }
+                else
+                {
+                    float atmden = m->atomDensity[mindx];
+                    matstr = std::to_string(m->zoneId[mindx]+1) + " " + std::to_string(m->atomDensity[mindx]);
+                }
+
                 // Increment zoneId by 1 because 0 is not legal for MCNP
-                std::string cellString = padFiveDigitsSpace(mindx+1) + " " + std::to_string(m->zoneId[mindx]+1) + " " + std::to_string(m->atomDensity[mindx]) + " " +
+                std::string cellString = padFourDigitsSpace(mindx+1) + " " + matstr + " " +
                         xsurf(xi) + " -" + xsurf(xi+1) + " " +
                         ysurf(yi) + " -" + ysurf(yi+1) + " " +
                         zsurf(zi) + " -" + zsurf(zi+1) + " " +
@@ -130,12 +150,10 @@ std::string McnpWriter::generatePhantom19MaterialString()
 {
     std::string allMatString = "c ---------- Materials ----------\n";
 
-
-
     for(int mid = 0; mid < MaterialUtils::hounsfieldRangePhantom19.size(); mid++)
     {
         std::vector<float> atomFractions = MaterialUtils::weightFracToAtomFrac(MaterialUtils::hounsfieldRangePhantom19Elements, MaterialUtils::hounsfieldRangePhantom19Weights[mid]);
-        std::string matString = std::to_string(mid+1) + " \n";
+        std::string matString = "m" + std::to_string(mid+1) + " \n";
 
         for(int zindx = 0; zindx < MaterialUtils::hounsfieldRangePhantom19Elements.size(); zindx++)
         {
@@ -195,7 +213,7 @@ std::string McnpWriter::padFourDigitsZero(int v)
     return padded;
 }
 
-std::string McnpWriter::padFiveDigitsSpace(int v)
+std::string McnpWriter::padFourDigitsSpace(int v)
 {
     if(v == 1E6)
     {
@@ -210,7 +228,7 @@ std::string McnpWriter::padFiveDigitsSpace(int v)
 
     std::string padded = "";
 
-    int maxbounds = 100000;
+    int maxbounds = 10000;
 
     while(maxbounds > 0)
     {
