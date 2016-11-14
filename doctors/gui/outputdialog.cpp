@@ -55,7 +55,7 @@ OutputDialog::OutputDialog(QWidget *parent) :
     connect(ui->debugNextPushButton, SIGNAL(clicked()), mainWinParent, SLOT(userDebugNext()));
 
     for(int i = 0; i < 19; i++)
-        ui->groupComboBox->addItem(QString::number(i+1));
+        ui->energyComboBox->addItem(QString::number(i+1));
 }
 
 OutputDialog::~OutputDialog()
@@ -109,7 +109,7 @@ void OutputDialog::reRender(std::vector<float> *data)
 void OutputDialog::setSliceLevel(int level)
 {
     // TODO - this should be dynamic!
-    const int energyGroup = ui->groupComboBox->currentIndex();  // = 5;
+    const int energyGroup = ui->energyComboBox->currentIndex();  // = 5;
 
     //qDebug() << "Set the slice to " << level;
 

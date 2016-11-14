@@ -19,6 +19,8 @@
 #include "legendre.h"
 #include "solver.h"
 
+#include "mcnpwriter.h"
+
 #include "materialutils.h"  // TODO - Delete, not needed, just for testing
 
 #include "config.h"
@@ -248,6 +250,9 @@ void MainWindow::updateLaunchButton()
     {
         ui->launchSolverPushButton->setEnabled(true);
         //ui->launchSolverPushButton->setToolTip("Ready to launch solver!");
+
+        McnpWriter mcnpwriter;
+        mcnpwriter.writeMcnp("./mcnp_out.inp", m_mesh);
     }
     else
     {
