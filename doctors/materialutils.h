@@ -19,9 +19,11 @@ public:
     static const std::vector<std::vector<float> > naturalAbundances;
 
     // Human phantom 19 groups
-    const static std::vector<int> hounsfieldRangePhantom19;
-    const static std::vector<int> hounsfieldRangePhantom19Elements;
-    const static std::vector<std::vector<float> > hounsfieldRangePhantom19Weights;
+    static const std::vector<int> hounsfieldRangePhantom19;
+    static const std::vector<int> hounsfieldRangePhantom19Elements;
+    static const std::vector<std::vector<float> > hounsfieldRangePhantom19Weights;
+
+    //static void hounsfieldRangePhantom19ZaidFract(std::vector<std::vector<int> > &zaids, std::vector<std::vector<float> > &fracts);
 
     static bool validate();
 

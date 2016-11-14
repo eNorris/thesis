@@ -667,3 +667,41 @@ bool MaterialUtils::validate()
     return true;
 
 }
+
+/*
+void MaterialUtils::hounsfieldRangePhantom19ZaidFract(std::vector<std::vector<int> > &zaids, std::vector<std::vector<float> > &fracts, )
+{
+    if(zaids.size() != 0 || fracts.size() != 0)
+    {
+        std::cerr << "MaterialUtils::hounsfieldRangePhantom19ZaidFract(): 675: the vectors are not initially empty!" << std::endl;
+    }
+
+    for(int mid = 0; mid < hounsfieldRangePhantom19.size(); mid++) // Iterate through all materials
+    {
+        std::vector<int> zaid;
+        std::vector<float> fract;
+
+        std::vector<float> zFract = weightFracToAtomFrac(hounsfieldRangePhantom19Elements, hounsfieldRangePhantom19Weights[mid]);
+
+        for(int zindx = 0; zindx < hounsfieldRangePhantom19Elements.size(); zindx++)
+        {
+
+        }
+    }
+}
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
