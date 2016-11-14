@@ -60,7 +60,8 @@ SOURCES += main.cpp\
     xs_reader/nuclidedata.cpp \
     materialutils.cpp \
     solver.cpp \
-    histogram.cpp
+    histogram.cpp \
+    mcnpwriter.cpp
 
 HEADERS  += mainwindow.h \
     config.h \
@@ -84,7 +85,8 @@ HEADERS  += mainwindow.h \
     xs_reader/nuclidedata.h \
     materialutils.h \
     solver.h \
-    histogram.h
+    histogram.h \
+    mcnpwriter.h
 
 FORMS    += mainwindow.ui \
     gui/outputdialog.ui \
