@@ -14,11 +14,12 @@ public:
     const static int MAX_BOUNDS = 100000;
 
     std::string generateSurfaceString(Mesh *m);
-    std::string generateCellString(Mesh *m);
-    std::string generateDataCards();
+    std::string generateCellString(Mesh *m, bool fineDensity);
+    std::string generateDataCards(Mesh *m);
     std::string generatePhantom19MaterialString();
+    std::string generateMeshTally(Mesh *m);
 
-    void writeMcnp(std::string filename, Mesh *m);
+    void writeMcnp(std::string filename, Mesh *m, bool fineDensity);
 
 protected:
     bool m_failFlag;

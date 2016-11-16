@@ -63,9 +63,33 @@ std::string McnpWriter::generateSurfaceString(Mesh *m)
     return surfString;
 }
 
-std::string McnpWriter::generateCellString(Mesh *m)
+std::string McnpWriter::generateCellString(Mesh *m, bool fineDensity)
 {
     std::string allCellString = "c ============================== CELL DECK ==============================\n";
+
+    std::vector<float> coarseDensity;
+    if(!fineDensity)
+    {
+        // Calculate the average density for each material
+        std::vector<int> matVoxels;
+        coarseDensity.resize(MaterialUtils::hounsfieldRangePhantom19.size(), 0.0f);
+        matVoxels.resize(MaterialUtils::hounsfieldRangePhantom19.size(), 0);
+
+        for(int i = 0; i < m->atomDensity.size(); i++)
+        {
+            if(m->zoneId[i] > matVoxels.size())
+            {
+                qDebug() << "matVoxels wasn't big enough!";
+            }
+            matVoxels[m->zoneId[i]]++;
+            coarseDensity[m->zoneId[i]] += m->atomDensity[i];
+        }
+
+        for(int i = 0; i < coarseDensity.size(); i++)
+        {
+            coarseDensity[i] /= matVoxels[i];
+        }
+    }
 
     for(int xi = 0; xi < m->xElemCt; xi++)
     {
@@ -97,8 +121,8 @@ std::string McnpWriter::generateCellString(Mesh *m)
                     continue;
                 }
 
-                if(mindx == 208311)
-                    qDebug() << "halt";
+                //if(mindx == 208311)
+                //    qDebug() << "halt";
 
                 std::string matstr = "";
 
@@ -109,16 +133,30 @@ std::string McnpWriter::generateCellString(Mesh *m)
                 }
                 else
                 {
-                    float atmden = m->atomDensity[mindx];
+                    float atmden;
+                    if(fineDensity)
+                        atmden = m->atomDensity[mindx];
+                    else
+                        atmden = coarseDensity[m->zoneId[mindx]];
                     matstr = std::to_string(m->zoneId[mindx]+1) + " " + std::to_string(m->atomDensity[mindx]);
                 }
+
+                int importance = 1;
+                float dx = m->xNodes[xi] + m->xNodes[xi+1];
+                float dy = m->yNodes[yi] + m->yNodes[yi+1];
+                float dz = m->zNodes[zi] + m->zNodes[zi+1];
+                float dist = sqrt(dx*dx + dy*dy + dz*dz);
+                float r2 = dist*dist;
+                if(r2 < 1.0)
+                    r2 = 1.0;
+                importance = r2;
 
                 // Increment zoneId by 1 because 0 is not legal for MCNP
                 std::string cellString = padFourDigitsSpace(mindx+1) + " " + matstr + " " +
                         xsurf(xi) + " -" + xsurf(xi+1) + " " +
                         ysurf(yi) + " -" + ysurf(yi+1) + " " +
                         zsurf(zi) + " -" + zsurf(zi+1) + " " +
-                        " imp:p=1  $ " + std::to_string(xi) + ", " + std::to_string(yi) + ", " + std::to_string(zi) + " \n";
+                        " imp:p=" + std::to_string(importance) + "  $ " + std::to_string(xi) + ", " + std::to_string(yi) + ", " + std::to_string(zi) + " \n";
 
                 if(cellString.length() > 81)  // The newline char doesn't count in the 80 limit
                 {
@@ -131,16 +169,22 @@ std::string McnpWriter::generateCellString(Mesh *m)
         }
     }
 
+    allCellString += std::string("99999999 0 ") +
+            " -" + xsurf(0) + ":" + xsurf(m->xNodeCt-1) +
+            ":-" + ysurf(0) + ":" + ysurf(m->yNodeCt-1) +
+            ":-" + zsurf(0) + ":" + zsurf(m->zNodeCt-1) +
+            " imp:p=0  $ Outside\n";
+
     return allCellString;
 }
 
-std::string McnpWriter::generateDataCards()
+std::string McnpWriter::generateDataCards(Mesh *m)
 {
     std::string dataString = "c ==================== DATA DECK ====================\n";
 
     dataString += "nps 1E7\n";
     dataString += "mode p\n";
-    dataString += "sdef par=2 pos=0 0 0 erg=0.30\n";
+    dataString += "sdef par=2 pos=" + std::to_string(m->xNodes[m->xNodeCt-1]/2) + " " + std::to_string(m->yNodes[m->yNodeCt-1]/2) + " " + std::to_string(m->zNodes[m->zNodeCt-1]/2) + " erg=0.30\n";
 
 
     return dataString;
@@ -167,7 +211,17 @@ std::string McnpWriter::generatePhantom19MaterialString()
     return allMatString;
 }
 
-void McnpWriter::writeMcnp(std::string filename, Mesh *m)
+std::string McnpWriter::generateMeshTally(Mesh *m)
+{
+    std::string tallyString = std::string("FMESH4:n GEOM=REC ORIGIN=0 0 0\n     ") +
+            "IMESH " + std::to_string(m->xNodes[m->xNodeCt-1]) + " IINTS " + std::to_string(m->xElemCt) + "\n     " +
+            "JMESH " + std::to_string(m->yNodes[m->yNodeCt-1]) + " JINTS " + std::to_string(m->yElemCt) + "\n     " +
+            "KMESH " + std::to_string(m->zNodes[m->zNodeCt-1]) + " KINTS " + std::to_string(m->zElemCt) + "\n";
+
+    return tallyString;
+}
+
+void McnpWriter::writeMcnp(std::string filename, Mesh *m, bool fineDensity)
 {
     std::ofstream fout;
     fout.open(filename.c_str());
@@ -176,12 +230,13 @@ void McnpWriter::writeMcnp(std::string filename, Mesh *m)
     fout << "c MCNP input deck automatically generated by DOCTORS framework\n";
     fout << "c Authors: Edward Norris and Xin Liu, Missouri Univ. of Sci. and Tech.\n";
     fout << "c \n";
-    fout << generateCellString(m);
+    fout << generateCellString(m, fineDensity);
     fout << "\n";
     fout << generateSurfaceString(m);
     fout << "\n";
-    fout << generateDataCards();
+    fout << generateDataCards(m);
     fout << generatePhantom19MaterialString();
+    fout << generateMeshTally(m);
 
     fout.close();
 }

@@ -332,10 +332,12 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
     std::vector<float> errMaxList;
     std::vector<std::vector<float> > errList;
     std::vector<int> converganceIters;
+    std::vector<float> converganceTracker;
 
     errMaxList.resize(xs->groupCount());
     errList.resize(xs->groupCount());
     converganceIters.resize(xs->groupCount());
+    converganceTracker.resize(xs->groupCount());
 
     const XSection &xsref = *xs;
 
@@ -378,7 +380,7 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
 
     qDebug() << "Solver::gssolver(): 379: Solving " << mesh->voxelCount() * quad->angleCount() * xs->groupCount() << " elements in phase space";
 
-    for(unsigned int ie = xs->groupCount()-3; ie < xs->groupCount(); ie++)  // for every energy group
+    for(unsigned int ie = xs->groupCount()-1; ie < xs->groupCount(); ie++)  // for every energy group
     {
 
         // TODO - remove check
@@ -570,7 +572,7 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                                     mesh->Ayz[ie*quad->angleCount()*mesh->yElemCt*mesh->zElemCt + iang*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz] * influxX +  // [cm^2 * #/cm^2]  The 2x is already factored in
                                     mesh->Axz[ie*quad->angleCount()*mesh->xElemCt*mesh->zElemCt + iang*mesh->xElemCt*mesh->zElemCt + ix*mesh->zElemCt + iz] * influxY +
                                     mesh->Axy[ie*quad->angleCount()*mesh->xElemCt*mesh->yElemCt + iang*mesh->xElemCt*mesh->yElemCt + ix*mesh->yElemCt + iy] * influxZ;
-                            float denom = mesh->vol[ix*xjmp+iy*yjmp+iz]*xsref.totXs1d(zid, ie)*mesh->atomDensity[ix*xjmp + iy*yjmp + iz]*100 +                               // [cm^3] * [b] * [1/b-cm]
+                            float denom = mesh->vol[ix*xjmp+iy*yjmp+iz]*xsref.totXs1d(zid, ie)*mesh->atomDensity[ix*xjmp + iy*yjmp + iz] +                               // [cm^3] * [b] * [1/b-cm]
                                     mesh->Ayz[ie*quad->angleCount()*mesh->yElemCt*mesh->zElemCt + iang*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz] +            // [cm^2]
                                     mesh->Axz[ie*quad->angleCount()*mesh->xElemCt*mesh->zElemCt + iang*mesh->xElemCt*mesh->zElemCt + ix*mesh->zElemCt + iz] +
                                     mesh->Axy[ie*quad->angleCount()*mesh->xElemCt*mesh->yElemCt + iang*mesh->xElemCt*mesh->yElemCt + ix*mesh->yElemCt + iy];
@@ -673,7 +675,7 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                 }
                 emit signalNewIteration(scalarFlux);
 
-
+                converganceTracker.push_back((*scalarFlux)[ie*mesh->voxelCount() + 128*xjmp + 128*yjmp + 32]);
 
                 //QThread::sleep(5);
                 //qDebug() << "It is done";
@@ -703,10 +705,10 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
 
             //std::ofstream fout;
             //fout.open("./lineout_" + iterNum + "_" + i);
-            for(int i = 0; i < 256; i++)
-            {
-                qDebug() << i << "\t" << (*scalarFlux)[ie*mesh->voxelCount() + i*xjmp + 128*yjmp + 32];
-            }
+            //for(int i = 0; i < 256; i++)
+            //{
+            //    qDebug() << i << "\t" << (*scalarFlux)[ie*mesh->voxelCount() + i*xjmp + 128*yjmp + 32];
+            //}
 
 
             for(unsigned int i = 0; i < tempFlux.size(); i++)
@@ -725,6 +727,13 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
     qDebug() << "Time to complete: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
     //OutWriter::writeScalarFluxMesh("./outlog.matmsh", *m_mesh, scalarFlux);
+
+    qDebug() << "Convergance of 128, 128, 32:";
+    for(int i = 0; i < converganceTracker.size(); i++)\
+    {
+        qDebug() << i << "\t" << converganceTracker[i];
+    }
+    qDebug() << "";
 
     for(unsigned int i = 0; i < errList.size(); i++)
     {
