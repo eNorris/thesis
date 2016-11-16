@@ -61,14 +61,14 @@ Consider that we have the following variables, $\Psi$ which is a function of $x$
 
 Given:
 \begin{itemize}
-\item A list of all energies, $\mathcal{E}$
-\item A list of all directions in the quadrature, $Q$
+\item A list of all energies, $\{E\}$
+\item A list of all directions in the quadrature, $\{\Omega\}$
 \item A mapping from $r$ to zone number, $\mathcal{Z}(r)$
-\item Lists of direction cosines, $\mu$, $\xi$, and $\eta$
+\item Lists of direction cosines, $\mu(\Omega)$, $\xi(\Omega)$, and $\eta(\Omega)$
 \item A map of $r$ to voxel volume, $V(r)$
-\item A list of all $x$, $y$, and $z$ voxel centers, $X$, $Y$, and $Z$
-\item A list of weights for the quadrature, $\omega$
-\item A list of scatter cross sections in zone $\mathcal{Z}(r)$ from energy $E'$ to $E$, $\Sigma_s(\mathcal{Z}(r), E', E)$
+%\item A list of all $x$, $y$, and $z$ voxel centers, $X$, $Y$, and $Z$
+\item A mapping of weights for the quadrature, $\omega(\Omega)$
+\item A mapping of scatter cross sections in zone $\mathcal{Z}(r)$ from energy $E'$ to $E$, $\Sigma_s(\mathcal{Z}(r), E' \rightarrow E)$
 \item A list of total cross sections in zone $\mathcal{Z}(r)$ at energy $E$, $\Sigma_T(\mathcal{Z}(r), E)$
 \item The surface area of all voxels, $A_{xy}(r)$, $A_{yz}(r)$, $A_{xz}(r)$
 \end{itemize}
@@ -77,19 +77,60 @@ Given:
 \begin{lstlisting}[escapeinside={(*}{*)}]
 function sweep()
 
+  # Knowns
+  (*$V(r)$*)  # [cm^3] volume of cell ijk
+  (*$A_{xy}(\Omega,i,j), A_{yz}(\Omega,j,k), A_{xz}(\Omega,i,k)$*)  # [cm^2] Area of each face of cell ijk
+  # Unknowns
   (*$\phi(r, E) = \vec{0}$*)    # Scalar flux
   (*$\Psi(r, \Omega, E) = \vec{0}$*)  # Angular flux
   
-  for (*$E \in \mathcal{E}$*) in descending order
+  for every (*$E \in \{E\}$*) in descending order
     while not converged
-      for (*$\Omega \in Q$*) in any order
-        if (*$\mu(\Omega) > 0$*) and (*$\xi(\Omega) > 0$*) and (*$\eta(\Omega) > 0$*)
-          octant1()
-        else if (*$\mu(\Omega) > 0$*) and (*$\xi(\Omega) > 0$*) and (*$\eta(\Omega) < 0$*)
-          octant2()
-        ...
-        else
-          octant8()
+      (*$\phi^{i-1}(r) = \phi^{i+1}(r)$*)
+      (*$S(r) = \vec{0}$*)
+      for every (*$E' >= E$*)
+        for every cell (*$ijk$*)
+          (*$S(ijk) = S(ijk) + 1/4\pi \phi(E', ijk)*\Sigma_s(\mathcal{Z}(ijk), E')*V(ijk)$*)
+      for every cell (*$ijk$*)
+        (*$S(ijk) = S(ijk) + S_{x}(ijk)$*)
+      (*$\phi^{i+1} = \vec{0}$*)
+      for every (*$\Omega \in Q$*) in any order
+        (*$i_0 = f(\mu(\Omega))$*)
+        (*$\Delta i = f(\mu(\Omega))$*)
+        (*$j_0 = f(\xi(\Omega))$*)
+        (*$\Delta j = f(\xi(\Omega))$*)
+        (*$k_0 = f(\eta(\Omega))$*)
+        (*$\Delta k = f(\eta(\Omega))$*)
+        for every cell (*$ijk$*) starting at (*$(i_0, j_0, k_0)$*) in direction (*$<\Delta i, \Delta j, \Delta k>$*)
+          if (*$i \in \partial$*)
+            (*$\phi_{x+} = 0$*)
+          else
+            (*$\phi_{x+} = \phi_{x-}(i\pm 1, j, k)$*)    
+          if (*$j \in \partial$*)
+            (*$\phi_{y+} = 0$*)
+          else
+            (*$\phi_{y+} = \phi_{y-}(i, j \pm 1, k)$*) 
+          if (*$k \in \partial$*)
+            (*$\phi_{z+} = 0$*)
+          else
+            (*$\phi_{z+} = \phi_{z-}(i, j, k \pm 1)$*)     
+          
+          (*$n = S(ijk) + A_{yz}(\Omega, j,k)\phi_{x+} + A_{xz}(\Omega, i, k) \phi_{y+} + A_{xy}(\Omega, i,j)\phi_{z+}$*)
+          (*$d = V(ijk)*\Sigma_t(\mathcal{Z}(ijk), E) + A_{yz}(\Omega, j, k) + A_{xz}(\Omega, i, k) + A_{xy}(\Omega, i, j)$*)
+          (*$\Psi_0 = n/d$*)
+          (*$\Psi(E, \Omega, ijk) = \Psi_0$*)
+          (*$\phi_{x-}(ijk) = 2\Psi_0 - \phi_{x+}$*)
+          (*$\phi_{y-}(ijk) = 2\Psi_0 - \phi_{y+}$*)
+          (*$\phi_{z-}(ijk) = 2\Psi_0 - \phi_{z+}$*)
+          (*$\phi^{i+1}(ijk) = \phi^{i+1} + \omega(\Omega)\Psi(e, \Omega, ijk)$*)
+        for every cell (*$ijk$*)
+          (*$\phi(E, ijk) = \phi^{i+1}(ijk)$*)
+        EMIT (*$\phi(E, ijk)$*)
+      (*$\epsilon = max((\phi^{i+1} - phi^{i-1})/\phi^{i+1})$*)
+      
+      for every cell (*$ijk$*)
+        (*$\phi(E, ijk) = \phi^{i+1}(ijk)$*)
+  output time to completion
 \end{lstlisting}
 
 \pagebreak
