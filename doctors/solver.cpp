@@ -260,7 +260,7 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
 
                         //tmpdist += finalDist;
 
-                        //if(abs(tmpdist - srcToCellDist) > 1E-6)
+                        //if(fabs(tmpdist - srcToCellDist) > 1E-6)
                         //{
                         //    qDebug() << "Caught a hookey";
                         //}
@@ -634,6 +634,7 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
 
 
                             /*
+                            // Flux fixup
                             if(outboundFluxX[ix*xjmp + iy*yjmp + iz] < 0)
                                 outboundFluxX[ix*xjmp + iy*yjmp + iz] = 0;
 
