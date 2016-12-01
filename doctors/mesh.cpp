@@ -239,33 +239,7 @@ void Mesh::calcAreas(const Quadrature *quad, const int eGroups)
             for(unsigned int xIndx = 0; xIndx < xElemCt; xIndx++)
                 for(unsigned int yIndx = 0; yIndx < yElemCt; yIndx++)
                 {
-                    //DC[eIndx * xElemCt*yElemCt + xIndx * yElemCt + yIndx] = vZi * dx[xIndx] * dy[yIndx];
-                    /*
-                    float qqv = 2 * vEta * dx[xIndx] * dy[yIndx];
-                    if(qqv < 1E-6)
-                    {
-                        qDebug() << "Captured a rat!";
-                    }
-
-
-                    if(eIndx == 0 && qIndx == 1 && xIndx == 0 && yIndx == 0)
-                    {
-                        qDebug() << "Caught the naive condition";
-                    }
-
-                    int m1 = *quad->angleCount()*xElemCt*yElemCt;
-                    int m2 = 3;
-
-                    if(eIndx*quad->angleCount()*xElemCt*yElemCt + qIndx*xElemCt*yElemCt + xIndx*yElemCt + yIndx == 65536)
-                    {
-                        qDebug() << "Trapped";
-                    }
-                    */
-
-                    //qDebug() << qqv;
                     Axy[eIndx*quad->angleCount()*xElemCt*yElemCt + qIndx*xElemCt*yElemCt + xIndx*yElemCt + yIndx] = 2 * vEta * dx[xIndx] * dy[yIndx];
-
-                    //tmptick++;
                 }
         }
     }
