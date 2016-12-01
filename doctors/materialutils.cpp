@@ -593,7 +593,7 @@ float MaterialUtils::atomsPerGram(std::vector<int> elements, std::vector<float> 
     float s = 0.0f;
     for(unsigned int i = 0; i < atomFractions.size(); i++)
         s += atomFractions[i];
-    if(abs(s - 1.0) > 1E-6)
+    if(fabs(s - 1.0) > 1E-6)
     {
         qDebug() << "MaterialUtils::atomsPerGram(): 597: atom fractions didn't add to 1.0, they added to " << s;
     }
