@@ -88,8 +88,8 @@ Mesh *CtDataManager::parse16(int xbins, int ybins, int zbins, std::string filena
 
     if(fin.good())
     {
-        int numx = fin.tellg()/2;
-        qDebug() << "numx = " << numx;
+        //int numx = fin.tellg()/2;
+        //qDebug() << "numx = " << numx;
 
         for(int i = 0; i < tbins; i++)
         {
@@ -102,8 +102,8 @@ Mesh *CtDataManager::parse16(int xbins, int ybins, int zbins, std::string filena
     }
 
     int gindx = 0;
-    int YX = 256 * 256;
-    int X = 256;
+    int YX = xbins * ybins;
+    int X = xbins;
     for(int i = 0; i < xbins; i++)
         for(int j = 0; j < ybins; j++)
             for(int k = 0; k < zbins; k++)
