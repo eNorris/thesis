@@ -223,7 +223,7 @@ void MainWindow::on_geometryOpenPushButton_clicked() //slotOpenCtData()
     ui->geometryFileLineEdit->setText(filename);
 
     CtDataManager ctman;
-    m_mesh = ctman.parse16(256, 256, 64, filename.toStdString());
+    m_mesh = ctman.parse16(64, 64, 16, filename.toStdString());
 
     if(m_mesh == NULL)
     {
