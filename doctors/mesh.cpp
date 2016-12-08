@@ -261,6 +261,38 @@ void Mesh::initCtVariables()
     atomDensity.resize(vol.size());
 }
 
+int Mesh::getFlatIndex(int xindx, int yindx, int zindx) const
+{
+    if(xindx > xElemCt)
+    {
+        qDebug() << __FILE__ << ": " << __LINE__ << ": x-index was too large (" << xindx << "/" << xElemCt << ")";
+    }
+
+    if(yindx > yElemCt)
+    {
+        qDebug() << __FILE__ << ": " << __LINE__ << ": y-index was too large (" << yindx << "/" << yElemCt << ")";
+    }
+
+    if(zindx > zElemCt)
+    {
+        qDebug() << __FILE__ << ": " << __LINE__ << ": z-index was too large (" << zindx << "/" << zElemCt << ")";
+    }
+
+    return xindx * yElemCt * zElemCt + yindx * zElemCt + zindx;
+}
+int Mesh::getZoneIdAt(int xindx, int yindx, int zindx) const
+{
+    return zoneId[getFlatIndex(xindx, yindx, zindx)];
+}
+float Mesh::getPhysicalDensityAt(int xindx, int yindx, int zindx) const
+{
+    return density[getFlatIndex(xindx, yindx, zindx)];
+}
+float Mesh::getAtomDensityAt(int xindx, int yindx, int zindx) const
+{
+    return atomDensity[getFlatIndex(xindx, yindx, zindx)];
+}
+
 /*
 std::vector<unsigned int> &Mesh::getOctantOrder(const float mu, const float xi, const float eta)
 {

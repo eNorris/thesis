@@ -74,12 +74,17 @@ public:
 
 public slots:
     void remesh(int xelems, int yelems, int zelems, const Config *config, const Quadrature *quad);
-
     void uniform(const int xelems, const int yelems, const int zelems, const float xLen, const float yLen, const float zLen);
 
 public:
     void calcAreas(const Quadrature *quad, const int eGroups);
     void initCtVariables();
+
+    int getFlatIndex(int xindx, int yindx, int zindx) const;
+    int getZoneIdAt(int xindx, int yindx, int zindx) const;
+    float getPhysicalDensityAt(int xindx, int yindx, int zindx) const;
+    float getAtomDensityAt(int xindx, int yindx, int zindx) const;
+
 
 private:
     bool insideBox(int x, int y, int z, int xmin, int xmax, int ymin, int ymax, int zmin, int zmax);
