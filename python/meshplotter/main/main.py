@@ -32,8 +32,14 @@ pyplot.close('all')
 matplotlib.rcParams['contour.negative_linestyle'] = 'solid'
 
 pyplot.figure()
-pyplot.contourf(x[:, :, 8], y[:, :, 8], numpy.log10(v[:, :, 8]), 64, cmap='viridis')
+pyplot.contourf(x[:, :, 8], y[:, :, 8], v[:, :, 8], 64, cmap='viridis')
 pyplot.colorbar()
+pyplot.title("flux")
+
+pyplot.figure()
+cs = pyplot.contourf(x[:, :, 8], y[:, :, 8], numpy.log10(v[:, :, 8]), 256, cmap='viridis')
+pyplot.colorbar()
+pyplot.contour(cs, colors='k', hold='on', levels=numpy.log10([.01, .001, .0001]))
 pyplot.title("log10(flux)")
 
 pyplot.figure()
