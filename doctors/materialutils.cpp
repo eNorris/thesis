@@ -560,20 +560,20 @@ MaterialUtils::~MaterialUtils()
 
 }
 
-std::vector<float> MaterialUtils::weightFracToAtomFrac(std::vector<int> elements, std::vector<float> weights)
+std::vector<float> MaterialUtils::weightFracToAtomFrac(std::vector<int> elementZ, std::vector<float> weights)
 {
     std::vector<float> atomFrac;
 
-    if(elements.size() != weights.size())
+    if(elementZ.size() != weights.size())
     {
         qDebug() << "MaterialUtils::weightFracToAtomFrac(): 554: vector size mismatch!";
         return atomFrac;
     }
 
     float totalWeight = 0.0f;
-    for(unsigned int i = 0; i < elements.size(); i++)
+    for(unsigned int i = 0; i < elementZ.size(); i++)
     {
-        atomFrac.push_back(weights[i]/MaterialUtils::atomicMass[elements[i]]);
+        atomFrac.push_back(weights[i]/MaterialUtils::atomicMass[elementZ[i]-1]);  // Subtact 1 for z to index
         totalWeight += atomFrac[i];
     }
 
@@ -583,9 +583,9 @@ std::vector<float> MaterialUtils::weightFracToAtomFrac(std::vector<int> elements
     return atomFrac;
 }
 
-float MaterialUtils::atomsPerGram(std::vector<int> elements, std::vector<float> atomFractions)
+float MaterialUtils::atomsPerGram(std::vector<int> elementZ, std::vector<float> atomFractions)
 {
-    if(elements.size() != atomFractions.size())
+    if(elementZ.size() != atomFractions.size())
     {
         qDebug() << "MaterialUtils::atomsPerGram(): 589: vector sizes don't match!";
     }
@@ -595,19 +595,20 @@ float MaterialUtils::atomsPerGram(std::vector<int> elements, std::vector<float> 
         s += atomFractions[i];
     if(fabs(s - 1.0) > 1E-6)
     {
-        qDebug() << "MaterialUtils::atomsPerGram(): 597: atom fractions didn't add to 1.0, they added to " << s;
+        qDebug() << "MaterialUtils::atomsPerGram(): 598: atom fractions didn't add to 1.0, they added to " << s;
     }
 
     float gpm = 0.0f;
 
     for(unsigned int i = 0; i < atomFractions.size(); i++)
     {
-        gpm += MaterialUtils::atomicMass[elements[i]] * atomFractions[i];  // grams per mol
+        //float tstgpm = MaterialUtils::atomicMass[elementZ[i]-1] * atomFractions[i];
+        gpm += MaterialUtils::atomicMass[elementZ[i]-1] * atomFractions[i];  // grams per mol
     }
 
-    float gpa = gpm / MaterialUtils::AVOGADRO;  // grams per atom
-
-    return 1.0f/gpa;  // atoms per gram
+    return MaterialUtils::AVOGADRO / gpm;
+    //float gpa = gpm / MaterialUtils::AVOGADRO;  // grams per atom
+    //return 1.0f/gpa;  // atoms per gram
 }
 
 bool MaterialUtils::validate()
