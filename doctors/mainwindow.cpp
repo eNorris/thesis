@@ -19,6 +19,8 @@
 #include "legendre.h"
 #include "solver.h"
 
+#include "outwriter.h"
+
 #include "mcnpwriter.h"
 
 #include "materialutils.h"  // TODO - Delete, not needed, just for testing
@@ -39,7 +41,9 @@ MainWindow::MainWindow(QWidget *parent):
     m_geomLoaded(false),
     m_xsLoaded(false),
     m_quadLoaded(false),
-    m_paramsLoaded(false)
+    m_paramsLoaded(false),
+    m_solution(NULL),
+    m_raytrace(NULL)
 {
     ui->setupUi(this);
 
@@ -80,6 +84,9 @@ MainWindow::MainWindow(QWidget *parent):
     //connect(ui->quadData2ComboBox, SIGNAL(activated(int)), this, SLOT(slotQuadSelected(int)));
 
     connect(m_parser, SIGNAL(signalNotifyNumberNuclides(int)), ui->mainProgressBar, SLOT(setMaximum(int)));
+
+    connect(m_solver, SIGNAL(solverFinished(std::vector<float>*)), this, SLOT(onSolverFinished(std::vector<float>*)));
+    connect(m_solver, SIGNAL(raytracerFinished(std::vector<float>*)), this, SLOT(onRaytracerFinished(std::vector<float>*)));
 
     // Set up xs reader threads
     m_parser->moveToThread(&m_xsWorkerThread);
@@ -183,10 +190,10 @@ void MainWindow::on_launchSolverPushButton_clicked()
 
     // First collision source
     //std::vector<float> raytraced = raytrace(m_quad, m_mesh, m_xs);
-    //emit signalLaunchRaytracer(m_quad, m_mesh, m_xs);
+    emit signalLaunchRaytracer(m_quad, m_mesh, m_xs);
     // Run the raytracer
     //std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, NULL);
-    emit signalLaunchSolver(m_quad, m_mesh, m_xs, NULL);
+    //emit signalLaunchSolver(m_quad, m_mesh, m_xs, NULL);
     //outputDialog->updateSolution(solution);
 }
 
@@ -224,6 +231,8 @@ void MainWindow::on_geometryOpenPushButton_clicked() //slotOpenCtData()
 
     CtDataManager ctman;
     m_mesh = ctman.parse16(64, 64, 16, filename.toStdString());
+
+    OutWriter::writeArray("/media/Storage/thesis/mcnp.gitignore/ctdensity.dat", m_mesh->density);
 
     if(m_mesh == NULL)
     {
@@ -462,7 +471,42 @@ bool MainWindow::buildMaterials(AmpxParser *parser)
     return allPassed;
 }
 
+void MainWindow::onRaytracerFinished(std::vector<float>* uncollided)
+{
+    m_raytrace = uncollided;
 
+    OutWriter::writeArray("uncol_flux.dat", *uncollided);
+
+    emit signalLaunchSolver(m_quad, m_mesh, m_xs, uncollided);
+}
+
+void MainWindow::onSolverFinished(std::vector<float> *solution)
+{
+    m_solution = solution;
+
+    std::vector<float> x;
+    std::vector<float> matids;
+    std::vector<float> density;
+    std::vector<float> flux;
+
+    std::vector<std::vector<float> > push;
+
+    for(int i = 0; i < m_mesh->xElemCt; i++)
+    {
+        float centerpt = (m_mesh->xNodes[i] + m_mesh->xNodes[i+1])/2.0;
+        x.push_back(centerpt);
+        matids.push_back(m_mesh->getZoneIdAt(i, 5, 9));
+        density.push_back(m_mesh->getPhysicalDensityAt(i, 5, 9));
+        flux.push_back((*m_solution)[18*m_mesh->voxelCount() + m_mesh->getFlatIndex(i, 5, 9)]);
+    }
+
+    push.push_back(x);
+    push.push_back(matids);
+    push.push_back(density);
+    push.push_back(flux);
+
+    OutWriter::writeFloatArrays("/media/Storage/thesis/doctors/solution.dat", push);
+}
 
 /*
 void MainWindow::launchXsReader()

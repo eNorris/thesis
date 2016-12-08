@@ -19,6 +19,8 @@ public:
 
 signals:
     void signalNewIteration(std::vector<float>*);
+    void raytracerFinished(std::vector<float>*);
+    void solverFinished(std::vector<float>*);
 
 public slots:
 

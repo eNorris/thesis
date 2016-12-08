@@ -62,6 +62,9 @@ private:
     Solver *m_solver;
     QThread m_solverWorkerThread;
 
+    std::vector<float> *m_solution;
+    std::vector<float> *m_raytrace;
+
     // Implemented in solvers.cpp instead of mainwindow.cpp
     //std::vector<float> gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<float> *uflux);
 
@@ -97,6 +100,9 @@ protected slots:
 
     bool buildMaterials(AmpxParser *parser);
     //void addMaterial(std::vector<int> z, std::vector<float> w, XSection *xs, AmpxParser *ampxParser);
+
+    void onRaytracerFinished(std::vector<float>* uncollided);
+    void onSolverFinished(std::vector<float>* solution);
 
 signals:
     //void signalNewIteration(std::vector<float>*);

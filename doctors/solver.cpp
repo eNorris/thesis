@@ -61,9 +61,9 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
 
     //for(unsigned int is = 0; is < config->sourceIntensity.size(); is++)
     //{
-    float sx = 10.0f;  //config->sourceX[is];
-    float sy = 10.0f;  //config->sourceY[is];
-    float sz = 10.0f;  //config->sourceZ[is];
+    float sx = 25.3906f;  //config->sourceX[is];
+    float sy = 50-46.4844f;  //config->sourceY[is];
+    float sz = 6.8906f;  //config->sourceZ[is];
     float srcStrength = 1.0f;
     //float srcStrength = config->sourceIntensity[is];
 
@@ -302,6 +302,7 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
     qDebug() << "Time to complete raytracer: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
     // TODO - should return a pointer!
+    emit raytracerFinished(uflux);
     emit signalNewIteration(uflux);
     //return uflux;
 }
@@ -365,14 +366,15 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
         qDebug() << "Building external source";
         // Calculate the external source mesh
         // TODO should be a function of energy
-        for(unsigned int ei = 0; ei < xs->groupCount(); ei++)
-        {
-            int srcIndxX = mesh->xElemCt/2;
-            int srcIndxY = 20;  //mesh->yElemCt/2;
-            int srcIndxZ = mesh->zElemCt/2;
+        //for(unsigned int ei = 0; ei < xs->groupCount(); ei++)
+        //{
+            int srcIndxE = xs->groupCount() - 1;
+            int srcIndxX = 32;
+            int srcIndxY = 4;  //mesh->yElemCt/2;
+            int srcIndxZ = 8;
             //                                                                        [#] = [#]
-            extSource[ei * mesh->voxelCount() + srcIndxX*xjmp + srcIndxY*yjmp + srcIndxZ] = 1.0;  //config->sourceIntensity[is];
-        }
+            extSource[srcIndxE * mesh->voxelCount() + srcIndxX*xjmp + srcIndxY*yjmp + srcIndxZ] = 1.0;  //config->sourceIntensity[is];
+        //}
     }
 
     //extSource[((mesh->xMesh - 1)/2)*xjmp + ((mesh->yMesh-1)/2)*yjmp + ((mesh->zMesh-1)/2)] = 1E6;  // [gammas / sec]
@@ -586,6 +588,16 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                             float axy = mesh->Axy[ie*quad->angleCount()*mesh->xElemCt*mesh->yElemCt + iang*mesh->xElemCt*mesh->yElemCt + ix*mesh->yElemCt + iy];
                             float sigv = mesh->vol[ix*xjmp+iy*yjmp+iz]*xsref.totXs1d(zid, ie)*mesh->atomDensity[ix*xjmp + iy*yjmp + iz];
 
+                            float vol = mesh->vol[ix*xjmp+iy*yjmp+iz];
+                            float xs = xsref.totXs1d(zid, ie);
+                            float atomden = mesh->atomDensity[ix*xjmp + iy*yjmp + iz];
+
+                            std::vector<float> gxs;
+                            for(int i = 0; i < xsref.groupCount(); i++)
+                            {
+                                gxs.push_back(xsref.totXs1d(zid, i));
+                            }
+
                             float tstoutboundFluxX = 2*angFlux - influxX;
                             float tstoutboundFluxY = 2*angFlux - influxY;
                             float tstoutboundFluxZ = 2*angFlux - influxZ;
@@ -597,10 +609,16 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                             float tstden = mesh->density[ix*xjmp + iy*yjmp + iz];
                             int rindx = ix*xjmp + iy*yjmp + iz;
 
-                            if(ix == 129 && iy == 128 && iz == 32)
+                            float eta = quad->eta[iang];
+                            float mu = quad->mu[iang];
+                            float zi = quad->zi[iang];
+
+                            if(ix >= 32 && iy == 4 && iz == 8 && dix>0 && diy>0)
                             {
-                                //qDebug() << "Center";
+                                qDebug() << "Break condition!";
                             }
+
+
 
                             if(iy == 128 && iz == 32)
                             {
@@ -654,7 +672,8 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                             //    qDebug() << "Got a fish!";
 
                             // Sum all the angular fluxes
-                            tempFlux[ix*xjmp + iy*yjmp + iz] += quad->wt[iang]*angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz];
+                            float w = quad->wt[iang];
+                            tempFlux[ix*xjmp + iy*yjmp + iz] += quad->wt[iang]*angFlux;
 
                             ix += dix;
                         } // end of for ix
@@ -744,6 +763,8 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
             std::cout << errList[i][j] << "\t";
         std::cout << "\n" << std::endl;
     }
+
+    emit solverFinished(scalarFlux);
 
     //return *scalarFlux;
 }
