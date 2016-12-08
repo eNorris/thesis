@@ -50,7 +50,6 @@ SOURCES += main.cpp\
     zoomablepannablegraphicsview.cpp \
     quadglwidget.cpp \
     outwriter.cpp \
-    raytracer.cpp \
     ctdatamanager.cpp \
     solverparams.cpp \
     solverparamsdialog.cpp \
