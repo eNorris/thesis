@@ -187,7 +187,10 @@ std::string McnpWriter::generateDataCards(Mesh *m)
 
     // The offset prevents the source from landing on a surface plane which can cause particles to get lost
     float offset = 0.001;
-    dataString += "sdef par=p pos=" + std::to_string(m->xNodes[m->xNodeCt-1]/2 + offset) + " " + std::to_string(m->yNodes[m->yNodeCt-1]/2 + offset) + " " + std::to_string(m->zNodes[m->zNodeCt-1]/2 + offset) + " erg=0.30\n";
+
+    float maxerg = 0.01;
+
+    dataString += "sdef par=p pos=" + std::to_string(m->xNodes[m->xNodeCt-1]/2 + offset) + " " + std::to_string(m->yNodes[m->yNodeCt-1]/2 + offset) + " " + std::to_string(m->zNodes[m->zNodeCt-1]/2 + offset) + " erg=0.030\n";
 
 
     return dataString;
@@ -219,7 +222,8 @@ std::string McnpWriter::generateMeshTally(Mesh *m)
     std::string tallyString = std::string("FMESH4:p GEOM=REC ORIGIN=0 0 0\n     ") +
             "IMESH " + std::to_string(m->xNodes[m->xNodeCt-1]) + " IINTS " + std::to_string(m->xElemCt) + "\n     " +
             "JMESH " + std::to_string(m->yNodes[m->yNodeCt-1]) + " JINTS " + std::to_string(m->yElemCt) + "\n     " +
-            "KMESH " + std::to_string(m->zNodes[m->zNodeCt-1]) + " KINTS " + std::to_string(m->zElemCt) + "\n";
+            "KMESH " + std::to_string(m->zNodes[m->zNodeCt-1]) + " KINTS " + std::to_string(m->zElemCt) + "\n     " +
+            "EMESH .01 .045 .1 .2 EINTS 1 1 1 1\n";
 
     return tallyString;
 }
