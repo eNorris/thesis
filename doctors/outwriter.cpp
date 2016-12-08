@@ -6,6 +6,8 @@
 #include <string>
 #include <iomanip>
 
+
+
 #include <QDebug>
 
 #include "mesh.h"
@@ -96,3 +98,41 @@ void OutWriter::writeZoneId(std::string filename, const Mesh& mesh)
     fout.flush();
     fout.close();
 }
+
+void OutWriter::writeFloatArrays(std::string filename, const std::vector<std::vector<float> >& arry)
+{
+    std::ofstream fout;
+    fout.open(filename.c_str());
+
+    fout << std::fixed;
+    fout << std::setprecision(6);
+
+    for(int indx = 0; indx < arry[0].size(); indx++)
+    {
+        for(int ai = 0; ai < arry.size(); ai++)
+        {
+            fout << arry[ai][indx] << '\t';
+        }
+        fout << '\n';
+    }
+
+    fout.flush();
+    fout.close();
+}
+
+/*
+void OutWriter::writeArray(std::string filename, const std::vector<float>& arry)
+{
+    std::ofstream fout;
+    fout.open(filename.c_str());
+
+    fout << std::fixed;
+    fout << std::setprecision(6);
+
+    for(int i = 0; i < arry.size(); i++)
+        fout << arry[i] << '\n';
+
+    fout.flush();
+    fout.close();
+}
+*/
