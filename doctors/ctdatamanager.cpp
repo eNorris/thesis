@@ -161,74 +161,60 @@ Mesh *CtDataManager::ctNumberToHumanPhantom(Mesh *mesh)
     for(unsigned int i = 0; i < MaterialUtils::hounsfieldRangePhantom19.size(); i++)
         atomPerG.push_back(MaterialUtils::atomsPerGram(MaterialUtils::hounsfieldRangePhantom19Elements, hounsfieldRangePhantom19Fractions[i]));
 
+    int offset = 1000;
     for(unsigned int i = 0; i < mesh->voxelCount(); i++)
     {
         // Raw data minus offset
-        int offset = 1000;
-        int ctv = mesh->ct[i] - offset;
 
-        //if(i == 208361)
-        //{
-        //    qDebug() << "stop here";
-        //}
+        int ctv = mesh->ct[i] - offset;  // Underlying data is 0-2500 instead of -1000-1500
 
         // Determine the density (atom density is after the zoneId calculation)
-        //if(ctv <= 55)
-        if(ctv <= 0)
+        if(ctv <= 55)
         {
-            if(ctv == -1000)
+            if(ctv <= -1000)
             {
-                mesh->density[i] = 0.001;
+                mesh->density[i] = 0.001225;
             }
             else
             {
-                mesh->density[i] = 0.001 * (ctv + offset);
-                //float tt = 0.001 * (ctv + offset);
-                //int x = 5;
+                //mesh->density[i] = 0.001 * (ctv + offset);
+                mesh->density[i] = 0.0010186*ctv + 1.013812;
             }
             //mesh->density[i] = 0.001 * (1.02 * ctv - 7.65);
         }
         else
         {
-            mesh->density[i] = 0.001 * (0.6 * ctv + offset);
-            //float tt = 0.001 * (0.6 * ctv + offset);
-            //int x = 5;
+            mesh->density[i] = 0.000578402*ctv + 1.103187;
+            //mesh->density[i] = 0.001 * (0.6 * ctv + offset);
             //mesh->density[i] = 0.001 * (0.58 * ctv + 467.79);
         }
 
         // Determine the material
         mesh->zoneId[i] = MaterialUtils::hounsfieldRangePhantom19.size() - 1;  // Last bin is "illegal"
-        for(unsigned int j = 0; j < MaterialUtils::hounsfieldRangePhantom19.size(); j++)
+        for(unsigned int j = 0; j < MaterialUtils::hounsfieldRangePhantom19.size()-1; j++)
         {
-            //int ctvm = ctv - 1024;
-            //int hsf = hounsfieldRangePhantom19[j];
-            //bool truth = ctvm < hsf;
             if(ctv < MaterialUtils::hounsfieldRangePhantom19[j])
             {
                 mesh->zoneId[i] = j;
-
-                /*
-                if(j == 8)
-                {
-                    qDebug() << "CtDataManager: 189: got a high density";
-                }
-                */
-
                 break;
             }
         }
 
-        //float den = mesh->density[i];
-        //float apg = atomPerG[mesh->zoneId[i]];
-        //float sol = mesh->density[i] * atomPerG[mesh->zoneId[i]] * 1E-24;
-        //tstHist.insert(ctv);
         if(mesh->zoneId[i] >= atomPerG.size())
         {
             qDebug() << "EXPLODE!";
         }
 
-        float aperg = atomPerG[mesh->zoneId[i]];
-        float pden = mesh->density[i];
+        float tstaperg = atomPerG[mesh->zoneId[i]];
+        float tstpden = mesh->density[i];
+
+        //qDebug() << "About to look for 3";
+
+        if(mesh->zoneId[i] == 0)
+        {
+            mesh->density[i] = 0.001225;  // force air density because it is very sensitive to miscalibrations
+            //qDebug() << "Caught a mat0";
+        }
 
         mesh->atomDensity[i] = mesh->density[i] * atomPerG[mesh->zoneId[i]] * 1E-24;  // g/cc * @/g * cm^2/b = @/cm-b
 
