@@ -80,7 +80,7 @@ Mesh *CtDataManager::parse16(int xbins, int ybins, int zbins, std::string filena
     m->uniform(xbins, ybins, zbins, 50.0, 50.0, 12.5);
     m->initCtVariables();
 
-    std::vector<u_int16_t> zoneIds;
+    std::vector<U16_T> zoneIds;
     zoneIds.resize(tbins);
     //zoneIds.resize(50);
 
@@ -173,24 +173,24 @@ Mesh *CtDataManager::ctNumberToHumanPhantom(Mesh *mesh)
         {
             if(ctv <= -1000)
             {
-                mesh->density[i] = 0.001225;
+                mesh->density[i] = 0.001225f;
             }
             else
             {
                 //mesh->density[i] = 0.001 * (ctv + offset);
-                mesh->density[i] = 0.0010186*ctv + 1.013812;
+                mesh->density[i] = 0.0010186f * ctv + 1.013812f;
             }
             //mesh->density[i] = 0.001 * (1.02 * ctv - 7.65);
         }
         else
         {
-            mesh->density[i] = 0.000578402*ctv + 1.103187;
+            mesh->density[i] = 0.000578402f * ctv + 1.103187f;
             //mesh->density[i] = 0.001 * (0.6 * ctv + offset);
             //mesh->density[i] = 0.001 * (0.58 * ctv + 467.79);
         }
 
         // Determine the material
-        mesh->zoneId[i] = MaterialUtils::hounsfieldRangePhantom19.size() - 1;  // Last bin is "illegal"
+        mesh->zoneId[i] = static_cast<U16_T>(MaterialUtils::hounsfieldRangePhantom19.size() - 1);  // Last bin is "illegal"
         for(unsigned int j = 0; j < MaterialUtils::hounsfieldRangePhantom19.size()-1; j++)
         {
             if(ctv < MaterialUtils::hounsfieldRangePhantom19[j])
@@ -205,20 +205,20 @@ Mesh *CtDataManager::ctNumberToHumanPhantom(Mesh *mesh)
             qDebug() << "EXPLODE!";
         }
 
-        float tstaperg = atomPerG[mesh->zoneId[i]];
-        float tstpden = mesh->density[i];
+        //float tstaperg = atomPerG[mesh->zoneId[i]];
+        //float tstpden = mesh->density[i];
 
         //qDebug() << "About to look for 3";
 
         if(mesh->zoneId[i] == 0)
         {
-            mesh->density[i] = 0.001225;  // force air density because it is very sensitive to miscalibrations
+            mesh->density[i] = 0.001225f;  // force air density because it is very sensitive to miscalibrations
             //qDebug() << "Caught a mat0";
         }
 
-        mesh->atomDensity[i] = mesh->density[i] * atomPerG[mesh->zoneId[i]] * 1E-24;  // g/cc * @/g * cm^2/b = @/cm-b
+        mesh->atomDensity[i] = mesh->density[i] * atomPerG[mesh->zoneId[i]] * 1.0E-24f;  // g/cc * @/g * cm^2/b = @/cm-b
 
-        if(mesh->atomDensity[i] <= 1E-10)
+        if(mesh->atomDensity[i] <= 1.0E-10f)
         {
             qDebug() << "Got zero density";
         }

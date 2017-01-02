@@ -65,8 +65,8 @@ bool NuclideData::parse(ifstream &binfile, int nGroups, int gGroups)
         bondarenko1.parse(binfile, nsig0, nt);
         bondarenko2.parse(binfile, nbond);
 
-        int numTemp = bondarenko1.getTempCount();
-        int numSig0 = bondarenko1.getSig0Count();
+        size_t numTemp = bondarenko1.getTempCount();
+        size_t numSig0 = bondarenko1.getSig0Count();
         const std::vector<int> &nf = bondarenko2.getNf();
         const std::vector<int> &nl = bondarenko2.getNl();
 
@@ -106,7 +106,7 @@ bool NuclideData::parse(ifstream &binfile, int nGroups, int gGroups)
                 nScatter2.push_back(next11);
             }
 
-            for(int j = 0; j < (MAX(procTempCount, 1))*(procPlCount+1); j++)
+            for(int j = 0; j < fmax(procTempCount, 1)*(procPlCount+1); j++)
             {
                 AmpxRecordParserType12 *next12 = new AmpxRecordParserType12();
                 next12->parse(binfile, procMaxLen, false, nGroups);

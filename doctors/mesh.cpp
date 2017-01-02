@@ -261,7 +261,7 @@ void Mesh::initCtVariables()
     atomDensity.resize(vol.size());
 }
 
-int Mesh::getFlatIndex(int xindx, int yindx, int zindx) const
+int Mesh::getFlatIndex(unsigned int xindx, unsigned int yindx, unsigned int zindx) const
 {
     if(xindx > xElemCt)
     {

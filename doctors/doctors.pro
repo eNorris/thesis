@@ -85,7 +85,8 @@ HEADERS  += mainwindow.h \
     materialutils.h \
     solver.h \
     histogram.h \
-    mcnpwriter.h
+    mcnpwriter.h \
+    globals.h
 
 FORMS    += mainwindow.ui \
     gui/outputdialog.ui \

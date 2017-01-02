@@ -14,8 +14,8 @@ OutputDialog::OutputDialog(QWidget *parent) :
     m_logInterp(false),
     ui(new Ui::OutputDialog),
     m_listModel(NULL),
-    m_minvalGlobal(1E35),
-    m_maxvalGlobal(-1E35),
+    m_minvalGlobal(1.0E35f),
+    m_maxvalGlobal(-1.0E35f),
     m_data(NULL)
 {
     ui->setupUi(this);
@@ -80,9 +80,9 @@ void OutputDialog::updateSolution(std::vector<float> *data)
 {
     m_data = data;
 
-    m_minvalGlobal = 1E35;
-    m_maxvalGlobal = -1E35;
-    float minGtZero = 1E35;
+    m_minvalGlobal = 1.0E35f;
+    m_maxvalGlobal = -1.0E35f;
+    float minGtZero = 1.0E35f;
 
     for(unsigned int i = 0; i < m_data->size(); i++)
     {

@@ -45,17 +45,17 @@ std::string McnpWriter::generateSurfaceString(Mesh *m)
         std::cerr << "SIZE MISMATCH @ McnpWriter::generateSurfaceString(Mesh*): 43: node count mismatch" << std::endl;
     }
 
-    for(int i = 0; i < m->xNodeCt; i++)
+    for(unsigned int i = 0; i < m->xNodeCt; i++)
     {
         surfString += ( xsurf(i) + " px " + std::to_string(m->xNodes[i]) + '\n');
     }
 
-    for(int i = 0; i < m->yNodeCt; i++)
+    for(unsigned int i = 0; i < m->yNodeCt; i++)
     {
         surfString += (ysurf(i) + " py " + std::to_string(m->yNodes[i]) + '\n');
     }
 
-    for(int i = 0; i < m->zNodeCt; i++)
+    for(unsigned int i = 0; i < m->zNodeCt; i++)
     {
         surfString += (zsurf(i) + " pz " + std::to_string(m->zNodes[i]) + '\n');
     }
@@ -91,11 +91,11 @@ std::string McnpWriter::generateCellString(Mesh *m, bool fineDensity)
         }
     }
 
-    for(int xi = 0; xi < m->xElemCt; xi++)
+    for(unsigned int xi = 0; xi < m->xElemCt; xi++)
     {
-        for(int yi = 0; yi < m->yElemCt; yi++)
+        for(unsigned int yi = 0; yi < m->yElemCt; yi++)
         {
-            for(int zi = 0; zi < m->zElemCt; zi++)
+            for(unsigned int zi = 0; zi < m->zElemCt; zi++)
             {
                 int mindx = xi * m->yElemCt * m->zElemCt + yi * m->zElemCt + zi;
                 //std::string cellString = "";
@@ -186,9 +186,9 @@ std::string McnpWriter::generateDataCards(Mesh *m)
     dataString += "mode p\n";
 
     // The offset prevents the source from landing on a surface plane which can cause particles to get lost
-    float offset = 0.001;
+    float offset = 0.001f;
 
-    float maxerg = 0.01;
+    //float maxerg = 0.01;
 
     dataString += "sdef par=p pos=" + std::to_string(m->xNodes[m->xNodeCt-1]/2 + offset) + " " + std::to_string(m->yNodes[m->yNodeCt-1]/2 + offset) + " " + std::to_string(m->zNodes[m->zNodeCt-1]/2 + offset) + " erg=0.030\n";
 

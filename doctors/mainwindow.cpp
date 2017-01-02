@@ -456,7 +456,7 @@ bool MainWindow::buildMaterials(AmpxParser *parser)
     qDebug() << "Generating materials";
 
     // One extra material for the empty material at the end
-    m_xs->allocateMemory(MaterialUtils::hounsfieldRangePhantom19Elements.size()+1, parser->getGammaEnergyGroups(), 6);
+    m_xs->allocateMemory(static_cast<unsigned int>(MaterialUtils::hounsfieldRangePhantom19Elements.size()+1), parser->getGammaEnergyGroups(), 6);
 
 
     bool allPassed = true;
@@ -491,7 +491,7 @@ void MainWindow::onSolverFinished(std::vector<float> *solution)
 
     std::vector<std::vector<float> > push;
 
-    for(int i = 0; i < m_mesh->xElemCt; i++)
+    for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
     {
         float centerpt = (m_mesh->xNodes[i] + m_mesh->xNodes[i+1])/2.0;
         x.push_back(centerpt);

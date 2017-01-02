@@ -3,7 +3,7 @@
 #include <iostream>
 #include <QDebug>
 
-const float MaterialUtils::AVOGADRO = 6.0221409E23;
+const float MaterialUtils::AVOGADRO = 6.0221409E23f;
 
 const std::vector<std::string> MaterialUtils::elementNames {
     "Hydrogen",
@@ -127,124 +127,124 @@ const std::vector<std::string> MaterialUtils::elementNames {
 };
 
 const std::vector<float> MaterialUtils::atomicMass {
-    1.008,          // H
-    4.0026022,      // He
-    6.94,           // Li
-    9.01218315,     // Be
-    10.81,          // B
-    12.011,         // C
-    14.007,         // N
-    15.999,         // O
-    18.9984031636,  // F
-    20.17976,       // Ne
-    22.989769282,   // Na
-    24.305,         // Mg
-    26.98153857,    // Al
-    28.085,         // Si
-    30.9737619985,  // P
-    32.06,          // S
-    35.45,          // Cl
-    39.9481,        // Ar
-    39.09831,       // K
-    40.0784,        // Ca
-    44.9559085,     // Sc
-    47.8671,        // Ti
-    50.94151,       // V
-    51.99616,       // Cr
-    54.9380443,     // Mn
-    55.8452,        // Fe
-    58.9331944,     // Co
-    58.69344,       // Ni
-    63.5463,        // Cu
-    65.382,         // Zn
-    69.7231,        // Ga
-    72.6308,        // Ge
-    74.9215956,     // As
-    78.9718,        // Se
-    79.904,         // Br
-    83.7982,        // Kr
-    85.46783,       // Rb
-    87.621,         // Sr
-    88.905842,      // Y
-    91.2242,        // Zr
-    92.906372,      // Nb
-    95.951,         // Mo
-    97,             // Tc
-    101.072,        // Ru
-    102.905502,     // Rh
-    106.421,        // Pd
-    107.86822,      // Ag
-    112.4144,       // Cd
-    114.8181,       // In
-    118.7107,       // Sn
-    121.7601,       // Sb
-    127.603,        // Te
-    126.904473,     // I
-    131.2936,       // Xe
-    132.905451966,  // Cs
-    137.3277,       // Ba
-    138.905477,     // La
-    140.1161,       // Ce
-    140.907662,     //Pr
-    144.2423,       // Nd
-    145,            // Pm
-    150.362,        // Sm
-    151.9641,       // Eu
-    157.253,        // Gd
-    158.925352,     // Tb
-    162.5001,       // Dy
-    164.930332,     // Ho
-    167.2593,       // Er
-    168.934222,     // Tm
-    173.04510,      // Yb
-    174.96681,      // Lu
-    178.492,        // Hf
-    180.947882,     // Ta
-    183.841,        // W
-    186.2071,       // Re
-    190.233,        // Os
-    192.2173,       // Ir
-    195.0849,       // Pt
-    196.9665695,    // Au
-    200.5923,       // Hg
-    204.38,         // Tl
-    207.21,         // Pb
-    208.980401,     // Bi
-    209,            // Po
-    210,            // At
-    222,            // Rn
-    223,            // Fr
-    226,            // Ra
-    227,            // Ac
-    232.03774,      // Th
-    231.035882,     // Pa
-    238.028913,     // U
-    237,            // Np
-    244,            // Pu
-    243,            // Am
-    247,            // Cm
-    247,            // Bk
-    251,            // Cf
-    252,            // Es
-    257,            // Fm
-    258,            // Md
-    259,            // No
-    262,            // Lr
-    267,            // Rf
-    270,            // Db
-    269,            // Sg
-    270,            // Bh
-    270,            // Hs
-    278,            // Mt
-    281,            // Ds
-    281,            // Rg
-    285,            // Cn
-    286,            // Nh
-    289,            // Fl
-    289,            // Mc
-    293,            // Lv
-    293,            // Ts
-    294             // Og
+    1.008f,          // H
+    4.0026022f,      // He
+    6.94f,           // Li
+    9.01218315f,     // Be
+    10.81f,          // B
+    12.011f,         // C
+    14.007f,         // N
+    15.999f,         // O
+    18.9984031636f,  // F
+    20.17976f,       // Ne
+    22.989769282f,   // Na
+    24.305f,         // Mg
+    26.98153857f,    // Al
+    28.085f,         // Si
+    30.9737619985f,  // P
+    32.06f,          // S
+    35.45f,          // Cl
+    39.9481f,        // Ar
+    39.09831f,       // K
+    40.0784f,        // Ca
+    44.9559085f,     // Sc
+    47.8671f,        // Ti
+    50.94151f,       // V
+    51.99616f,       // Cr
+    54.9380443f,     // Mn
+    55.8452f,        // Fe
+    58.9331944f,     // Co
+    58.69344f,       // Ni
+    63.5463f,        // Cu
+    65.382f,         // Zn
+    69.7231f,        // Ga
+    72.6308f,        // Ge
+    74.9215956f,     // As
+    78.9718f,        // Se
+    79.904f,         // Br
+    83.7982f,        // Kr
+    85.46783f,       // Rb
+    87.621f,         // Sr
+    88.905842f,      // Y
+    91.2242f,        // Zr
+    92.906372f,      // Nb
+    95.951f,         // Mo
+    97.0f,             // Tc
+    101.072f,        // Ru
+    102.905502f,     // Rh
+    106.421f,        // Pd
+    107.86822f,      // Ag
+    112.4144f,       // Cd
+    114.8181f,       // In
+    118.7107f,       // Sn
+    121.7601f,       // Sb
+    127.603f,        // Te
+    126.904473f,     // I
+    131.2936f,       // Xe
+    132.905451966f,  // Cs
+    137.3277f,       // Ba
+    138.905477f,     // La
+    140.1161f,       // Ce
+    140.907662f,     //Pr
+    144.2423f,       // Nd
+    145.0f,            // Pm
+    150.362f,        // Sm
+    151.9641f,       // Eu
+    157.253f,        // Gd
+    158.925352f,     // Tb
+    162.5001f,       // Dy
+    164.930332f,     // Ho
+    167.2593f,       // Er
+    168.934222f,     // Tm
+    173.04510f,      // Yb
+    174.96681f,      // Lu
+    178.492f,        // Hf
+    180.947882f,     // Ta
+    183.841f,        // W
+    186.2071f,       // Re
+    190.233f,        // Os
+    192.2173f,       // Ir
+    195.0849f,       // Pt
+    196.9665695f,    // Au
+    200.5923f,       // Hg
+    204.38f,         // Tl
+    207.21f,         // Pb
+    208.980401f,     // Bi
+    209.0f,            // Po
+    210.0f,            // At
+    222.0f,            // Rn
+    223.0f,            // Fr
+    226.0f,            // Ra
+    227.0f,            // Ac
+    232.03774f,      // Th
+    231.035882f,     // Pa
+    238.028913f,     // U
+    237.0f,            // Np
+    244.0f,            // Pu
+    243.0f,            // Am
+    247.0f,            // Cm
+    247.0f,            // Bk
+    251.0f,            // Cf
+    252.0f,            // Es
+    257.0f,            // Fm
+    258.0f,            // Md
+    259.0f,            // No
+    262.0f,            // Lr
+    267.0f,            // Rf
+    270.0f,            // Db
+    269.0f,            // Sg
+    270.0f,            // Bh
+    270.0f,            // Hs
+    278.0f,            // Mt
+    281.0f,            // Ds
+    281.0f,            // Rg
+    285.0f,            // Cn
+    286.0f,            // Nh
+    289.0f,            // Fl
+    289.0f,            // Mc
+    293.0f,            // Lv
+    293.0f,            // Ts
+    294.0f             // Og
 };
 
 const std::vector<std::vector<int> > MaterialUtils::naturalIsotopes {
@@ -369,98 +369,98 @@ const std::vector<std::vector<int> > MaterialUtils::naturalIsotopes {
 };
 
 const std::vector<std::vector<float> > MaterialUtils::naturalAbundances {
-    std::vector<float>{0.999885, 0.000115},           // H
-    std::vector<float>{0.00000137, 0.99999863},       // He
-    std::vector<float>{0.0759, 0.9241},               // Li
-    std::vector<float>{1.0},                          // Be
-    std::vector<float>{0.199, 0.801},                 // B
-    std::vector<float>{0.9893, 0.0107},               // C
-    std::vector<float>{0.99632, 0.00368},             // N
-    std::vector<float>{0.99757, 0.00038, 0.00205},    // O
-    std::vector<float>{1.0},                         // F
-    std::vector<float>{0.9048, 0.0027, 0.0925},     // Ne
-    std::vector<float>{1.0},                         // Na
-    std::vector<float>{0.7899, 0.1000, 0.1101},     // Mg
-    std::vector<float>{1.0},                            // Al
-    std::vector<float>{0.922296, 0.046832, 0.030872},     // Si
-    std::vector<float>{1.0},                           // P
-    std::vector<float>{0.9493, 0.0076, 0.0429, 0.0002},     // S
-    std::vector<float>{0.7578, 0.2422},                     // Cl
-    std::vector<float>{0.003365, 0.000632, 0.996003},         // Ar
-    std::vector<float>{0.932581, 0.000117, 0.067302},         // K
-    std::vector<float>{0.96941, 0.00647, 0.00135, 0.02086, 0.00004, 0.00187},     // Ca
-    std::vector<float>{1.0},                                        // Sc
-    std::vector<float>{0.0825, 0.0744, 0.7372, 0.0541, 0.0518},     // Ti
-    std::vector<float>{0.00250, 0.99750},                                // V
-    std::vector<float>{0.04345, 0.83789, 0.09501, 0.02365},         // Cr
-    std::vector<float>{1.0},                                       // Mn
-    std::vector<float>{0.05845, 0.91754, 0.02119, 0.00282},         // Fe
-    std::vector<float>{1.0},                                          // Co
-    std::vector<float>{0.680769, 0.262231, 0.011399, 0.036345, 0.009256},     // Ni
-    std::vector<float>{0.6917, 0.3083},                             // Cu
-    std::vector<float>{0.4863, 0.2790, 0.0410, 0.1875, 0.0062},     // Zn
-    std::vector<float>{0.60108, 0.39892},                           // Ga
-    std::vector<float>{0.2084, 0.2754, 0.0773, 0.3628, 0.0761},     // Ge
-    std::vector<float>{1.0},                                         // As
-    std::vector<float>{0.0089, 0.0937, 0.0763, 0.2377, 0.4961, 0.0873},     // Se
-    std::vector<float>{0.5069, 0.4931},                                     // Br
-    std::vector<float>{0.0035, 0.0228, 0.1158, 0.1149, 0.5700, 0.1730},     // Kr
-    std::vector<float>{0.7217, 0.2783},                        // Rb
-    std::vector<float>{0.0056, 0.0986, 0.0700, 0.8258},         // Sr
-    std::vector<float>{1.0},                                       // Y
-    std::vector<float>{0.5145, 0.1122, 0.1715, 0.1738, 0.0280},     // Zr
-    std::vector<float>{1.0},                                        // Nb
-    std::vector<float>{0.1484, 0.0925, 0.1592, 0.1668, 0.0955, .2413, 0.0963},     // Mo
+    std::vector<float>{0.999885f, 0.000115f},           // H
+    std::vector<float>{0.00000137f, 0.99999863f},       // He
+    std::vector<float>{0.0759f, 0.9241f},               // Li
+    std::vector<float>{1.0f},                          // Be
+    std::vector<float>{0.199f, 0.801f},                 // B
+    std::vector<float>{0.9893f, 0.0107f},               // C
+    std::vector<float>{0.99632f, 0.00368f},             // N
+    std::vector<float>{0.99757f, 0.00038f, 0.00205f},    // O
+    std::vector<float>{1.0f},                         // F
+    std::vector<float>{0.9048f, 0.0027f, 0.0925f},     // Ne
+    std::vector<float>{1.0f},                         // Na
+    std::vector<float>{0.7899f, 0.1000f, 0.1101f},     // Mg
+    std::vector<float>{1.0f},                            // Al
+    std::vector<float>{0.922296f, 0.046832f, 0.030872f},     // Si
+    std::vector<float>{1.0f},                           // P
+    std::vector<float>{0.9493f, 0.0076f, 0.0429f, 0.0002f},     // S
+    std::vector<float>{0.7578f, 0.2422f},                     // Cl
+    std::vector<float>{0.003365f, 0.000632f, 0.996003f},         // Ar
+    std::vector<float>{0.932581f, 0.000117f, 0.067302f},         // K
+    std::vector<float>{0.96941f, 0.00647f, 0.00135f, 0.02086f, 0.00004f, 0.00187f},     // Ca
+    std::vector<float>{1.0f},                                        // Sc
+    std::vector<float>{0.0825f, 0.0744f, 0.7372f, 0.0541f, 0.0518f},     // Ti
+    std::vector<float>{0.00250f, 0.99750f},                                // V
+    std::vector<float>{0.04345f, 0.83789f, 0.09501f, 0.02365f},         // Cr
+    std::vector<float>{1.0f},                                       // Mn
+    std::vector<float>{0.05845f, 0.91754f, 0.02119f, 0.00282f},         // Fe
+    std::vector<float>{1.0f},                                          // Co
+    std::vector<float>{0.680769f, 0.262231f, 0.011399f, 0.036345f, 0.009256f},     // Ni
+    std::vector<float>{0.6917f, 0.3083f},                             // Cu
+    std::vector<float>{0.4863f, 0.2790f, 0.0410f, 0.1875f, 0.0062f},     // Zn
+    std::vector<float>{0.60108f, 0.39892f},                           // Ga
+    std::vector<float>{0.2084f, 0.2754f, 0.0773f, 0.3628f, 0.0761f},     // Ge
+    std::vector<float>{1.0f},                                         // As
+    std::vector<float>{0.0089f, 0.0937f, 0.0763f, 0.2377f, 0.4961f, 0.0873f},     // Se
+    std::vector<float>{0.5069f, 0.4931f},                                     // Br
+    std::vector<float>{0.0035f, 0.0228f, 0.1158f, 0.1149f, 0.5700f, 0.1730f},     // Kr
+    std::vector<float>{0.7217f, 0.2783f},                        // Rb
+    std::vector<float>{0.0056f, 0.0986f, 0.0700f, 0.8258f},         // Sr
+    std::vector<float>{1.0f},                                       // Y
+    std::vector<float>{0.5145f, 0.1122f, 0.1715f, 0.1738f, 0.0280f},     // Zr
+    std::vector<float>{1.0f},                                        // Nb
+    std::vector<float>{0.1484f, 0.0925f, 0.1592f, 0.1668f, 0.0955f, .2413f, 0.0963f},     // Mo
     std::vector<float>{},                                                          // Tc
-    std::vector<float>{0.0554, 0.0187, 0.1276, 0.1260, 0.1706, 0.3155, 0.1862},     // Ru
-    std::vector<float>{1.0},                                                        // Rh
-    std::vector<float>{0.0102, 0.1114, 0.2233, 0.2733, 0.2646, 0.1172},             // Pd
-    std::vector<float>{0.51839, 0.48161},                                           // Ag
-    std::vector<float>{0.0125, 0.0089, 0.1249, 0.1280, 0.2413, 0.1222, 0.2873, 0.0749},     // Cd
-    std::vector<float>{0.0429, 0.9571},                                                        // In
-    std::vector<float>{0.0097, 0.0066, 0.0034, 0.1454, 0.0768, 0.2422, 0.0859, 0.3258, 0.0463, 0.0579},     // Sn
-    std::vector<float>{0.5721, 0.4279},                                                     // Sb
-    std::vector<float>{0.0009, 0.0255, 0.0089, 0.0474, 0.0707, 0.1884, 0.3174, 0.3408},     // Te
-    std::vector<float>{1.0},                                                                 // I
-    std::vector<float>{0.0009, 0.0009, 0.0192, 0.2644, 0.0408, 0.2118, 0.2689, 0.1044, 0.0887},     // Xe
-    std::vector<float>{1.0},                                                                      // Cs
-    std::vector<float>{0.00106, 0.00101, 0.02417, 0.06592, 0.07854, 0.11232, 0.71698},     // Ba
-    std::vector<float>{0.00090, 0.99910},                              // La
-    std::vector<float>{0.00185, 0.00251, 0.88450, 0.11114},            // Ce
-    std::vector<float>{1.0},                                               //Pr
-    std::vector<float>{0.272, 0.122, 0.238, 0.083, 0.172, 0.057, 0.056},     // Nd
+    std::vector<float>{0.0554f, 0.0187f, 0.1276f, 0.1260f, 0.1706f, 0.3155f, 0.1862f},     // Ru
+    std::vector<float>{1.0f},                                                        // Rh
+    std::vector<float>{0.0102f, 0.1114f, 0.2233f, 0.2733f, 0.2646f, 0.1172f},             // Pd
+    std::vector<float>{0.51839f, 0.48161f},                                           // Ag
+    std::vector<float>{0.0125f, 0.0089f, 0.1249f, 0.1280f, 0.2413f, 0.1222f, 0.2873f, 0.0749f},     // Cd
+    std::vector<float>{0.0429f, 0.9571f},                                                        // In
+    std::vector<float>{0.0097f, 0.0066f, 0.0034f, 0.1454f, 0.0768f, 0.2422f, 0.0859f, 0.3258f, 0.0463f, 0.0579f},     // Sn
+    std::vector<float>{0.5721f, 0.4279f},                                                     // Sb
+    std::vector<float>{0.0009f, 0.0255f, 0.0089f, 0.0474f, 0.0707f, 0.1884f, 0.3174f, 0.3408f},     // Te
+    std::vector<float>{1.0f},                                                                 // I
+    std::vector<float>{0.0009f, 0.0009f, 0.0192f, 0.2644f, 0.0408f, 0.2118f, 0.2689f, 0.1044f, 0.0887f},     // Xe
+    std::vector<float>{1.0f},                                                                      // Cs
+    std::vector<float>{0.00106f, 0.00101f, 0.02417f, 0.06592f, 0.07854f, 0.11232f, 0.71698f},     // Ba
+    std::vector<float>{0.00090f, 0.99910f},                              // La
+    std::vector<float>{0.00185f, 0.00251f, 0.88450f, 0.11114f},            // Ce
+    std::vector<float>{1.0f},                                               //Pr
+    std::vector<float>{0.272f, 0.122f, 0.238f, 0.083f, 0.172f, 0.057f, 0.056f},     // Nd
     std::vector<float>{},                                                       // Pm
-    std::vector<float>{0.0307, 0.1499, 0.1124, 0.1382, 0.0738, 0.2675, 0.2275},     // Sm
-    std::vector<float>{0.4781, 0.5219},                                               // Eu
-    std::vector<float>{0.0020, 0.0218, 0.1480, 0.2047, 0.1565, 0.2484, 0.2186},     // Gd
-    std::vector<float>{1.0},                                                        // Tb
-    std::vector<float>{0.0006, 0.0010, 0.0234, 0.1891, 0.2551, 0.2490, 0.2818},     // Dy
-    std::vector<float>{1.0},                                                       // Ho
-    std::vector<float>{0.0014, 0.0161, 0.3361, 0.2293, 0.2678, 0.1493},              // Er
-    std::vector<float>{1.0},                                                         // Tm
-    std::vector<float>{0.0013, 0.0304, 0.1428, 0.2183, 0.1613, 0.3183, 0.1276},     // Yb
-    std::vector<float>{0.9741, 0.0259},                                             // Lu
-    std::vector<float>{0.0016, 0.0526, 0.1860, 0.2728, 0.1362, 0.3508},              // Hf
-    std::vector<float>{0.00012, 0.99988},                                            // Ta
-    std::vector<float>{0.0012, 0.2650, 0.1431, 0.3064, 0.2843},                        // W
-    std::vector<float>{0.3740, 0.6260},                                                 // Re
-    std::vector<float>{0.0002, 0.0159, 0.0196, 0.1324, 0.1615, 0.2626, 0.4078},     // Os
-    std::vector<float>{0.373, 0.627},                                                  // Ir
-    std::vector<float>{0.00014, 0.00782, 0.32967, 0.33832, 0.25242, 0.07163},     // Pt
-    std::vector<float>{1.0},                                                         // Au
-    std::vector<float>{0.0015, 0.0997, 0.1687, 0.2310, 0.1318, 0.2986, 0.0687},     // Hg
-    std::vector<float>{0.29524, 0.70476},                                             // Tl
-    std::vector<float>{0.014, 0.241, 0.221, 0.524},                                // Pb
-    std::vector<float>{1.0},                                                         // Bi
+    std::vector<float>{0.0307f, 0.1499f, 0.1124f, 0.1382f, 0.0738f, 0.2675f, 0.2275f},     // Sm
+    std::vector<float>{0.4781f, 0.5219f},                                               // Eu
+    std::vector<float>{0.0020f, 0.0218f, 0.1480f, 0.2047f, 0.1565f, 0.2484f, 0.2186f},     // Gd
+    std::vector<float>{1.0f},                                                        // Tb
+    std::vector<float>{0.0006f, 0.0010f, 0.0234f, 0.1891f, 0.2551f, 0.2490f, 0.2818f},     // Dy
+    std::vector<float>{1.0f},                                                       // Ho
+    std::vector<float>{0.0014f, 0.0161f, 0.3361f, 0.2293f, 0.2678f, 0.1493f},              // Er
+    std::vector<float>{1.0f},                                                         // Tm
+    std::vector<float>{0.0013f, 0.0304f, 0.1428f, 0.2183f, 0.1613f, 0.3183f, 0.1276f},     // Yb
+    std::vector<float>{0.9741f, 0.0259f},                                             // Lu
+    std::vector<float>{0.0016f, 0.0526f, 0.1860f, 0.2728f, 0.1362f, 0.3508f},              // Hf
+    std::vector<float>{0.00012f, 0.99988f},                                            // Ta
+    std::vector<float>{0.0012f, 0.2650f, 0.1431f, 0.3064f, 0.2843f},                        // W
+    std::vector<float>{0.3740f, 0.6260f},                                                 // Re
+    std::vector<float>{0.0002f, 0.0159f, 0.0196f, 0.1324f, 0.1615f, 0.2626f, 0.4078f},     // Os
+    std::vector<float>{0.373f, 0.627f},                                                  // Ir
+    std::vector<float>{0.00014f, 0.00782f, 0.32967f, 0.33832f, 0.25242f, 0.07163f},     // Pt
+    std::vector<float>{1.0f},                                                         // Au
+    std::vector<float>{0.0015f, 0.0997f, 0.1687f, 0.2310f, 0.1318f, 0.2986f, 0.0687f},     // Hg
+    std::vector<float>{0.29524f, 0.70476f},                                             // Tl
+    std::vector<float>{0.014f, 0.241f, 0.221f, 0.524f},                                // Pb
+    std::vector<float>{1.0f},                                                         // Bi
     std::vector<float>{},        // Po
     std::vector<float>{},        // At
     std::vector<float>{},        // Rn
     std::vector<float>{},        // Fr
     std::vector<float>{},        // Ra
     std::vector<float>{},        // Ac
-    std::vector<float>{1.0},     // Th
+    std::vector<float>{1.0f},     // Th
     std::vector<float>{},        // Pa
-    std::vector<float>{0.000055, 0.007200, 0.992745},     // U
+    std::vector<float>{0.000055f, 0.007200f, 0.992745f},     // U
     std::vector<float>{},     // Np
     std::vector<float>{},     // Pu
     std::vector<float>{},     // Am
@@ -528,26 +528,26 @@ const std::vector<int> MaterialUtils::hounsfieldRangePhantom19Elements{
 };
 
 const std::vector<std::vector<float> > MaterialUtils::hounsfieldRangePhantom19Weights{
-    std::vector<float> {0.000, 0.000, 0.757, 0.232, 0.000, 0.000, 0.000, 0.000, 0.000, 0.013, 0.000, 0.000}, // Air 1
-    std::vector<float> {0.103, 0.105, 0.031, 0.749, 0.002, 0.000, 0.002, 0.003, 0.003, 0.000, 0.002, 0.000}, // Lung 2
-    std::vector<float> {0.112, 0.508, 0.012, 0.364, 0.001, 0.000, 0.000, 0.001, 0.001, 0.000, 0.000, 0.000}, // Adipose/adrenal 3
-    std::vector<float> {0.100, 0.163, 0.043, 0.684, 0.004, 0.000, 0.000, 0.004, 0.003, 0.000, 0.000, 0.000}, // Small intestine 4
-    std::vector<float> {0.097, 0.447, 0.025, 0.359, 0.000, 0.000, 0.023, 0.002, 0.001, 0.000, 0.001, 0.045}, // Bone 5
-    std::vector<float> {0.091, 0.414, 0.027, 0.368, 0.000, 0.001, 0.032, 0.002, 0.001, 0.000, 0.001, 0.063}, // Bone 6
-    std::vector<float> {0.085, 0.378, 0.029, 0.379, 0.000, 0.001, 0.041, 0.002, 0.001, 0.000, 0.001, 0.082}, // Bone 7
-    std::vector<float> {0.080, 0.345, 0.031, 0.388, 0.000, 0.001, 0.050, 0.002, 0.001, 0.000, 0.001, 0.010}, // Bone 8
-    std::vector<float> {0.075, 0.316, 0.032, 0.397, 0.000, 0.001, 0.058, 0.002, 0.001, 0.000, 0.000, 0.116}, // Bone 9
-    std::vector<float> {0.071, 0.289, 0.034, 0.404, 0.000, 0.001, 0.066, 0.002, 0.001, 0.000, 0.000, 0.131}, // Bone 10
-    std::vector<float> {0.067, 0.264, 0.035, 0.412, 0.000, 0.002, 0.072, 0.003, 0.000, 0.000, 0.000, 0.144}, // Bone 11
-    std::vector<float> {0.063, 0.242, 0.037, 0.418, 0.000, 0.002, 0.078, 0.003, 0.000, 0.000, 0.000, 0.157}, // Bone 12
-    std::vector<float> {0.060, 0.221, 0.038, 0.424, 0.000, 0.002, 0.084, 0.003, 0.000, 0.000, 0.000, 0.168}, // Bone 13
-    std::vector<float> {0.056, 0.201, 0.039, 0.430, 0.000, 0.002, 0.089, 0.003, 0.000, 0.000, 0.000, 0.179}, // Bone 14
-    std::vector<float> {0.053, 0.183, 0.040, 0.435, 0.000, 0.002, 0.094, 0.003, 0.000, 0.000, 0.000, 0.189}, // Bone 15
-    std::vector<float> {0.051, 0.166, 0.041, 0.440, 0.000, 0.002, 0.099, 0.003, 0.000, 0.000, 0.000, 0.198}, // Bone 16
-    std::vector<float> {0.048, 0.150, 0.042, 0.444, 0.000, 0.002, 0.103, 0.003, 0.000, 0.000, 0.000, 0.207}, // Bone 17
-    std::vector<float> {0.046, 0.136, 0.042, 0.449, 0.000, 0.002, 0.107, 0.003, 0.000, 0.000, 0.000, 0.215}, // Bone 18
-    std::vector<float> {0.043, 0.122, 0.043, 0.453, 0.000, 0.002, 0.111, 0.003, 0.000, 0.000, 0.000, 0.222}, // Bone 19
-    std::vector<float> {1.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000}  // Empty 20
+    std::vector<float> {0.000f, 0.000f, 0.757f, 0.232f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.013f, 0.000f, 0.000f}, // Air 1
+    std::vector<float> {0.103f, 0.105f, 0.031f, 0.749f, 0.002f, 0.000f, 0.002f, 0.003f, 0.003f, 0.000f, 0.002f, 0.000f}, // Lung 2
+    std::vector<float> {0.112f, 0.508f, 0.012f, 0.364f, 0.001f, 0.000f, 0.000f, 0.001f, 0.001f, 0.000f, 0.000f, 0.000f}, // Adipose/adrenal 3
+    std::vector<float> {0.100f, 0.163f, 0.043f, 0.684f, 0.004f, 0.000f, 0.000f, 0.004f, 0.003f, 0.000f, 0.000f, 0.000f}, // Small intestine 4
+    std::vector<float> {0.097f, 0.447f, 0.025f, 0.359f, 0.000f, 0.000f, 0.023f, 0.002f, 0.001f, 0.000f, 0.001f, 0.045f}, // Bone 5
+    std::vector<float> {0.091f, 0.414f, 0.027f, 0.368f, 0.000f, 0.001f, 0.032f, 0.002f, 0.001f, 0.000f, 0.001f, 0.063f}, // Bone 6
+    std::vector<float> {0.085f, 0.378f, 0.029f, 0.379f, 0.000f, 0.001f, 0.041f, 0.002f, 0.001f, 0.000f, 0.001f, 0.082f}, // Bone 7
+    std::vector<float> {0.080f, 0.345f, 0.031f, 0.388f, 0.000f, 0.001f, 0.050f, 0.002f, 0.001f, 0.000f, 0.001f, 0.010f}, // Bone 8
+    std::vector<float> {0.075f, 0.316f, 0.032f, 0.397f, 0.000f, 0.001f, 0.058f, 0.002f, 0.001f, 0.000f, 0.000f, 0.116f}, // Bone 9
+    std::vector<float> {0.071f, 0.289f, 0.034f, 0.404f, 0.000f, 0.001f, 0.066f, 0.002f, 0.001f, 0.000f, 0.000f, 0.131f}, // Bone 10
+    std::vector<float> {0.067f, 0.264f, 0.035f, 0.412f, 0.000f, 0.002f, 0.072f, 0.003f, 0.000f, 0.000f, 0.000f, 0.144f}, // Bone 11
+    std::vector<float> {0.063f, 0.242f, 0.037f, 0.418f, 0.000f, 0.002f, 0.078f, 0.003f, 0.000f, 0.000f, 0.000f, 0.157f}, // Bone 12
+    std::vector<float> {0.060f, 0.221f, 0.038f, 0.424f, 0.000f, 0.002f, 0.084f, 0.003f, 0.000f, 0.000f, 0.000f, 0.168f}, // Bone 13
+    std::vector<float> {0.056f, 0.201f, 0.039f, 0.430f, 0.000f, 0.002f, 0.089f, 0.003f, 0.000f, 0.000f, 0.000f, 0.179f}, // Bone 14
+    std::vector<float> {0.053f, 0.183f, 0.040f, 0.435f, 0.000f, 0.002f, 0.094f, 0.003f, 0.000f, 0.000f, 0.000f, 0.189f}, // Bone 15
+    std::vector<float> {0.051f, 0.166f, 0.041f, 0.440f, 0.000f, 0.002f, 0.099f, 0.003f, 0.000f, 0.000f, 0.000f, 0.198f}, // Bone 16
+    std::vector<float> {0.048f, 0.150f, 0.042f, 0.444f, 0.000f, 0.002f, 0.103f, 0.003f, 0.000f, 0.000f, 0.000f, 0.207f}, // Bone 17
+    std::vector<float> {0.046f, 0.136f, 0.042f, 0.449f, 0.000f, 0.002f, 0.107f, 0.003f, 0.000f, 0.000f, 0.000f, 0.215f}, // Bone 18
+    std::vector<float> {0.043f, 0.122f, 0.043f, 0.453f, 0.000f, 0.002f, 0.111f, 0.003f, 0.000f, 0.000f, 0.000f, 0.222f}, // Bone 19
+    std::vector<float> {1.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f}  // Empty 20
 };
 
 MaterialUtils::MaterialUtils()

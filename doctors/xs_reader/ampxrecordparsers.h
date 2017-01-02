@@ -289,8 +289,8 @@ public:
 
     bool parse(ifstream &binfile, int nsig0, int nt);
 
-    int getTempCount() const { return temp.size(); }
-    int getSig0Count() const { return sig0.size(); }
+    size_t getTempCount() const { return temp.size(); }
+    size_t getSig0Count() const { return sig0.size(); }
 };
 
 
@@ -401,7 +401,7 @@ public:
 
     bool parse(ifstream &binfile, int mtCount, int groups);
 
-    int getMtCount() const { return mt.size(); }
+    size_t getMtCount() const { return mt.size(); }
     const std::vector<float> &getMtList() const { return mt; }
     int getMtIndex(const int mtId) const;
     const std::vector<float> &getSigma() const { return sigma; }

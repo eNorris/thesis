@@ -5,8 +5,12 @@
 
 #include <QObject>
 
+#include <cstdint>
+
 #include "config.h"
 #include "quadrature.h"
+
+#include "globals.h"
 
 class Mesh : public QObject
 {
@@ -56,7 +60,7 @@ public:
     std::vector<float> vol;
 
     // Only initialized when reading CT data
-    std::vector<u_int16_t> ct;
+    std::vector<U16_T> ct;
 
     /** density in [g/cm^3] */
     std::vector<float> density;
@@ -80,7 +84,7 @@ public:
     void calcAreas(const Quadrature *quad, const int eGroups);
     void initCtVariables();
 
-    int getFlatIndex(int xindx, int yindx, int zindx) const;
+    int getFlatIndex(unsigned int xindx, unsigned int yindx, unsigned int zindx) const;
     int getZoneIdAt(int xindx, int yindx, int zindx) const;
     float getPhysicalDensityAt(int xindx, int yindx, int zindx) const;
     float getAtomDensityAt(int xindx, int yindx, int zindx) const;

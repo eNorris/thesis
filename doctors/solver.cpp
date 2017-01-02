@@ -1,8 +1,10 @@
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include "solver.h"
 
 //#include "solvers.h"
-#define _USE_MATH_DEFINES
-#include <cmath>
+
 
 //#include "mainwindow.h"
 
@@ -52,8 +54,8 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
 
     qDebug() << "Running raytracer";
 
-    float tiny = 1.0E-35;
-    float huge = 1.0E35;
+    float tiny = 1.0E-35f;
+    float huge = 1.0E35f;
     //float e3 = 1.0E-8;
     //float e4 = 2.5E-9;
     std::vector<float> meanFreePaths;
@@ -62,7 +64,7 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
     //for(unsigned int is = 0; is < config->sourceIntensity.size(); is++)
     //{
     float sx = 25.3906f;  //config->sourceX[is];
-    float sy = 50-46.4844f;  //config->sourceY[is];
+    float sy = 50.0f - 46.4844f;  //config->sourceY[is];
     float sz = 6.8906f;  //config->sourceZ[is];
     float srcStrength = 1.0f;
     //float srcStrength = config->sourceIntensity[is];
@@ -181,7 +183,7 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                     tmpdistv.push_back(tmin);
                     tmpxsv.push_back(xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx]);
                     float gain = tmin * xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
-                    float current = mfpv.size() == 0 ? 0.0f : mfpv[mfpv.size()-1];
+                    //float current = mfpv.size() == 0 ? 0.0f : mfpv[mfpv.size()-1];
                     mfpv.push_back(gain);
 
                     // Update cell indices and positions
@@ -288,10 +290,10 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                     float flx = srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
 
                     if(flx < 0)
-                        qDebug() << "raytracer.cpp: (223): Negative?";
+                        qDebug() << "solver.cpp: (291): Negative?";
 
                     if(flx > 1E6)
-                        qDebug() << "raytracer.cpp: (226): Too big!";
+                        qDebug() << "solver.cpp: (294): Too big!";
 
                     (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = flx;  //srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
                 }
@@ -317,7 +319,7 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
     std::clock_t startMoment = std::clock();
 
     const int maxIterations = 25;
-    const float epsilon = 0.01;
+    const float epsilon = 0.01f;
 
 
     std::vector<float> angularFlux(xs->groupCount() * quad->angleCount() * mesh->voxelCount());
@@ -582,36 +584,36 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                             //   [#/cm^2] = [#]  / [cm^2]
                             float angFlux = numer/denom;
 
-                            float totsrc = totalSource[ix*xjmp+iy*yjmp+iz];
-                            float ayz = mesh->Ayz[ie*quad->angleCount()*mesh->yElemCt*mesh->zElemCt + iang*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz];
-                            float axz = mesh->Axz[ie*quad->angleCount()*mesh->xElemCt*mesh->zElemCt + iang*mesh->xElemCt*mesh->zElemCt + ix*mesh->zElemCt + iz];
-                            float axy = mesh->Axy[ie*quad->angleCount()*mesh->xElemCt*mesh->yElemCt + iang*mesh->xElemCt*mesh->yElemCt + ix*mesh->yElemCt + iy];
-                            float sigv = mesh->vol[ix*xjmp+iy*yjmp+iz]*xsref.totXs1d(zid, ie)*mesh->atomDensity[ix*xjmp + iy*yjmp + iz];
+                            //float totsrc = totalSource[ix*xjmp+iy*yjmp+iz];
+                            //float ayz = mesh->Ayz[ie*quad->angleCount()*mesh->yElemCt*mesh->zElemCt + iang*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz];
+                            //float axz = mesh->Axz[ie*quad->angleCount()*mesh->xElemCt*mesh->zElemCt + iang*mesh->xElemCt*mesh->zElemCt + ix*mesh->zElemCt + iz];
+                            //float axy = mesh->Axy[ie*quad->angleCount()*mesh->xElemCt*mesh->yElemCt + iang*mesh->xElemCt*mesh->yElemCt + ix*mesh->yElemCt + iy];
+                            //float sigv = mesh->vol[ix*xjmp+iy*yjmp+iz]*xsref.totXs1d(zid, ie)*mesh->atomDensity[ix*xjmp + iy*yjmp + iz];
 
-                            float vol = mesh->vol[ix*xjmp+iy*yjmp+iz];
-                            float xs = xsref.totXs1d(zid, ie);
-                            float atomden = mesh->atomDensity[ix*xjmp + iy*yjmp + iz];
+                            //float vol = mesh->vol[ix*xjmp+iy*yjmp+iz];
+                            //float xs = xsref.totXs1d(zid, ie);
+                            //float atomden = mesh->atomDensity[ix*xjmp + iy*yjmp + iz];
 
                             std::vector<float> gxs;
-                            for(int i = 0; i < xsref.groupCount(); i++)
+                            for(unsigned int i = 0; i < xsref.groupCount(); i++)
                             {
                                 gxs.push_back(xsref.totXs1d(zid, i));
                             }
 
-                            float tstoutboundFluxX = 2*angFlux - influxX;
-                            float tstoutboundFluxY = 2*angFlux - influxY;
-                            float tstoutboundFluxZ = 2*angFlux - influxZ;
+                            //float tstoutboundFluxX = 2*angFlux - influxX;
+                            //float tstoutboundFluxY = 2*angFlux - influxY;
+                            //float tstoutboundFluxZ = 2*angFlux - influxZ;
 
-                            float tstzid = mesh->zoneId[ix*xjmp + iy*yjmp + iz];
-                            float tstxs = xsref.totXs1d(zid, ie);
-                            float tstN = mesh->atomDensity[ix*xjmp + iy*yjmp + iz];
-                            float tstMacroXS = tstxs * tstN;
-                            float tstden = mesh->density[ix*xjmp + iy*yjmp + iz];
-                            int rindx = ix*xjmp + iy*yjmp + iz;
+                            //float tstzid = mesh->zoneId[ix*xjmp + iy*yjmp + iz];
+                            //float tstxs = xsref.totXs1d(zid, ie);
+                            //float tstN = mesh->atomDensity[ix*xjmp + iy*yjmp + iz];
+                            //float tstMacroXS = tstxs * tstN;
+                            //float tstden = mesh->density[ix*xjmp + iy*yjmp + iz];
+                            //int rindx = ix*xjmp + iy*yjmp + iz;
 
-                            float eta = quad->eta[iang];
-                            float mu = quad->mu[iang];
-                            float zi = quad->zi[iang];
+                            //float eta = quad->eta[iang];
+                            //float mu = quad->mu[iang];
+                            //float zi = quad->zi[iang];
 
                             if(ix >= 32 && iy == 4 && iz == 8 && dix>0 && diy>0)
                             {
@@ -672,7 +674,7 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                             //    qDebug() << "Got a fish!";
 
                             // Sum all the angular fluxes
-                            float w = quad->wt[iang];
+                            //float w = quad->wt[iang];
                             tempFlux[ix*xjmp + iy*yjmp + iz] += quad->wt[iang]*angFlux;
 
                             ix += dix;
@@ -708,7 +710,7 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
 
             } // end of all angles
 
-            maxDiff = -1E35;
+            maxDiff = -1.0E35f;
             for(unsigned int i = 0; i < tempFlux.size(); i++)
             {
                 //float z = qAbs((tempFlux[i] - preFlux[i])/tempFlux[i]);
