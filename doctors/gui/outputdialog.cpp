@@ -150,8 +150,8 @@ void OutputDialog::setSliceLevel(int level)
 
     loadParulaBrush();
 
-    float minvalLevel = 1E35;
-    float maxvalLevel = -1E35;
+    float minvalLevel = 1.0E35f;
+    float maxvalLevel = -1.0E35f;
 
     if(ui->xyRadioButton->isChecked())
     {
