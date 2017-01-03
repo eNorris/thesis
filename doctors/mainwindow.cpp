@@ -98,8 +98,8 @@ MainWindow::MainWindow(QWidget *parent):
     // Set up the solver thread
     m_solver->moveToThread(&m_solverWorkerThread);
     connect(&m_xsWorkerThread, SIGNAL(finished()), m_solver, SLOT(deleteLater()));
-    connect(this, SIGNAL(signalLaunchRaytracer(const Quadrature*,const Mesh*,const XSection*)), m_solver, SLOT(raytrace(const Quadrature*,const Mesh*,const XSection*)));
-    connect(this, SIGNAL(signalLaunchSolver(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)), m_solver, SLOT(gssolver(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)));
+    connect(this, SIGNAL(signalLaunchRaytracer(const Quadrature*,const Mesh*,const XSection*)), m_solver, SLOT(raytraceIso(const Quadrature*,const Mesh*,const XSection*)));
+    connect(this, SIGNAL(signalLaunchSolver(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)), m_solver, SLOT(gssolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)));
     connect(m_solver, SIGNAL(signalNewIteration(std::vector<float>*)), outputDialog, SLOT(reRender(std::vector<float>*)));
     m_solverWorkerThread.start();
 
@@ -159,13 +159,8 @@ void MainWindow::on_launchSolverPushButton_clicked()
     // This can't be done without the energy group information
     m_mesh->calcAreas(m_quad, m_parser->getGammaEnergyGroups());
 
-    // First collision source
-    //std::vector<float> raytraced = raytrace(m_quad, m_mesh, m_xs);
+    // When the raytracer finishes, the gs solver is automatically launched
     emit signalLaunchRaytracer(m_quad, m_mesh, m_xs);
-    // Run the raytracer
-    //std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, NULL);
-    //emit signalLaunchSolver(m_quad, m_mesh, m_xs, NULL);
-    //outputDialog->updateSolution(solution);
 }
 
 void MainWindow::userDebugNext()
