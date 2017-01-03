@@ -4,7 +4,6 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QMatrix4x4>
-//#include <qopenglfunctions.h>
 
 class QuadGlWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {

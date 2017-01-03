@@ -2,7 +2,6 @@
 #define COLORMAPPABLE_H
 
 #include <vector>
-
 #include <QBrush>
 
 class ColorMappable

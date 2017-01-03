@@ -7,7 +7,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
 
-#include "colormappable.h"
+#include "gui/colormappable.h"
 
 class Mesh;
 
@@ -35,7 +35,6 @@ private:
     bool m_logInterp;
     Ui::OutputDialog *ui;
     QGraphicsScene *scene;
-    //QGraphicsRectItem *rect;
     QStringListModel *m_listModel;
 
     std::vector<QGraphicsRectItem*> rects;
@@ -48,7 +47,6 @@ private:
 
 
 protected slots:
-    //void disp(std::vector<float>);
     void setSliceLevel(int level);
     void updateMeshSlicePlane();
     void reRender(std::vector<float>*);

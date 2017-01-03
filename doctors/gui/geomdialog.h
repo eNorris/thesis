@@ -5,7 +5,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
 
-#include "colormappable.h"
+#include "gui/colormappable.h"
 
 class Mesh;
 

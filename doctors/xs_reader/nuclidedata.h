@@ -2,17 +2,7 @@
 #define NUCLIDEDATA_H
 
 #include "ampxrecordparsers.h"
-
 #include <vector>
-
-// This is supposedly an improved macro that can save you in certain situations with
-// side effects. However, I don't know if this is supported on Windows machines, so
-// I have also inlcuded the standard MAX macros
-//#define MAX(x, y) (((x) > (y)) ? (x) : (y))
-#define MAX(a,b) \
-   ({ __typeof__ (a) _a = (a); \
-       __typeof__ (b) _b = (b); \
-     _a > _b ? _a : _b; })
 
 class NuclideData
 {
@@ -59,7 +49,6 @@ public:
 
     const AmpxRecordParserType10 &getGammaScatterDirectory() const { return gScatter1; }
     const std::vector<AmpxRecordParserType12*> &getGammaScatterMatrices() const { return gScatter2; }
-    //std::vector<AmpxRecordParserType12*> getGammaScatterMatricesMt(int mt) const;
     AmpxRecordParserType12 *getGammaScatterMatrix(const int mt, const int nl) const;
 };
 

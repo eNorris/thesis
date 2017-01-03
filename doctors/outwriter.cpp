@@ -1,12 +1,9 @@
 #include "outwriter.h"
 
-//#include <istream>
 #include <fstream>
 #include <vector>
 #include <string>
 #include <iomanip>
-
-
 
 #include <QDebug>
 
@@ -120,19 +117,4 @@ void OutWriter::writeFloatArrays(std::string filename, const std::vector<std::ve
     fout.close();
 }
 
-/*
-void OutWriter::writeArray(std::string filename, const std::vector<float>& arry)
-{
-    std::ofstream fout;
-    fout.open(filename.c_str());
 
-    fout << std::fixed;
-    fout << std::setprecision(6);
-
-    for(int i = 0; i < arry.size(); i++)
-        fout << arry[i] << '\n';
-
-    fout.flush();
-    fout.close();
-}
-*/

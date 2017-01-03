@@ -19,8 +19,6 @@ GeomDialog::GeomDialog(QWidget *parent) :
     ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
     ui->graphicsView->setInteractive(true);
     ui->graphicsView->setMouseTracking(true);
-    //ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    //ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
 
     connect(ui->sliceVerticalSlider, SIGNAL(sliderMoved(int)), ui->sliceSpinBox, SLOT(setValue(int)));
@@ -28,7 +26,6 @@ GeomDialog::GeomDialog(QWidget *parent) :
 
     connect(ui->sliceSpinBox, SIGNAL(valueChanged(int)), this, SLOT(setSliceLevel(int)));
 
-    //connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(updateMeshSlicePlane()));
     connect(ui->xyRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
     connect(ui->xzRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
     connect(ui->yzRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
@@ -37,10 +34,6 @@ GeomDialog::GeomDialog(QWidget *parent) :
     connect(ui->densityRadioButton, SIGNAL(clicked()), this, SLOT(updateRenderType()));
     connect(ui->atomDensityRadioButton, SIGNAL(clicked()), this, SLOT(updateRenderType()));
     connect(ui->ctRadioButton, SIGNAL(clicked()), this, SLOT(updateRenderType()));
-
-    //connect(ui->xyRadioButton, SIGNAL())
-
-    // TODO updateMeshSlicePlane when a radio button is selected
 }
 
 GeomDialog::~GeomDialog()
@@ -68,11 +61,6 @@ void GeomDialog::setSliceLevel(int level)
 
     if(level < 0)
         level = ui->sliceSpinBox->value();
-
-    //loadUniqueBrush();
-    //loadParulaBrush();
-    //loadViridis256Brush();
-    //loadPhantom19Brush();
 
     if(m_rendertype == 0)
         loadPhantom19Brush();
@@ -178,7 +166,6 @@ void GeomDialog::setSliceLevel(int level)
             return;
         }
 
-        //loadUniqueBrush();
         for(unsigned int i = 0; i < m_mesh->yElemCt; i++)
             for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
             {

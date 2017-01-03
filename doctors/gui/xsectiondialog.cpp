@@ -2,7 +2,6 @@
 #include "ui_xsectiondialog.h"
 
 #include "xsection.h"
-
 #include "xs_reader/ampxparser.h"
 
 XSectionDialog::XSectionDialog(QWidget *parent) :
@@ -17,9 +16,6 @@ XSectionDialog::XSectionDialog(QWidget *parent) :
 XSectionDialog::~XSectionDialog()
 {
     delete ui;
-
-    //if(m_xs != NULL)
-    //    delete m_xs;
 }
 
 void XSectionDialog::updateXs(XSection *xs)

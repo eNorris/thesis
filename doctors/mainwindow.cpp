@@ -82,18 +82,6 @@ MainWindow::MainWindow(QWidget *parent):
     connect(ui->quadExplorePushButton, SIGNAL(clicked()), quadDialog, SLOT(show()));
     connect(ui->geometryExplorePushButton, SIGNAL(clicked()), geomDialog, SLOT(show()));
 
-    // Connect open buttons
-    //connect(ui->geometryOpenPushButton, SIGNAL(clicked()), this, SLOT(slotOpenCtData()));
-
-    // Connect solver launch button
-    //connect(ui->launchSolverPushButton, SIGNAL(clicked()), this, SLOT(launchSolver()));
-
-    //connect(this, SIGNAL(signalNewIteration(std::vector<float>*)), outputDialog, SLOT(reRender(std::vector<float>*)));
-
-    //connect(ui->quadTypecomboBox, SIGNAL(activated(int)), this, SLOT(slotQuadSelected(int)));
-    //connect(ui->quadData1ComboBox, SIGNAL(activated(int)), this, SLOT(slotQuadSelected(int)));
-    //connect(ui->quadData2ComboBox, SIGNAL(activated(int)), this, SLOT(slotQuadSelected(int)));
-
     connect(m_parser, SIGNAL(signalNotifyNumberNuclides(int)), ui->mainProgressBar, SLOT(setMaximum(int)));
 
     connect(m_solver, SIGNAL(solverFinished(std::vector<float>*)), this, SLOT(onSolverFinished(std::vector<float>*)));
@@ -113,9 +101,6 @@ MainWindow::MainWindow(QWidget *parent):
     connect(this, SIGNAL(signalLaunchRaytracer(const Quadrature*,const Mesh*,const XSection*)), m_solver, SLOT(raytrace(const Quadrature*,const Mesh*,const XSection*)));
     connect(this, SIGNAL(signalLaunchSolver(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)), m_solver, SLOT(gssolver(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)));
     connect(m_solver, SIGNAL(signalNewIteration(std::vector<float>*)), outputDialog, SLOT(reRender(std::vector<float>*)));
-    //connect(this, SIGNAL(signalBeginXsParse(QString)), m_parser, SLOT(parseFile(QString)));
-    //connect(m_parser, SIGNAL(signalXsUpdate(int)), this, SLOT(xsParseUpdateHandler(int)));
-    //connect(m_parser, SIGNAL(finishedParsing(AmpxParser*)), this, SLOT(buildMaterials(AmpxParser*)));
     m_solverWorkerThread.start();
 
     // Add the tooltips
@@ -130,39 +115,18 @@ MainWindow::MainWindow(QWidget *parent):
 
 
     // Make a configuration object and load its defaults
-    //config = new Config;
     m_config = new Config;
-    //m_config->loadFile("testinput.cfg");
     m_config->loadDefaults();
 
     qDebug() << "Loaded default configuration";
 
-    //Quadrature *m_quad = new Quadrature(config);
-    //m_quad = new Quadrature(m_config);
     quadDialog->updateQuad(m_quad);
-
-    //Mesh *mesh = new Mesh(config, quad);
-    //m_mesh = new Mesh(m_config, m_quad);
-
-
-    //XSection *xs = new XSection(config);
     m_xs = new XSection();
-    //xsDialog->updateXs(m_xs);
 
     AssocLegendre a;
     int l = 5;
     for(int m = 0; m <= l; m++)
         std::cout << a(l, m, 0.75) << std::endl;
-
-
-
-    //OutWriter::writeZoneId(std::string("zoneid.dat"), *m_mesh);
-
-    //outputDialog->updateMesh(m_mesh);
-    //std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, m_config);
-    //std::vector<float> raysolution = raytrace(m_quad, m_mesh, m_xs, m_config);
-    //std::vector<float> solution = gssolver(m_quad, m_mesh, m_xs, m_config, raysolution);
-    //outputDialog->updateSolution(raysolution);
 }
 
 MainWindow::~MainWindow()
@@ -184,14 +148,10 @@ MainWindow::~MainWindow()
     delete m_goodPalette;
     delete m_badPalette;
 
-    //for(int i = 0; i < m_mats.size(); i++)
-    //    delete m_mats[i];
-
     m_xsWorkerThread.quit();
     m_xsWorkerThread.wait();
 }
 
-//void MainWindow::launchSolver()
 void MainWindow::on_launchSolverPushButton_clicked()
 {
     outputDialog->show();
@@ -223,12 +183,9 @@ QMutex &MainWindow::getBlockingMutex()
     return m_mutex;
 }
 
-void MainWindow::on_geometryOpenPushButton_clicked() //slotOpenCtData()
+void MainWindow::on_geometryOpenPushButton_clicked()
 {
     QString filename = QFileDialog::getOpenFileName(this, "Open CT Data File", "/media/data/thesis/doctors/data/", "Binary Files(*.bin);;All Files (*)");
-
-    //if(!filename.isEmpty())
-    //    m_config->loadFile(filename.toStdString());
 
     if(filename.isEmpty())
     {
@@ -253,7 +210,6 @@ void MainWindow::on_geometryOpenPushButton_clicked() //slotOpenCtData()
         return;
     }
 
-    //m_mesh->calcAreas(m_quad, m_config->m);
     qDebug() << "Here the zslice = " << m_mesh->zElemCt;
     geomDialog->updateMesh(m_mesh);
     outputDialog->updateMesh(m_mesh);
@@ -269,7 +225,6 @@ void MainWindow::updateLaunchButton()
     if(m_geomLoaded && m_quadLoaded && m_xsLoaded)
     {
         ui->launchSolverPushButton->setEnabled(true);
-        //ui->launchSolverPushButton->setToolTip("Ready to launch solver!");
 
         McnpWriter mcnpwriter;
         mcnpwriter.writeMcnp("../mcnp.gitignore/mcnp_out.inp", m_mesh, false);
@@ -292,39 +247,33 @@ void MainWindow::updateLaunchButton()
 
     if(m_quadLoaded)
     {
-        //ui->geometryGroupBox->setPalette(*m_goodPalette);
         ui->quadGroupBox->setStyleSheet("QGroupBox { color: black; } ");
         ui->quadExplorePushButton->setEnabled(true);
     }
     else
     {
-        //ui->geometryGroupBox->setPalette(*m_badPalette);
         ui->quadGroupBox->setStyleSheet("QGroupBox { color: red; } ");
         ui->quadExplorePushButton->setEnabled(false);
     }
 
     if(m_xsLoaded)
     {
-        //ui->geometryGroupBox->setPalette(*m_goodPalette);
         ui->xsGroupBox->setStyleSheet("QGroupBox { color: black; } ");
         ui->xsExplorePushButton->setEnabled(true);
     }
     else
     {
-        //ui->geometryGroupBox->setPalette(*m_badPalette);
         ui->xsGroupBox->setStyleSheet("QGroupBox { color: red; } ");
         ui->xsExplorePushButton->setEnabled(false);
     }
 
     if(m_paramsLoaded)
     {
-        //ui->geometryGroupBox->setPalette(*m_goodPalette);
         ui->paramsGroupBox->setStyleSheet("QGroupBox { color: black; } ");
         ui->paramsExplorePushButton->setEnabled(true);
     }
     else
     {
-        //ui->geometryGroupBox->setPalette(*m_badPalette);
         ui->paramsGroupBox->setStyleSheet("QGroupBox { color: red; } ");
         ui->paramsExplorePushButton->setEnabled(false);
     }
@@ -456,8 +405,6 @@ void MainWindow::xsParseErrorHandler(QString msg)
 
 void MainWindow::xsParseUpdateHandler(int x)
 {
-    //qDebug() << x << "/" << m_parser->getNumberNuclides();
-    //ui->mainProgressBar->setMaximum(m_parser->getNumberNuclides());
     ui->mainProgressBar->setValue(x+1);
     // TODO: should catch signal emitted from the AmpxParser
 }
@@ -468,7 +415,6 @@ bool MainWindow::buildMaterials(AmpxParser *parser)
 
     // One extra material for the empty material at the end
     m_xs->allocateMemory(static_cast<unsigned int>(MaterialUtils::hounsfieldRangePhantom19Elements.size()+1), parser->getGammaEnergyGroups(), 6);
-
 
     bool allPassed = true;
 
@@ -520,12 +466,3 @@ void MainWindow::onSolverFinished(std::vector<float> *solution)
 
     OutWriter::writeFloatArrays("/media/Storage/thesis/doctors/solution.dat", push);
 }
-
-/*
-void MainWindow::launchXsReader()
-{
-    qDebug() << "MainWindow.cpp: 341: Yeah... not implemented yet...";
-
-    //QThread q;
-}
-*/

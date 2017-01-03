@@ -23,8 +23,6 @@ public:
     static const std::vector<int> hounsfieldRangePhantom19Elements;
     static const std::vector<std::vector<float> > hounsfieldRangePhantom19Weights;
 
-    //static void hounsfieldRangePhantom19ZaidFract(std::vector<std::vector<int> > &zaids, std::vector<std::vector<float> > &fracts);
-
     static bool validate();
 
     static std::vector<float> weightFracToAtomFrac(std::vector<int> elements, std::vector<float> weights);

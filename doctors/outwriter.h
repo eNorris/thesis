@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <string>
-//#include <iostream>
 #include <fstream>
 #include <iomanip>
 #include <QDebug>
@@ -13,12 +12,6 @@
 #include <cstdarg>  // For variadic templates
 
 class Mesh;
-
-//template<typename T>
-//static void writeArray(std::string filename, const std::vector<T>& arry);
-
-//template<typename T1, typename T2>
-//static void writeArray2(std::string filename, const std::vector<T1>& arry1, const std::vector<T2>& arry2);
 
 class OutWriter
 {
@@ -30,8 +23,6 @@ public:
 
     static void writeZoneId(std::string filename, const Mesh& mesh);
 
-    //static void writeArray(std::string filename, const std::vector<float>& arry);
-
     template<typename T>
     static void writeArray(std::string filename, const std::vector<T>& arry);
 
@@ -40,12 +31,8 @@ public:
 
     template<typename T1, typename T2, typename T3>
     static void writeArray3(std::string filename, const std::vector<T1>& arry1, const std::vector<T2>& arry2, const std::vector<T3>& arry3);
-    //static void writeArray(std::string filename, const std:::vector<float>& arry);
 
     static void writeFloatArrays(std::string filename, const std::vector<std::vector<float> >& arry);
-
-    //template<typename... types>
-    //void writeArrayT(std::string filename, const std::vector<types...>& args);
 
 };
 

@@ -12,7 +12,6 @@ public:
     void setModifiers(Qt::KeyboardModifiers mods);
 
 private:
-    //float m_zoom;
     float m_zoomFactorBase;
     Qt::KeyboardModifiers m_modifiers;
     QPointF target_scene_pos, target_viewport_pos;

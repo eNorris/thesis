@@ -20,14 +20,10 @@ public:
     ~XSectionDialog();
 
     void updateXs(XSection *xs);
-
     void setXs(AmpxParser *p);
-
-
 
 private:
     Ui::XSectionDialog *ui;
-
     XSection *m_xs;
 };
 

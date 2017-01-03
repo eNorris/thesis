@@ -3,24 +3,16 @@
 #include <cmath>
 #include <limits>
 
-
-
-
 double doubleFactorial(double x)
 {
     if(x < 2.0)
         return 1.0;
 
-    //if((int)(x) % 2 == 0)
-    //{
     return x * doubleFactorial(x-2.0);
-    //} else {
-    //
-    //}
 }
 
 
-AssocLegendre::AssocLegendre() //: m_maxOrder(-1)
+AssocLegendre::AssocLegendre()
 {
 
 }

@@ -70,18 +70,13 @@ public:
     QMutex &getBlockingMutex();
 
 protected slots:
-    //void launchSolver();
     void userDebugNext();
     void userDebugAbort();
-    //void slotLoadConfigClicked();
-    //void slotOpenCtData();
     void on_geometryOpenPushButton_clicked();
     void on_quadTypeComboBox_activated(int);
     void on_quadData1ComboBox_activated(int);
     void on_quadData2ComboBox_activated(int);
     void on_launchSolverPushButton_clicked();
-    //void slotQuadSelected(int);
-    //void slotQuadSelected(int);
     void on_xsOpenPushButton_clicked();
     void on_xsExplorePushButton_clicked();
 
@@ -90,13 +85,11 @@ protected slots:
     void xsParseUpdateHandler(int x);
 
     bool buildMaterials(AmpxParser *parser);
-    //void addMaterial(std::vector<int> z, std::vector<float> w, XSection *xs, AmpxParser *ampxParser);
 
     void onRaytracerFinished(std::vector<float>* uncollided);
     void onSolverFinished(std::vector<float>* solution);
 
 signals:
-    //void signalNewIteration(std::vector<float>*);
     void signalLaunchRaytracer(const Quadrature *quad, const Mesh *mesh, const XSection *xs);
     void signalLaunchSolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<float> *uflux);
     void signalDebugHalt(std::vector<float>);

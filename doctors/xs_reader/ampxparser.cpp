@@ -35,7 +35,6 @@ bool AmpxParser::openFile(QString filename)
 
 bool AmpxParser::parseFile(QString filename)
 {
-    //qDebug() << "Parsing begins...";
     if(openFile(filename))
     {
         if(parseHeader())
@@ -109,9 +108,6 @@ bool AmpxParser::parseData()
 
     for(int i = 0; i < header.getNumberNuclides(); i++)
     {
-        // output the current nuclide
-
-        //qDebug() << "Reading nuclide " << (i+1) << "/" << header.getNumberNuclides();
         NuclideData *nextData = new NuclideData;
         nextData->parse(binfile, header.getGroupCountNeutron(), header.getGroupCountGamma());
         data.push_back(nextData);

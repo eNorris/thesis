@@ -1,6 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include "globals.h"
+
 #include <string>
 #include <vector>
 
@@ -11,13 +13,9 @@ public:
     ~Config();
 
     void loadDefaults();
-    //void loadFile(std::string filename);
 
     std::string resultsBasename;
-    // callback output
 
-    // Source and collimator
-    // callback_spectrum
     std::string spectrumFile;
     float sourceFanAngle;
     float sourceConeAngle;
@@ -45,9 +43,6 @@ public:
 
     // Bowtie and flat filter
     std::string bowtieType;  // Bowtie type: small, medium, large
-    //int m_flatFilterCount;  // The number of flat filters
-    //float *m_flatFilterThickness;  // [cm]
-    //std::string *m_flatFilterMat;  // material ('cu', 'al', etc.)
     std::vector<std::string> flatFilterMat;
     std::vector<float> flatFilterThickness;
 

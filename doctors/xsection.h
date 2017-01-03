@@ -3,10 +3,7 @@
 
 #include <vector>
 
-//#include "config.h"
-
 class AmpxParser;
-
 
 class XSection
 {
@@ -18,13 +15,7 @@ public:
     std::vector<float> m_scat1d;
 
     XSection();
-    //XSection(const Config *config);
     ~XSection();
-
-
-    //int operator()(int grp, int d2, int d3, int d4) const;
-
-    //void load(const Config *config);
 
     unsigned int groupCount() const;
 

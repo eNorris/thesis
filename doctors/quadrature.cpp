@@ -4,36 +4,15 @@
 #include <string>
 #include <qmath.h>
 
-// Static allocators
-//const Quadrature Quadrature::ms_sn2(2);
-
 Quadrature::Quadrature() : m_angles(0)
 {
 
 }
 
-//Quadrature::Quadrature(const Config *config) : m_angles(0)
-//{
-//    load(config);
-//}
-
 Quadrature::Quadrature(const int sn)
 {
     loadSn(sn);
 }
-
-/*
-void Quadrature::load(const Config *config)
-{
-    //int sn = config->sn;
-    if(config->quadType == "sn")
-        loadSn(config->sn);
-    else if(config->quadType == "special")
-        loadSpecial(config->quadSpecial);
-    else
-        qDebug() << "Unknown quadrature type: " << QString::fromStdString(config->quadType);
-}
-*/
 
 void Quadrature::loadSpecial(const int special)
 {
@@ -216,11 +195,6 @@ void Quadrature::loadSn(const int sn)
         qDebug() << "ERROR: Unknown quadrature!! Sn=" << sn;
     }
 }
-
-//const Quadrature& Quadrature::getSn2()
-//{
-//    return ms_sn2;
-//}
 
 int Quadrature::angleCount() const
 {

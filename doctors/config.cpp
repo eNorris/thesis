@@ -1,11 +1,6 @@
-#define _USE_MATH_DEFINES
-#include <cmath>
-
 #include "config.h"
 
 #include <QDebug>
-
-
 
 // This project relies on libconfig++ being installed. To install it, download libconfig-X.X.tar.gz from http://www.hyperrealm.com/libconfig/  unzip.
 //   Follow the directions in the INSTALL file (./configure, make, make install). Then run "sudo ldconfig" to update the LD path variables so it can be found.

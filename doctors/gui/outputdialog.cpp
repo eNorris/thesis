@@ -1,8 +1,9 @@
+#include "globals.h"
+
 #include "outputdialog.h"
 #include "ui_outputdialog.h"
 
 #include <QDebug>
-#include <cmath>
 #include <QString>
 #include <QStringListModel>
 
@@ -34,16 +35,12 @@ OutputDialog::OutputDialog(QWidget *parent) :
     ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
     ui->graphicsView->setInteractive(true);
     ui->graphicsView->setMouseTracking(true);
-    //ui->graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    //ui->graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-
 
     connect(ui->sliceVerticalSlider, SIGNAL(sliderMoved(int)), ui->sliceSpinBox, SLOT(setValue(int)));
     connect(ui->sliceSpinBox, SIGNAL(valueChanged(int)), ui->sliceVerticalSlider, SLOT(setValue(int)));
 
     connect(ui->sliceSpinBox, SIGNAL(valueChanged(int)), this, SLOT(setSliceLevel(int)));
 
-    //connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(updateMeshSlicePlane()));
     connect(ui->xyRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
     connect(ui->xzRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
     connect(ui->yzRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
@@ -106,17 +103,13 @@ void OutputDialog::updateSolution(std::vector<float> *data)
 void OutputDialog::reRender(std::vector<float> *data)
 {
     updateSolution(data);
-    //updateMeshSlicePlane();
     setSliceLevel(ui->sliceVerticalSlider->value());
 }
 
 
 void OutputDialog::setSliceLevel(int level)
 {
-    // TODO - this should be dynamic!
-    const int energyGroup = ui->energyComboBox->currentIndex();  // = 5;
-
-    //qDebug() << "Set the slice to " << level;
+    const int energyGroup = ui->energyComboBox->currentIndex();
 
     if(level < 0)
     {
@@ -149,8 +142,6 @@ void OutputDialog::setSliceLevel(int level)
         qDebug() << "ERROR: There are no rectangles in the drawing pipeline!";
         qDebug() << "Did you call the mesher?";
         updateMeshSlicePlane();
-        //dispErrMap();
-        //return;
     }
 
     loadParulaBrush();
@@ -246,7 +237,6 @@ void OutputDialog::setSliceLevel(int level)
                         fid = round(63*(flux-m_minvalGlobal) / (m_maxvalGlobal-m_minvalGlobal));
                 }
 
-                // TODO - Not sure how this can happen, but it seems to....
                 if(fid > 63)
                 {
                     qDebug() << "WARNING: fid > 63!";
@@ -271,9 +261,6 @@ void OutputDialog::setSliceLevel(int level)
         }
         list << datastring;
         list << fidstring;
-
-        // Makes the OutputDialog update the listview
-        //m_listModel->setStringList(list);
     }
     else if(ui->xzRadioButton->isChecked())
     {
@@ -386,14 +373,12 @@ void OutputDialog::setLinearInterp()
 {
     m_logInterp = false;
     refresh();
-    //setSliceLevel(ui->sliceVerticalSlider->value());
 }
 
 void OutputDialog::setLogInterp()
 {
     m_logInterp = true;
     refresh();
-    //setSliceLevel(ui->sliceVerticalSlider->value());
 }
 
 bool OutputDialog::debuggingEnabled()

@@ -133,8 +133,6 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
             }
 
             // Handle the total 1d xs
-            //d = p->getData(naturalIndx);
-            //gxs = d->getGammaXs();
             int tot1dIndex = gxs.getMtIndex(MT_GAMMA_TOTAL_INTERACTION);
             if(tot1dIndex >= 0)
             {
@@ -207,8 +205,6 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
                     }
 
                     // Handle the total 1d xs
-                    //d = p->getData(naturalIndx);
-                    //gxs = d->getGammaXs();
                     int tot1dIndex = gxs.getMtIndex(MT_GAMMA_TOTAL_INTERACTION);
                     if(tot1dIndex >= 0)
                     {

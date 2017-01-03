@@ -25,11 +25,7 @@ public:
     explicit AmpxParser(QObject *parent = NULL);
     virtual ~AmpxParser();
 
-    //bool openFile(QString filename);
     void closeFile();
-
-    //bool parseHeader();
-    //bool parseData();
 
     std::vector<int> getZaids() const;
     int getNumberNuclides() const;

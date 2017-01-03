@@ -179,13 +179,10 @@ AmpxRecordParserType12 *NuclideData::getGammaScatterMatrix(const int mt, const i
     if(nl_index > (scatdir.getNlList()[mtindx]))
     {
         qDebug() << "Requested Legendre expansion is too large (" << nl_index << "/" << (scatdir.getNlList()[mtindx]-1) << ")";
-        //nlindx = scatdir.getNlList()[mtindx]-1;
         return NULL;
     }
 
     indx += nlindx;  // Add the legendre expansions before the one of interest
-
-    //qDebug() << "nuclidedata: 200: indx = " << indx;
 
     return getGammaScatterMatrices()[indx];
 }
