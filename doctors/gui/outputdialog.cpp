@@ -13,10 +13,15 @@ OutputDialog::OutputDialog(QWidget *parent) :
     QDialog(parent),
     m_logInterp(false),
     ui(new Ui::OutputDialog),
+    scene(NULL),
     m_listModel(NULL),
+    rects(),
+    m_data(NULL),
+    m_mesh(NULL),
     m_minvalGlobal(1.0E35f),
     m_maxvalGlobal(-1.0E35f),
-    m_data(NULL)
+    m_minvalGlobalLog(-1.0E35f),
+    m_maxvalGlobalLog(1.0E35f)
 {
     ui->setupUi(this);
 

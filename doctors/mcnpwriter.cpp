@@ -75,7 +75,7 @@ std::string McnpWriter::generateCellString(Mesh *m, bool fineDensity)
         coarseDensity.resize(MaterialUtils::hounsfieldRangePhantom19.size(), 0.0f);
         matVoxels.resize(MaterialUtils::hounsfieldRangePhantom19.size(), 0);
 
-        for(int i = 0; i < m->atomDensity.size(); i++)
+        for(unsigned int i = 0; i < m->atomDensity.size(); i++)
         {
             if(m->zoneId[i] > matVoxels.size())
             {
@@ -85,7 +85,7 @@ std::string McnpWriter::generateCellString(Mesh *m, bool fineDensity)
             coarseDensity[m->zoneId[i]] += m->atomDensity[i];
         }
 
-        for(int i = 0; i < coarseDensity.size(); i++)
+        for(unsigned int i = 0; i < coarseDensity.size(); i++)
         {
             coarseDensity[i] /= matVoxels[i];
         }
@@ -97,7 +97,7 @@ std::string McnpWriter::generateCellString(Mesh *m, bool fineDensity)
         {
             for(unsigned int zi = 0; zi < m->zElemCt; zi++)
             {
-                int mindx = xi * m->yElemCt * m->zElemCt + yi * m->zElemCt + zi;
+                unsigned int mindx = xi * m->yElemCt * m->zElemCt + yi * m->zElemCt + zi;
                 //std::string cellString = "";
 
                 if(mindx == 208311)
@@ -138,7 +138,7 @@ std::string McnpWriter::generateCellString(Mesh *m, bool fineDensity)
                         atmden = m->atomDensity[mindx];
                     else
                         atmden = coarseDensity[m->zoneId[mindx]];
-                    matstr = std::to_string(m->zoneId[mindx]+1) + " " + std::to_string(m->atomDensity[mindx]);
+                    matstr = std::to_string(m->zoneId[mindx]+1) + " " + std::to_string(atmden);
                 }
 
                 int importance = 1;
@@ -186,7 +186,7 @@ std::string McnpWriter::generateDataCards(Mesh *m)
     dataString += "mode p\n";
 
     // The offset prevents the source from landing on a surface plane which can cause particles to get lost
-    float offset = 0.001f;
+    //float offset = 0.001f;
 
     //float maxerg = 0.01;
 
@@ -202,12 +202,12 @@ std::string McnpWriter::generatePhantom19MaterialString()
 {
     std::string allMatString = "c ---------- Materials ----------\n";
 
-    for(int mid = 0; mid < MaterialUtils::hounsfieldRangePhantom19.size(); mid++)
+    for(unsigned int mid = 0; mid < MaterialUtils::hounsfieldRangePhantom19.size(); mid++)
     {
         std::vector<float> atomFractions = MaterialUtils::weightFracToAtomFrac(MaterialUtils::hounsfieldRangePhantom19Elements, MaterialUtils::hounsfieldRangePhantom19Weights[mid]);
         std::string matString = "m" + std::to_string(mid+1) + " \n";
 
-        for(int zindx = 0; zindx < MaterialUtils::hounsfieldRangePhantom19Elements.size(); zindx++)
+        for(unsigned int zindx = 0; zindx < MaterialUtils::hounsfieldRangePhantom19Elements.size(); zindx++)
         {
             if(MaterialUtils::hounsfieldRangePhantom19Weights[mid][zindx] > 0)
                 matString += "     " + std::to_string(MaterialUtils::hounsfieldRangePhantom19Elements[zindx]) + "000 " + std::to_string(atomFractions[zindx]) + "\n";

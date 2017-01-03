@@ -39,7 +39,6 @@ private:
     Config *m_config;
     Mesh *m_mesh;
     XSection *m_xs;
-    //std::vector<XSection *> m_mats;
     Quadrature *m_quad;
 
     OutputDialog *outputDialog;

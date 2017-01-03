@@ -37,11 +37,22 @@ MainWindow::MainWindow(QWidget *parent):
     m_mesh(NULL),
     m_xs(NULL),
     m_quad(NULL),
-    m_configSelectDialog(NULL),
+    outputDialog(NULL),
+    geomDialog(NULL),
+    quadDialog(NULL),
+    xsDialog(NULL),
     m_geomLoaded(false),
     m_xsLoaded(false),
     m_quadLoaded(false),
     m_paramsLoaded(false),
+    m_configSelectDialog(NULL),
+    m_pendingUserContinue(),
+    m_mutex(),
+    m_parser(NULL),
+    m_xsWorkerThread(NULL),
+    m_solver(NULL),
+    m_solverWorkerThread(NULL),
+
     m_solution(NULL),
     m_raytrace(NULL)
 {
@@ -462,7 +473,7 @@ bool MainWindow::buildMaterials(AmpxParser *parser)
     bool allPassed = true;
 
     // Add the materials to the xs library
-    for(int i = 0; i < MaterialUtils::hounsfieldRangePhantom19Elements.size(); i++)
+    for(unsigned int i = 0; i < MaterialUtils::hounsfieldRangePhantom19Elements.size(); i++)
         allPassed &= m_xs->addMaterial(MaterialUtils::hounsfieldRangePhantom19Elements, MaterialUtils::hounsfieldRangePhantom19Weights[i], parser);
 
     // The last material is empty and should never be used

@@ -98,9 +98,9 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                 }
 
                 // Start raytracing through the geometry
-                int xIndx = xIndxStart;
-                int yIndx = yIndxStart;
-                int zIndx = zIndxStart;
+                unsigned int xIndx = xIndxStart;
+                unsigned int yIndx = yIndxStart;
+                unsigned int zIndx = zIndxStart;
 
                 float srcToCellX = sx - x;
                 float srcToCellY = sy - y;
@@ -643,7 +643,7 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                 } // end of for iz
 
                 float sm = 0.0f;
-                for(int i = 0; i < tempFlux.size(); i++)
+                for(unsigned int i = 0; i < tempFlux.size(); i++)
                     sm += tempFlux[i];
 
                 for(unsigned int i = 0; i < tempFlux.size(); i++)
@@ -707,7 +707,7 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
     //OutWriter::writeScalarFluxMesh("./outlog.matmsh", *m_mesh, scalarFlux);
 
     qDebug() << "Convergance of 128, 128, 32:";
-    for(int i = 0; i < converganceTracker.size(); i++)\
+    for(unsigned int i = 0; i < converganceTracker.size(); i++)\
     {
         qDebug() << i << "\t" << converganceTracker[i];
     }
@@ -717,7 +717,7 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
     {
         qDebug() << "Group: " << i << "   maxDiff: " << errMaxList[i];
         qDebug() << "Iterations: " << converganceIters[i];
-        for(int j = 0; j < errList[i].size(); j++)
+        for(unsigned int j = 0; j < errList[i].size(); j++)
             std::cout << errList[i][j] << "\t";
         std::cout << "\n" << std::endl;
     }

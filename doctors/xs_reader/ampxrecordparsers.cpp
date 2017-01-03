@@ -449,7 +449,7 @@ std::vector<float> AmpxRecordParserType9::getSigmaMt(int mtIndex) const
 
 int AmpxRecordParserType9::getMtIndex(const int mtId) const
 {
-    for(int i = 0; i < mt.size(); i++)
+    for(unsigned int i = 0; i < mt.size(); i++)
         if(mtId == mt[i])
             return i;
     return -1;
@@ -499,7 +499,7 @@ bool AmpxRecordParserType10::parse(ifstream &binfile, int nProcesses)
 
 int AmpxRecordParserType10::getMtIndex(const int mtId) const
 {
-    for(int i = 0; i < mt.size(); i++)
+    for(unsigned int i = 0; i < mt.size(); i++)
         if(mtId == mt[i])
             return i;
     return -1;
@@ -507,7 +507,7 @@ int AmpxRecordParserType10::getMtIndex(const int mtId) const
 
 int AmpxRecordParserType10::getNlIndex(const int nlId) const
 {
-    for(int i = 0; i < nl.size(); i++)
+    for(unsigned int i = 0; i < nl.size(); i++)
         if(nlId == nl[i])
             return i;
     return -1;

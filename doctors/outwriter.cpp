@@ -107,9 +107,9 @@ void OutWriter::writeFloatArrays(std::string filename, const std::vector<std::ve
     fout << std::fixed;
     fout << std::setprecision(6);
 
-    for(int indx = 0; indx < arry[0].size(); indx++)
+    for(unsigned int indx = 0; indx < arry[0].size(); indx++)
     {
-        for(int ai = 0; ai < arry.size(); ai++)
+        for(unsigned int ai = 0; ai < arry.size(); ai++)
         {
             fout << arry[ai][indx] << '\t';
         }

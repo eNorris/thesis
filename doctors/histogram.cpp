@@ -35,7 +35,7 @@ void Histogram::insert(float x)
         m_overflows++;
     else
     {
-        for(int indx = 0; indx < m_upperBounds.size(); indx++)
+        for(unsigned int indx = 0; indx < m_upperBounds.size(); indx++)
         {
             if(m_upperBounds[indx] > x)
             {
