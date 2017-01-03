@@ -332,7 +332,7 @@ void MainWindow::on_quadTypeComboBox_activated(int type)
         ui->quadData1ComboBox->addItem("N");
         ui->quadData1ComboBox->addItem("2");
         ui->quadData1ComboBox->addItem("4");
-        ui->quadData1ComboBox->addItem("8");
+        ui->quadData1ComboBox->addItem("6");
         ui->quadData2ComboBox->clear();
         ui->quadData2ComboBox->setEnabled(false);
         ui->quadOpenPushButton->setEnabled(false);
@@ -483,6 +483,8 @@ void MainWindow::onRaytracerFinished(std::vector<float>* uncollided)
 void MainWindow::onSolverFinished(std::vector<float> *solution)
 {
     m_solution = solution;
+
+    OutWriter::writeArray("solution.dat", *solution);
 
     std::vector<float> x;
     std::vector<float> matids;

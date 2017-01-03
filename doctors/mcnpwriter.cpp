@@ -190,7 +190,9 @@ std::string McnpWriter::generateDataCards(Mesh *m)
 
     //float maxerg = 0.01;
 
-    dataString += "sdef par=p pos=" + std::to_string(m->xNodes[m->xNodeCt-1]/2 + offset) + " " + std::to_string(m->yNodes[m->yNodeCt-1]/2 + offset) + " " + std::to_string(m->zNodes[m->zNodeCt-1]/2 + offset) + " erg=0.030\n";
+    dataString += "sdef par=p pos=" + std::to_string(25.3906) + " " + std::to_string(3.5156) + " " + std::to_string(6.8906) + " erg=d1\n" +
+            "SI1 H   0.01   0.045   0.1   0.2\n" +
+            "SP1 D 0      1       0     0\n";
 
 
     return dataString;
@@ -219,11 +221,13 @@ std::string McnpWriter::generatePhantom19MaterialString()
 
 std::string McnpWriter::generateMeshTally(Mesh *m)
 {
-    std::string tallyString = std::string("FMESH4:p GEOM=REC ORIGIN=0 0 0\n     ") +
+    std::string tallyString = std::string("FMESH4:p GEOM=REC ORIGIN=0 0 0 INC \n     ") +
             "IMESH " + std::to_string(m->xNodes[m->xNodeCt-1]) + " IINTS " + std::to_string(m->xElemCt) + "\n     " +
             "JMESH " + std::to_string(m->yNodes[m->yNodeCt-1]) + " JINTS " + std::to_string(m->yElemCt) + "\n     " +
             "KMESH " + std::to_string(m->zNodes[m->zNodeCt-1]) + " KINTS " + std::to_string(m->zElemCt) + "\n     " +
-            "EMESH .01 .045 .1 .2 EINTS 1 1 1 1\n";
+            "EMESH .01 .045 .1 .2 EINTS 1 1 1 1\n" +
+            "UNC:p 0 65536r\n" +
+            "FU4 0 1 1000000\n";
 
     return tallyString;
 }

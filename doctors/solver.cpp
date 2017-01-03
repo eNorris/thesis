@@ -61,60 +61,47 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
     std::vector<float> meanFreePaths;
     meanFreePaths.resize(xs->groupCount());
 
-    //for(unsigned int is = 0; is < config->sourceIntensity.size(); is++)
-    //{
     float sx = 25.3906f;  //config->sourceX[is];
     float sy = 50.0f - 46.4844f;  //config->sourceY[is];
     float sz = 6.8906f;  //config->sourceZ[is];
-    float srcStrength = 1.0f;
-    //float srcStrength = config->sourceIntensity[is];
+    //float srcStrength = 1.0f;
+    //                                0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5  6  7  8
+    std::vector<float> srcStrength = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0};
 
     unsigned int srcIndxX = int(sx / mesh->dx[0]);  // TODO: This will only work for evenly spaced grids
     unsigned int srcIndxY = int(sy / mesh->dy[0]);
     unsigned int srcIndxZ = int(sz / mesh->dz[0]);
 
-    //for(unsigned int xIndxStart = 0; xIndxStart < mesh->xElemCt; xIndxStart++)
-    //    for(unsigned int yIndxStart = 0; yIndxStart < mesh->yElemCt; yIndxStart++)
-    //        for(unsigned int zIndxStart = 0; zIndxStart < mesh->zElemCt; zIndxStart++)
     for(unsigned int zIndxStart = 0; zIndxStart < mesh->zElemCt; zIndxStart++)
         for(unsigned int yIndxStart = 0; yIndxStart < mesh->yElemCt; yIndxStart++)
-            for(unsigned int xIndxStart = 0; xIndxStart < mesh->xElemCt; xIndxStart++)
+            for(unsigned int xIndxStart = 0; xIndxStart < mesh->xElemCt; xIndxStart++)  // For every voxel
             {
                 float x = mesh->xNodes[xIndxStart] + mesh->dx[xIndxStart]/2;
                 float y = mesh->yNodes[yIndxStart] + mesh->dy[yIndxStart]/2;
                 float z = mesh->zNodes[zIndxStart] + mesh->dz[zIndxStart]/2;
 
-                //float tmpdist = 0.0f;
                 std::vector<float> tmpdistv;
                 std::vector<float> tmpxsv;
                 std::vector<float> mfpv;
 
-                //if(xIndxStart == 5 && yIndxStart == 52 && zIndxStart == 13)
-                //{
-                //    qDebug() << "Halt!!!!";
-                //}
-
-
-                if(xIndxStart == srcIndxX && yIndxStart == srcIndxY && zIndxStart == srcIndxZ)
+                if(xIndxStart == srcIndxX && yIndxStart == srcIndxY && zIndxStart == srcIndxZ)  // End condition
                 {
-                    // TODO: Calculate
                     float srcToCellDist = sqrt((x-sx)*(x-sx) + (y-sy)*(y-sy) + (z-sz)*(z-sz));
                     unsigned int zid = mesh->zoneId[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
                     float xsval;
                     for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
                     {
                         xsval = xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
-                        (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = srcStrength * exp(-xsval*srcToCellDist) / (4 * M_PI * srcToCellDist * srcToCellDist);
+                        (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = srcStrength[ie] * exp(-xsval*srcToCellDist) / (4 * M_PI * srcToCellDist * srcToCellDist);
                     }
-                    //tmpdist += srcToCellDist;
                     continue;
                 }
 
+                // Start raytracing through the geometry
                 int xIndx = xIndxStart;
                 int yIndx = yIndxStart;
                 int zIndx = zIndxStart;
 
-                // TODO: Do these need to reverse direction? Right now it's source -> cell
                 float srcToCellX = sx - x;
                 float srcToCellY = sy - y;
                 float srcToCellZ = sz - z;
@@ -133,12 +120,10 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                 for(unsigned int i = 0; i < xs->groupCount(); i++)
                     meanFreePaths[i] = 0.0f;
 
-                //int mchk = 1;
                 bool exhaustedRay = false;
                 while(!exhaustedRay)
                 {
                     // Determine the distance to cell boundaries
-                    //float zz = fabs(xcos);
                     float tx = (fabs(xcos) < tiny ? huge : (mesh->xNodes[xBoundIndx] - x)/xcos);  // Distance traveled [cm] when next cell is
                     float ty = (fabs(ycos) < tiny ? huge : (mesh->yNodes[yBoundIndx] - y)/ycos);  //   entered traveling in x direction
                     float tz = (fabs(zcos) < tiny ? huge : (mesh->zNodes[zBoundIndx] - z)/zcos);
@@ -163,22 +148,15 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                         dirHitFirst = DIRECTION_Z;
                     }
 
-                    // TODO - handle this a little smarter
                     if(tmin < -3E-8)  // Include a little padding for hitting an edge
                         qDebug() << "Reversed space!";
-
-                    //tmpdist += tmin;
 
                     // Update mpf array
                     unsigned int zid = mesh->zoneId[xIndx*xjmp + yIndx*yjmp + zIndx];
                     for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
                     {
-                        //xsval = xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
                         //                   [cm] * [b] * [atom/b-cm]
                         meanFreePaths[ie] += tmin * xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
-
-
-
                     }
                     tmpdistv.push_back(tmin);
                     tmpxsv.push_back(xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx]);
@@ -202,8 +180,6 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                             xIndx--;
                             xBoundIndx--;
                         }
-                        //if(xIndx < 0 || xIndx >= (signed) mesh->xElemCt)
-                        //    exhaustedRay = true;
                     }
                     else if(dirHitFirst == DIRECTION_Y) // y direction
                     {
@@ -220,8 +196,6 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                             yIndx--;
                             yBoundIndx--;
                         }
-                        //if(yIndx < 0 || yIndx >= (signed) mesh->yElemCt)
-                        //    exhaustedRay = true;
                     }
                     else if(dirHitFirst == DIRECTION_Z) // z direction
                     {
@@ -238,8 +212,6 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                             zIndx--;
                             zBoundIndx--;
                         }
-                        //if(zIndx < 0 || zIndx >= (signed) mesh->zElemCt)
-                        //    exhaustedRay = true;
                     }
 
                     if(xIndx == srcIndxX && yIndx == srcIndxY && zIndx == srcIndxZ)
@@ -248,9 +220,8 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
 
                         for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
                         {
+                            //       [#]       = [cm] * [b] * [1/cm-b]
                             meanFreePaths[ie] += finalDist * xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
-                            //xsval = xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
-                            //uflux[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = srcStrength * exp(-xsval*srcToCellDist) / (4 * M_PI * srcToCellDist * srcToCellDist);
                         }
 
                         tmpdistv.push_back(finalDist);
@@ -259,18 +230,10 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                         float gain = finalDist * xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
                         mfpv.push_back(gain);
 
-
-                        //tmpdist += finalDist;
-
-                        //if(fabs(tmpdist - srcToCellDist) > 1E-6)
+                        //if(xIndxStart == 180 && yIndxStart == 193 && zIndxStart == srcIndxZ)
                         //{
-                        //    qDebug() << "Caught a hookey";
+                        //    qDebug() << "Caught a fishy";
                         //}
-
-                        if(xIndxStart == 180 && yIndxStart == 193 && zIndxStart == srcIndxZ)
-                        {
-                            qDebug() << "Caught a fishy";
-                        }
 
                         exhaustedRay = true;
                     }
@@ -279,15 +242,8 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
 
                 for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
                 {
-                    // TODO - For now all sources emit the same strength for all energies
-                    //unsigned short zid = mesh->zoneId[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
-                    //float optical = meanFreePaths[ie];
                     //float mfp = meanFreePaths[ie];
-                    //float r2 = 4 * M_PI * srcToCellDist * srcToCellDist;
-                    //float uf = srcStrength * exp(-optical) / r2;
-
-                    //float mfp = meanFreePaths[ie];
-                    float flx = srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
+                    float flx = srcStrength[ie] * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
 
                     if(flx < 0)
                         qDebug() << "solver.cpp: (291): Negative?";
@@ -303,10 +259,8 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
 
     qDebug() << "Time to complete raytracer: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
-    // TODO - should return a pointer!
     emit raytracerFinished(uflux);
     emit signalNewIteration(uflux);
-    //return uflux;
 }
 
 
@@ -353,6 +307,8 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
     int xjmp = mesh->xjmp();
     int yjmp = mesh->yjmp();
 
+    bool downscatterFlag = false;
+
     if(uflux != NULL)
     {
         qDebug() << "Loading uncollided flux into external source";
@@ -362,6 +318,8 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
             for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
                 //                              [#]   =                        [#/cm^2]      * [cm^3]        *  [b]                               * [1/b-cm]
                 extSource[ei*mesh->voxelCount() + ri] = (*uflux)[ei*mesh->voxelCount() + ri] * mesh->vol[ri] * xs->scatXs1d(mesh->zoneId[ri], ei) * mesh->atomDensity[ri];
+
+        OutWriter::writeArray("externalSrc.dat", extSource);
     }
     else
     {
@@ -384,8 +342,23 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
 
     qDebug() << "Solver::gssolver(): 379: Solving " << mesh->voxelCount() * quad->angleCount() * xs->groupCount() << " elements in phase space";
 
-    for(unsigned int ie = xs->groupCount()-1; ie < xs->groupCount(); ie++)  // for every energy group
+    for(unsigned int ie = 0; ie < xs->groupCount(); ie++)  // for every energy group
     {
+        if(!downscatterFlag)
+        {
+            float dmax = 0.0;
+            int vc = mesh->voxelCount();
+            for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
+            {
+                dmax = (dmax > extSource[ie*vc + ri]) ? dmax : extSource[ie*vc + ri];
+            }
+            if(dmax <= 0.0)
+            {
+                qDebug() << "No external source or downscatter, skipping energy group " << ie;
+                continue;
+            }
+        }
+        downscatterFlag = true;
 
         // TODO - remove check
         //for(int chk = 0; chk < mesh->Axy.size(); chk++)
@@ -428,25 +401,8 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
             for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
             {
                 //  [#]         +=  [#]
-                //float presrc = totalSource[ri];
                 totalSource[ri] += extSource[ie*mesh->voxelCount() + ri];
-
-                //float extsrc = extSource[ie*mesh->voxelCount() + ri];
-                //float totalsrc = totalSource[ri];
-
-                //if(extSource[ie*mesh->voxelCount() + ri] > 0)
-                //{
-                //    qDebug() << "Fish as always";
-                //}
-
-                //tmprat.push_back(extSource[ie*mesh->voxelCount() + ri] / totalSource[ri]);
             }
-
-            //float s = 0;
-            //for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
-            //    s += totalSource[ri];
-            //
-            //qDebug() << "S = " << s;
 
             // Clear for a new sweep
             for(unsigned int i = 0; i < tempFlux.size(); i++)
@@ -615,17 +571,17 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                             //float mu = quad->mu[iang];
                             //float zi = quad->zi[iang];
 
-                            if(ix >= 32 && iy == 4 && iz == 8 && dix>0 && diy>0)
-                            {
-                                qDebug() << "Break condition!";
-                            }
+                            //if(ix >= 32 && iy == 4 && iz == 8 && dix>0 && diy>0)
+                            //{
+                            //    qDebug() << "Break condition!";
+                            //}
 
 
 
-                            if(iy == 128 && iz == 32)
-                            {
+                            //if(iy == 128 && iz == 32)
+                            //{
                                 //qDebug() << ix << "\t" << angFlux;
-                            }
+                            //}
 
                             if(std::isnan(angFlux))
                             {
