@@ -41,7 +41,6 @@ SOURCES += main.cpp\
     quadrature.cpp \
     mesh.cpp \
     xsection.cpp \
-    solvers.cpp \
     gui/outputdialog.cpp \
     gui/geomdialog.cpp \
     gui/quaddialog.cpp \
