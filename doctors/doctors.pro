@@ -36,16 +36,19 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
-    config.cpp \
-    quadrature.cpp \
-    mesh.cpp \
-    xsection.cpp \
     gui/outputdialog.cpp \
     gui/geomdialog.cpp \
     gui/quaddialog.cpp \
     gui/xsectiondialog.cpp \
-    colormappable.cpp \
+    gui/colormappable.cpp \
+    xs_reader/ampxparser.cpp \
+    xs_reader/ampxrecordparsers.cpp \
+    xs_reader/nuclidedata.cpp \
+    mainwindow.cpp \
+    config.cpp \
+    quadrature.cpp \
+    mesh.cpp \
+    xsection.cpp \
     zoomablepannablegraphicsview.cpp \
     quadglwidget.cpp \
     outwriter.cpp \
@@ -53,24 +56,24 @@ SOURCES += main.cpp\
     solverparams.cpp \
     solverparamsdialog.cpp \
     legendre.cpp \
-    xs_reader/ampxparser.cpp \
-    xs_reader/ampxrecordparsers.cpp \
-    xs_reader/nuclidedata.cpp \
     materialutils.cpp \
     solver.cpp \
     histogram.cpp \
-    mcnpwriter.cpp
+    mcnpwriter.cpp \
 
 HEADERS  += mainwindow.h \
-    config.h \
-    quadrature.h \
-    mesh.h \
-    xsection.h \
     gui/outputdialog.h \
     gui/geomdialog.h \
     gui/quaddialog.h \
     gui/xsectiondialog.h \
-    colormappable.h \
+    gui/colormappable.h \
+    xs_reader/ampxparser.h \
+    xs_reader/ampxrecordparsers.h \
+    xs_reader/nuclidedata.h \
+    config.h \
+    quadrature.h \
+    mesh.h \
+    xsection.h \
     zoomablepannablegraphicsview.h \
     quadglwidget.h \
     outwriter.h \
@@ -78,9 +81,6 @@ HEADERS  += mainwindow.h \
     solverparams.h \
     solverparamsdialog.h \
     legendre.h \
-    xs_reader/ampxparser.h \
-    xs_reader/ampxrecordparsers.h \
-    xs_reader/nuclidedata.h \
     materialutils.h \
     solver.h \
     histogram.h \
