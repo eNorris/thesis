@@ -513,7 +513,10 @@ void Solver::gssolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
                 }
                 emit signalNewIteration(scalarFlux);
 
-                converganceTracker.push_back((*scalarFlux)[ie*mesh->voxelCount() + 32*xjmp + 32*yjmp + 8]);
+                unsigned int xTracked = mesh->xElemCt/2;
+                unsigned int yTracked = mesh->yElemCt/2;
+                unsigned int zTracked = mesh->zElemCt/2;
+                converganceTracker.push_back((*scalarFlux)[ie*mesh->voxelCount() + xTracked*xjmp + yTracked*yjmp + zTracked]);
 
             } // end of all angles
 
@@ -1056,7 +1059,10 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                 }
                 emit signalNewIteration(scalarFlux);
 
-                converganceTracker.push_back((*scalarFlux)[ie*mesh->voxelCount() + 128*xjmp + 128*yjmp + 32]);
+                unsigned int xTracked = mesh->xElemCt/2;
+                unsigned int yTracked = mesh->yElemCt/2;
+                unsigned int zTracked = mesh->zElemCt/2;
+                converganceTracker.push_back((*scalarFlux)[ie*mesh->voxelCount() + xTracked*xjmp + yTracked*yjmp + zTracked]);
 
             } // end of all angles
 
