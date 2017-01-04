@@ -513,7 +513,7 @@ void Solver::gssolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
                 }
                 emit signalNewIteration(scalarFlux);
 
-                converganceTracker.push_back((*scalarFlux)[ie*mesh->voxelCount() + 128*xjmp + 128*yjmp + 32]);
+                converganceTracker.push_back((*scalarFlux)[ie*mesh->voxelCount() + 32*xjmp + 32*yjmp + 8]);
 
             } // end of all angles
 
