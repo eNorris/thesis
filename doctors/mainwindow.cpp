@@ -25,7 +25,7 @@
 
 #include "materialutils.h"  // TODO - Delete, not needed, just for testing
 
-#include "config.h"
+//#include "config.h"
 
 QPalette *MainWindow::m_goodPalette = NULL;
 QPalette *MainWindow::m_badPalette = NULL;
@@ -33,7 +33,7 @@ QPalette *MainWindow::m_badPalette = NULL;
 MainWindow::MainWindow(QWidget *parent):
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_config(NULL),
+    //m_config(NULL),
     m_mesh(NULL),
     m_xs(NULL),
     m_quad(NULL),
@@ -52,7 +52,6 @@ MainWindow::MainWindow(QWidget *parent):
     m_xsWorkerThread(NULL),
     m_solver(NULL),
     m_solverWorkerThread(NULL),
-
     m_solution(NULL),
     m_raytrace(NULL)
 {
@@ -115,8 +114,8 @@ MainWindow::MainWindow(QWidget *parent):
 
 
     // Make a configuration object and load its defaults
-    m_config = new Config;
-    m_config->loadDefaults();
+    //m_config = new Config;
+    //m_config->loadDefaults();
 
     qDebug() << "Loaded default configuration";
 
@@ -133,8 +132,8 @@ MainWindow::~MainWindow()
 {
     delete ui;
 
-    if(m_config != NULL)
-        delete m_config;
+    //if(m_config != NULL)
+    //    delete m_config;
 
     if(m_mesh != NULL)
         delete m_mesh;

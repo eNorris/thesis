@@ -1,8 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "globals.h"
-
 #include <string>
 #include <vector>
 

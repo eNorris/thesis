@@ -19,7 +19,7 @@ class Solver;
 class Quadrature;
 class Mesh;
 class XSection;
-class Config;
+//class Config;
 
 namespace Ui {
 class MainWindow;
@@ -36,7 +36,7 @@ public:
 private:
     Ui::MainWindow *ui;
 
-    Config *m_config;
+    //Config *m_config;
     Mesh *m_mesh;
     XSection *m_xs;
     Quadrature *m_quad;
