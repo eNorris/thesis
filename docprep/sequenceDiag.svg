@@ -99,9 +99,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.49497475"
-     inkscape:cx="1326.0357"
-     inkscape:cy="228.05658"
+     inkscape:zoom="0.35"
+     inkscape:cx="2482.1173"
+     inkscape:cy="226.23087"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -128,7 +128,7 @@
      id="layer1">
     <g
        id="g4142"
-       transform="translate(-85.714286,-118.5734)">
+       transform="translate(857.14286,-115.71626)">
       <rect
          y="138.75967"
          x="95.826035"
@@ -150,13 +150,13 @@
     </g>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 162.85714,73.788811 0,1169.428589"
+       d="m 1105.7143,76.645954 0,1169.428546"
        id="path4147"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
     <g
        id="g4188"
-       transform="translate(89.526733,4.2837545)">
+       transform="translate(1032.3839,7.1408974)">
       <rect
          style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          id="rect4151"
@@ -179,12 +179,12 @@
     <path
        inkscape:connector-curvature="0"
        id="path4157"
-       d="m 616.66958,73.788815 0,1169.428585"
+       d="m 1559.5267,76.645958 0,1169.428542"
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        sodipodi:nodetypes="cc" />
     <g
        id="g4193"
-       transform="translate(142.08142,0.08347257)">
+       transform="translate(1084.9386,2.9406154)">
       <rect
          y="20.017378"
          x="775.65521"
@@ -206,13 +206,13 @@
     </g>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 983.51002,73.874248 0,1169.428652"
+       d="m 1926.3672,76.731391 0,1169.428609"
        id="path4168"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
     <g
        id="g4198"
-       transform="translate(844.00012,4.3412992)">
+       transform="translate(1786.8573,7.1984421)">
       <rect
          style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          id="rect4170"
@@ -235,39 +235,39 @@
     <path
        inkscape:connector-curvature="0"
        id="path4176"
-       d="m 2076.8573,73.84636 0,1169.42864"
+       d="m 3019.7144,76.703503 0,1169.428597"
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:16, 32;stroke-dashoffset:0;stroke-opacity:1"
-       d="m 1596.2857,-50.494938 0,1148.571438"
+       d="m 2539.1428,-47.637795 0,1148.571395"
        id="path4178"
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="1653.4285"
-       y="-61.923512"
+       x="2596.2856"
+       y="-59.066368"
        id="text4180"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4182"
-         x="1653.4285"
-         y="-61.923512">Solver Thread</tspan></text>
+         x="2596.2856"
+         y="-59.066368">Solver Thread</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="-17.142876"
-       y="-47.637791"
+       x="925.71429"
+       y="-44.780647"
        id="text4184"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4186"
-         x="-17.142876"
-         y="-47.637791">UI Thread</tspan></text>
+         x="925.71429"
+         y="-44.780647">UI Thread</tspan></text>
     <g
        id="g4251"
-       transform="translate(207.49725,4.2857143)">
+       transform="translate(1150.3544,7.1428572)">
       <rect
          style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          id="rect4235"
@@ -290,71 +290,71 @@
     <path
        inkscape:connector-curvature="0"
        id="path4241"
-       d="m 1315.3544,73.790775 0,1169.428625"
+       d="m 2258.2115,76.647918 0,1169.428582"
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
-       d="m 162.63456,121.24267 453.55849,0"
+       d="m 1105.4917,124.09981 453.5585,0"
        id="path4263"
        inkscape:connector-curvature="0" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker4553)"
-       d="m 161.42857,201.50506 822.85715,0"
+       d="m 1104.2857,204.3622 822.8572,0"
        id="path4545"
        inkscape:connector-curvature="0" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 162.85714,255.79078 1399.25616,0"
+       d="m 1105.7143,258.64792 1399.2561,0"
        id="path4581"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="255.14285"
-       y="108.21935"
+       x="1198"
+       y="111.07649"
        id="text4583"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4585"
-         x="255.14285"
-         y="108.21935"
+         x="1198"
+         y="111.07649"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">show()</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text4683"
-       y="188.21936"
-       x="255.14285"
+       y="191.07651"
+       x="1198"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '"
-         y="188.21936"
-         x="255.14285"
+         y="191.07651"
+         x="1198"
          id="tspan4685"
          sodipodi:role="line">calcAread()</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="184.71428"
-       y="246.79079"
+       x="1127.5714"
+       y="249.64793"
        id="text4759"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4761"
-         x="184.71428"
-         y="246.79079"
+         x="1127.5714"
+         y="249.64793"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">signalLaunchRaytracer</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text4763"
-       y="240.82269"
-       x="1859.4996"
+       y="243.67984"
+       x="2802.3567"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '"
-         y="240.82269"
-         x="1859.4996"
+         y="243.67984"
+         x="2802.3567"
          id="tspan4765"
          sodipodi:role="line">raytraceIso()</tspan></text>
     <rect
@@ -362,11 +362,11 @@
        id="rect4769"
        width="352.94693"
        height="102.94691"
-       x="1748.5265"
-       y="295.74591" />
+       x="2691.3835"
+       y="298.60306" />
     <g
        id="g4775"
-       transform="translate(56,0)">
+       transform="translate(998.85714,2.8571429)">
       <path
          sodipodi:nodetypes="czc"
          inkscape:connector-curvature="0"
@@ -383,17 +383,17 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="1752.8173"
-       y="332.76758"
+       x="2695.6743"
+       y="335.62473"
        id="text4779"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4781"
-         x="1752.8173"
-         y="332.76758"
+         x="2695.6743"
+         y="335.62473"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">Iteration</tspan></text>
     <g
-       transform="translate(130,0)"
+       transform="translate(1072.8571,2.8571429)"
        id="g4783">
       <path
          style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -411,47 +411,48 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="1761.5403"
-       y="372.42679"
+       x="2704.3975"
+       y="375.28394"
        id="text4789"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4791"
-         x="1761.5403"
-         y="372.42679"
+         x="2704.3975"
+         y="375.28394"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">signalNewIteration</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text4793"
-       y="480.43188"
-       x="1762.525"
+       y="483.28903"
+       x="2705.3821"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '"
-         y="480.43188"
-         x="1762.525"
+         y="483.28903"
+         x="2705.3821"
          id="tspan4795"
          sodipodi:role="line">signalNewIteration</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="1682.5453"
-       y="557.00043"
+       x="2625.4023"
+       y="559.85754"
        id="text4797"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4799"
-         x="1682.5453"
-         y="557.00043"
+         x="2625.4023"
+         y="559.85754"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">signalRaytracerFinished</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 1640.1987,255.35184 437.0804,0"
+       d="m 2583.0558,258.20898 437.0804,0"
        id="path4801"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
     <g
-       id="g4827">
+       id="g4827"
+       transform="translate(942.85714,2.8571429)">
       <g
          transform="matrix(-1,0,0,-1,3146.2126,637.60768)"
          id="g4803">
@@ -479,22 +480,22 @@
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
        id="path4811"
-       d="m 617.42579,383.79078 944.68751,0"
+       d="m 1560.2829,386.64792 944.6875,0"
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <text
        sodipodi:linespacing="125%"
        id="text4813"
-       y="374.79077"
-       x="626.71429"
+       y="377.64792"
+       x="1569.5714"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '"
-         y="374.79077"
-         x="626.71429"
+         y="377.64792"
+         x="1569.5714"
          id="tspan4815"
          sodipodi:role="line">reRender()</tspan></text>
     <g
-       transform="translate(56,128)"
+       transform="translate(998.85714,130.85714)"
        id="g4817">
       <g
          id="g4823"
@@ -515,7 +516,7 @@
     </g>
     <g
        id="g4833"
-       transform="translate(0,108)">
+       transform="translate(942.85714,110.85714)">
       <g
          id="g4835"
          transform="matrix(-1,0,0,-1,3146.2126,637.60768)">
@@ -540,7 +541,7 @@
          style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     </g>
     <g
-       transform="translate(0,186)"
+       transform="translate(942.85714,188.85714)"
        id="g4843">
       <g
          transform="matrix(-1,0,0,-1,3146.2126,637.60768)"
@@ -567,25 +568,25 @@
     </g>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 617.42579,485.79078 944.68751,0"
+       d="m 1560.2829,488.64792 944.6875,0"
        id="path4853"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="626.71429"
-       y="476.79077"
+       x="1569.5714"
+       y="479.64792"
        id="text4855"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4857"
-         x="626.71429"
-         y="476.79077"
+         x="1569.5714"
+         y="479.64792"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">reRender()</tspan></text>
     <g
        id="g4859"
-       transform="translate(56,230)">
+       transform="translate(998.85714,232.85714)">
       <g
          transform="matrix(-1,0,0,-1,3016.5698,511.78625)"
          id="g4861">
@@ -607,22 +608,22 @@
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
        id="path4867"
-       d="m 160.83684,569.79078 1401.27646,0"
+       d="m 1103.694,572.64792 1401.2764,0"
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <text
        sodipodi:linespacing="125%"
        id="text4869"
-       y="560.79077"
-       x="180.71429"
+       y="563.64789"
+       x="1123.5714"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '"
-         y="560.79077"
-         x="180.71429"
+         y="563.64789"
+         x="1123.5714"
          id="tspan4871"
          sodipodi:role="line">OnRaytracerFinished()</tspan></text>
     <g
-       transform="translate(56,314)"
+       transform="translate(998.85714,316.85714)"
        id="g4873">
       <g
          id="g4875"
@@ -643,41 +644,41 @@
     </g>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker4889)"
-       d="m 161.62441,644.26058 1155.61449,0"
+       d="m 1104.4816,647.11772 1155.6144,0"
        id="path4881"
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="182.41187"
-       y="632.68646"
+       x="1125.269"
+       y="635.54358"
        id="text4923"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4925"
-         x="182.41187"
-         y="632.68646"
+         x="1125.269"
+         y="635.54358"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">writeArray()</tspan></text>
     <path
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
        id="path4927"
-       d="m 162.85714,723.79078 1399.25616,0"
+       d="m 1105.7143,726.64792 1399.2561,0"
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <text
        sodipodi:linespacing="125%"
        id="text4929"
-       y="714.79077"
-       x="184.71428"
+       y="717.64789"
+       x="1127.5714"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '"
-         y="714.79077"
-         x="184.71428"
+         y="717.64789"
+         x="1127.5714"
          id="tspan4931"
          sodipodi:role="line">signalLaunchSolver</tspan></text>
     <g
-       transform="translate(56,468)"
+       transform="translate(998.85714,470.85714)"
        id="g4933">
       <path
          style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -695,18 +696,18 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="1855.4996"
-       y="708.82269"
+       x="2798.3567"
+       y="711.67981"
        id="text4939"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4941"
-         x="1855.4996"
-         y="708.82269"
+         x="2798.3567"
+         y="711.67981"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">gsSolverIso()</tspan></text>
     <g
        id="g4943"
-       transform="translate(130,468)">
+       transform="translate(1072.8571,470.85714)">
       <path
          sodipodi:nodetypes="czc"
          inkscape:connector-curvature="0"
@@ -724,11 +725,11 @@
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
        id="path4949"
-       d="m 1640.1987,723.35184 437.0804,0"
+       d="m 2583.0558,726.20898 437.0804,0"
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <rect
-       y="749.74591"
-       x="1748.5265"
+       y="752.60303"
+       x="2691.3835"
        height="102.94691"
        width="352.94693"
        id="rect4951"
@@ -736,54 +737,54 @@
     <text
        sodipodi:linespacing="125%"
        id="text4953"
-       y="786.76758"
-       x="1752.8173"
+       y="789.62469"
+       x="2695.6743"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '"
-         y="786.76758"
-         x="1752.8173"
+         y="789.62469"
+         x="2695.6743"
          id="tspan4955"
          sodipodi:role="line">Iteration</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text4957"
-       y="826.42676"
-       x="1761.5403"
+       y="829.28387"
+       x="2704.3975"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '"
-         y="826.42676"
-         x="1761.5403"
+         y="829.28387"
+         x="2704.3975"
          id="tspan4959"
          sodipodi:role="line">signalNewIteration</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="1762.525"
-       y="934.43188"
+       x="2705.3821"
+       y="937.289"
        id="text4961"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4963"
-         x="1762.525"
-         y="934.43188"
+         x="2705.3821"
+         y="937.289"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">signalNewIteration</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text4965"
-       y="1011.0004"
-       x="1682.5453"
+       y="1013.8575"
+       x="2625.4023"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '"
-         y="1011.0004"
-         x="1682.5453"
+         y="1013.8575"
+         x="2625.4023"
          id="tspan4967"
          sodipodi:role="line">signalSolverFinished</tspan></text>
     <g
        id="g4969"
-       transform="translate(0,454)">
+       transform="translate(942.85714,456.85714)">
       <g
          id="g4971"
          transform="matrix(-1,0,0,-1,3146.2126,637.60768)">
@@ -808,7 +809,7 @@
          style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     </g>
     <g
-       transform="translate(0,562)"
+       transform="translate(942.85714,564.85714)"
        id="g4979">
       <g
          transform="matrix(-1,0,0,-1,3146.2126,637.60768)"
@@ -835,7 +836,7 @@
     </g>
     <g
        id="g4989"
-       transform="translate(0,640)">
+       transform="translate(942.85714,642.85714)">
       <g
          id="g4991"
          transform="matrix(-1,0,0,-1,3146.2126,637.60768)">
@@ -861,25 +862,25 @@
     </g>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 617.42579,837.79078 944.68751,0"
+       d="m 1560.2829,840.64792 944.6875,0"
        id="path5024"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="626.71429"
-       y="828.79077"
+       x="1569.5714"
+       y="831.64789"
        id="text5026"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan5028"
-         x="626.71429"
-         y="828.79077"
+         x="1569.5714"
+         y="831.64789"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">reRender()</tspan></text>
     <g
        id="g5030"
-       transform="translate(56,582)">
+       transform="translate(998.85714,584.85714)">
       <g
          transform="matrix(-1,0,0,-1,3016.5698,511.78625)"
          id="g5032">
@@ -901,22 +902,22 @@
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
        id="path5038"
-       d="m 617.42579,939.79078 944.68751,0"
+       d="m 1560.2829,942.64792 944.6875,0"
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <text
        sodipodi:linespacing="125%"
        id="text5040"
-       y="930.79077"
-       x="626.71429"
+       y="933.64789"
+       x="1569.5714"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '"
-         y="930.79077"
-         x="626.71429"
+         y="933.64789"
+         x="1569.5714"
          id="tspan5042"
          sodipodi:role="line">reRender()</tspan></text>
     <g
-       transform="translate(56,684)"
+       transform="translate(998.85714,686.85714)"
        id="g5044">
       <g
          id="g5046"
@@ -937,25 +938,25 @@
     </g>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 160.83684,1019.7908 1401.27646,0"
+       d="m 1103.694,1022.6479 1401.2764,0"
        id="path5052"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="180.71429"
-       y="1010.7908"
+       x="1123.5714"
+       y="1013.6479"
        id="text5054"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan5056"
-         x="180.71429"
-         y="1010.7908"
+         x="1123.5714"
+         y="1013.6479"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">OnSolverFinished()</tspan></text>
     <g
        id="g5058"
-       transform="translate(56,764)">
+       transform="translate(998.85714,766.85714)">
       <g
          transform="matrix(-1,0,0,-1,3016.5698,511.78625)"
          id="g5060">
@@ -976,36 +977,36 @@
     <path
        inkscape:connector-curvature="0"
        id="path5066"
-       d="m 161.62441,1076.2606 1155.61449,0"
+       d="m 1104.4816,1079.1177 1155.6144,0"
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker5072)" />
     <text
        sodipodi:linespacing="125%"
        id="text5068"
-       y="1064.6865"
-       x="182.41187"
+       y="1067.5437"
+       x="1125.269"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"><tspan
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '"
-         y="1064.6865"
-         x="182.41187"
+         y="1067.5437"
+         x="1125.269"
          id="tspan5070"
          sodipodi:role="line">writeArray()</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker6090)"
-       d="m 161.62441,1134.2606 1155.61449,0"
+       d="m 1104.4816,1137.1177 1155.6144,0"
        id="path6084"
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="182.41187"
-       y="1122.6865"
+       x="1125.269"
+       y="1125.5437"
        id="text6086"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan6088"
-         x="182.41187"
-         y="1122.6865"
+         x="1125.269"
+         y="1125.5437"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">writeFloatArrays()</tspan></text>
   </g>
 </svg>
