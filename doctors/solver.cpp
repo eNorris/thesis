@@ -584,8 +584,12 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
     const unsigned short DIRECTION_Y = 2;
     const unsigned short DIRECTION_Z = 3;
 
+    const int lSize = pn + 1;
+    const int mSize = 2* pn + 1;
+    const int momentBins = lSize * mSize;
+
     std::vector<float> *uflux = new std::vector<float>;
-    uflux->resize(groups * mesh->voxelCount());
+    uflux->resize(momentBins * groups * mesh->voxelCount());
 
     unsigned int ejmp = mesh->voxelCount();
     unsigned int xjmp = mesh->xjmp();
