@@ -240,12 +240,12 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
 
     qDebug() << "Time to complete raytracer: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
-    emit raytracerFinished(uflux);
+    emit signalRaytracerFinished(uflux);
     emit signalNewIteration(uflux);
 }
 
 
-void Solver::gssolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<float> *uflux)
+void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<float> *uflux)
 {
 
     std::clock_t startMoment = std::clock();
@@ -565,7 +565,8 @@ void Solver::gssolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
         std::cout << "\n" << std::endl;
     }
 
-    emit solverFinished(scalarFlux);
+    emit signalNewIteration(scalarFlux);
+    emit signalSolverFinished(scalarFlux);
 }
 
 
@@ -786,7 +787,7 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
 
     qDebug() << "Time to complete raytracer: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
-    emit raytracerFinished(uflux);
+    emit signalRaytracerFinished(uflux);
     emit signalNewIteration(uflux);
 }
 
@@ -1111,5 +1112,5 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
         std::cout << "\n" << std::endl;
     }
 
-    emit solverFinished(scalarFlux);
+    emit signalSolverFinished(scalarFlux);
 }

@@ -46,8 +46,8 @@ MainWindow::MainWindow(QWidget *parent):
     m_quadLoaded(false),
     m_paramsLoaded(false),
     m_configSelectDialog(NULL),
-    m_pendingUserContinue(),
-    m_mutex(),
+    //m_pendingUserContinue(),
+    //m_mutex(),
     m_parser(NULL),
     m_xsWorkerThread(NULL),
     m_solver(NULL),
@@ -122,10 +122,10 @@ MainWindow::MainWindow(QWidget *parent):
     quadDialog->updateQuad(m_quad);
     m_xs = new XSection();
 
-    AssocLegendre a;
-    int l = 5;
-    for(int m = 0; m <= l; m++)
-        std::cout << a(l, m, 0.75) << std::endl;
+    //AssocLegendre a;
+    //int l = 5;
+    //for(int m = 0; m <= l; m++)
+    //    std::cout << a(l, m, 0.75) << std::endl;
 }
 
 MainWindow::~MainWindow()
@@ -162,6 +162,7 @@ void MainWindow::on_launchSolverPushButton_clicked()
     emit signalLaunchRaytracer(m_quad, m_mesh, m_xs);
 }
 
+/*
 void MainWindow::userDebugNext()
 {
     m_mutex.unlock();
@@ -172,10 +173,12 @@ void MainWindow::userDebugAbort()
 
 }
 
+
 QMutex &MainWindow::getBlockingMutex()
 {
     return m_mutex;
 }
+*/
 
 void MainWindow::on_geometryOpenPushButton_clicked()
 {

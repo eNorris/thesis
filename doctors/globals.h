@@ -10,4 +10,6 @@
 #undef U16_T
 #endif
 
+#define SOL_T float
+
 #endif // GLOBALS_H

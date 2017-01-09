@@ -52,8 +52,8 @@ private:
 
     QFileDialog *m_configSelectDialog;
 
-    QWaitCondition m_pendingUserContinue;
-    QMutex m_mutex;
+    //QWaitCondition m_pendingUserContinue;
+    //QMutex m_mutex;
 
     AmpxParser *m_parser;
     QThread m_xsWorkerThread;
@@ -70,8 +70,8 @@ public:
     QMutex &getBlockingMutex();
 
 protected slots:
-    void userDebugNext();
-    void userDebugAbort();
+    //void userDebugNext();
+    //void userDebugAbort();
     void on_geometryOpenPushButton_clicked();
     void on_quadTypeComboBox_activated(int);
     void on_quadData1ComboBox_activated(int);
