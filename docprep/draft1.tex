@@ -287,6 +287,91 @@ There are six faces on each parallelpiped with normals $<\pm 1, 0, 0>$, $<0, \pm
     \label{simulationfigure}
 \end{figure}
 
+\subsection{Raytracer}
+Discrete ordinate solutions greatly benefit from the presence of a raytracing algorithm to provide the uncollided flux to the solver.
+
+The raytracer was implemented as...
+
+When the solver is changed from isotropic to anisotropic, the raytracer must be able to produce a Pn expansion needed by the anisotropic solver. We defined the spherical harmonic function as
+
+\begin{equation}
+    Y_l^m(\theta, \phi)= 
+\begin{cases}
+\sqrt{2} K_l^m \cos(m \phi) P_l^m(\cos(\theta)),      & m > 0 \\
+K_l^0 P_l^0(\cos(\theta)),              & m = 0  \\
+\sqrt{2} K_l^m \sin(-m \phi) P_l^{-m}(\cos(\theta)),           & m < 0
+\end{cases}
+\end{equation}
+
+where $K_l^m$ is defined as
+
+\begin{equation}
+K_l^m = \sqrt{\frac{2l+1}{4 \pi} \frac{(l-|m|)!}{(l+|m|)!}}
+\end{equation}
+
+and the associated Legendre functions are computed by the recursion
+
+\begin{equation}
+\begin{aligned}
+P_0^0(x) &= 1 \\
+P_m^m(x) &= (2m-1)!!(1-x^2)^{m/2} \\
+P_{m+1}^m(x) &= x(2m+1)P_m^m(x) \\
+P_l^m(x) &= \frac{x(2l-1)}{l-m} P_{l-1}^m (x) - \frac{l+m-1}{l-m} P_{l-2}^m (x)
+\end{aligned}
+\end{equation}
+
+The spherical harmonic expansion is used to approximate a function $f$ by 
+
+\begin{equation}
+f(\theta, \phi) = \sum_{l=0}^\infty \sum_{m=-l}^l y_l^m(\theta, \phi) f_l^m
+\end{equation}
+
+which is exact when the expansion continues to infinity. However, it is trunctated at L yielding
+
+\begin{equation}
+f(\theta, \phi) \approx \sum_{l=0}^L \sum_{m=-l}^l y_l^m(\theta, \phi) f_l^m
+\end{equation}
+
+However, the value of each $f_l^m$ must be computed before the approximation can be used.
+
+These values are computed by
+
+\begin{equation}\label{eq:flm}
+f_l^m = \int_{4 \pi} y_l^m(\theta, \phi) f(\theta, \phi) d\hat{\Omega}
+\end{equation}
+
+In the case of the raytracer solution, since \textit{only} the uncollided source is considered, the direction at any point is always precisely known, the particles are traveling away from the source point. Therefore, the function to be approximated is a Dirac delta function in the two dimensional surface of the unit sphere. Equation~\ref{eq:flm} can be reduced to
+
+\begin{equation}
+f_l^m = \int_{4 \pi} y_l^m(\theta, \phi)f(\theta_0, \phi_0) d\hat{\Omega}
+\end{equation}
+
+The property of the Dirac delta function 
+
+\begin{equation}
+\int_{-\infty}^{\infty} \delta(x_0) f(x) dx = f(x_0)
+\end{equation}
+
+can now be used which reduces Equation~\ref{eq:flm} to
+
+\begin{equation}
+f_l^m = y_l^m(\theta_0, \phi_0)
+\end{equation}
+
+The moments are related to the angular flux by
+
+\begin{equation}
+\phi_l^m(\vec{r}, E) = \int Y_l^m(\hat{\Omega} ') \psi(\vec{r}, \hat{\Omega}', E) d\hat{\Omega}'
+\end{equation}
+
+which becomes
+
+\begin{equation}
+\phi_l^m(\vec{r}, E) = \Psi Y_l^m(\hat{\Omega}_0)
+\end{equation}
+
+where $\Psi$ is equal to the magnitude of $\psi_{unc}$ in the $\hat{\Omega}_0$ direction.
+
 \section{Implementation}
 At this point, we have successfully developed an algorithm that can be implemented on a computer. However, there are many challenges in actually implementing this algorithm.
 
