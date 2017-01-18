@@ -83,8 +83,8 @@ MainWindow::MainWindow(QWidget *parent):
 
     connect(m_parser, SIGNAL(signalNotifyNumberNuclides(int)), ui->mainProgressBar, SLOT(setMaximum(int)));
 
-    connect(m_solver, SIGNAL(solverFinished(std::vector<float>*)), this, SLOT(onSolverFinished(std::vector<float>*)));
-    connect(m_solver, SIGNAL(raytracerFinished(std::vector<float>*)), this, SLOT(onRaytracerFinished(std::vector<float>*)));
+    connect(m_solver, SIGNAL(signalSolverFinished(std::vector<float>*)), this, SLOT(onSolverFinished(std::vector<float>*)));
+    connect(m_solver, SIGNAL(signalRaytracerFinished(std::vector<float>*)), this, SLOT(onRaytracerFinished(std::vector<float>*)));
 
     // Set up xs reader threads
     m_parser->moveToThread(&m_xsWorkerThread);
@@ -98,7 +98,7 @@ MainWindow::MainWindow(QWidget *parent):
     m_solver->moveToThread(&m_solverWorkerThread);
     connect(&m_xsWorkerThread, SIGNAL(finished()), m_solver, SLOT(deleteLater()));
     connect(this, SIGNAL(signalLaunchRaytracer(const Quadrature*,const Mesh*,const XSection*)), m_solver, SLOT(raytraceIso(const Quadrature*,const Mesh*,const XSection*)));
-    connect(this, SIGNAL(signalLaunchSolver(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)), m_solver, SLOT(gssolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)));
+    connect(this, SIGNAL(signalLaunchSolver(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)), m_solver, SLOT(gsSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)));
     connect(m_solver, SIGNAL(signalNewIteration(std::vector<float>*)), outputDialog, SLOT(reRender(std::vector<float>*)));
     m_solverWorkerThread.start();
 

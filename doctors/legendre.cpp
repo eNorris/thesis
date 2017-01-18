@@ -59,7 +59,7 @@ float AssocLegendre::operator()(const int l, const int m, const float x)
 
 
 
-
+/*
 float AssocLegendre::operator ()(const int l, const int m, const float x)
 {
     if(l == 0 && m == 0)
@@ -79,6 +79,7 @@ float AssocLegendre::operator ()(const int l, const int m, const float x)
         return x*(2*l-1)/(l-m) * operator()(l-1, m, x) - (l+m-1.0)/(l-m)*operator()(l-2, m, x);
     }
 }
+*/
 
 
 SphericalHarmonic::SphericalHarmonic()
