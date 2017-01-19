@@ -8,7 +8,7 @@
 \usepackage{color}
 \usepackage{listings}
 \usepackage{fullpage}
-
+\usepackage{mathtools}
 \numberwithin{equation}{subsection}
 
 \definecolor{mygreen}{rgb}{0,0.6,0}
@@ -476,12 +476,10 @@ Spherical & Legendre polynomial, Power, Circular \\ \hline
 
 Legendre polynomials are solutions to
 \begin{equation}
-P_n(x) = \frac{1}{2 \pi i} \oint (1-2\xi x + \xi^2)^{-1/2} \xi^{-n-1} d\xi
+P_n(x) = \frac{1}{2 \pi i} \oint \frac{1}{\sqrt{1-2\xi x + \xi^2}} \frac{1}{\xi^{n+1}} d\xi
 \end{equation}
 
-\begin{equation}
-P_n(x) = \frac{1}{2^n n!}\frac{d^n}{dx^n}(x^2-1)^n
-\end{equation}
+
 
 The first few such solutions are \\
 $P_0(x) = 1$ \\
@@ -492,193 +490,62 @@ $P_4(x) = \frac{1}{8}(35x^4 - 30x^2 + 3)$ \\
 $P_5(x) = \frac{1}{8}(63x^5 - 70x^3 + 15x)$ \\
 $P_6(x) = \frac{1}{16}(231x^6 - 315x^4 + 105x^2 - 5)$ \\
 
+Legencre polynomials are useful for approximating functions truncated at some point. Legendre polynomials are mutually orthogonal which gives them the property
+
+\begin{equation}
+f(x) = \sum_{n=0}^\infty P_n(x)
+\end{equation}
+
+where $f(x)$ is any arbitrary function. Often, like a Fourier series which uses sin and cos instead of Legendre functions, the series is cut off at some threshold as an approximation. As an example of this, consider the function $1.75x^3 + 0.6x^2+.21x-.06$ over the domain $[2,5]$ using the first four Legendre polynomials.
+
+The coefficients are computed
+
+\begin{align}
+k_0 &= \int_2^5 P_0(x) f(x) dx = \int_2^5  f(x) dx\\
+k_1 &= \int_2^5 P_1(x) f(x) dx = \int_2^5 x f(x) dx\\
+k_2 &= \int_2^5 P_2(x) f(x) dx = \int_2^5 \frac{1}{2}(3x^2-1) f(x) dx\\
+k_3 &= \int_2^5 P_3(x) f(x) dx = \int_2^5 \frac{1}{2}(5x^3 - 3x) f(x) dx\\
+\end{align}
+
+These values are then used to reconstruct the original function by
+
+\begin{equation}
+f(x) \approx k_0 P_0(x) + k_1 P_1(x) + k_2 P_2(x) + k_3 P_3(x)
+\end{equation}
+
+
 Associated Legendre polynomials are a generalization of the Legendre polynomial and solve 
+
+\subsection{Associated Legendre Polynomials}\label{sec:assoc_leg}
+
+The associated Legendre polynomials are solutions to the equation 
 
 \begin{equation}
 P_l^m(x) = (-1)^m(1-x^2)^{m/2}\frac{d^m P_l(x)}{dx^m}
 \end{equation}
 
-Both Legendre polynomials and Associated Legendre Polynomials can be calculated using the Boost C++ library.
+The associated Legendre polynomials can be computed recusively by
+
+\begin{align}
+P_m^m(x) &= (-1)^m(2m-1)!!(1-x^2)^(m/2) \\
+P_{m+1}^m(x) &= x(2m+1)P_m^m(x) \\
+(l-m) P_l^m(x) &= x(2l-1)P_{l-1}^m(x) - (l+m-1)P_{l-2}^m(x)
+\end{align}
+
+where $x!!$ is the double factorial function defined by:
+
+\begin{equation}
+x!! = \prod_{k=0}^{\lceil x/2 \rceil - 1} x-2k
+\end{equation}
+
+For example, $5!! = 5 \times 3 \times 1 = 15$ and $6!! = 6 \times 4 \times 2 = 48$.
 
 \subsection{Spherical Harmonic Function}
 
-First, we assume that Laplace's equation is of the seperable form $f(\rho, \theta, \phi) = R(\rho)Y(\theta, \phi)$. Equation \ref{eq_laplace_spherical} can then be rewritten as
-
-\begin{equation} \label{eq_spherical1}
-\begin{split}
-\nabla^2 f(\rho, \theta, \phi) = 
-\frac{1}{\rho^2}
-\frac{\partial}{\partial \rho} 
-\left( \rho^2 \frac{\partial (R(\rho)Y(\theta, \phi))}{\partial \rho}\right) 
-+ \\
-\frac{1}{\rho^2 \sin \theta}
-\frac{\partial}{\partial \theta}
-\left( \sin \theta \frac{\partial (R(\rho)Y(\theta, \phi))}{\partial \theta}\right) 
-+ 
-\frac{1}{\rho^2 \sin^2 \theta} 
-\frac{\partial^2 (R(\rho)Y(\theta, \phi))}{\partial \phi^2} = 0
-\end{split}
-\end{equation}
-
-\noindent
-which simplifies to
-\begin{equation} \label{eq_spherical2}
-\begin{split}
-\frac{Y(\theta, \phi)}{\rho^2}
-\frac{\partial}{\partial \rho} 
-\left( \rho^2 \frac{\partial R(\rho)}{\partial \rho}\right) 
-+ 
-\frac{R(\rho)}{\rho^2 \sin \theta}
-\frac{\partial}{\partial \theta}
-\left( \sin \theta \frac{\partial Y(\theta, \phi)}{\partial \theta}\right) 
-+ \\
-\frac{R(\rho)}{\rho^2 \sin^2 \theta} 
-\frac{\partial^2 Y(\theta, \phi)}{\partial \phi^2}
-\end{split} = 0
-\end{equation}
-
-\noindent
-Multiplying Eq. \ref{eq_spherical2} by $\rho^2 / (R(\rho)Y(\theta, \phi))$ yields
-
-\begin{equation}\label{eq_spherical3}
-\begin{split}
-\frac{1}{R(\rho)}
-\frac{\partial}{\partial \rho} 
-\left( \rho^2 \frac{\partial R(\rho)}{\partial \rho}\right) 
-+ 
-\frac{1}{Y(\theta, \phi) \sin \theta}
-\frac{\partial}{\partial \theta}
-\left( \sin \theta \frac{\partial Y(\theta, \phi)}{\partial \theta}\right) 
-+ \\
-\frac{1}{Y(\theta, \phi) \sin^2 \theta} 
-\frac{\partial^2 Y(\theta, \phi)}{\partial \phi^2} = 0
-\end{split}
-\end{equation}
-
-Equation \ref{eq_spherical3} can be split into two parts, a function of $\rho$ alone and a component that is a function of $\theta$ and $\phi$ alone. The component that is a function of $\theta$ and $\phi$ can be moved to the other side of the equation. Since two functions of different variables are equal, they must each be equal to some constant, $\lambda$. Therefore, Eq. \ref{eq_spherical3} can be rewritten as two equations:
-
-\begin{equation}\label{eq_spherical_r}
-\frac{1}{R(\rho)}
-\frac{\partial}{\partial \rho} 
-\left( \rho^2 \frac{\partial R(\rho)}{\partial \rho}\right) = \lambda
-\end{equation}
-
-\begin{equation}\label{eq_spherical_tp}
-\frac{1}{Y(\theta, \phi) \sin \theta}
-\frac{\partial}{\partial \theta}
-\left( \sin \theta \frac{\partial Y(\theta, \phi)}{\partial \theta}\right) 
-+ \\
-\frac{1}{Y(\theta, \phi) \sin^2 \theta} 
-\frac{\partial^2 Y(\theta, \phi)}{\partial \phi^2} = -\lambda
-\end{equation}
-
-$Y(\theta, \phi)$ can be further seperated into $Y(\theta, \phi) = \Theta(\theta)\Phi(\phi)$ which produces
-
-\begin{equation}\label{eq_spherical_y}
-\begin{split}
-\frac{1}{\Theta(\theta)\Phi(\phi) \sin \theta}
-\frac{\partial}{\partial \theta}
-\left( \sin \theta \frac{\partial (\Theta(\theta)\Phi(\phi))}{\partial \theta}\right) 
-+ \\
-\frac{1}{\Theta(\theta)\Phi(\phi) \sin^2 \theta} 
-\frac{\partial^2 (\Theta(\theta)\Phi(\phi))}{\partial \phi^2} = -\lambda
-\end{split}
-\end{equation}
-
-\noindent
-which simplifies to
-
-\begin{equation}\label{eq_spherical_y2}
-\begin{split}
-\frac{1}{\Theta(\theta) \sin \theta}
-\frac{\partial}{\partial \theta}
-\left( \sin \theta \frac{\partial \Theta(\theta)}{\partial \theta}\right) 
-+ 
-\frac{1}{\Phi(\phi) \sin^2 \theta} 
-\frac{\partial^2 \Phi(\phi)}{\partial \phi^2} = -\lambda
-\end{split}
-\end{equation}
-
-Multiplying Eq. \ref{eq_spherical_y2} by $\sin^2(\theta)$ and rearranging yields
-
-\begin{equation}\label{eq_spherical_y3}
-\begin{split}
-\frac{\sin \theta}{\Theta(\theta)}
-\frac{\partial}{\partial \theta}
-\left( \sin \theta \frac{\partial \Theta(\theta)}{\partial \theta}\right) 
-+ \lambda \sin \theta
- = \frac{-1}{\Phi(\phi)} 
-\frac{\partial^2 \Phi(\phi)}{\partial \phi^2}
-\end{split}
-\end{equation}
-
-As before, each side of Eq. \ref{eq_spherical_y3} is a function of a single variable, therefore, both sides are equal to some constant. In this case, we select $m^2$ to be  the constant variable. The produces
-
-\begin{equation}\label{eq_spherical_t}
-\begin{split}
-\frac{\sin \theta}{\Theta(\theta)}
-\frac{\partial}{\partial \theta}
-\left( \sin \theta \frac{\partial \Theta(\theta)}{\partial \theta}\right) 
-+ \lambda \sin \theta
- = m^2
-\end{split}
-\end{equation}
-
-\begin{equation}\label{eq_spherical_p}
-\begin{split}
-\frac{1}{\Phi(\phi)} 
-\frac{\partial^2 \Phi(\phi)}{\partial \phi^2} = -m^2
-\end{split}
-\end{equation}
-
-Combining Eq. \ref{eq_spherical_r}, \ref{eq_spherical_t}, and \ref{eq_spherical_p} Laplace's equation in sperical coordinates can be expressed in a fully seperated form as
-
-\begin{equation}\label{eq_spherical_sep}
-\begin{split}
-\frac{1}{R(\rho)}
-\frac{\partial}{\partial \rho} 
-\left( \rho^2 \frac{\partial R(\rho)}{\partial \rho}\right) 
-&= \lambda \\
-\frac{\sin \theta}{\Theta(\theta)}
-\frac{\partial}{\partial \theta}
-\left( \sin \theta \frac{\partial \Theta(\theta)}{\partial \theta}\right) 
-+ \lambda \sin \theta
-&= m^2 \\
-\frac{1}{\Phi(\phi)} 
-\frac{\partial^2 \Phi(\phi)}{\partial \phi^2}
-&= -m^2
-\end{split}
-\end{equation}
-
-It can be shown through a detailed anlysis that is outside the scope of this paper that $m$ and $\lambda$ must both be integers. $\lambda$ is further constrained in that the relation $\lambda = l(l+1)$ where $l \leq |m|$ and $l \in \mathbb{Z}$. Therefore, Eq. \ref{eq_spherical_sep} can be written as
-
-\begin{equation}\label{eq_spherical_sep2}
-\begin{split}
-\frac{1}{R(\rho)}
-\frac{\partial}{\partial \rho} 
-\left( \rho^2 \frac{\partial R(\rho)}{\partial \rho}\right) 
-&= l(l+1) \\
-\frac{\sin \theta}{\Theta(\theta)}
-\frac{\partial}{\partial \theta}
-\left( \sin \theta \frac{\partial \Theta(\theta)}{\partial \theta}\right) 
-+ l(l+1) \sin \theta
-&= m^2 \\
-\frac{1}{\Phi(\phi)} 
-\frac{\partial^2 \Phi(\phi)}{\partial \phi^2}
-&= -m^2 \\
-& l, m \in \mathbb{Z} \\
-& l \leq |m|
-\end{split}
-\end{equation}
-
-% TODO
-TODO - Discontinuous
-
-It can be shown that the solution is stated
+Combining the associated Legendre polynomials and the sin/cos series, the spherical harmonics equations can be derived. They are orthogonal in both directions.
 
 \begin{equation}\label{eq:spherical_harmonic}
-Y_l^m(\theta, \varphi) = (-1)^{l}\sqrt{\frac{2l+1}{4 \pi}
-\frac{(l-m)!}{(l+m)!}} P_l^m(\cos \theta) e^{im \varphi}
+Y_l^m(\theta, \phi) = N_l^{|m|} P_l^{|m|}(\cos \theta) e^{i m \phi}
 \end{equation}
 
 Using Euler's Equation (Eq. \ref{eq:euler}) to compute the imaginary exponent, the spherical harmonic can be expanded to Eq. \ref{eq:spherical_harmonic_exp}.
@@ -688,8 +555,24 @@ e^{i \theta} = \cos(\theta) + i \sin(\theta)
 \end{equation}
 
 \begin{equation}\label{eq:spherical_harmonic_exp}
-Y_l^m(\theta, \varphi) = (-1)^{l}\sqrt{\frac{2l+1}{4 \pi}
-\frac{(l-m)!}{(l+m)!}} P_l^m(\cos \theta) \left[ \cos(m \varphi) + i \sin(m \varphi) \right]
+Y_l^m(\theta, \varphi) = N_l^{|m|} P_l^m(\cos \theta) \left[ \cos(m \phi) + i \sin(m \phi) \right]
+\end{equation}
+
+The normalization constant $N_l^m$ is defined as
+
+\begin{equation}
+N_l^m = \sqrt{\frac{2l+1}{4 \pi} \frac{(l-m)!}{(l+m)!}}
+\end{equation}
+
+In many cases, only the real part ($y_l^m$) of the complex spherical harmonics ($Y_l^m$) are necessary. 
+
+\begin{equation}
+y_l^m =
+\begin{cases*}
+\sqrt{2} N_l^m \cos(m\phi) P_l^m(\cos(\theta)) \\
+N_l^0 P_l^0(\cos(\theta)) \\
+\sqrt{2} N_l^{|m|} \sin(|m| \phi) P_l^{|m|}(\cos(\theta))
+\end{cases*}
 \end{equation}
 
 \begin{equation}\label{eq:spherical_harmonic_xs}
