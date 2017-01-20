@@ -24,6 +24,8 @@ public:
 
     float normConst(const int l, const int m);
     float operator()(const int l, const int m, const float theta, const float phi);
+    float ylm_e(const int l, const int m, const float theta, const float phi);
+    float ylm_o(const int l, const int m, const float theta, const float phi);
 
 protected:
     AssocLegendre m_assoc;

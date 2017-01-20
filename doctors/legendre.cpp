@@ -94,13 +94,19 @@ SphericalHarmonic::~SphericalHarmonic()
 
 float SphericalHarmonic::normConst(const int l, const int m)
 {
-    float t1 = static_cast<float>(2*l+1) / (4 * M_PI);
+    float sgn = (m%2 == 0 ? 1.0f : -1.0f);
+    float t1 = static_cast<float>(2*l+1) / (2.0 * M_PI);
     float t2 = factorial(l-fabs(m)) / factorial(l + fabs(m));
-    return sqrt(t1 * t2);
+    if(m == 0)
+    {
+        t1 *= 2.0f;
+    }
+    return sgn * sqrt(t1 * t2);
 }
 
 float SphericalHarmonic::operator()(const int l, const int m, const float theta, const float phi)
 {
+    // Y_l^m(\theta, \phi)
     if(m > 0)
     {
         return sqrt(2.0) * normConst(l, m) * cos(m * phi) * m_assoc(l, m, cos(theta));
@@ -113,6 +119,16 @@ float SphericalHarmonic::operator()(const int l, const int m, const float theta,
     {
         return sqrt(2.0) * normConst(l, m) * sin(-m*phi) * m_assoc(l, -m, cos(theta));
     }
+}
+
+float SphericalHarmonic::ylm_e(const int l, const int m, const float theta, const float phi)
+{
+    return normConst(l, m) * m_assoc(l, m, cos(theta)) * cos(m * phi);
+}
+
+float SphericalHarmonic::ylm_o(const int l, const int m, const float theta, const float phi)
+{
+    return normConst(l, m) * m_assoc(l, m, cos(theta)) * sin(m * phi);
 }
 
 

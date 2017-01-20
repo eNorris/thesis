@@ -16,6 +16,7 @@
 #include "xsection.h"
 #include "outwriter.h"
 #include "gui/outputdialog.h"
+#include "legendre.h"
 
 Solver::Solver(QObject *parent) : QObject(parent)
 {
@@ -584,12 +585,8 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
     const unsigned short DIRECTION_Y = 2;
     const unsigned short DIRECTION_Z = 3;
 
-    const int lSize = pn + 1;
-    const int mSize = 2* pn + 1;
-    const int momentBins = lSize * mSize;
-
     std::vector<float> *uflux = new std::vector<float>;
-    uflux->resize(momentBins * groups * mesh->voxelCount());
+    uflux->resize(groups * mesh->voxelCount());
 
     unsigned int ejmp = mesh->voxelCount();
     unsigned int xjmp = mesh->xjmp();
@@ -620,9 +617,13 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                 float y = mesh->yNodes[yIndxStart] + mesh->dy[yIndxStart]/2;
                 float z = mesh->zNodes[zIndxStart] + mesh->dz[zIndxStart]/2;
 
-                std::vector<float> tmpdistv;
-                std::vector<float> tmpxsv;
-                std::vector<float> mfpv;
+                float deltaX = x - srcIndxX;
+                float deltaY = y - srcIndxY;
+                float deltaZ = z - srcIndxZ;
+
+                //std::vector<float> tmpdistv;
+                //std::vector<float> tmpxsv;
+                //std::vector<float> mfpv;
 
                 if(xIndxStart == srcIndxX && yIndxStart == srcIndxY && zIndxStart == srcIndxZ)  // End condition
                 {
@@ -633,6 +634,12 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                     {
                         xsval = xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
                         (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = srcStrength[ie] * exp(-xsval*srcToCellDist) / (4 * M_PI * srcToCellDist * srcToCellDist);
+                        //float magnitude = srcStrength[ie] * exp(-xsval*srcToCellDist) / (4 * M_PI * srcToCellDist * srcToCellDist);
+                        //for(unsigned int il = 0; il < lSize; il++)
+                        //{
+                        //    for(unsigned int im = -il; im < il; im++)
+                        //    (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart*momentBins + im] = magnitude * harmonics(l, m, theta, phi);
+                        //}
                     }
                     continue;
                 }
@@ -698,10 +705,10 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                         //                   [cm] * [b] * [atom/b-cm]
                         meanFreePaths[ie] += tmin * xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
                     }
-                    tmpdistv.push_back(tmin);
-                    tmpxsv.push_back(xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx]);
-                    float gain = tmin * xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
-                    mfpv.push_back(gain);
+                    //tmpdistv.push_back(tmin);
+                    //tmpxsv.push_back(xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx]);
+                    //float gain = tmin * xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
+                    //mfpv.push_back(gain);
 
                     // Update cell indices and positions
                     if(dirHitFirst == DIRECTION_X) // x direction
@@ -763,11 +770,11 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                             meanFreePaths[ie] += finalDist * xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
                         }
 
-                        tmpdistv.push_back(finalDist);
-                        tmpxsv.push_back(xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx]);
+                        //tmpdistv.push_back(finalDist);
+                        //tmpxsv.push_back(xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx]);
 
-                        float gain = finalDist * xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
-                        mfpv.push_back(gain);
+                        //float gain = finalDist * xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
+                        //mfpv.push_back(gain);
 
                         exhaustedRay = true;
                     }
@@ -791,12 +798,57 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
 
     qDebug() << "Time to complete raytracer: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
-    emit signalRaytracerFinished(uflux);
+    const int lSize = pn + 1;
+    const int mSize = 2* pn + 1;
+    const int momentBins = lSize * mSize;
+    SphericalHarmonic harmonics;
+
+    std::vector<float> *ufluxAniso = new std::vector<float>;
+    ufluxAniso->resize(groups * mesh->voxelCount() * lSize);
+
+    int eajmp = mesh->voxelCount() * momentBins;
+    int xajmp = mesh->yNodeCt * mesh->zNodeCt * momentBins;
+    int yajmp = mesh->zNodeCt * momentBins;
+    int zajmp = momentBins;
+
+    for(unsigned int ie = 0; ie < groups; ie++)
+        for(unsigned int iz = 0; iz < mesh->zElemCt; iz++)
+            for(unsigned int iy = 0; iy < mesh->yElemCt; iy++)
+                for(unsigned int ix = 0; ix < mesh->xElemCt; ix++)  // For every voxel
+                {
+                    float x = mesh->xNodes[ix] + mesh->dx[ix]/2;
+                    float y = mesh->yNodes[iy] + mesh->dy[iy]/2;
+                    float z = mesh->zNodes[iz] + mesh->dz[iz]/2;
+
+                    float deltaX = x - srcIndxX;
+                    float deltaY = y - srcIndxY;
+                    float deltaZ = z - srcIndxZ;
+
+                    // normalize to unit vector
+                    float mag = sqrt(deltaX*deltaX + deltaY*deltaY + deltaZ*deltaZ);
+                    deltaX /= mag;
+                    deltaY /= mag;
+                    deltaZ /= mag;
+
+                    float phi = acos(deltaZ);  // In radians
+                    float theta = acos(x/sin(phi));
+
+                    for(int il = 0; il < lSize; il++)
+                        for(int im = 0; im < il; im++)
+                        {
+                            int indx = ie*eajmp + ix*xajmp + iy*yajmp + iz*zajmp + (il + 1)*il + im;
+                            (*ufluxAniso)[indx] = (*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz] * harmonics.ylm_o(0, 0, 0.0f, 0.0f);
+                        }
+                }
+
+
+
+    emit signalRaytracerFinished(ufluxAniso);
     emit signalNewIteration(uflux);
 }
 
 
-void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const int pn, const std::vector<float> *uflux)
+void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const int pn, const std::vector<float> *angFlux)
 {
 
     std::clock_t startMoment = std::clock();
@@ -838,14 +890,14 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
 
     bool downscatterFlag = false;
 
-    if(uflux != NULL)
+    if(angFlux != NULL)
     {
         qDebug() << "Loading uncollided flux into external source";
         // If there is an uncollided flux provided, use it, otherwise, calculate the external source
         for(unsigned int ei = 0; ei < xs->groupCount(); ei++)
             for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
                 //                              [#]   =                        [#/cm^2]      * [cm^3]        *  [b]                               * [1/b-cm]
-                extSource[ei*mesh->voxelCount() + ri] = (*uflux)[ei*mesh->voxelCount() + ri] * mesh->vol[ri] * xs->scatXs1d(mesh->zoneId[ri], ei) * mesh->atomDensity[ri];
+                extSource[ei*mesh->voxelCount() + ri] = (*angFlux)[ei*mesh->voxelCount() + ri] * mesh->vol[ri] * xs->scatXs1d(mesh->zoneId[ri], ei) * mesh->atomDensity[ri];
 
         OutWriter::writeArray("externalSrc.dat", extSource);
     }
