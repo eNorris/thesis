@@ -3,6 +3,7 @@
 
 #include "legendre.h"
 #include <limits>
+#include <QDebug>
 
 double factorial(double x)
 {
@@ -10,6 +11,15 @@ double factorial(double x)
         return 1.0;
 
     return x * factorial(x - 1.0);
+}
+
+double fastFactorial(int x)
+{
+    const std::vector<double> facts = {1.0, 1.0, 2.0, 6.0, 24.0, 120.0,
+                                      720.0, 5040.0, 40320.0, 362880.0, 3628800.0,
+                                      39916800.0, };
+
+    return facts[x];
 }
 
 double doubleFactorial(double x)
@@ -94,14 +104,14 @@ SphericalHarmonic::~SphericalHarmonic()
 
 float SphericalHarmonic::normConst(const int l, const int m)
 {
-    float sgn = (m%2 == 0 ? 1.0f : -1.0f);
+    //float sgn = (m%2 == 0 ? 1.0f : -1.0f);
     float t1 = static_cast<float>(2*l+1) / (2.0 * M_PI);
     float t2 = factorial(l-fabs(m)) / factorial(l + fabs(m));
     if(m == 0)
     {
-        t1 *= 2.0f;
+        t1 /= 2.0f;
     }
-    return sgn * sqrt(t1 * t2);
+    return sqrt(t1 * t2);
 }
 
 float SphericalHarmonic::operator()(const int l, const int m, const float theta, const float phi)
@@ -123,11 +133,19 @@ float SphericalHarmonic::operator()(const int l, const int m, const float theta,
 
 float SphericalHarmonic::ylm_e(const int l, const int m, const float theta, const float phi)
 {
+    if(m < 0)
+    {
+        qDebug() << "Got a neg. m value!";
+    }
     return normConst(l, m) * m_assoc(l, m, cos(theta)) * cos(m * phi);
 }
 
 float SphericalHarmonic::ylm_o(const int l, const int m, const float theta, const float phi)
 {
+    if(m <= 0)
+    {
+        qDebug() << "Got a neg m value!";
+    }
     return normConst(l, m) * m_assoc(l, m, cos(theta)) * sin(m * phi);
 }
 
