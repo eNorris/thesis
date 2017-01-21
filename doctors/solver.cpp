@@ -833,12 +833,28 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                     float phi = acos(deltaZ);  // In radians
                     float theta = acos(x/sin(phi));
 
+                    int indx = ie*eajmp + ix*xajmp + iy*yajmp + iz*zajmp;  // index of start of moments
                     for(int il = 0; il < lSize; il++)
-                        for(int im = 0; im < il; im++)
+                    {
+
+                        int ildx = il * il; // Offset for il index
+
+                        // P_il^0
+                        (*ufluxAniso)[indx + ildx] = (*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz] * harmonics.ylm_e(il, 0, theta, phi);
+
+                        for(int im = 1; im <= il; im++)
                         {
-                            int indx = ie*eajmp + ix*xajmp + iy*yajmp + iz*zajmp + (il + 1)*il + im;
-                            (*ufluxAniso)[indx] = (*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz] * harmonics.ylm_o(0, 0, 0.0f, 0.0f);
+                            int imdx = 2*im - 1;  // Offset for im index
+
+                            if(indx + ildx + imdx + 1 >= ufluxAniso->size())
+                            {
+                                qDebug() << "Failed indexing check!";
+                            }
+
+                            (*ufluxAniso)[indx + ildx + imdx] = (*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz] * harmonics.ylm_o(il, im, theta, phi);
+                            (*ufluxAniso)[indx + ildx + imdx + 1] = (*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz] * harmonics.ylm_e(il, im, theta, phi);
                         }
+                    }
                 }
 
 
@@ -855,9 +871,11 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
 
     const int maxIterations = 25;
     const float epsilon = 0.01f;
+    const int momentCount = (pn+1) * (pn+1);
 
 
     std::vector<float> angularFlux(xs->groupCount() * quad->angleCount() * mesh->voxelCount());
+    std::vector<float> moments(xs->groupCount() * mesh->voxelCount() * momentCount);
     std::vector<float> *scalarFlux = new std::vector<float>(xs->groupCount() * mesh->voxelCount(), 0.0f);
     std::vector<float> tempFlux(mesh->voxelCount());
     std::vector<float> preFlux(mesh->voxelCount(), -100.0f);
@@ -897,22 +915,20 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
         for(unsigned int ei = 0; ei < xs->groupCount(); ei++)
             for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
                 //                              [#]   =                        [#/cm^2]      * [cm^3]        *  [b]                               * [1/b-cm]
+                // TODO - This should load either the moments or angular flux
                 extSource[ei*mesh->voxelCount() + ri] = (*angFlux)[ei*mesh->voxelCount() + ri] * mesh->vol[ri] * xs->scatXs1d(mesh->zoneId[ri], ei) * mesh->atomDensity[ri];
 
         OutWriter::writeArray("externalSrc.dat", extSource);
     }
     else
     {
-        qDebug() << "Building external source";
-        int srcIndxE = xs->groupCount() - 1;
-        int srcIndxX = 32;
-        int srcIndxY = 4;  //mesh->yElemCt/2;
-        int srcIndxZ = 8;
-        //                                                                              [#] = [#]
-        extSource[srcIndxE * mesh->voxelCount() + srcIndxX*xjmp + srcIndxY*yjmp + srcIndxZ] = 1.0;
+        qWarning() << "Building external source is illegal in anisotropic case!";
+
+        //       [#] = [#]
+        extSource[0] = 1.0;
     }
 
-    qDebug() << "Solver::gssolver(): 379: Solving " << mesh->voxelCount() * quad->angleCount() * xs->groupCount() << " elements in phase space";
+    qDebug() << "Solving " << mesh->voxelCount() * quad->angleCount() * xs->groupCount() << " elements in phase space";
 
     for(unsigned int ie = 0; ie < xs->groupCount(); ie++)  // for every energy group
     {
@@ -920,8 +936,9 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
         {
             float dmax = 0.0;
             int vc = mesh->voxelCount();
-            for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
+            for(unsigned int ri = 0; ri < vc; ri++)
             {
+                // TODO indexing over angle or moment?
                 dmax = (dmax > extSource[ie*vc + ri]) ? dmax : extSource[ie*vc + ri];
             }
             if(dmax <= 0.0)
@@ -933,7 +950,6 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
         downscatterFlag = true;
 
         qDebug() << "Energy group #" << ie;
-        // Do the solving...
 
         int iterNum = 1;
         float maxDiff = 1.0;
@@ -948,6 +964,7 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                 totalSource[i] = 0;
 
             // Calculate the scattering source
+            /*
             for(unsigned int iie = 0; iie <= ie; iie++)
                 for(int iik = 0; iik < (signed) mesh->zElemCt; iik++)
                     for(int iij = 0; iij < (signed)mesh->yElemCt; iij++)
@@ -966,6 +983,7 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                 //  [#]         +=  [#]
                 totalSource[ri] += extSource[ie*mesh->voxelCount() + ri];
             }
+            */
 
             // Clear for a new sweep
             for(unsigned int i = 0; i < tempFlux.size(); i++)
@@ -1010,6 +1028,13 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                         while(ix < (signed) mesh->xElemCt && ix >= 0)  // for every mesh element in the proper order
                         {
                             int zid = mesh->zoneId[ix*xjmp + iy*yjmp + iz];  // Get the zone id of this element
+
+                            float src_era = 0.0f;  // source for this energy, voxel, angle
+                            for(unsigned int iie = 0; iie <= ie; iie++)  // For every group higher
+                             {
+                                //         [#]    +=  [#]          *      [#/cm^2]                               * [b]                          * [1/b-cm]                * [cm^3]
+                                totalSource[1] += 1.0/(4.0*M_PI)*(*scalarFlux)[iie*mesh->voxelCount() + 1] * xsref.scatXs1d(zid, iie) * mesh->atomDensity[1] * mesh->vol[1]; //xsref(ie-1, zidIndx, 0, iie));
+                            }
 
                             // Handle the x influx
                             if(quad->mu[iang] >= 0)                                       // Approach x = 0 -> xMesh
