@@ -540,6 +540,14 @@ x!! = \prod_{k=0}^{\lceil x/2 \rceil - 1} x-2k
 
 For example, $5!! = 5 \times 3 \times 1 = 15$ and $6!! = 6 \times 4 \times 2 = 48$.
 
+Some references omit the Condon-Shortley phase $(-1)^m$ while most others include it. These two are distinguished by the nomenclature
+
+\begin{equation}
+P_{lm}(x) = (-1)^m P_l^m(x)
+\end{equation}
+
+Only the more commonly found $P_l^m$ form will be used in this work.
+
 \subsection{Spherical Harmonic Function}
 
 Combining the associated Legendre polynomials and the sin/cos series, the spherical harmonics equations can be derived. They are orthogonal in both directions.
@@ -555,13 +563,23 @@ e^{i \theta} = \cos(\theta) + i \sin(\theta)
 \end{equation}
 
 \begin{equation}\label{eq:spherical_harmonic_exp}
-Y_l^m(\theta, \varphi) = N_l^{|m|} P_l^m(\cos \theta) \left[ \cos(m \phi) + i \sin(m \phi) \right]
+Y_l^m(\theta, \varphi) = N_l^{|m|} P_l^{|m|}(\cos \theta) \left[ \cos(m \phi) + i \sin(m \phi) \right]
 \end{equation}
 
 The normalization constant $N_l^m$ is defined as
 
 \begin{equation}
-N_l^m = \sqrt{\frac{2l+1}{4 \pi} \frac{(l-m)!}{(l+m)!}}
+N_l^m = \sqrt{(2-\delta_{m,0}) \frac{2l+1}{4 \pi} \frac{(l-m)!}{(l+m)!}}
+\end{equation}
+
+where $\delta$ is the Kronecker delta defined by
+
+\begin{equation}
+\delta_{x,y} =
+\begin{cases*}
+1,  \quad \text{if } x = y \\
+0, \quad \text{otherwise} \\
+\end{cases*}
 \end{equation}
 
 In many cases, only the real part ($y_l^m$) of the complex spherical harmonics ($Y_l^m$) are necessary. 
@@ -569,9 +587,9 @@ In many cases, only the real part ($y_l^m$) of the complex spherical harmonics (
 \begin{equation}
 y_l^m =
 \begin{cases*}
-\sqrt{2} N_l^m \cos(m\phi) P_l^m(\cos(\theta)) \\
-N_l^0 P_l^0(\cos(\theta)) \\
-\sqrt{2} N_l^{|m|} \sin(|m| \phi) P_l^{|m|}(\cos(\theta))
+N_l^m P_l^m(\cos(\theta)) \cos(m\phi) & m \textgreater \, 0  \\
+N_l^0 P_l^0(\cos(\theta)) & m = 0 \\
+N_l^{|m|} P_l^{|m|}(\cos(\theta)) \sin(|m| \phi) & m \textless \, 0 
 \end{cases*}
 \end{equation}
 
