@@ -864,7 +864,7 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
 }
 
 
-void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const int pn, const std::vector<float> *angFlux)
+void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const int pn, const std::vector<float> *uFlux)
 {
 
     std::clock_t startMoment = std::clock();
@@ -872,6 +872,7 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
     const int maxIterations = 25;
     const float epsilon = 0.01f;
     const int momentCount = (pn+1) * (pn+1);
+    SphericalHarmonic harmonic;
 
 
     std::vector<float> angularFlux(xs->groupCount() * quad->angleCount() * mesh->voxelCount());
@@ -908,15 +909,16 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
 
     bool downscatterFlag = false;
 
-    if(angFlux != NULL)
+    if(uFlux != NULL)
     {
         qDebug() << "Loading uncollided flux into external source";
         // If there is an uncollided flux provided, use it, otherwise, calculate the external source
         for(unsigned int ei = 0; ei < xs->groupCount(); ei++)
             for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
+                for(unsigned int li = 0; li < momentCount; li++)
                 //                              [#]   =                        [#/cm^2]      * [cm^3]        *  [b]                               * [1/b-cm]
-                // TODO - This should load either the moments or angular flux
-                extSource[ei*mesh->voxelCount() + ri] = (*angFlux)[ei*mesh->voxelCount() + ri] * mesh->vol[ri] * xs->scatXs1d(mesh->zoneId[ri], ei) * mesh->atomDensity[ri];
+                // TODO - Is this the correct way to convert flux into source?
+                extSource[ei*mesh->voxelCount()*momentCount + ri*momentCount + li] = (*uFlux)[ei*mesh->voxelCount()*momentCount + ri*momentCount + li] * mesh->vol[ri] * xs->scatXs1d(mesh->zoneId[ri], ei) * mesh->atomDensity[ri];
 
         OutWriter::writeArray("externalSrc.dat", extSource);
     }
@@ -992,6 +994,8 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
             for(int iang = 0; iang < quad->angleCount(); iang++)  // for every angle
             {
                 qDebug() << "Angle #" << iang;
+                float theta = acos(quad->zi[iang]);
+                float phi = acos(quad->mu[iang]/sqrt(1 - quad->zi[iang]*quad->zi[iang]));
 
                 // Find the correct direction to sweep
                 int izStart = 0;                  // Sweep start index
@@ -1029,11 +1033,38 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                         {
                             int zid = mesh->zoneId[ix*xjmp + iy*yjmp + iz];  // Get the zone id of this element
 
+                            // Compute the source
                             float src_era = 0.0f;  // source for this energy, voxel, angle
                             for(unsigned int iie = 0; iie <= ie; iie++)  // For every group higher
                              {
-                                //         [#]    +=  [#]          *      [#/cm^2]                               * [b]                          * [1/b-cm]                * [cm^3]
-                                totalSource[1] += 1.0/(4.0*M_PI)*(*scalarFlux)[iie*mesh->voxelCount() + 1] * xsref.scatXs1d(zid, iie) * mesh->atomDensity[1] * mesh->vol[1]; //xsref(ie-1, zidIndx, 0, iie));
+                                for(unsigned int il = 0; il < pn; il++)  // For every Legendre projection
+                                {
+                                    float sig_slgg = xs->scatxs2d(zid, iie, ie, il);
+                                    float integral = 0.0f;
+
+                                    float moment_l0e = 0.0f;
+
+                                    // TODO compute moment l0e
+
+                                    integral += harmonic.ylm_e(il, 0, theta, phi) * moment_l0e;
+
+                                    for(unsigned int im = 1; im < il; im++)
+                                    {
+                                        float moment_lme = 0.0f;
+                                        float moment_lmo = 0.0f;
+
+                                        // TODO compute moments
+
+                                        integral += harmonic.ylm_e(il, im, theta, phi) * moment_lme + harmonic.ylm_o(il, im, theta, phi) * moment_lmo;
+                                    }
+
+                                    src_era += sig_slgg * integral;
+
+                                    //ei*mesh->voxelCount()*momentCount + ri*momentCount + li
+                                    //         [#]    +=  [#]          *      [#/cm^2]                               * [b]                          * [1/b-cm]                * [cm^3]
+                                    //src_era = extSource[];
+                                    //totalSource[1] += 1.0/(4.0*M_PI)*(*scalarFlux)[iie*mesh->voxelCount() + 1] * xsref.scatXs1d(zid, iie) * mesh->atomDensity[1] * mesh->vol[1]; //xsref(ie-1, zidIndx, 0, iie));
+                                }
                             }
 
                             // Handle the x influx
