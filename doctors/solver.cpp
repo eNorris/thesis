@@ -579,7 +579,7 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
 {
     std::clock_t startMoment = std::clock();
 
-    int groups = xs->groupCount();
+    unsigned int groups = xs->groupCount();
 
     const unsigned short DIRECTION_X = 1;
     const unsigned short DIRECTION_Y = 2;
@@ -617,9 +617,9 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                 float y = mesh->yNodes[yIndxStart] + mesh->dy[yIndxStart]/2;
                 float z = mesh->zNodes[zIndxStart] + mesh->dz[zIndxStart]/2;
 
-                float deltaX = x - srcIndxX;
-                float deltaY = y - srcIndxY;
-                float deltaZ = z - srcIndxZ;
+                //float deltaX = x - srcIndxX;
+                //float deltaY = y - srcIndxY;
+                //float deltaZ = z - srcIndxZ;
 
                 //std::vector<float> tmpdistv;
                 //std::vector<float> tmpxsv;
@@ -864,14 +864,21 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
 }
 
 
-void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const int pn, const std::vector<float> *uFlux)
+void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<float> *uFlux)
 {
+
+    // Do some input checks
+    if(pn > 10)
+    {
+        qDebug() << "pn check failed, pn = " << pn;
+        return;
+    }
 
     std::clock_t startMoment = std::clock();
 
     const int maxIterations = 25;
     const float epsilon = 0.01f;
-    const int momentCount = (pn+1) * (pn+1);
+    const unsigned int momentCount = (pn+1) * (pn+1);
     SphericalHarmonic harmonic;
 
 
@@ -916,7 +923,7 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
         for(unsigned int ei = 0; ei < xs->groupCount(); ei++)
             for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
                 for(unsigned int li = 0; li < momentCount; li++)
-                //                              [#]   =                        [#/cm^2]      * [cm^3]        *  [b]                               * [1/b-cm]
+                //                                                           [#]   =                        [#/cm^2]      * [cm^3]        *  [b]                               * [1/b-cm]
                 // TODO - Is this the correct way to convert flux into source?
                 extSource[ei*mesh->voxelCount()*momentCount + ri*momentCount + li] = (*uFlux)[ei*mesh->voxelCount()*momentCount + ri*momentCount + li] * mesh->vol[ri] * xs->scatXs1d(mesh->zoneId[ri], ei) * mesh->atomDensity[ri];
 
@@ -937,7 +944,7 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
         if(!downscatterFlag)
         {
             float dmax = 0.0;
-            int vc = mesh->voxelCount();
+            unsigned int vc = mesh->voxelCount();
             for(unsigned int ri = 0; ri < vc; ri++)
             {
                 // TODO indexing over angle or moment?
@@ -1037,7 +1044,7 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                             float src_era = 0.0f;  // source for this energy, voxel, angle
                             for(unsigned int iie = 0; iie <= ie; iie++)  // For every group higher
                              {
-                                for(unsigned int il = 0; il < pn; il++)  // For every Legendre projection
+                                for(unsigned int il = 0; il <= pn; il++)  // For every Legendre projection
                                 {
                                     float sig_slgg = xs->scatxs2d(zid, iie, ie, il);
                                     float integral = 0.0f;
