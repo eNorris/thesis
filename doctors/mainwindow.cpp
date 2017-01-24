@@ -76,12 +76,14 @@ MainWindow::MainWindow(QWidget *parent):
 
     m_solver = new Solver;
 
+    m_xs = new XSection();
+
     // Connect explore buttons
     connect(ui->actionSolution_Explorer, SIGNAL(triggered()), outputDialog, SLOT(show()));
     connect(ui->quadExplorePushButton, SIGNAL(clicked()), quadDialog, SLOT(show()));
     connect(ui->geometryExplorePushButton, SIGNAL(clicked()), geomDialog, SLOT(show()));
 
-    connect(m_parser, SIGNAL(signalNotifyNumberNuclides(int)), ui->mainProgressBar, SLOT(setMaximum(int)));
+
 
     connect(m_solver, SIGNAL(signalSolverFinished(std::vector<float>*)), this, SLOT(onSolverFinished(std::vector<float>*)));
     connect(m_solver, SIGNAL(signalRaytracerFinished(std::vector<float>*)), this, SLOT(onRaytracerFinished(std::vector<float>*)));
@@ -92,6 +94,7 @@ MainWindow::MainWindow(QWidget *parent):
     connect(this, SIGNAL(signalBeginXsParse(QString)), m_parser, SLOT(parseFile(QString)));
     connect(m_parser, SIGNAL(signalXsUpdate(int)), this, SLOT(xsParseUpdateHandler(int)));
     connect(m_parser, SIGNAL(finishedParsing(AmpxParser*)), this, SLOT(buildMaterials(AmpxParser*)));
+    connect(m_parser, SIGNAL(signalNotifyNumberNuclides(int)), ui->mainProgressBar, SLOT(setMaximum(int)));
     m_xsWorkerThread.start();
 
     // Set up the solver thread
@@ -112,15 +115,10 @@ MainWindow::MainWindow(QWidget *parent):
     ui->paramsGroupBox->setStyleSheet("QGroupBox { color: red; } ");
     ui->quadGroupBox->setStyleSheet("QGroupBox { color: red; } ");
 
-
-    // Make a configuration object and load its defaults
-    //m_config = new Config;
-    //m_config->loadDefaults();
-
     qDebug() << "Loaded default configuration";
 
     quadDialog->updateQuad(m_quad);
-    m_xs = new XSection();
+
 
     //AssocLegendre a;
     //int l = 5;

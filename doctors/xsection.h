@@ -1,6 +1,10 @@
 #ifndef XSECTION_H
 #define XSECTION_H
 
+/**
+  This class uses data from the AMPX cross sections.
+  */
+
 #include <vector>
 
 class AmpxParser;

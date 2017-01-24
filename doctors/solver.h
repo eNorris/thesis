@@ -1,6 +1,9 @@
 #ifndef SOLVER_H
 #define SOLVER_H
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include <QObject>
 #include <vector>
 
@@ -15,6 +18,8 @@ public:
     explicit Solver(QObject *parent = 0);
     ~Solver();
 
+    const float M_4PI = 4 * M_PI;
+
 signals:
     void signalNewIteration(std::vector<float>*);
     void signalRaytracerFinished(std::vector<float>*);
@@ -26,6 +31,9 @@ public slots:
 
     void raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const int pn);
     void gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const int pn, const std::vector<float> *uflux);
+
+    void raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const int pn);
+    void gssolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const int pn, const std::vector<float> *uflux);
 
 };
 
