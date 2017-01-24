@@ -294,7 +294,23 @@ Discrete ordinate solutions greatly benefit from the presence of a raytracing al
 
 The raytracer was implemented as...
 
-When the solver is changed from isotropic to anisotropic, the raytracer must be able to produce a Pn expansion needed by the anisotropic solver. We defined the spherical harmonic function as
+When the solver is changed from isotropic to anisotropic, the raytracer must be able to not only compute the uncollided flux but compute the direction of flux in each voxel and map that onto the discrete quadrature.
+
+To map an arbitrary direction onto a discete quadrature set, the direction is split amonst the three nearest directions in the quadrature set. Each quadrature direction is weighted. The closeness of each direction computed by calcualting the cosine of the angle between a direction $\hat{\Omega}$ and the quadrature direction $\hat{\Omega}_a$. The cosine is computed
+
+\begin{equation}
+\cos(\theta) = \hat{\Omega} \cdot \hat{\Omega}_a
+\end{equation}
+
+The three nearest points are then taken to form a triangle with the $\hat{\Omega}$ direction between them as shown in Fig. XYZ.
+
+The area of $\triangle \mathbf{A} \mathbf{B} \mathbf{\Omega}$ is
+
+\begin{equation}
+A = |\mathbf{A}-\mathbf{B}| |\mathbf{A}-\mathbf{C}| \sqrt{1-\left[ (\mathbf{A}-\mathbf{B}) \cdot (\mathbf{A}-\mathbf{C}) \right]}
+\end{equation}
+
+Remove what is below this!
 
 \begin{equation}
     Y_l^m(\theta, \phi)= 
