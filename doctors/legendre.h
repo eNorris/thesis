@@ -1,11 +1,21 @@
 #ifndef LEGENDRE_H
 #define LEGENDRE_H
 
+#include "globals.h"
+
 #include <iostream>
 #include <vector>
 
 double doubleFactorial(double x);
 
+class Legendre
+{
+public:
+    Legendre();
+    ~Legendre();
+
+    SOL_T operator()(const int l, const SOL_T mu);
+};
 
 class AssocLegendre
 {

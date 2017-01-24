@@ -30,6 +30,50 @@ double doubleFactorial(double x)
     return x * doubleFactorial(x-2.0);
 }
 
+Legendre()
+{
+
+}
+
+~Legendre()
+{
+
+}
+
+SOL_T operator()(const int l, const SOL_T mu)
+{
+    double result;
+    switch(l)
+    {
+    case 0:
+        result = 1.0;
+    case 1:
+        result = mu;
+    case 2:
+        result = 0.5 * (3 * pow(mu, 2.0) - 1);
+    case 3:
+        result = 0.5 * (5 * pow(mu, 3.0) - 3*mu);
+    case 4:
+        result = 0.125 * (35 * pow(mu, 4.0) - 30 * pow(mu, 2.0) + 3);
+    case 5:
+        result = 0.125 * (63 * pow(mu, 5.0) - 70 * pow(mu, 3.0) + 15*mu);
+    case 6:
+        result = 0.0625 * (231 * pow(mu, 6.0) - 315 * pow(mu, 4.0) + 105*pow(mu, 2.0) - 5);
+    case 7:
+        result = 0.0625 * (429 * pow(mu, 7.0) - 693 * pow(mu, 5.0) + 315*pow(mu, 3.0) - 35*mu);
+    case 8:
+        result = 0.0078125 * (6435 * pow(mu, 8.0) - 12012 * pow(mu, 6.0) + 6930*pow(mu, 4.0) - 1260*pow(mu, 2.0) + 35);
+    case 9:
+        result = 0.0078125 * (12155 * pow(mu, 9.0) - 25740 * pow(mu, 7.0) + 18018*pow(mu, 5.0) - 4620*pow(mu, 3.0) + 315*mu);
+    case 10:
+        result = 0.00390625 * (46189 * pow(mu, 10.0) - 109395 * pow(mu, 8.0) + 90090*pow(mu, 6.0) - 30030*pow(mu, 4.0) + 3465*pow(mu, 2.0) - 63);
+    default:
+        qWarning << "Can't compute Legendre polynomials beyond order ";
+    };
+
+    return static_cast<SOL_T>(result);
+
+}
 
 AssocLegendre::AssocLegendre()
 {
