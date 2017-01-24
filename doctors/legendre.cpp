@@ -30,17 +30,17 @@ double doubleFactorial(double x)
     return x * doubleFactorial(x-2.0);
 }
 
-Legendre()
+Legendre::Legendre()
 {
 
 }
 
-~Legendre()
+Legendre::~Legendre()
 {
 
 }
 
-SOL_T operator()(const int l, const SOL_T mu)
+SOL_T Legendre::operator()(const int l, const SOL_T mu)
 {
     double result;
     switch(l)
