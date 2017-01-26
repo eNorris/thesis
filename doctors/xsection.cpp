@@ -34,50 +34,54 @@ float XSection::totXs1d(const int matid, const int g) const
 
 float XSection::scatxs2d(const int matid, const int gSrcIndx, const int gSinkIndx, const int n) const
 {
-    if(matid > m_matsLoaded || gSrcIndx > (m_groups-1) || gSinkIndx > (m_groups-1) || n >= m_pns)
+    if(matid > m_matsLoaded || gSrcIndx >= m_groups || gSinkIndx >= m_groups || n > m_pn)
     {
         qDebug() << "XSection::scatxs2d(): 39: Illegal index value";
+        qDebug() << "Violated matid > m_matsLoaded || gSrcIndx >= m_groups || gSinkIndx >= m_groups || n > m_pn";
+        qDebug() <<  matid << "> " << m_matsLoaded << " || " << gSrcIndx << " >= " << m_groups << " || " << gSinkIndx << " >= " << m_groups << " || " << n << " > " << m_pn;
         return -1.0;
     }
-    return m_scat2d[matid*m_groups*m_groups*m_pns + gSrcIndx*m_groups*m_pns + gSinkIndx*m_pns + n];
+    const int pnCount = m_pn+1;
+    return m_scat2d[matid*m_groups*m_groups*pnCount + gSrcIndx*m_groups*pnCount + gSinkIndx*pnCount + n];
 }
 
-bool XSection::allocateMemory(const unsigned int materialCount, const unsigned int groupCount, const unsigned int pnCount)
+bool XSection::allocateMemory(const unsigned int materialCount, const unsigned int groupCount, const unsigned int pn)
 {
     m_mats = materialCount;
     m_groups = groupCount;
-    m_pns = pnCount;
-    size_t bytes1d = materialCount * groupCount * sizeof(float);
-    size_t bytes2d = materialCount * groupCount * groupCount * pnCount * sizeof(float);
+    m_pn = pn;
+    size_t floats1d = materialCount * groupCount;
+    size_t floats2d = materialCount * groupCount * groupCount * (m_pn+1);
 
-    qDebug() << "Total 1d bytes: " << (2*bytes1d);
-    qDebug() << "Total 2d bytes: " << bytes2d;
+    qDebug() << "Total 1d bytes: " << (2*floats1d * sizeof(float));
+    qDebug() << "Total 2d bytes: " << (floats2d * sizeof(float));
 
     try{
-        m_tot1d.resize(bytes1d);
+        m_tot1d.resize(floats1d);
     }
     catch(std::bad_alloc &bad)
     {
-        qDebug() << "bad_alloc caught during XS initialization of the 1d total xs data, requested " << bytes1d << " bytes: ";
-        qDebug() << "Reported error: " << bad.what(); ;
-        return false;
-    }
-
-    try{m_scat1d.resize(bytes1d);m_tot1d.resize(bytes1d);
-    }
-    catch(std::bad_alloc &bad)
-    {
-        qDebug() << "bad_alloc caught during XS initialization of the 1d scatter xs data, requested " << bytes1d << " bytes: ";
+        qDebug() << "bad_alloc caught during XS initialization of the 1d total xs data, requested " << (floats1d * sizeof(float)) << " bytes";
         qDebug() << "Reported error: " << bad.what(); ;
         return false;
     }
 
     try{
-        m_scat2d.resize(bytes2d);
+        m_scat1d.resize(floats1d);
     }
     catch(std::bad_alloc &bad)
     {
-        qDebug() << "bad_alloc caught during XS initialization of the 2d scatter xs data, requested " << bytes2d << " bytes: ";
+        qDebug() << "bad_alloc caught during XS initialization of the 1d scatter xs data, requested " << (floats1d * sizeof(float)) << " bytes: ";
+        qDebug() << "Reported error: " << bad.what(); ;
+        return false;
+    }
+
+    try{
+        m_scat2d.resize(floats2d);
+    }
+    catch(std::bad_alloc &bad)
+    {
+        qDebug() << "bad_alloc caught during XS initialization of the 2d scatter xs data, requested " << (floats2d * sizeof(float)) << " bytes: ";
         qDebug() << "Reported error: " << bad.what(); ;
         return false;
     }
@@ -90,8 +94,8 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
 
     if(m_matsLoaded >= m_mats)
     {
-        qDebug() << "XSection::addMaterial(): 93: Tried to add another cross section to a full table";
-        qDebug() << "XSection::addMaterial(): 94: Max size = " << m_mats;
+        qCritical() << "XSection::addMaterial(): 93: Tried to add another cross section to a full table";
+        qCritical() << "XSection::addMaterial(): 94: Max size = " << m_mats;
         return false;
     }
 
@@ -142,7 +146,8 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
             }
 
             // Handle the scatter 2d xs
-            for(int n = 0; n < m_pns; n++)
+            const int pnCount = m_pn+1;
+            for(int n = 0; n <= m_pn; n++)
             {
                 AmpxRecordParserType12 *gxsc = d->getGammaScatterMatrix(MT_GAMMA_COHERENT_SCATTER, n);
                 if(gxsc != NULL)
@@ -150,7 +155,7 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
                     {
                         for(int iesnk = 0; iesnk < m_groups; iesnk++)
                         {
-                            m_scat2d[m_matsLoaded*m_groups*m_groups*m_pns + iesrc*m_groups*m_pns + iesnk*m_pns + n] += gxsc->getXs(iesrc, iesnk)*afrac;
+                            m_scat2d[m_matsLoaded*m_groups*m_groups*pnCount + iesrc*m_groups*pnCount + iesnk*pnCount + n] += gxsc->getXs(iesrc, iesnk)*afrac;
                         }
                     }
 
@@ -160,12 +165,12 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
                     {
                         for(int iesnk = 0; iesnk < m_groups; iesnk++)
                         {
-                            m_scat2d[m_matsLoaded*m_groups*m_groups*m_pns + iesrc*m_groups*m_pns + iesnk*m_pns + n] += gxsc->getXs(iesrc, iesnk)*afrac;
+                            m_scat2d[m_matsLoaded*m_groups*m_groups*pnCount + iesrc*m_groups*pnCount + iesnk*pnCount + n] += gxsc->getXs(iesrc, iesnk)*afrac;
                         }
                     }
             }
         }
-        else  // Look at all isitopes of z[i]
+        else  // Look at all isotopes of z[i]
         {
             //qDebug() << "No natural isotope for z = " << z[i];
             float weightCovered = 0.0f;
@@ -214,7 +219,8 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
                     }
 
                     // Handle the scatter 2d xs
-                    for(int n = 0; n < m_pns; n++)
+                    const int pnCount = m_pn + 1;
+                    for(int n = 0; n < pnCount; n++)
                     {
                         AmpxRecordParserType12 *gxsc = d->getGammaScatterMatrix(MT_GAMMA_COHERENT_SCATTER, n);
                         if(gxsc != NULL)
@@ -222,7 +228,7 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
                             {
                                 for(int iesnk = 0; iesnk < m_groups; iesnk++)
                                 {
-                                    m_scat2d[m_matsLoaded*m_groups*m_groups*m_pns + iesrc*m_groups*m_pns + iesnk*m_pns + n] += gxsc->getXs(iesrc, iesnk)*afrac*MaterialUtils::naturalAbundances[elemIndx][j];
+                                    m_scat2d[m_matsLoaded*m_groups*m_groups*pnCount + iesrc*m_groups*pnCount + iesnk*pnCount + n] += gxsc->getXs(iesrc, iesnk)*afrac*MaterialUtils::naturalAbundances[elemIndx][j];
                                 }
                             }
 
@@ -232,7 +238,7 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
                             {
                                 for(int iesnk = 0; iesnk < m_groups; iesnk++)
                                 {
-                                    m_scat2d[m_matsLoaded*m_groups*m_groups*m_pns + iesrc*m_groups*m_pns + iesnk*m_pns + n] += gxsc->getXs(iesrc, iesnk)*afrac*MaterialUtils::naturalAbundances[elemIndx][j];
+                                    m_scat2d[m_matsLoaded*m_groups*m_groups*pnCount + iesrc*m_groups*pnCount + iesnk*pnCount + n] += gxsc->getXs(iesrc, iesnk)*afrac*MaterialUtils::naturalAbundances[elemIndx][j];
                                 }
                             }
                     }
@@ -248,13 +254,13 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
                     m_tot1d[m_matsLoaded*m_groups + ei] /= weightCovered;
                 }
 
-                for(int n = 0; n < m_pns; n++)
+                for(int n = 0; n < m_pn; n++)
                 {
                     for(int iesrc = 0; iesrc < m_groups; iesrc++)
                     {
                         for(int iesnk = 0; iesnk < m_groups; iesnk++)
                         {
-                            m_scat2d[m_matsLoaded*m_groups*m_groups*m_pns + iesrc*m_groups*m_pns + iesnk*m_pns + n] /= weightCovered;
+                            m_scat2d[m_matsLoaded*m_groups*m_groups*m_pn + iesrc*m_groups*m_pn + iesnk*m_pn + n] /= weightCovered;
                         }
                     }
                 }

@@ -53,9 +53,14 @@ MainWindow::MainWindow(QWidget *parent):
     m_solver(NULL),
     m_solverWorkerThread(NULL),
     m_solution(NULL),
-    m_raytrace(NULL)
+    m_raytrace(NULL),
+    m_solType(MainWindow::ISOTROPIC),
+    m_pn(0)
 {
     ui->setupUi(this);
+
+    //m_solType = MainWindow::LEGENDRE;
+    //m_pn = 3;
 
     // Initialize static member variables
     MainWindow::m_badPalette = new QPalette();
@@ -101,13 +106,25 @@ MainWindow::MainWindow(QWidget *parent):
     m_solver->moveToThread(&m_solverWorkerThread);
     connect(&m_xsWorkerThread, SIGNAL(finished()), m_solver, SLOT(deleteLater()));
 
-    connect(this, SIGNAL(signalLaunchIsoRaytracer(const Quadrature*,const Mesh*,const XSection*)), m_solver, SLOT(raytraceIso(const Quadrature*,const Mesh*,const XSection*)));
-    connect(m_solver, SIGNAL(signalRaytracerIsoFinished(std::vector<float>*)), this, SLOT(onRaytracerIsoFinished(std::vector<float>*)));
-    connect(this, SIGNAL(signalLaunchIsoSolver(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)), m_solver, SLOT(gsSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)));
-    connect(m_solver, SIGNAL(signalSolverIsoFinished(std::vector<float>*)), this, SLOT(onSolverIsoFinished(std::vector<float>*)));
+    connect(this, SIGNAL(signalLaunchRaytracerIso(const Quadrature*,const Mesh*,const XSection*)), m_solver, SLOT(raytraceIso(const Quadrature*,const Mesh*,const XSection*)));
+    connect(this, SIGNAL(signalLaunchSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)), m_solver, SLOT(gsSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)));
+
+    connect(this, SIGNAL(signalLaunchRaytracerLegendre(const Quadrature*,const Mesh*,const XSection*, const unsigned int)), m_solver, SLOT(raytraceLegendre(const Quadrature*,const Mesh*,const XSection*, const unsigned int)));
+    connect(this, SIGNAL(signalLaunchSolverLegendre(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<float>*)), m_solver, SLOT(gsSolverLegendre(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<float>*)));
+
+    connect(this, SIGNAL(signalLaunchRaytracerHarmonic(const Quadrature*,const Mesh*,const XSection*, const unsigned int)), m_solver, SLOT(raytraceHarmonic(const Quadrature*,const Mesh*,const XSection*, const unsigned int)));
+    connect(this, SIGNAL(signalLaunchSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<float>*)), m_solver, SLOT(gsSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<float>*)));
+
+    connect(m_solver, SIGNAL(signalRaytracerFinished(std::vector<float>*)), this, SLOT(onRaytracerFinished(std::vector<float>*)));
+    connect(m_solver, SIGNAL(signalSolverFinished(std::vector<float>*)), this, SLOT(onSolverFinished(std::vector<float>*)));
 
     connect(m_solver, SIGNAL(signalNewIteration(std::vector<float>*)), outputDialog, SLOT(reRender(std::vector<float>*)));
     m_solverWorkerThread.start();
+
+    for(int i = 0; i < 10; i++)
+    {
+        ui->paramsPnComboBox->addItem(QString::number(i));
+    }
 
     // Add the tooltips
     updateLaunchButton();  // Sets the tooltip
@@ -155,7 +172,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_launchSolverPushButton_clicked()
 {
-    bool isotropicTreatment = true;
+
 
     outputDialog->show();
 
@@ -163,14 +180,21 @@ void MainWindow::on_launchSolverPushButton_clicked()
     m_mesh->calcAreas(m_quad, m_parser->getGammaEnergyGroups());
 
     // When the raytracer finishes, the gs solver is automatically launched
-    if(isotropicTreatment)
+    switch(m_solType)
     {
-        emit signalLaunchIsoRaytracer(m_quad, m_mesh, m_xs);
+    case MainWindow::ISOTROPIC:
+        emit signalLaunchRaytracerIso(m_quad, m_mesh, m_xs);
+        break;
+    case MainWindow::LEGENDRE:
+        emit signalLaunchRaytracerLegendre(m_quad, m_mesh, m_xs, m_pn);
+        break;
+    case MainWindow::HARMONIC:
+        emit signalLaunchRaytracerHarmonic(m_quad, m_mesh, m_xs, m_pn);
+        break;
+    default:
+        qDebug() << "No solver of type " << m_solType;
     }
-    else
-    {
-        emit signalLaunchRaytracer(m_quad, m_mesh, m_xs, 3);
-    }
+    return;
 }
 
 /*
@@ -228,9 +252,7 @@ void MainWindow::on_geometryOpenPushButton_clicked()
 
 void MainWindow::updateLaunchButton()
 {
-    // TODO - temporarily removed the dependence on the solver params since I'm hard coding them for now
-    //if(m_geomLoaded && m_quadLoaded && m_xsLoaded && m_paramsLoaded)
-    if(m_geomLoaded && m_quadLoaded && m_xsLoaded)
+    if(m_geomLoaded && m_quadLoaded && m_xsLoaded && m_paramsLoaded)
     {
         ui->launchSolverPushButton->setEnabled(true);
 
@@ -278,12 +300,12 @@ void MainWindow::updateLaunchButton()
     if(m_paramsLoaded)
     {
         ui->paramsGroupBox->setStyleSheet("QGroupBox { color: black; } ");
-        ui->paramsExplorePushButton->setEnabled(true);
+        //ui->paramsExplorePushButton->setEnabled(true);
     }
     else
     {
         ui->paramsGroupBox->setStyleSheet("QGroupBox { color: red; } ");
-        ui->paramsExplorePushButton->setEnabled(false);
+        //ui->paramsExplorePushButton->setEnabled(false);
     }
 
     ui->geometryGroupBox->update();
@@ -378,6 +400,33 @@ void MainWindow::on_quadData2ComboBox_activated(int)
 
 }
 
+void MainWindow::on_paramsTypeComboBox_activated(int indx)
+{
+    //if(indx > 1)
+    //{
+    //    ui->paramsPnComboBox->setEnabled(true);
+    //}
+    //else
+    //{
+    //    ui->paramsPnComboBox->setEnabled(false);
+    //}
+    ui->paramsPnComboBox->setEnabled(indx > 1);
+    m_solType = indx - 1; // Resetting to the default (indx = 0) rolls over to UINT_MAX
+
+    m_paramsLoaded = (indx == 1 || (indx > 1 && ui->paramsPnComboBox->currentIndex() > 1));
+
+    updateLaunchButton();
+}
+
+void MainWindow::on_paramsPnComboBox_activated(int indx)
+{
+    m_pn = indx - 1;  // Resetting to the default rolls over to UINT_MAX
+
+    m_paramsLoaded = (ui->paramsTypeComboBox->currentIndex() == 1 || (ui->paramsTypeComboBox->currentIndex() > 1 && indx > 1));
+
+    updateLaunchButton();
+}
+
 
 void MainWindow::on_xsOpenPushButton_clicked()
 {
@@ -421,13 +470,13 @@ bool MainWindow::buildMaterials(AmpxParser *parser)
 {
     qDebug() << "Generating materials";
 
-    // One extra material for the empty material at the end
-    m_xs->allocateMemory(static_cast<unsigned int>(MaterialUtils::hounsfieldRangePhantom19Elements.size()+1), parser->getGammaEnergyGroups(), 6);
+    // One extra material for the empty material at the end (1u is unsigned 1.0)
+    m_xs->allocateMemory(MaterialUtils::hounsfieldRangePhantom19.size() + 1u, parser->getGammaEnergyGroups(), m_pn);
 
     bool allPassed = true;
 
     // Add the materials to the xs library
-    for(unsigned int i = 0; i < MaterialUtils::hounsfieldRangePhantom19Elements.size(); i++)
+    for(unsigned int i = 0; i < MaterialUtils::hounsfieldRangePhantom19.size(); i++)
         allPassed &= m_xs->addMaterial(MaterialUtils::hounsfieldRangePhantom19Elements, MaterialUtils::hounsfieldRangePhantom19Weights[i], parser);
 
     // The last material is empty and should never be used
@@ -436,16 +485,31 @@ bool MainWindow::buildMaterials(AmpxParser *parser)
     return allPassed;
 }
 
-void MainWindow::onRaytracerIsoFinished(std::vector<float>* uncollided)
+void MainWindow::onRaytracerFinished(std::vector<float>* uncollided)
 {
     m_raytrace = uncollided;
 
     OutWriter::writeArray("uncol_flux.dat", *uncollided);
 
-    emit signalLaunchIsoSolver(m_quad, m_mesh, m_xs, uncollided);
+    switch(m_solType)
+    {
+    case MainWindow::ISOTROPIC:
+        emit signalLaunchSolverIso(m_quad, m_mesh, m_xs, uncollided);
+        break;
+    case MainWindow::LEGENDRE:
+        emit signalLaunchSolverLegendre(m_quad, m_mesh, m_xs, m_pn, uncollided);
+        break;
+    case MainWindow::HARMONIC:
+        emit signalLaunchSolverHarmonic(m_quad, m_mesh, m_xs, m_pn, uncollided);
+        break;
+    default:
+        qDebug() << "No solver of type " << m_solType;
+    }
+
+    //emit signalLaunchIsoSolver(m_quad, m_mesh, m_xs, uncollided);
 }
 
-void MainWindow::onSolverIsoFinished(std::vector<float> *solution)
+void MainWindow::onSolverFinished(std::vector<float> *solution)
 {
     m_solution = solution;
 

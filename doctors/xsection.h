@@ -33,7 +33,7 @@ public:
 private:
     int m_groups;
     int m_mats;
-    int m_pns;
+    int m_pn;
     int m_matsLoaded;
 
     const static unsigned int MT_GAMMA_TOTAL_INTERACTION = 501;

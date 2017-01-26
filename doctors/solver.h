@@ -22,8 +22,8 @@ public:
 
 signals:
     void signalNewIteration(std::vector<float>*);
-    void signalRaytracerIsoFinished(std::vector<float>*);
-    void signalSolverIsoFinished(std::vector<float>*);
+    //void signalRaytracerIsoFinished(std::vector<float>*);
+    //void signalSolverIsoFinished(std::vector<float>*);
 
     void signalRaytracerFinished(std::vector<float>*);
     void signalSolverFinished(std::vector<float>*);
@@ -32,8 +32,8 @@ public slots:
     void raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs);
     void gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<float> *uflux);
 
-    void raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn);
-    void gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<float> *uflux);
+    void raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn);
+    void gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<float> *uflux);
 
     void raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn);
     void gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<float> *uflux);

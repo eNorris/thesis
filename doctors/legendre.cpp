@@ -50,28 +50,39 @@ SOL_T Legendre::operator()(const unsigned int l, const SOL_T mu)
     {
     case 0:
         result = 1.0;
+        break;
     case 1:
         result = mu;
+        break;
     case 2:
         result = 0.5 * (3 * pow(mu, 2.0) - 1);
+        break;
     case 3:
         result = 0.5 * (5 * pow(mu, 3.0) - 3*mu);
+        break;
     case 4:
         result = 0.125 * (35 * pow(mu, 4.0) - 30 * pow(mu, 2.0) + 3);
+        break;
     case 5:
         result = 0.125 * (63 * pow(mu, 5.0) - 70 * pow(mu, 3.0) + 15*mu);
+        break;
     case 6:
         result = 0.0625 * (231 * pow(mu, 6.0) - 315 * pow(mu, 4.0) + 105*pow(mu, 2.0) - 5);
+        break;
     case 7:
         result = 0.0625 * (429 * pow(mu, 7.0) - 693 * pow(mu, 5.0) + 315*pow(mu, 3.0) - 35*mu);
+        break;
     case 8:
         result = 0.0078125 * (6435 * pow(mu, 8.0) - 12012 * pow(mu, 6.0) + 6930*pow(mu, 4.0) - 1260*pow(mu, 2.0) + 35);
+        break;
     case 9:
         result = 0.0078125 * (12155 * pow(mu, 9.0) - 25740 * pow(mu, 7.0) + 18018*pow(mu, 5.0) - 4620*pow(mu, 3.0) + 315*mu);
+        break;
     case 10:
         result = 0.00390625 * (46189 * pow(mu, 10.0) - 109395 * pow(mu, 8.0) + 90090*pow(mu, 6.0) - 30030*pow(mu, 4.0) + 3465*pow(mu, 2.0) - 63);
+        break;
     default:
-        qWarning() << "Can't compute Legendre polynomials beyond order ";
+        qWarning() << "Can't compute Legendre polynomials beyond order 10, requested order " << l;
     };
 
     return static_cast<SOL_T>(result);

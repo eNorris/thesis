@@ -241,7 +241,7 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
 
     qDebug() << "Time to complete raytracer: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
-    emit signalRaytracerIsoFinished(uflux);
+    emit signalRaytracerFinished(uflux);
     emit signalNewIteration(uflux);
 }
 
@@ -566,7 +566,7 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
     }
 
     emit signalNewIteration(scalarFlux);
-    emit signalSolverIsoFinished(scalarFlux);
+    emit signalSolverFinished(scalarFlux);
 }
 
 
@@ -574,7 +574,7 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
 //                           Anisotropic versions of the above solvers                            //
 // ////////////////////////////////////////////////////////////////////////////////////////////// //
 
-void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn)
+void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn)
 {
     std::clock_t startMoment = std::clock();
 
@@ -616,14 +616,6 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                 float y = mesh->yNodes[yIndxStart] + mesh->dy[yIndxStart]/2;
                 float z = mesh->zNodes[zIndxStart] + mesh->dz[zIndxStart]/2;
 
-                //float deltaX = x - srcIndxX;
-                //float deltaY = y - srcIndxY;
-                //float deltaZ = z - srcIndxZ;
-
-                //std::vector<float> tmpdistv;
-                //std::vector<float> tmpxsv;
-                //std::vector<float> mfpv;
-
                 if(xIndxStart == srcIndxX && yIndxStart == srcIndxY && zIndxStart == srcIndxZ)  // End condition
                 {
                     float srcToCellDist = sqrt((x-sx)*(x-sx) + (y-sy)*(y-sy) + (z-sz)*(z-sz));
@@ -633,12 +625,6 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                     {
                         xsval = xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
                         (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = srcStrength[ie] * exp(-xsval*srcToCellDist) / (4 * M_PI * srcToCellDist * srcToCellDist);
-                        //float magnitude = srcStrength[ie] * exp(-xsval*srcToCellDist) / (4 * M_PI * srcToCellDist * srcToCellDist);
-                        //for(unsigned int il = 0; il < lSize; il++)
-                        //{
-                        //    for(unsigned int im = -il; im < il; im++)
-                        //    (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart*momentBins + im] = magnitude * harmonics(l, m, theta, phi);
-                        //}
                     }
                     continue;
                 }
@@ -704,10 +690,6 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                         //                   [cm] * [b] * [atom/b-cm]
                         meanFreePaths[ie] += tmin * xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
                     }
-                    //tmpdistv.push_back(tmin);
-                    //tmpxsv.push_back(xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx]);
-                    //float gain = tmin * xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
-                    //mfpv.push_back(gain);
 
                     // Update cell indices and positions
                     if(dirHitFirst == DIRECTION_X) // x direction
@@ -769,12 +751,6 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                             meanFreePaths[ie] += finalDist * xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
                         }
 
-                        //tmpdistv.push_back(finalDist);
-                        //tmpxsv.push_back(xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx]);
-
-                        //float gain = finalDist * xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
-                        //mfpv.push_back(gain);
-
                         exhaustedRay = true;
                     }
 
@@ -797,16 +773,10 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
 
     qDebug() << "Time to complete raytracer: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
-    //const int lSize = pn + 1;
-    //const int mSize = 2* pn + 1;
-    //const int momentBins = lSize * mSize;
-    //SphericalHarmonic harmonics;
-
     std::vector<float> *ufluxAniso = new std::vector<float>;
     ufluxAniso->resize(groups * quad->angleCount() * mesh->voxelCount(), 0.0f);
 
     int eajmp = quad->angleCount() * mesh->voxelCount();
-    //int aajmp = mesh->voxelCount();
     int xajmp = mesh->yNodeCt * mesh->zNodeCt;
     int yajmp = mesh->zNodeCt;
 
@@ -829,11 +799,7 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                     deltaY /= mag;
                     deltaZ /= mag;
 
-                    //float phi = acos(deltaZ);  // In radians
-                    //float theta = acos(x/sin(phi));
-
                     int indx = ie*eajmp + ix*xajmp + iy*yajmp + iz;  // index of start of moments
-                    //for(int il = 0; il < lSize; il++)
 
                     unsigned int bestAngIndx = 0;
                     float bestCosT = 0.0f;
@@ -884,7 +850,7 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
 }
 
 
-void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<float> *uFlux)
+void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<float> *uFlux)
 {
     // Do some input checks
     if(pn > 10)

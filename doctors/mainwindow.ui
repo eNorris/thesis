@@ -331,30 +331,39 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_5">
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <layout class="QHBoxLayout" name="horizontalLayout_10">
            <item>
-            <widget class="QPushButton" name="paramsOpenPushButton">
-             <property name="text">
-              <string>Open</string>
+            <widget class="QComboBox" name="paramsTypeComboBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
              </property>
+             <item>
+              <property name="text">
+               <string>Solver Type</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Isotropic</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Legendre</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Harmonic</string>
+              </property>
+             </item>
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="paramsFileLineEdit"/>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_9">
-           <item>
-            <widget class="QPushButton" name="paramsExplorePushButton">
-             <property name="text">
-              <string>Explore</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer">
+            <spacer name="horizontalSpacer_4">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -367,10 +376,15 @@
             </spacer>
            </item>
            <item>
-            <widget class="QPushButton" name="paramsHelpPushButton">
-             <property name="text">
-              <string>Help</string>
+            <widget class="QComboBox" name="paramsPnComboBox">
+             <property name="enabled">
+              <bool>false</bool>
              </property>
+             <item>
+              <property name="text">
+               <string>Pn</string>
+              </property>
+             </item>
             </widget>
            </item>
           </layout>

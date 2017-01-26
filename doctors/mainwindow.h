@@ -33,6 +33,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    const static unsigned int ISOTROPIC = 0;
+    const static unsigned int LEGENDRE = 1;
+    const static unsigned int HARMONIC = 2;
+
 private:
     Ui::MainWindow *ui;
 
@@ -64,6 +68,9 @@ private:
     std::vector<float> *m_solution;
     std::vector<float> *m_raytrace;
 
+    unsigned int m_solType;
+    unsigned int m_pn;
+
     void launchXsReader();
 
 public:
@@ -76,9 +83,12 @@ protected slots:
     void on_quadTypeComboBox_activated(int);
     void on_quadData1ComboBox_activated(int);
     void on_quadData2ComboBox_activated(int);
+    void on_paramsTypeComboBox_activated(int);
+    void on_paramsPnComboBox_activated(int);
     void on_launchSolverPushButton_clicked();
     void on_xsOpenPushButton_clicked();
     void on_xsExplorePushButton_clicked();
+
 
     void updateLaunchButton();
     void xsParseErrorHandler(QString);
@@ -86,15 +96,18 @@ protected slots:
 
     bool buildMaterials(AmpxParser *parser);
 
-    void onRaytracerIsoFinished(std::vector<float>* uncollided);
-    void onSolverIsoFinished(std::vector<float>* solution);
+    void onRaytracerFinished(std::vector<float>* uncollided);
+    void onSolverFinished(std::vector<float>* solution);
 
 signals:
-    void signalLaunchIsoRaytracer(const Quadrature *quad, const Mesh *mesh, const XSection *xs);
-    void signalLaunchIsoSolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<float> *uflux);
+    void signalLaunchRaytracerIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs);
+    void signalLaunchSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<float> *uflux);
 
-    void signalLaunchRaytracer(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn);
-    void signalLaunchSolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<float> *uflux);
+    void signalLaunchRaytracerLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn);
+    void signalLaunchSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<float> *uflux);
+
+    void signalLaunchRaytracerHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn);
+    void signalLaunchSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<float> *uflux);
 
     void signalDebugHalt(std::vector<float>);
     void signalBeginXsParse(QString);
