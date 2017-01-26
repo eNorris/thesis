@@ -186,18 +186,18 @@ void OutputDialog::setSliceLevel(int level)
 
         if((maxvalLevel - minvalLevel) / maxvalLevel < 1E-5)
         {
-            qDebug() << "Displaying a flat surface!";
+            //qDebug() << "Displaying a flat surface!";
             dispErrMap();
             return;
         }
 
-        qDebug() << "minvalglobal = " << m_minvalGlobal << "   maxvalGlobal = " << m_maxvalGlobal << "   minvalLevel = " << minvalLevel << "   maxvalLevel = " << maxvalLevel;
+        //qDebug() << "minvalglobal = " << m_minvalGlobal << "   maxvalGlobal = " << m_maxvalGlobal << "   minvalLevel = " << minvalLevel << "   maxvalLevel = " << maxvalLevel;
 
         if(m_logInterp)
         {
             minvalLevel = log10(minvalLevel);
             maxvalLevel = log10(maxvalLevel);
-            qDebug() << "log(minvalglobal) = " << m_minvalGlobalLog << "   log(maxvalGlobal) = " << m_maxvalGlobalLog << "log(minvalLevel) = " << minvalLevel << "  log(maxvalLevel) = " << maxvalLevel;
+            //qDebug() << "log(minvalglobal) = " << m_minvalGlobalLog << "   log(maxvalGlobal) = " << m_maxvalGlobalLog << "log(minvalLevel) = " << minvalLevel << "  log(maxvalLevel) = " << maxvalLevel;
         }
 
         QStringList list;
@@ -271,27 +271,251 @@ void OutputDialog::setSliceLevel(int level)
             return;
         }
 
+        // Get the min/max for this slice level
+        for(unsigned int ix = 0; ix < m_mesh->xElemCt; ix++)
+            for(unsigned int iz = 0; iz < m_mesh->zElemCt; iz++)
+            {
+                float val = (*m_data)[energyGroup*m_mesh->voxelCount() + ix*m_mesh->xjmp() + iz + level];
+                if(val < minvalLevel)
+                {
+                    if(!m_logInterp || val > 0)  // Don't count 0 on log scale
+                        minvalLevel = val;
+                }
+                if(val > maxvalLevel)
+                    maxvalLevel = val;
+            }
+
+        if(maxvalLevel <= 1E-35)
+        {
+            qDebug() << "Zero flux everywhere!";
+            dispErrMap();
+            return;
+        }
+
+        if(minvalLevel < 0)
+        {
+            qDebug() << "WARNING: Negative flux!";
+        }
+
+        if((maxvalLevel - minvalLevel) / maxvalLevel < 1E-5)
+        {
+            //qDebug() << "Displaying a flat surface!";
+            dispErrMap();
+            return;
+        }
+
+        //qDebug() << "minvalglobal = " << m_minvalGlobal << "   maxvalGlobal = " << m_maxvalGlobal << "   minvalLevel = " << minvalLevel << "   maxvalLevel = " << maxvalLevel;
+
+        if(m_logInterp)
+        {
+            minvalLevel = log10(minvalLevel);
+            maxvalLevel = log10(maxvalLevel);
+            //qDebug() << "log(minvalglobal) = " << m_minvalGlobalLog << "   log(maxvalGlobal) = " << m_maxvalGlobalLog << "log(minvalLevel) = " << minvalLevel << "  log(maxvalLevel) = " << maxvalLevel;
+        }
+
+        QStringList list;
+        QString datastring = "";
+        QString fidstring = "";
         for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
+        {
             for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
             {
-                int zid = m_mesh->zoneId[i*m_mesh->yElemCt*m_mesh->zElemCt + level*m_mesh->zElemCt + j];
-                rects[i*m_mesh->zElemCt + j]->setBrush(brushes[zid]);
+                float flux = (*m_data)[energyGroup*m_mesh->voxelCount() + i*m_mesh->xjmp() + j + level];
+
+                if(m_logInterp)
+                {
+                    if(flux <= 1E-35)
+                    {
+                        rects[i*m_mesh->yElemCt + j]->setBrush(errBrush);
+                        continue;
+                    }
+                    else
+                    {
+                        flux = log10(flux);
+                    }
+                }
+
+
+                // Map the flux value to color space
+                int fid;
+                if(ui->levelScaleCheckBox->isChecked())
+                {
+                    fid = round(63*(flux-minvalLevel) / (maxvalLevel-minvalLevel));
+                }
+                else
+                {
+                    if(m_logInterp)
+                        fid = round(63*(flux-m_minvalGlobalLog) / (m_maxvalGlobalLog-m_minvalGlobalLog));
+                    else
+                        fid = round(63*(flux-m_minvalGlobal) / (m_maxvalGlobal-m_minvalGlobal));
+                }
+
+                if(fid > 63)
+                {
+                    qDebug() << "WARNING: fid > 63!";
+                    qDebug() << "flux = " << flux << "  maxvalLevel = " << maxvalLevel << "  maxvalGlobal = " << m_maxvalGlobal << "  log(maxvalGlobal) = " << m_maxvalGlobalLog;
+                    fid = -1;
+                }
+                if(fid < 0)
+                {
+                    qDebug() << "WARNING: fid < 0!";
+                    qDebug() << "flux = " << flux << "  maxvalLevel = " << maxvalLevel << "  maxvalGlobal = " << m_maxvalGlobal << "  log(maxvalGlobal) = " << m_maxvalGlobalLog;
+                    fid = -1;
+                }
+                if(fid == -1)
+                    rects[i*m_mesh->yElemCt + j]->setBrush(errBrush);
+                else
+                    rects[i*m_mesh->yElemCt + j]->setBrush(brushes[fid]);
+                datastring += "   " + QString::number(flux);
+                fidstring += "   " + QString::number(fid);
             }
+            datastring += "\n";
+            fidstring += "\n";
+        }
+        list << datastring;
+        list << fidstring;
+        /////////////////////////////////////////
+        ///////////////////////////////////////
+        //if(level >= (signed) m_mesh->yElemCt)
+        //{
+        //    qDebug() << "level is too high! y-slices = " << m_mesh->yElemCt;
+        //    dispErrMap();
+        //    return;
+        //}
+
+        //for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
+        //    for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
+        //    {
+        //        int zid = m_mesh->zoneId[i*m_mesh->yElemCt*m_mesh->zElemCt + level*m_mesh->zElemCt + j];
+        //        rects[i*m_mesh->zElemCt + j]->setBrush(brushes[zid]);
+        //    }
     }
     else if(ui->yzRadioButton->isChecked())
     {
         if(level >= (signed) m_mesh->xElemCt)
         {
             qDebug() << "level is too high! x-slices = " << m_mesh->xElemCt;
+            dispErrMap();
             return;
         }
 
+        // Get the min/max for this slice level
+        for(unsigned int iy = 0; iy < m_mesh->yElemCt; iy++)
+            for(unsigned int iz = 0; iz < m_mesh->zElemCt; iz++)
+            {
+                float val = (*m_data)[energyGroup*m_mesh->voxelCount() + iy*m_mesh->yElemCt + iz + level];
+                if(val < minvalLevel)
+                {
+                    if(!m_logInterp || val > 0)  // Don't count 0 on log scale
+                        minvalLevel = val;
+                }
+                if(val > maxvalLevel)
+                    maxvalLevel = val;
+            }
+
+        if(maxvalLevel <= 1E-35)
+        {
+            qDebug() << "Zero flux everywhere!";
+            dispErrMap();
+            return;
+        }
+
+        if(minvalLevel < 0)
+        {
+            qDebug() << "WARNING: Negative flux!";
+        }
+
+        if((maxvalLevel - minvalLevel) / maxvalLevel < 1E-5)
+        {
+            //qDebug() << "Displaying a flat surface!";
+            dispErrMap();
+            return;
+        }
+
+        //qDebug() << "minvalglobal = " << m_minvalGlobal << "   maxvalGlobal = " << m_maxvalGlobal << "   minvalLevel = " << minvalLevel << "   maxvalLevel = " << maxvalLevel;
+
+        if(m_logInterp)
+        {
+            minvalLevel = log10(minvalLevel);
+            maxvalLevel = log10(maxvalLevel);
+            //qDebug() << "log(minvalglobal) = " << m_minvalGlobalLog << "   log(maxvalGlobal) = " << m_maxvalGlobalLog << "log(minvalLevel) = " << minvalLevel << "  log(maxvalLevel) = " << maxvalLevel;
+        }
+
+        QStringList list;
+        QString datastring = "";
+        QString fidstring = "";
         for(unsigned int i = 0; i < m_mesh->yElemCt; i++)
+        {
             for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
             {
-                int zid = m_mesh->zoneId[level*m_mesh->yElemCt*m_mesh->zElemCt + i*m_mesh->zElemCt + j];
-                rects[i*m_mesh->zElemCt + j]->setBrush(brushes[zid]);
+                float flux = (*m_data)[energyGroup*m_mesh->voxelCount() + i*m_mesh->yElemCt + j + level];
+
+                if(m_logInterp)
+                {
+                    if(flux <= 1E-35)
+                    {
+                        rects[i*m_mesh->yElemCt + j]->setBrush(errBrush);
+                        continue;
+                    }
+                    else
+                    {
+                        flux = log10(flux);
+                    }
+                }
+
+
+                // Map the flux value to color space
+                int fid;
+                if(ui->levelScaleCheckBox->isChecked())
+                {
+                    fid = round(63*(flux-minvalLevel) / (maxvalLevel-minvalLevel));
+                }
+                else
+                {
+                    if(m_logInterp)
+                        fid = round(63*(flux-m_minvalGlobalLog) / (m_maxvalGlobalLog-m_minvalGlobalLog));
+                    else
+                        fid = round(63*(flux-m_minvalGlobal) / (m_maxvalGlobal-m_minvalGlobal));
+                }
+
+                if(fid > 63)
+                {
+                    qDebug() << "WARNING: fid > 63!";
+                    qDebug() << "flux = " << flux << "  maxvalLevel = " << maxvalLevel << "  maxvalGlobal = " << m_maxvalGlobal << "  log(maxvalGlobal) = " << m_maxvalGlobalLog;
+                    fid = -1;
+                }
+                if(fid < 0)
+                {
+                    qDebug() << "WARNING: fid < 0!";
+                    qDebug() << "flux = " << flux << "  maxvalLevel = " << maxvalLevel << "  maxvalGlobal = " << m_maxvalGlobal << "  log(maxvalGlobal) = " << m_maxvalGlobalLog;
+                    fid = -1;
+                }
+                if(fid == -1)
+                    rects[i*m_mesh->yElemCt + j]->setBrush(errBrush);
+                else
+                    rects[i*m_mesh->yElemCt + j]->setBrush(brushes[fid]);
+                datastring += "   " + QString::number(flux);
+                fidstring += "   " + QString::number(fid);
             }
+            datastring += "\n";
+            fidstring += "\n";
+        }
+        list << datastring;
+        list << fidstring;
+        ////////////////////////////////////////
+        ///////////////////////////////////////
+        //if(level >= (signed) m_mesh->xElemCt)
+        //{
+        //    qDebug() << "level is too high! x-slices = " << m_mesh->xElemCt;
+        //    return;
+        //}
+
+        //for(unsigned int i = 0; i < m_mesh->yElemCt; i++)
+        //    for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
+        //    {
+        //        int zid = m_mesh->zoneId[level*m_mesh->yElemCt*m_mesh->zElemCt + i*m_mesh->zElemCt + j];
+         //       rects[i*m_mesh->zElemCt + j]->setBrush(brushes[zid]);
+        //    }
     }
     else
     {
@@ -325,7 +549,6 @@ void OutputDialog::updateMeshSlicePlane()
     else if(ui->xzRadioButton->isChecked())
     {
         qDebug() << "XZ max = " << m_mesh->yElemCt-1;
-
 
         QBrush greenBrush(Qt::green);
         for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
