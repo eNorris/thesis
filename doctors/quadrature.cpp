@@ -196,7 +196,7 @@ void Quadrature::loadSn(const int sn)
     }
 }
 
-int Quadrature::angleCount() const
+unsigned int Quadrature::angleCount() const
 {
     return m_angles;
 }

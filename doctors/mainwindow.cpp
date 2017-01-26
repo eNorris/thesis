@@ -85,8 +85,8 @@ MainWindow::MainWindow(QWidget *parent):
 
 
 
-    connect(m_solver, SIGNAL(signalSolverFinished(std::vector<float>*)), this, SLOT(onSolverFinished(std::vector<float>*)));
-    connect(m_solver, SIGNAL(signalRaytracerFinished(std::vector<float>*)), this, SLOT(onRaytracerFinished(std::vector<float>*)));
+
+
 
     // Set up xs reader threads
     m_parser->moveToThread(&m_xsWorkerThread);
@@ -100,8 +100,12 @@ MainWindow::MainWindow(QWidget *parent):
     // Set up the solver thread
     m_solver->moveToThread(&m_solverWorkerThread);
     connect(&m_xsWorkerThread, SIGNAL(finished()), m_solver, SLOT(deleteLater()));
-    connect(this, SIGNAL(signalLaunchRaytracer(const Quadrature*,const Mesh*,const XSection*)), m_solver, SLOT(raytraceIso(const Quadrature*,const Mesh*,const XSection*)));
-    connect(this, SIGNAL(signalLaunchSolver(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)), m_solver, SLOT(gsSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)));
+
+    connect(this, SIGNAL(signalLaunchIsoRaytracer(const Quadrature*,const Mesh*,const XSection*)), m_solver, SLOT(raytraceIso(const Quadrature*,const Mesh*,const XSection*)));
+    connect(m_solver, SIGNAL(signalRaytracerIsoFinished(std::vector<float>*)), this, SLOT(onRaytracerIsoFinished(std::vector<float>*)));
+    connect(this, SIGNAL(signalLaunchIsoSolver(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)), m_solver, SLOT(gsSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)));
+    connect(m_solver, SIGNAL(signalSolverIsoFinished(std::vector<float>*)), this, SLOT(onSolverIsoFinished(std::vector<float>*)));
+
     connect(m_solver, SIGNAL(signalNewIteration(std::vector<float>*)), outputDialog, SLOT(reRender(std::vector<float>*)));
     m_solverWorkerThread.start();
 
@@ -151,13 +155,22 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_launchSolverPushButton_clicked()
 {
+    bool isotropicTreatment = true;
+
     outputDialog->show();
 
     // This can't be done without the energy group information
     m_mesh->calcAreas(m_quad, m_parser->getGammaEnergyGroups());
 
     // When the raytracer finishes, the gs solver is automatically launched
-    emit signalLaunchRaytracer(m_quad, m_mesh, m_xs);
+    if(isotropicTreatment)
+    {
+        emit signalLaunchIsoRaytracer(m_quad, m_mesh, m_xs);
+    }
+    else
+    {
+        emit signalLaunchRaytracer(m_quad, m_mesh, m_xs, 3);
+    }
 }
 
 /*
@@ -423,16 +436,16 @@ bool MainWindow::buildMaterials(AmpxParser *parser)
     return allPassed;
 }
 
-void MainWindow::onRaytracerFinished(std::vector<float>* uncollided)
+void MainWindow::onRaytracerIsoFinished(std::vector<float>* uncollided)
 {
     m_raytrace = uncollided;
 
     OutWriter::writeArray("uncol_flux.dat", *uncollided);
 
-    emit signalLaunchSolver(m_quad, m_mesh, m_xs, uncollided);
+    emit signalLaunchIsoSolver(m_quad, m_mesh, m_xs, uncollided);
 }
 
-void MainWindow::onSolverFinished(std::vector<float> *solution)
+void MainWindow::onSolverIsoFinished(std::vector<float> *solution)
 {
     m_solution = solution;
 

@@ -241,7 +241,7 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
 
     qDebug() << "Time to complete raytracer: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
-    emit signalRaytracerFinished(uflux);
+    emit signalRaytracerIsoFinished(uflux);
     emit signalNewIteration(uflux);
 }
 
@@ -330,7 +330,7 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
         }
         downscatterFlag = true;
 
-        qDebug() << "Energy group #" << ie;
+        //qDebug() << "Energy group #" << ie;
         // Do the solving...
 
         int iterNum = 1;
@@ -338,7 +338,7 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
 
         while(iterNum <= maxIterations && maxDiff > epsilon)  // while not converged
         {
-            qDebug() << "Iteration #" << iterNum;
+            //qDebug() << "Iteration #" << iterNum;
 
             preFlux = tempFlux;  // Store flux for previous iteration
 
@@ -371,7 +371,7 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
 
             for(int iang = 0; iang < quad->angleCount(); iang++)  // for every angle
             {
-                qDebug() << "Angle #" << iang;
+                //qDebug() << "Angle #" << iang;
 
                 // Find the correct direction to sweep
                 int izStart = 0;                  // Sweep start index
@@ -550,24 +550,23 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
 
     qDebug() << "Time to complete: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
-    qDebug() << "Convergance of 128, 128, 32:";
-    for(unsigned int i = 0; i < converganceTracker.size(); i++)\
-    {
-        qDebug() << i << "\t" << converganceTracker[i];
-    }
-    qDebug() << "";
+    //qDebug() << "Convergance of 128, 128, 32:";
+    //for(unsigned int i = 0; i < converganceTracker.size(); i++)\
+    //{
+    //    qDebug() << i << "\t" << converganceTracker[i];
+    //}
+    //qDebug() << "";
 
     for(unsigned int i = 0; i < errList.size(); i++)
     {
-        qDebug() << "Group: " << i << "   maxDiff: " << errMaxList[i];
-        qDebug() << "Iterations: " << converganceIters[i];
+        std::cout << "Group: " << i << "   maxDiff: " << errMaxList[i] << "   Iterations: " << converganceIters[i] << '\n';
         for(unsigned int j = 0; j < errList[i].size(); j++)
-            std::cout << errList[i][j] << "\t";
-        std::cout << "\n" << std::endl;
+            std::cout << errList[i][j] << '\t';
+        std::cout << std::endl;
     }
 
     emit signalNewIteration(scalarFlux);
-    emit signalSolverFinished(scalarFlux);
+    emit signalSolverIsoFinished(scalarFlux);
 }
 
 
@@ -575,7 +574,7 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
 //                           Anisotropic versions of the above solvers                            //
 // ////////////////////////////////////////////////////////////////////////////////////////////// //
 
-void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs)
+void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn)
 {
     std::clock_t startMoment = std::clock();
 
@@ -848,9 +847,10 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
                             bestAngIndx = ia;
                         }
                     }
+                    (*ufluxAniso)[indx + bestAngIndx*mesh->voxelCount()] = (*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz];
 
                     // The rest of the directions remain zero
-                    (*ufluxAniso)[indx + ia*mesh->voxelCount()] = (*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz];
+
 
                     //for(unsigned int ia = 0; ia < quad->angleCount(); ia++)
                     //{
@@ -886,7 +886,6 @@ void Solver::raytrace(const Quadrature *quad, const Mesh *mesh, const XSection *
 
 void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<float> *uFlux)
 {
-
     // Do some input checks
     if(pn > 10)
     {
@@ -900,6 +899,8 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
     const float epsilon = 0.01f;
     //const unsigned int momentCount = (pn+1) * (pn+1);
     //SphericalHarmonic harmonic;
+    Legendre legendre;
+    legendre.precompute(quad, pn);
 
 
     std::vector<float> angularFlux(xs->groupCount() * quad->angleCount() * mesh->voxelCount());
@@ -907,7 +908,7 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
     std::vector<float> *scalarFlux = new std::vector<float>(xs->groupCount() * mesh->voxelCount(), 0.0f);
     std::vector<float> tempFlux(mesh->voxelCount());
     std::vector<float> preFlux(mesh->voxelCount(), -100.0f);
-    std::vector<float> totalSource(mesh->voxelCount(), -100.0f);
+    //std::vector<float> totalSource(mesh->voxelCount(), -100.0f);
     std::vector<float> outboundFluxX(mesh->voxelCount(), -100.0f);
     std::vector<float> outboundFluxY(mesh->voxelCount(), -100.0f);
     std::vector<float> outboundFluxZ(mesh->voxelCount(), -100.0f);
@@ -947,12 +948,12 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                     float firstColSrc = 0.0f;
                     // TODO - should the equality condition be there?
                     for(unsigned int epi = 0; epi <= ei; epi++)  // For every higher energy that can downscatter
-                        for(unsigned int l = 0; l < pn; l++)  // For every Legendre expansion coeff
+                        for(unsigned int l = 0; l <= pn; l++)  // For every Legendre expansion coeff
                         {
                             float legendre_coeff = (2*l + 1) / M_4PI * xs->scatxs2d(mesh->zoneId[ri], epi, ei, l);  // [b]
                             float integral = 0.0f;
                             for(unsigned int api = 0; api < quad->angleCount(); api++) // For every angle
-                                integral += legendre(ai, api, l) * uFlux[ei*ejmp + ai*ajmp + ri] * quad->wt[api];
+                                integral += legendre.table(api, ai, l) * (*uFlux)[epi*ejmp + api*ajmp + ri] * quad->wt[api];
                             // [b/cm^2]  = [b]  * [1/cm^2]
                             firstColSrc += legendre_coeff * integral;
                         }
@@ -1004,10 +1005,10 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
         {
             qDebug() << "Iteration #" << iterNum;
 
-            preFlux = tempFlux;  // Store flux for previous iteration
+            preFlux = tempFlux;  // Store flux from previous iteration for convergance eval
 
-            for(unsigned int i = 0; i < totalSource.size(); i++)
-                totalSource[i] = 0;
+            //for(unsigned int i = 0; i < totalSource.size(); i++)
+            //    totalSource[i] = 0;
 
             // Calculate the scattering source
             /*
@@ -1032,14 +1033,14 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
             */
 
             // Clear for a new sweep
-            for(unsigned int i = 0; i < tempFlux.size(); i++)
-                tempFlux[i] = 0;
+            //for(unsigned int i = 0; i < tempFlux.size(); i++)
+            //    tempFlux[i] = 0;
 
             for(int iang = 0; iang < quad->angleCount(); iang++)  // for every angle
             {
                 qDebug() << "Angle #" << iang;
-                float theta = acos(quad->zi[iang]);
-                float phi = acos(quad->mu[iang]/sqrt(1 - quad->zi[iang]*quad->zi[iang]));
+                //float theta = acos(quad->zi[iang]);
+                //float phi = acos(quad->mu[iang]/sqrt(1 - quad->zi[iang]*quad->zi[iang]));
 
                 // Find the correct direction to sweep
                 int izStart = 0;                  // Sweep start index
@@ -1075,7 +1076,29 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                         int ix = ixStart;
                         while(ix < (signed) mesh->xElemCt && ix >= 0)  // for every mesh element in the proper order
                         {
-                            int zid = mesh->zoneId[ix*xjmp + iy*yjmp + iz];  // Get the zone id of this element
+                            const unsigned int ri = ix*xjmp+iy*yjmp+iz;
+                            int zid = mesh->zoneId[ri];  // Get the zone id of this element
+
+
+                            /* Copied from the earlier scatter calculation which is basically the same
+                            float firstColSrc = 0.0f;
+                            // TODO - should the equality condition be there?
+                            for(unsigned int epi = 0; epi <= ei; epi++)  // For every higher energy that can downscatter
+                                for(unsigned int l = 0; l < pn; l++)  // For every Legendre expansion coeff
+                                {
+                                    float legendre_coeff = (2*l + 1) / M_4PI * xs->scatxs2d(mesh->zoneId[ri], epi, ei, l);  // [b]
+                                    float integral = 0.0f;
+                                    for(unsigned int api = 0; api < quad->angleCount(); api++) // For every angle
+                                        integral += legendre(ai, api, l) * uFlux[ei*ejmp + ai*ajmp + ri] * quad->wt[api];
+                                    // [b/cm^2]  = [b]  * [1/cm^2]
+                                    firstColSrc += legendre_coeff * integral;
+                                }
+
+
+                            //for(unsigned int li = 0; li < momentCount; li++)
+                            //                          [#]   =    [b/cm^2]      * [cm^3]          * [1/b-cm]
+                            extSource[ei*ejmp + ai*ajmp + ri] = firstColSrc * mesh->vol[ri] * mesh->atomDensity[ri];  //(*uFlux)[ei*ejmp + ai*ajmp + ri] * mesh->vol[ri] * xs->scatXs1d(mesh->zoneId[ri], ei) * mesh->atomDensity[ri];
+                            */
 
                             // Compute the source
                             float src_era = 0.0f;  // source for this energy, voxel, angle
@@ -1083,26 +1106,13 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                              {
                                 for(unsigned int il = 0; il <= pn; il++)  // For every Legendre projection
                                 {
-                                    float sig_slgg = xs->scatxs2d(zid, iie, ie, il);
+
+                                    float legendre_coeff = (2*il + 1) / M_4PI * xs->scatxs2d(mesh->zoneId[ri], iie, ie, il);  // [b]
                                     float integral = 0.0f;
-
-                                    float moment_l0e = 0.0f;
-
-                                    // TODO compute moment l0e
-
-                                    integral += harmonic.ylm_e(il, 0, theta, phi) * moment_l0e;
-
-                                    for(unsigned int im = 1; im < il; im++)
-                                    {
-                                        float moment_lme = 0.0f;
-                                        float moment_lmo = 0.0f;
-
-                                        // TODO compute moments
-
-                                        integral += harmonic.ylm_e(il, im, theta, phi) * moment_lme + harmonic.ylm_o(il, im, theta, phi) * moment_lmo;
-                                    }
-
-                                    src_era += sig_slgg * integral;
+                                    for(unsigned int api = 0; api < quad->angleCount(); api++) // For every angle
+                                        integral += legendre.table(iang, api, il) * angularFlux[iie*ejmp + api*ajmp + ri] * quad->wt[api];
+                                    // [b/cm^2]  = [b]  * [1/cm^2]
+                                    src_era += legendre_coeff * integral * mesh->vol[ri] * mesh->atomDensity[ri];
 
                                     //ei*mesh->voxelCount()*momentCount + ri*momentCount + li
                                     //         [#]    +=  [#]          *      [#/cm^2]                               * [b]                          * [1/b-cm]                * [cm^3]
@@ -1110,6 +1120,8 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                                     //totalSource[1] += 1.0/(4.0*M_PI)*(*scalarFlux)[iie*mesh->voxelCount() + 1] * xsref.scatXs1d(zid, iie) * mesh->atomDensity[1] * mesh->vol[1]; //xsref(ie-1, zidIndx, 0, iie));
                                 }
                             }
+
+                            src_era += extSource[ie*ejmp + iang*ajmp + ri];
 
                             // Handle the x influx
                             if(quad->mu[iang] >= 0)                                       // Approach x = 0 -> xMesh
@@ -1159,7 +1171,7 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                                     influxZ = outboundFluxZ[ix*xjmp + iy*yjmp + iz+1];
                             }
 
-                            float numer = totalSource[ix*xjmp+iy*yjmp+iz] +                                                                                              // [#]
+                            float numer = src_era +                                                                                              // [#]
                                     mesh->Ayz[ie*quad->angleCount()*mesh->yElemCt*mesh->zElemCt + iang*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz] * influxX +  // [cm^2 * #/cm^2]  The 2x is already factored in
                                     mesh->Axz[ie*quad->angleCount()*mesh->xElemCt*mesh->zElemCt + iang*mesh->xElemCt*mesh->zElemCt + ix*mesh->zElemCt + iz] * influxY +
                                     mesh->Axy[ie*quad->angleCount()*mesh->xElemCt*mesh->yElemCt + iang*mesh->xElemCt*mesh->yElemCt + ix*mesh->yElemCt + iy] * influxZ;
@@ -1169,15 +1181,15 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                                     mesh->Axy[ie*quad->angleCount()*mesh->xElemCt*mesh->yElemCt + iang*mesh->xElemCt*mesh->yElemCt + ix*mesh->yElemCt + iy];
 
                             //   [#/cm^2] = [#]  / [cm^2]
-                            float angFlux = numer/denom;
+                            float cellAvgAngFlux = numer/denom;
 
-                            std::vector<float> gxs;
-                            for(unsigned int i = 0; i < xsref.groupCount(); i++)
-                            {
-                                gxs.push_back(xsref.totXs1d(zid, i));
-                            }
+                            //std::vector<float> gxs;
+                            //for(unsigned int i = 0; i < xsref.groupCount(); i++)
+                            //{
+                            //    gxs.push_back(xsref.totXs1d(zid, i));
+                            //}
 
-                            if(std::isnan(angFlux))
+                            if(std::isnan(cellAvgAngFlux))
                             {
                                 qDebug() << "Found a nan!";
                                 qDebug() << "Vol = " << mesh->vol[ix*xjmp+iy*yjmp+iz];
@@ -1187,14 +1199,14 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                                 qDebug() << "Axy = " << mesh->Axy[iang*mesh->xElemCt*mesh->yElemCt + ix*mesh->yElemCt + iy];
                             }
 
-                            angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz] = angFlux;
+                            angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz] = cellAvgAngFlux;
 
-                            outboundFluxX[ix*xjmp + iy*yjmp + iz] = 2*angFlux - influxX;
-                            outboundFluxY[ix*xjmp + iy*yjmp + iz] = 2*angFlux - influxY;
-                            outboundFluxZ[ix*xjmp + iy*yjmp + iz] = 2*angFlux - influxZ;
+                            outboundFluxX[ix*xjmp + iy*yjmp + iz] = 2*cellAvgAngFlux - influxX;
+                            outboundFluxY[ix*xjmp + iy*yjmp + iz] = 2*cellAvgAngFlux - influxY;
+                            outboundFluxZ[ix*xjmp + iy*yjmp + iz] = 2*cellAvgAngFlux - influxZ;
 
                             // Sum all the angular fluxes
-                            tempFlux[ix*xjmp + iy*yjmp + iz] += quad->wt[iang]*angFlux;
+                            tempFlux[ix*xjmp + iy*yjmp + iz] += quad->wt[iang]*cellAvgAngFlux;
 
                             ix += dix;
                         } // end of for ix
@@ -1205,9 +1217,9 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
                     iz += diz;
                 } // end of for iz
 
-                float sm = 0.0f;
-                for(unsigned int i = 0; i < tempFlux.size(); i++)
-                    sm += tempFlux[i];
+                //float sm = 0.0f;
+                //for(unsigned int i = 0; i < tempFlux.size(); i++)
+                //    sm += tempFlux[i];
 
                 for(unsigned int i = 0; i < tempFlux.size(); i++)
                 {
@@ -1271,7 +1283,7 @@ void Solver::gssolver(const Quadrature *quad, const Mesh *mesh, const XSection *
     emit signalSolverFinished(scalarFlux);
 }
 
-void Solver::raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, , const int pn)
+void Solver::raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn)
 {
     std::clock_t startMoment = std::clock();
 
@@ -1489,8 +1501,15 @@ void Solver::raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XS
 }
 
 
-void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, , const int pn, const std::vector<float> *uflux)
+void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<float> *uflux)
 {
+
+    // Do some input checks
+    if(pn > 10)
+    {
+        qDebug() << "pn check failed, pn = " << pn;
+        return;
+    }
 
     std::clock_t startMoment = std::clock();
 

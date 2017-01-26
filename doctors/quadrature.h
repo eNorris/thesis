@@ -18,10 +18,10 @@ public:
 
     void loadSn(const int sn);
     void loadSpecial(const int sp);
-    int angleCount() const;
+    unsigned int angleCount() const;
 
 private:
-    int m_angles;
+    unsigned int m_angles;
 };
 
 #endif // QUADRATURE_H

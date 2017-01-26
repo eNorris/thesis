@@ -86,12 +86,16 @@ protected slots:
 
     bool buildMaterials(AmpxParser *parser);
 
-    void onRaytracerFinished(std::vector<float>* uncollided);
-    void onSolverFinished(std::vector<float>* solution);
+    void onRaytracerIsoFinished(std::vector<float>* uncollided);
+    void onSolverIsoFinished(std::vector<float>* solution);
 
 signals:
-    void signalLaunchRaytracer(const Quadrature *quad, const Mesh *mesh, const XSection *xs);
-    void signalLaunchSolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<float> *uflux);
+    void signalLaunchIsoRaytracer(const Quadrature *quad, const Mesh *mesh, const XSection *xs);
+    void signalLaunchIsoSolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<float> *uflux);
+
+    void signalLaunchRaytracer(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn);
+    void signalLaunchSolver(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<float> *uflux);
+
     void signalDebugHalt(std::vector<float>);
     void signalBeginXsParse(QString);
 
