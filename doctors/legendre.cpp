@@ -4,6 +4,9 @@
 #include "legendre.h"
 #include <limits>
 #include <QDebug>
+#include <QErrorMessage>
+
+#include "quadrature.h"
 
 double factorial(double x)
 {
@@ -30,7 +33,7 @@ double doubleFactorial(double x)
     return x * doubleFactorial(x-2.0);
 }
 
-Legendre::Legendre()
+Legendre::Legendre() : m_precomputed(false), m_angles(0), m_pn(0), m_table()
 {
 
 }
@@ -40,7 +43,7 @@ Legendre::~Legendre()
 
 }
 
-SOL_T Legendre::operator()(const int l, const SOL_T mu)
+SOL_T Legendre::operator()(const unsigned int l, const SOL_T mu)
 {
     double result;
     switch(l)
@@ -68,11 +71,57 @@ SOL_T Legendre::operator()(const int l, const SOL_T mu)
     case 10:
         result = 0.00390625 * (46189 * pow(mu, 10.0) - 109395 * pow(mu, 8.0) + 90090*pow(mu, 6.0) - 30030*pow(mu, 4.0) + 3465*pow(mu, 2.0) - 63);
     default:
-        qWarning << "Can't compute Legendre polynomials beyond order ";
+        qWarning() << "Can't compute Legendre polynomials beyond order ";
     };
 
     return static_cast<SOL_T>(result);
 
+}
+
+SOL_T Legendre::table(const unsigned int ia1, const unsigned int ia2, const unsigned int il)
+{
+    if(!m_precomputed)
+    {
+        qCritical() << "Attempted to access a data table before it was computed!";
+        return static_cast<SOL_T>(1.0);
+    }
+
+    if(ia1 >= m_angles || ia2 >= m_angles)
+    {
+        qCritical() << "Attempted to access an angle that doesn't exist!  ia1=" << ia1 << "   ia2=" << ia2;
+        return static_cast<SOL_T>(1.0);
+    }
+
+    if(il > m_pn)
+    {
+        qCritical() << "Attempted to access a Legendre coeff that doesn't exist!  il=" << il;
+        return static_cast<SOL_T>(1.0);
+    }
+
+    return m_table[ia1*m_ia1jmp + ia2*m_ia2jmp + il];
+}
+
+void Legendre::precompute(const Quadrature *quad, const unsigned int pn)
+{
+    if(m_precomputed)
+    {
+        qWarning() << "Computing a table after it has already been computed!";
+        m_table.clear();
+    }
+
+    m_angles = quad->angleCount();
+    m_pn = pn;
+    m_table.resize(m_angles * m_angles * (m_pn + 1));
+
+    m_ia1jmp = m_angles * (m_pn + 1);
+    m_ia2jmp = m_pn + 1;
+
+    for(unsigned int ia1 = 0; ia1 < m_angles; ia1++)
+        for(unsigned int ia2 = 0; ia2 < m_angles; ia2++)
+            for(unsigned int il = 0; il <= m_pn; il++)
+                m_table[ia1*m_ia1jmp + ia2*m_ia2jmp + il] = (*this)(il, quad->mu[ia1]*quad->mu[ia2] + quad->eta[ia1]*quad->eta[ia2] + quad->zi[ia1]*quad->zi[ia2]);
+
+    m_precomputed = true;
 }
 
 AssocLegendre::AssocLegendre()

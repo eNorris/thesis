@@ -6,6 +6,8 @@
 #include <iostream>
 #include <vector>
 
+class Quadrature;
+
 double doubleFactorial(double x);
 
 class Legendre
@@ -14,7 +16,17 @@ public:
     Legendre();
     ~Legendre();
 
-    SOL_T operator()(const int l, const SOL_T mu);
+    SOL_T operator()(const unsigned int l, const SOL_T mu);
+    SOL_T table(const unsigned int ia1, const unsigned int ia2, const unsigned int il);
+    void precompute(const Quadrature *quad, const unsigned int pn);
+
+protected:
+    bool m_precomputed;
+    unsigned int m_angles;
+    unsigned int m_pn;
+    unsigned int m_ia1jmp;
+    unsigned int m_ia2jmp;
+    std::vector<SOL_T> m_table;
 };
 
 class AssocLegendre
