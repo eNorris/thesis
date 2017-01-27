@@ -58,17 +58,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="410.07215"
-     inkscape:cy="512.36273"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="448.25602"
+     inkscape:cy="585.78111"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1855"
-     inkscape:window-height="1056"
-     inkscape:window-x="65"
-     inkscape:window-y="24"
-     inkscape:window-maximized="1" />
+     inkscape:window-width="1276"
+     inkscape:window-height="723"
+     inkscape:window-x="235"
+     inkscape:window-y="150"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -246,15 +246,15 @@
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       x="517.19812"
-       y="429.09811"
+       x="461.63974"
+       y="382.6311"
        id="text5233"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan5235"
-         x="517.19812"
-         y="429.09811"
-         style="font-style:italic;font-family:Times New Roman;-inkscape-font-specification:Times New Roman">x</tspan></text>
+         x="461.63974"
+         y="382.6311"
+         style="font-style:italic;font-family:Times New Roman;-inkscape-font-specification:Times New Roman">Ω</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 271.45792,601.14787 222.8649,83.7164"
