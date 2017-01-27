@@ -12,14 +12,17 @@
 #include <cstdarg>  // For variadic templates
 
 class Mesh;
+class Quadrature;
+class XSection;
 
 class OutWriter
 {
 public:
     OutWriter();
 
-    static void writeScalarFlux(std::string filename, const Mesh& mesh, const std::vector<float>& flux);
-    static void writeScalarFluxMesh(std::string filename, const Mesh& mesh, const std::vector<float>& flux);
+    static void writeScalarFlux(std::string filename, const XSection &xs, const Mesh& mesh, const std::vector<float>& flux);
+    //static void writeScalarFluxMesh(std::string filename, const Mesh& mesh, const std::vector<float>& flux);
+    static void writeAngularFluxMesh(std::string filename, const XSection &xs, const Quadrature &quad, const Mesh &mesh, const std::vector<float>& flux);
 
     static void writeZoneId(std::string filename, const Mesh& mesh);
 

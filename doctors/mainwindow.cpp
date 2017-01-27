@@ -98,7 +98,7 @@ MainWindow::MainWindow(QWidget *parent):
     connect(&m_xsWorkerThread, SIGNAL(finished()), m_parser, SLOT(deleteLater()));
     connect(this, SIGNAL(signalBeginXsParse(QString)), m_parser, SLOT(parseFile(QString)));
     connect(m_parser, SIGNAL(signalXsUpdate(int)), this, SLOT(xsParseUpdateHandler(int)));
-    connect(m_parser, SIGNAL(finishedParsing(AmpxParser*)), this, SLOT(buildMaterials(AmpxParser*)));
+    //connect(m_parser, SIGNAL(finishedParsing(AmpxParser*)), this, SLOT(buildMaterials(AmpxParser*)));
     connect(m_parser, SIGNAL(signalNotifyNumberNuclides(int)), ui->mainProgressBar, SLOT(setMaximum(int)));
     m_xsWorkerThread.start();
 
@@ -139,20 +139,11 @@ MainWindow::MainWindow(QWidget *parent):
     qDebug() << "Loaded default configuration";
 
     quadDialog->updateQuad(m_quad);
-
-
-    //AssocLegendre a;
-    //int l = 5;
-    //for(int m = 0; m <= l; m++)
-    //    std::cout << a(l, m, 0.75) << std::endl;
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-
-    //if(m_config != NULL)
-    //    delete m_config;
 
     if(m_mesh != NULL)
         delete m_mesh;
@@ -163,21 +154,29 @@ MainWindow::~MainWindow()
     if(m_quad != NULL)
         delete m_quad;
 
+    if(m_parser != NULL)
+        delete m_parser;
+
     delete m_goodPalette;
     delete m_badPalette;
 
+    // Kill running threads
     m_xsWorkerThread.quit();
     m_xsWorkerThread.wait();
+
+    m_solverWorkerThread.quit();
+    m_solverWorkerThread.wait();
 }
 
 void MainWindow::on_launchSolverPushButton_clicked()
 {
-
-
     outputDialog->show();
 
     // This can't be done without the energy group information
     m_mesh->calcAreas(m_quad, m_parser->getGammaEnergyGroups());
+
+    // Needs XS and Pn information
+    buildMaterials(m_parser);
 
     // When the raytracer finishes, the gs solver is automatically launched
     switch(m_solType)
@@ -489,17 +488,20 @@ void MainWindow::onRaytracerFinished(std::vector<float>* uncollided)
 {
     m_raytrace = uncollided;
 
-    OutWriter::writeArray("uncol_flux.dat", *uncollided);
+    //OutWriter::writeScalarFluxMesh("uncol_flux.dat", *m_xs, *m_mesh, *uncollided);
 
     switch(m_solType)
     {
     case MainWindow::ISOTROPIC:
+        OutWriter::writeScalarFlux("uncol_flux.dat", *m_xs, *m_mesh, *uncollided);
         emit signalLaunchSolverIso(m_quad, m_mesh, m_xs, uncollided);
         break;
     case MainWindow::LEGENDRE:
+        OutWriter::writeAngularFluxMesh("uncol_flux.dat", *m_xs, *m_quad, *m_mesh, *uncollided);
         emit signalLaunchSolverLegendre(m_quad, m_mesh, m_xs, m_pn, uncollided);
         break;
     case MainWindow::HARMONIC:
+        OutWriter::writeAngularFluxMesh("uncol_flux.dat", *m_xs, *m_quad, *m_mesh, *uncollided);
         emit signalLaunchSolverHarmonic(m_quad, m_mesh, m_xs, m_pn, uncollided);
         break;
     default:

@@ -777,6 +777,7 @@ void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XS
     ufluxAniso->resize(groups * quad->angleCount() * mesh->voxelCount(), 0.0f);
 
     int eajmp = quad->angleCount() * mesh->voxelCount();
+    int aajmp = mesh->voxelCount();
     int xajmp = mesh->yNodeCt * mesh->zNodeCt;
     int yajmp = mesh->zNodeCt;
 
@@ -785,13 +786,17 @@ void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XS
             for(unsigned int iy = 0; iy < mesh->yElemCt; iy++)
                 for(unsigned int ix = 0; ix < mesh->xElemCt; ix++)  // For every voxel
                 {
+                    // If there is no flux (skipped energy group) skip
+                    if((*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz] == 0)
+                        continue;
+
                     float x = mesh->xNodes[ix] + mesh->dx[ix]/2;
                     float y = mesh->yNodes[iy] + mesh->dy[iy]/2;
                     float z = mesh->zNodes[iz] + mesh->dz[iz]/2;
 
-                    float deltaX = x - srcIndxX;
-                    float deltaY = y - srcIndxY;
-                    float deltaZ = z - srcIndxZ;
+                    float deltaX = x - sx;
+                    float deltaY = y - sy;
+                    float deltaZ = z - sz;
 
                     // normalize to unit vector
                     float mag = sqrt(deltaX*deltaX + deltaY*deltaY + deltaZ*deltaZ);
@@ -799,10 +804,10 @@ void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XS
                     deltaY /= mag;
                     deltaZ /= mag;
 
-                    int indx = ie*eajmp + ix*xajmp + iy*yajmp + iz;  // index of start of moments
+                    //int indx = ie*eajmp + ix*xajmp + iy*yajmp + iz;  // index of start of moments
 
                     unsigned int bestAngIndx = 0;
-                    float bestCosT = 0.0f;
+                    float bestCosT = -1.0f;
 
                     for(unsigned int ia = 0; ia < quad->angleCount(); ia++)
                     {
@@ -813,37 +818,12 @@ void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XS
                             bestAngIndx = ia;
                         }
                     }
-                    (*ufluxAniso)[indx + bestAngIndx*mesh->voxelCount()] = (*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz];
-
-                    // The rest of the directions remain zero
-
-
-                    //for(unsigned int ia = 0; ia < quad->angleCount(); ia++)
-                    //{
-
-                        //int ildx = il * il; // Offset for il index
-
-                        // P_il^0
-
-
-                        /*
-                        for(int im = 1; im <= il; im++)
-                        {
-                            int imdx = 2*im - 1;  // Offset for im index
-
-                            if(indx + ildx + imdx + 1 >= ufluxAniso->size())
-                            {
-                                qDebug() << "Failed indexing check!";
-                            }
-
-                            (*ufluxAniso)[indx + ildx + imdx] = (*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz] * harmonics.ylm_o(il, im, theta, phi);
-                            (*ufluxAniso)[indx + ildx + imdx + 1] = (*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz] * harmonics.ylm_e(il, im, theta, phi);
-                        }
-                        */
-                    //}
+                    int tstnewindx = ie*eajmp + bestAngIndx*aajmp + ix*xajmp + iy*yajmp + iz;
+                    int tstoldindx = ie*ejmp + ix*xjmp + iy*yjmp + iz;
+                    (*ufluxAniso)[ie*eajmp + bestAngIndx*aajmp + ix*xajmp + iy*yajmp + iz] = (*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz];
                 }
 
-
+    qDebug() << "Raytracer + anisotropic mapping completed in " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
     emit signalRaytracerFinished(ufluxAniso);
     emit signalNewIteration(uflux);
