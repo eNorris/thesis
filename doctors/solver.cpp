@@ -773,8 +773,8 @@ void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XS
 
     qDebug() << "Time to complete raytracer: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
-    std::vector<float> *ufluxAniso = new std::vector<float>;
-    ufluxAniso->resize(groups * quad->angleCount() * mesh->voxelCount(), 0.0f);
+    std::vector<float> *ufluxAng = new std::vector<float>;
+    ufluxAng->resize(groups * quad->angleCount() * mesh->voxelCount(), 0.0f);
 
     int eajmp = quad->angleCount() * mesh->voxelCount();
     int aajmp = mesh->voxelCount();
@@ -787,8 +787,8 @@ void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XS
                 for(unsigned int ix = 0; ix < mesh->xElemCt; ix++)  // For every voxel
                 {
                     // If there is no flux (skipped energy group) skip
-                    if((*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz] == 0)
-                        continue;
+                    //if((*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz] == 0)
+                    //    continue;
 
                     float x = mesh->xNodes[ix] + mesh->dx[ix]/2;
                     float y = mesh->yNodes[iy] + mesh->dy[iy]/2;
@@ -818,14 +818,26 @@ void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XS
                             bestAngIndx = ia;
                         }
                     }
+
+                    if(ie == 17 && ix == 44 && iy == 21 && iz == 9)
+                    {
+                        qDebug() << "blit";
+                    }
+
                     int tstnewindx = ie*eajmp + bestAngIndx*aajmp + ix*xajmp + iy*yajmp + iz;
+                    int tstnewline = tstnewindx + 194;
+
                     int tstoldindx = ie*ejmp + ix*xjmp + iy*yjmp + iz;
-                    (*ufluxAniso)[ie*eajmp + bestAngIndx*aajmp + ix*xajmp + iy*yajmp + iz] = (*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz];
+                    int tstoldline = tstoldindx + 169;
+
+                    float tstv = (*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz];
+
+                    (*ufluxAng)[ie*eajmp + bestAngIndx*aajmp + ix*xajmp + iy*yajmp + iz] = (*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz];
                 }
 
     qDebug() << "Raytracer + anisotropic mapping completed in " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
-    emit signalRaytracerFinished(ufluxAniso);
+    emit signalRaytracerFinished(ufluxAng);
     emit signalNewIteration(uflux);
 }
 

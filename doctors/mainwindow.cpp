@@ -505,7 +505,7 @@ void MainWindow::onRaytracerFinished(std::vector<float>* uncollided)
         emit signalLaunchSolverHarmonic(m_quad, m_mesh, m_xs, m_pn, uncollided);
         break;
     default:
-        qDebug() << "No solver of type " << m_solType;
+        qCritical() << "No solver of type " << m_solType;
     }
 
     //emit signalLaunchIsoSolver(m_quad, m_mesh, m_xs, uncollided);
