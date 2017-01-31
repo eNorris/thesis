@@ -493,15 +493,15 @@ void MainWindow::onRaytracerFinished(std::vector<float>* uncollided)
     switch(m_solType)
     {
     case MainWindow::ISOTROPIC:
-        OutWriter::writeScalarFlux("uncol_flux.dat", *m_xs, *m_mesh, *uncollided);
+        OutWriter::writeScalarFlux("raytrace_flux_iso.dat", *m_xs, *m_mesh, *uncollided);
         emit signalLaunchSolverIso(m_quad, m_mesh, m_xs, uncollided);
         break;
     case MainWindow::LEGENDRE:
-        OutWriter::writeAngularFluxMesh("uncol_flux.dat", *m_xs, *m_quad, *m_mesh, *uncollided);
+        OutWriter::writeAngularFluxMesh("raytrace_flux_leg.dat", *m_xs, *m_quad, *m_mesh, *uncollided);
         emit signalLaunchSolverLegendre(m_quad, m_mesh, m_xs, m_pn, uncollided);
         break;
     case MainWindow::HARMONIC:
-        OutWriter::writeAngularFluxMesh("uncol_flux.dat", *m_xs, *m_quad, *m_mesh, *uncollided);
+        OutWriter::writeAngularFluxMesh("raytrace_flux_harm.dat", *m_xs, *m_quad, *m_mesh, *uncollided);
         emit signalLaunchSolverHarmonic(m_quad, m_mesh, m_xs, m_pn, uncollided);
         break;
     default:

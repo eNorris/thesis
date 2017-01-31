@@ -77,7 +77,7 @@ void OutWriter::writeAngularFluxMesh(std::string filename, const XSection &xs, c
     std::ofstream fout;
     fout.open(filename.c_str());
 
-    if(xs.groupCount() * quad.angleCount() * mesh.xElemCt * mesh.yElemCt * mesh.zElemCt != flux.size())
+    if(xs.groupCount() * quad.angleCount() * mesh.voxelCount() != flux.size())
         qCritical() << "WARNING: OutWriter::writeScalarFlux: the mesh size did not match the data size";
 
     fout << "5\n";
