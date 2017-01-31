@@ -18,7 +18,8 @@ public:
     explicit Solver(QObject *parent = 0);
     ~Solver();
 
-    const float M_4PI = 4 * M_PI;
+    const float M_4PI = 4.0 * M_PI;
+    const float M_4PI_INV = 1.0 / M_4PI;
 
 signals:
     void signalNewIteration(std::vector<float>*);

@@ -778,8 +778,8 @@ void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XS
 
     int eajmp = quad->angleCount() * mesh->voxelCount();
     int aajmp = mesh->voxelCount();
-    int xajmp = mesh->yNodeCt * mesh->zNodeCt;
-    int yajmp = mesh->zNodeCt;
+    int xajmp = mesh->yElemCt * mesh->zElemCt;
+    int yajmp = mesh->zElemCt;
 
     for(unsigned int ie = 0; ie < groups; ie++)
         for(unsigned int iz = 0; iz < mesh->zElemCt; iz++)
@@ -855,18 +855,14 @@ void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XS
 
     const int maxIterations = 25;
     const float epsilon = 0.01f;
-    //const unsigned int momentCount = (pn+1) * (pn+1);
-    //SphericalHarmonic harmonic;
     Legendre legendre;
     legendre.precompute(quad, pn);
 
 
     std::vector<float> angularFlux(xs->groupCount() * quad->angleCount() * mesh->voxelCount());
-    //std::vector<float> moments(xs->groupCount() * mesh->voxelCount() * momentCount);
     std::vector<float> *scalarFlux = new std::vector<float>(xs->groupCount() * mesh->voxelCount(), 0.0f);
     std::vector<float> tempFlux(mesh->voxelCount());
     std::vector<float> preFlux(mesh->voxelCount(), -100.0f);
-    //std::vector<float> totalSource(mesh->voxelCount(), -100.0f);
     std::vector<float> outboundFluxX(mesh->voxelCount(), -100.0f);
     std::vector<float> outboundFluxY(mesh->voxelCount(), -100.0f);
     std::vector<float> outboundFluxZ(mesh->voxelCount(), -100.0f);
@@ -905,13 +901,15 @@ void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XS
                 {
                     float firstColSrc = 0.0f;
                     // TODO - should the equality condition be there?
-                    for(unsigned int epi = 0; epi <= ei; epi++)  // For every higher energy that can downscatter
+                    for(unsigned int iep = 0; iep <= ei; iep++)  // For every higher energy that can downscatter
                         for(unsigned int l = 0; l <= pn; l++)  // For every Legendre expansion coeff
                         {
-                            float legendre_coeff = (2*l + 1) / M_4PI * xs->scatxs2d(mesh->zoneId[ri], epi, ei, l);  // [b]
+                            // The 2l+1 term is already accounted for in the XS
+                            //float legendre_coeff = (2*l + 1) / M_4PI * xs->scatxs2d(mesh->zoneId[ri], epi, ei, l);  // [b]
+                            float legendre_coeff = M_4PI_INV * xs->scatxs2d(mesh->zoneId[ri], iep, ei, l);  // [b]
                             float integral = 0.0f;
-                            for(unsigned int api = 0; api < quad->angleCount(); api++) // For every angle
-                                integral += legendre.table(api, ai, l) * (*uFlux)[epi*ejmp + api*ajmp + ri] * quad->wt[api];
+                            for(unsigned int iap = 0; iap < quad->angleCount(); iap++) // For every angle
+                                integral += legendre.table(iap, ai, l) * (*uFlux)[iep*ejmp + iap*ajmp + ri] * quad->wt[iap];
                             // [b/cm^2]  = [b]  * [1/cm^2]
                             firstColSrc += legendre_coeff * integral;
                         }
@@ -1220,7 +1218,7 @@ void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XS
         //emit signalNewIteration(scalarFlux);
     }  // end each energy group
 
-    qDebug() << "Time to complete: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
+    qDebug() << "Time to complete: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000.0) << " ms";
 
     qDebug() << "Convergance of 128, 128, 32:";
     for(unsigned int i = 0; i < converganceTracker.size(); i++)\
