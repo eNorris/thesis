@@ -819,10 +819,10 @@ void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XS
                         }
                     }
 
-                    if(ie == 17 && ix == 44 && iy == 21 && iz == 9)
-                    {
-                        qDebug() << "blit";
-                    }
+                    //if(ie == 17 && ix == 44 && iy == 21 && iz == 9)
+                    //{
+                    //    qDebug() << "blit";
+                    //}
 
                     int tstnewindx = ie*eajmp + bestAngIndx*aajmp + ix*xajmp + iy*yajmp + iz;
                     int tstnewline = tstnewindx + 194;
@@ -889,13 +889,51 @@ void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XS
     int xjmp = mesh->xjmp();
     int yjmp = mesh->yjmp();
 
-    bool downscatterFlag = false;
+    bool noDownscatterYet = true;
+    unsigned int highestEnergy = 0;
+
+    while(noDownscatterYet)
+    {
+        float dmax = 0.0;
+        unsigned int vc = mesh->voxelCount() * quad->angleCount();
+        for(unsigned int ira = 0; ira < vc; ira++)
+        {
+            dmax = (dmax > (*uFlux)[highestEnergy*vc + ira]) ? dmax : (*uFlux)[highestEnergy*vc + ira];
+        }
+        if(dmax <= 0.0)
+        {
+            qDebug() << "No external source or downscatter, skipping energy group " << highestEnergy;
+            highestEnergy++;
+        }
+        else
+        {
+            noDownscatterYet = false;
+        }
+    }
+    /*
+    for(int ie = 0; ie < xs->groupCount(); ie++)
+        if(!downscatterFlag)
+        {
+            float dmax = 0.0;
+            unsigned int vc = mesh->voxelCount() * quad->angleCount();
+            for(unsigned int ri = 0; ri < vc; ri++)
+            {
+                dmax = (dmax > extSource[ie*vc + ri]) ? dmax : extSource[ie*vc + ri];
+            }
+            if(dmax <= 0.0)
+            {
+                qDebug() << "No external source or downscatter, skipping energy group " << ie;
+                continue;
+            }
+        }
+        downscatterFlag = true;
+    */
 
     if(uFlux != NULL)
     {
         qDebug() << "Computing 1st collision source";
         // If there is an uncollided flux provided, use it, otherwise, calculate the external source
-        for(unsigned int ei = 0; ei < xs->groupCount(); ei++)
+        for(unsigned int ei = highestEnergy; ei < xs->groupCount(); ei++)
             for(unsigned int ai = 0; ai < quad->angleCount(); ai++)
                 for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
                 {
@@ -934,24 +972,8 @@ void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XS
 
     qDebug() << "Solving " << mesh->voxelCount() * quad->angleCount() * xs->groupCount() << " elements in phase space";
 
-    for(unsigned int ie = 0; ie < xs->groupCount(); ie++)  // for every energy group
+    for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)  // for every energy group
     {
-        if(!downscatterFlag)
-        {
-            float dmax = 0.0;
-            unsigned int vc = mesh->voxelCount() * quad->angleCount();
-            for(unsigned int ri = 0; ri < vc; ri++)
-            {
-                dmax = (dmax > extSource[ie*vc + ri]) ? dmax : extSource[ie*vc + ri];
-            }
-            if(dmax <= 0.0)
-            {
-                qDebug() << "No external source or downscatter, skipping energy group " << ie;
-                continue;
-            }
-        }
-        downscatterFlag = true;
-
         qDebug() << "Energy group #" << ie;
 
         int iterNum = 1;
@@ -1452,12 +1474,59 @@ void Solver::raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XS
 
     qDebug() << "Time to complete raytracer: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
-    emit signalRaytracerFinished(uflux);
+    std::vector<float> *moments = new std::vector<float>;
+    float momentCount = (pn + 1) * (pn + 1);
+    moments->resize(groups * mesh->voxelCount() * momentCount, 0.0f);
+
+    int epjmp = mesh->voxelCount() * momentCount;
+    int xpjmp = mesh->yElemCt * mesh->zElemCt * momentCount;
+    int ypjmp = mesh->zElemCt * momentCount;
+    int zpjmp = momentCount;
+
+    SphericalHarmonic harmonic;
+
+    for(unsigned int ie = 0; ie < groups; ie++)
+        for(unsigned int iz = 0; iz < mesh->zElemCt; iz++)
+            for(unsigned int iy = 0; iy < mesh->yElemCt; iy++)
+                for(unsigned int ix = 0; ix < mesh->xElemCt; ix++)  // For every voxel
+                {
+                    float x = mesh->xNodes[ix] + mesh->dx[ix]/2;
+                    float y = mesh->yNodes[iy] + mesh->dy[iy]/2;
+                    float z = mesh->zNodes[iz] + mesh->dz[iz]/2;
+
+                    float deltaX = x - sx;
+                    float deltaY = y - sy;
+                    float deltaZ = z - sz;
+
+                    // normalize to unit vector
+                    float mag = sqrt(deltaX*deltaX + deltaY*deltaY + deltaZ*deltaZ);
+                    deltaX /= mag;
+                    deltaY /= mag;
+                    deltaZ /= mag;
+
+                    float theta = atan(deltaY / deltaX);
+                    float phi = acos(deltaZ);
+
+                    for(unsigned int il = 0; il <= pn; il++)
+                    {
+                        //const unsigned int il2 = il * il;
+                        (*moments)[ie*epjmp + ix*xpjmp + iy*ypjmp + iz*zpjmp + il*il] = (*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz] * harmonic.yl0(il, theta, phi);
+                        for(unsigned int im = 1; im <= il; im++)
+                        {
+                            (*moments)[ie*epjmp + ix*xpjmp + iy*ypjmp + iz*zpjmp + il*il + 2*im - 1] = (*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz] * harmonic.ylm_o(il, im, theta, phi);
+                            (*moments)[ie*epjmp + ix*xpjmp + iy*ypjmp + iz*zpjmp + il*il + 2*im]     = (*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz] * harmonic.ylm_e(il, im, theta, phi);
+                        }
+                    }
+                }
+
+    qDebug() << "Raytracer + moment mapping completed in " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
+
+    emit signalRaytracerFinished(moments);
     emit signalNewIteration(uflux);
 }
 
 
-void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<float> *uflux)
+void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<float> *umoments)
 {
 
     // Do some input checks
@@ -1471,7 +1540,8 @@ void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XS
 
     const int maxIterations = 25;
     const float epsilon = 0.01f;
-
+    const unsigned int momentCount = (pn + 1) * (pn + 1);
+    SphericalHarmonic harmonic;
 
     std::vector<float> angularFlux(xs->groupCount() * quad->angleCount() * mesh->voxelCount());
     std::vector<float> *scalarFlux = new std::vector<float>(xs->groupCount() * mesh->voxelCount(), 0.0f);
@@ -1482,6 +1552,7 @@ void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XS
     std::vector<float> outboundFluxY(mesh->voxelCount(), -100.0f);
     std::vector<float> outboundFluxZ(mesh->voxelCount(), -100.0f);
     std::vector<float> extSource(xs->groupCount() * mesh->voxelCount(), 0.0f);
+    std::vector<float> momentToDiscrete(quad->angleCount() * momentCount);
 
     std::vector<float> errMaxList;
     std::vector<std::vector<float> > errList;
@@ -1504,16 +1575,35 @@ void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XS
     int xjmp = mesh->xjmp();
     int yjmp = mesh->yjmp();
 
+    // Compute the moment-to-discrete matrix
+    for(unsigned int ia = 0; ia < quad->angleCount(); ia++)
+    {
+        float theta = acos(quad->zi[ia]);
+        float phi = atan(quad->eta[ia] / quad->mu[ia]);
+
+        for(unsigned int il = 0; il <= pn; il++)
+        {
+            momentToDiscrete[ia * momentCount + il*il] = harmonic.yl0(il, theta, phi);
+            for(unsigned int im = 1; im <= il; im++)
+            {
+                momentToDiscrete[ia*momentCount + il*il + 2*im-1] = harmonic.ylm_o(il, im, theta, phi);
+                momentToDiscrete[ia*momentCount + il*il + 2*im] = harmonic.ylm_e(il, im, theta, phi);
+            }
+        }
+    }
+
     bool downscatterFlag = false;
 
-    if(uflux != NULL)
+    /*
+     * No need to convert in moment space
+    if(umoments != NULL)
     {
         qDebug() << "Loading uncollided flux into external source";
         // If there is an uncollided flux provided, use it, otherwise, calculate the external source
         for(unsigned int ei = 0; ei < xs->groupCount(); ei++)
             for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
                 //                              [#]   =                        [#/cm^2]      * [cm^3]        *  [b]                               * [1/b-cm]
-                extSource[ei*mesh->voxelCount() + ri] = (*uflux)[ei*mesh->voxelCount() + ri] * mesh->vol[ri] * xs->scatXs1d(mesh->zoneId[ri], ei) * mesh->atomDensity[ri];
+                extSource[ei*mesh->voxelCount() + ri] = (*umoments)[ei*mesh->voxelCount() + ri] * mesh->vol[ri] * xs->scatXs1d(mesh->zoneId[ri], ei) * mesh->atomDensity[ri];
 
         OutWriter::writeArray("externalSrc.dat", extSource);
     }
@@ -1527,8 +1617,9 @@ void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XS
         //                                                                              [#] = [#]
         extSource[srcIndxE * mesh->voxelCount() + srcIndxX*xjmp + srcIndxY*yjmp + srcIndxZ] = 1.0;
     }
+    */
 
-    qDebug() << "Solver::gssolver(): 379: Solving " << mesh->voxelCount() * quad->angleCount() * xs->groupCount() << " elements in phase space";
+    qDebug() << "Solver::gsSolverHarmonic solving " << mesh->voxelCount() * quad->angleCount() * xs->groupCount() << " elements in phase space";
 
     for(unsigned int ie = 0; ie < xs->groupCount(); ie++)  // for every energy group
     {

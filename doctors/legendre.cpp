@@ -172,30 +172,6 @@ float AssocLegendre::operator()(const int l, const int m, const float x)
 }
 
 
-
-/*
-float AssocLegendre::operator ()(const int l, const int m, const float x)
-{
-    if(l == 0 && m == 0)
-    {
-        return 1.0;
-    }
-    else if(l == m)
-    {
-        return ((m%2==0)? (1.0) : (-1.0)) * doubleFactorial(2*m - 1) * pow(1-x*x, m/2.0);
-    }
-    else if(l == m+1)
-    {
-        return x * (2*m+1) * operator ()(m, m, x);
-    }
-    else
-    {
-        return x*(2*l-1)/(l-m) * operator()(l-1, m, x) - (l+m-1.0)/(l-m)*operator()(l-2, m, x);
-    }
-}
-*/
-
-
 SphericalHarmonic::SphericalHarmonic()
 {
 
@@ -208,16 +184,21 @@ SphericalHarmonic::~SphericalHarmonic()
 
 float SphericalHarmonic::normConst(const int l, const int m)
 {
+    if(m == 0)
+    {
+        qDebug() << "Got a m=0 case in the normConst which shouldn't handle it";
+    }
+
     //float sgn = (m%2 == 0 ? 1.0f : -1.0f);
     float t1 = static_cast<float>(2*l+1) / (2.0 * M_PI);
     float t2 = factorial(l-fabs(m)) / factorial(l + fabs(m));
-    if(m == 0)
-    {
-        t1 /= 2.0f;
-    }
+    //if(m == 0)
+    //{
+    //    t1 /= 2.0f;
+    //}
     return sqrt(t1 * t2);
 }
-
+/*
 float SphericalHarmonic::operator()(const int l, const int m, const float theta, const float phi)
 {
     // Y_l^m(\theta, \phi)
@@ -234,10 +215,11 @@ float SphericalHarmonic::operator()(const int l, const int m, const float theta,
         return sqrt(2.0) * normConst(l, m) * sin(-m*phi) * m_assoc(l, -m, cos(theta));
     }
 }
+*/
 
 float SphericalHarmonic::ylm_e(const int l, const int m, const float theta, const float phi)
 {
-    if(m < 0)
+    if(m <= 0)
     {
         qDebug() << "Got a neg. m value!";
     }
@@ -251,6 +233,11 @@ float SphericalHarmonic::ylm_o(const int l, const int m, const float theta, cons
         qDebug() << "Got a neg m value!";
     }
     return normConst(l, m) * m_assoc(l, m, cos(theta)) * sin(m * phi);
+}
+
+float SphericalHarmonic::yl0(const int l, const float theta, const float phi)
+{
+    return sqrt((2*l + 1)/(4.0 * M_PI)) * m_assoc(l, 0, cos(theta));
 }
 
 
