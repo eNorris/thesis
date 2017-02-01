@@ -599,7 +599,8 @@ bool AmpxRecordParserType12::parse(ifstream &binfile, int maxlen, bool selfDefin
             return false;
         }
 
-        for(int src = firstScatGroup; src < lastScatGroup+1; src++)
+        //for(int src = firstScatGroup; src < lastScatGroup+1; src++)
+        for(int src = lastScatGroup; src >= firstScatGroup; src--)
         {
             //int indx = (src-1)*groups + sinkGroup-1;
             //if(indx >= xsData.size())
