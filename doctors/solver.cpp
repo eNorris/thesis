@@ -62,17 +62,20 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
     unsigned int srcIndxY = int(sy / mesh->dy[0]);
     unsigned int srcIndxZ = int(sz / mesh->dz[0]);
 
+    unsigned int totalMissedVoxels = 0;
+
     for(unsigned int zIndxStart = 0; zIndxStart < mesh->zElemCt; zIndxStart++)
         for(unsigned int yIndxStart = 0; yIndxStart < mesh->yElemCt; yIndxStart++)
             for(unsigned int xIndxStart = 0; xIndxStart < mesh->xElemCt; xIndxStart++)  // For every voxel
             {
-                float x = mesh->xNodes[xIndxStart] + mesh->dx[xIndxStart]/2;
-                float y = mesh->yNodes[yIndxStart] + mesh->dy[yIndxStart]/2;
-                float z = mesh->zNodes[zIndxStart] + mesh->dz[zIndxStart]/2;
+                //qDebug() << "voxel " << xIndxStart << " " << yIndxStart << " " << zIndxStart;
+                double x = mesh->xNodes[xIndxStart] + mesh->dx[xIndxStart]/2;
+                double y = mesh->yNodes[yIndxStart] + mesh->dy[yIndxStart]/2;
+                double z = mesh->zNodes[zIndxStart] + mesh->dz[zIndxStart]/2;
 
-                std::vector<float> tmpdistv;
-                std::vector<float> tmpxsv;
-                std::vector<float> mfpv;
+                //std::vector<float> tmpdistv;
+                //std::vector<float> tmpxsv;
+                //std::vector<float> mfpv;
 
                 if(xIndxStart == srcIndxX && yIndxStart == srcIndxY && zIndxStart == srcIndxZ)  // End condition
                 {
@@ -92,15 +95,15 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
                 unsigned int yIndx = yIndxStart;
                 unsigned int zIndx = zIndxStart;
 
-                float srcToCellX = sx - x;
-                float srcToCellY = sy - y;
-                float srcToCellZ = sz - z;
+                double srcToCellX = sx - x;
+                double srcToCellY = sy - y;
+                double srcToCellZ = sz - z;
 
-                float srcToCellDist = sqrt(srcToCellX*srcToCellX + srcToCellY*srcToCellY + srcToCellZ*srcToCellZ);
+                double srcToCellDist = sqrt(srcToCellX*srcToCellX + srcToCellY*srcToCellY + srcToCellZ*srcToCellZ);
 
-                float xcos = srcToCellX/srcToCellDist;  // Fraction of direction biased in x-direction, unitless
-                float ycos = srcToCellY/srcToCellDist;
-                float zcos = srcToCellZ/srcToCellDist;
+                double xcos = srcToCellX/srcToCellDist;  // Fraction of direction biased in x-direction, unitless
+                double ycos = srcToCellY/srcToCellDist;
+                double zcos = srcToCellZ/srcToCellDist;
 
                 int xBoundIndx = (xcos >= 0 ? xIndx+1 : xIndx);
                 int yBoundIndx = (ycos >= 0 ? yIndx+1 : yIndx);
@@ -113,13 +116,14 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
                 bool exhaustedRay = false;
                 while(!exhaustedRay)
                 {
+                    //qDebug() << x << " " << y << " "  << z << " " << xIndx << " " << yIndx << " " << zIndx;
                     // Determine the distance to cell boundaries
-                    float tx = (fabs(xcos) < tiny ? huge : (mesh->xNodes[xBoundIndx] - x)/xcos);  // Distance traveled [cm] when next cell is
-                    float ty = (fabs(ycos) < tiny ? huge : (mesh->yNodes[yBoundIndx] - y)/ycos);  //   entered traveling in x direction
-                    float tz = (fabs(zcos) < tiny ? huge : (mesh->zNodes[zBoundIndx] - z)/zcos);
+                    double tx = (fabs(xcos) < tiny ? huge : (mesh->xNodes[xBoundIndx] - x)/xcos);  // Distance traveled [cm] when next cell is
+                    double ty = (fabs(ycos) < tiny ? huge : (mesh->yNodes[yBoundIndx] - y)/ycos);  //   entered traveling in x direction
+                    double tz = (fabs(zcos) < tiny ? huge : (mesh->zNodes[zBoundIndx] - z)/zcos);
 
                     // Determine the shortest distance traveled [cm] before _any_ surface is crossed
-                    float tmin;
+                    double tmin;
                     unsigned short dirHitFirst;
 
                     if(tx < ty && tx < tz)
@@ -148,10 +152,10 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
                         //                   [cm] * [b] * [atom/b-cm]
                         meanFreePaths[ie] += tmin * xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
                     }
-                    tmpdistv.push_back(tmin);
-                    tmpxsv.push_back(xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx]);
-                    float gain = tmin * xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
-                    mfpv.push_back(gain);
+                    //tmpdistv.push_back(tmin);
+                    //tmpxsv.push_back(xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx]);
+                    //float gain = tmin * xs->m_tot1d[zid*groups + 17] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
+                    //mfpv.push_back(gain);
 
                     // Update cell indices and positions
                     if(dirHitFirst == DIRECTION_X) // x direction
@@ -163,11 +167,23 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
                         {
                             xIndx++;
                             xBoundIndx++;
+                            if(xIndx > srcIndxX)
+                            {
+                                totalMissedVoxels++;
+                                qCritical() << "Missed the target x+ bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
+                                exhaustedRay = true;
+                            }
                         }
                         else
                         {
                             xIndx--;
                             xBoundIndx--;
+                            if(xIndx < srcIndxX)
+                            {
+                                totalMissedVoxels++;
+                                qCritical() << "Missed the target x- bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
+                                exhaustedRay = true;
+                            }
                         }
                     }
                     else if(dirHitFirst == DIRECTION_Y) // y direction
@@ -179,11 +195,23 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
                         {
                             yIndx++;
                             yBoundIndx++;
+                            if(yIndx > srcIndxY)
+                            {
+                                totalMissedVoxels++;
+                                qCritical() << "Missed the target y+ bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
+                                exhaustedRay = true;
+                            }
                         }
                         else
                         {
                             yIndx--;
                             yBoundIndx--;
+                            if(yIndx < srcIndxY)
+                            {
+                                totalMissedVoxels++;
+                                qCritical() << "Missed the target y- bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
+                                exhaustedRay = true;
+                            }
                         }
                     }
                     else if(dirHitFirst == DIRECTION_Z) // z direction
@@ -195,15 +223,27 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
                         {
                             zIndx++;
                             zBoundIndx++;
+                            if(zIndx > srcIndxZ)
+                            {
+                                totalMissedVoxels++;
+                                qCritical() << "Missed the target z+ bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
+                                exhaustedRay = true;
+                            }
                         }
                         else
                         {
                             zIndx--;
                             zBoundIndx--;
+                            if(zIndx < srcIndxZ)
+                            {
+                                totalMissedVoxels++;
+                                qCritical() << "Missed the target z- bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
+                                exhaustedRay = true;
+                            }
                         }
                     }
 
-                    if(xIndx == srcIndxX && yIndx == srcIndxY && zIndx == srcIndxZ)
+                    if((xIndx == srcIndxX && yIndx == srcIndxY && zIndx == srcIndxZ) || exhaustedRay)
                     {
                         float finalDist = sqrt((x-sx)*(x-sx) + (y-sy)*(y-sy) + (z-sz)*(z-sz));
 
@@ -212,12 +252,6 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
                             //       [#]       = [cm] * [b] * [1/cm-b]
                             meanFreePaths[ie] += finalDist * xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
                         }
-
-                        tmpdistv.push_back(finalDist);
-                        tmpxsv.push_back(xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx]);
-
-                        float gain = finalDist * xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
-                        mfpv.push_back(gain);
 
                         exhaustedRay = true;
                     }

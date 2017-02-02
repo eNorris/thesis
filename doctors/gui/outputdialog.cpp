@@ -200,9 +200,9 @@ void OutputDialog::setSliceLevel(int level)
             //qDebug() << "log(minvalglobal) = " << m_minvalGlobalLog << "   log(maxvalGlobal) = " << m_maxvalGlobalLog << "log(minvalLevel) = " << minvalLevel << "  log(maxvalLevel) = " << maxvalLevel;
         }
 
-        QStringList list;
-        QString datastring = "";
-        QString fidstring = "";
+        //QStringList list;
+        //QString datastring = "";
+        //QString fidstring = "";
         for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
         {
             for(unsigned int j = 0; j < m_mesh->yElemCt; j++)
@@ -253,14 +253,14 @@ void OutputDialog::setSliceLevel(int level)
                     rects[i*m_mesh->yElemCt + j]->setBrush(errBrush);
                 else
                     rects[i*m_mesh->yElemCt + j]->setBrush(brushes[fid]);
-                datastring += "   " + QString::number(flux);
-                fidstring += "   " + QString::number(fid);
+                //datastring += "   " + QString::number(flux);
+                //fidstring += "   " + QString::number(fid);
             }
-            datastring += "\n";
-            fidstring += "\n";
+            //datastring += "\n";
+            //fidstring += "\n";
         }
-        list << datastring;
-        list << fidstring;
+        //list << datastring;
+        //list << fidstring;
     }
     else if(ui->xzRadioButton->isChecked())
     {
@@ -275,7 +275,7 @@ void OutputDialog::setSliceLevel(int level)
         for(unsigned int ix = 0; ix < m_mesh->xElemCt; ix++)
             for(unsigned int iz = 0; iz < m_mesh->zElemCt; iz++)
             {
-                float val = (*m_data)[energyGroup*m_mesh->voxelCount() + ix*m_mesh->xjmp() + iz + level];
+                float val = (*m_data)[energyGroup*m_mesh->voxelCount() + ix*m_mesh->xjmp() + iz + level*m_mesh->yjmp()];
                 if(val < minvalLevel)
                 {
                     if(!m_logInterp || val > 0)  // Don't count 0 on log scale
@@ -313,14 +313,14 @@ void OutputDialog::setSliceLevel(int level)
             //qDebug() << "log(minvalglobal) = " << m_minvalGlobalLog << "   log(maxvalGlobal) = " << m_maxvalGlobalLog << "log(minvalLevel) = " << minvalLevel << "  log(maxvalLevel) = " << maxvalLevel;
         }
 
-        QStringList list;
-        QString datastring = "";
-        QString fidstring = "";
+        //QStringList list;
+        //QString datastring = "";
+        //QString fidstring = "";
         for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
         {
             for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
             {
-                float flux = (*m_data)[energyGroup*m_mesh->voxelCount() + i*m_mesh->xjmp() + j + level];
+                float flux = (*m_data)[energyGroup*m_mesh->voxelCount() + i*m_mesh->xjmp() + j + level*m_mesh->yjmp()];
 
                 if(m_logInterp)
                 {
@@ -363,32 +363,17 @@ void OutputDialog::setSliceLevel(int level)
                     fid = -1;
                 }
                 if(fid == -1)
-                    rects[i*m_mesh->yElemCt + j]->setBrush(errBrush);
+                    rects[i*m_mesh->zElemCt + j]->setBrush(errBrush);
                 else
-                    rects[i*m_mesh->yElemCt + j]->setBrush(brushes[fid]);
-                datastring += "   " + QString::number(flux);
-                fidstring += "   " + QString::number(fid);
+                    rects[i*m_mesh->zElemCt + j]->setBrush(brushes[fid]);
+                //datastring += "   " + QString::number(flux);
+                //fidstring += "   " + QString::number(fid);
             }
-            datastring += "\n";
-            fidstring += "\n";
+            //datastring += "\n";
+            //fidstring += "\n";
         }
-        list << datastring;
-        list << fidstring;
-        /////////////////////////////////////////
-        ///////////////////////////////////////
-        //if(level >= (signed) m_mesh->yElemCt)
-        //{
-        //    qDebug() << "level is too high! y-slices = " << m_mesh->yElemCt;
-        //    dispErrMap();
-        //    return;
-        //}
-
-        //for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
-        //    for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
-        //    {
-        //        int zid = m_mesh->zoneId[i*m_mesh->yElemCt*m_mesh->zElemCt + level*m_mesh->zElemCt + j];
-        //        rects[i*m_mesh->zElemCt + j]->setBrush(brushes[zid]);
-        //    }
+        //list << datastring;
+        //list << fidstring;
     }
     else if(ui->yzRadioButton->isChecked())
     {
@@ -403,7 +388,7 @@ void OutputDialog::setSliceLevel(int level)
         for(unsigned int iy = 0; iy < m_mesh->yElemCt; iy++)
             for(unsigned int iz = 0; iz < m_mesh->zElemCt; iz++)
             {
-                float val = (*m_data)[energyGroup*m_mesh->voxelCount() + iy*m_mesh->yElemCt + iz + level];
+                float val = (*m_data)[energyGroup*m_mesh->voxelCount() + iy*m_mesh->yjmp() + iz + level*m_mesh->xjmp()];
                 if(val < minvalLevel)
                 {
                     if(!m_logInterp || val > 0)  // Don't count 0 on log scale
@@ -441,20 +426,20 @@ void OutputDialog::setSliceLevel(int level)
             //qDebug() << "log(minvalglobal) = " << m_minvalGlobalLog << "   log(maxvalGlobal) = " << m_maxvalGlobalLog << "log(minvalLevel) = " << minvalLevel << "  log(maxvalLevel) = " << maxvalLevel;
         }
 
-        QStringList list;
-        QString datastring = "";
-        QString fidstring = "";
-        for(unsigned int i = 0; i < m_mesh->yElemCt; i++)
+        //QStringList list;
+        //QString datastring = "";
+        //QString fidstring = "";
+        for(unsigned int iy = 0; iy < m_mesh->yElemCt; iy++)
         {
-            for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
+            for(unsigned int iz = 0; iz < m_mesh->zElemCt; iz++)
             {
-                float flux = (*m_data)[energyGroup*m_mesh->voxelCount() + i*m_mesh->yElemCt + j + level];
+                float flux = (*m_data)[energyGroup*m_mesh->voxelCount() + level*m_mesh->xjmp() + iy*m_mesh->yjmp() + iz];
 
                 if(m_logInterp)
                 {
                     if(flux <= 1E-35)
                     {
-                        rects[i*m_mesh->yElemCt + j]->setBrush(errBrush);
+                        rects[iy*m_mesh->yjmp() + iz]->setBrush(errBrush);
                         continue;
                     }
                     else
@@ -491,31 +476,17 @@ void OutputDialog::setSliceLevel(int level)
                     fid = -1;
                 }
                 if(fid == -1)
-                    rects[i*m_mesh->yElemCt + j]->setBrush(errBrush);
+                    rects[iy*m_mesh->yjmp() + iz]->setBrush(errBrush);
                 else
-                    rects[i*m_mesh->yElemCt + j]->setBrush(brushes[fid]);
-                datastring += "   " + QString::number(flux);
-                fidstring += "   " + QString::number(fid);
+                    rects[iy*m_mesh->yjmp() + iz]->setBrush(brushes[fid]);
+                //datastring += "   " + QString::number(flux);
+                //fidstring += "   " + QString::number(fid);
             }
-            datastring += "\n";
-            fidstring += "\n";
+            //datastring += "\n";
+            //fidstring += "\n";
         }
-        list << datastring;
-        list << fidstring;
-        ////////////////////////////////////////
-        ///////////////////////////////////////
-        //if(level >= (signed) m_mesh->xElemCt)
-        //{
-        //    qDebug() << "level is too high! x-slices = " << m_mesh->xElemCt;
-        //    return;
-        //}
-
-        //for(unsigned int i = 0; i < m_mesh->yElemCt; i++)
-        //    for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
-        //    {
-        //        int zid = m_mesh->zoneId[level*m_mesh->yElemCt*m_mesh->zElemCt + i*m_mesh->zElemCt + j];
-         //       rects[i*m_mesh->zElemCt + j]->setBrush(brushes[zid]);
-        //    }
+        //list << datastring;
+        //list << fidstring;
     }
     else
     {

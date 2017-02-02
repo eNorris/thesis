@@ -229,7 +229,24 @@ void MainWindow::on_geometryOpenPushButton_clicked()
     ui->geometryFileLineEdit->setText(filename);
 
     CtDataManager ctman;
-    m_mesh = ctman.parse16(64, 64, 16, filename.toStdString());
+    //m_mesh = ctman.parse16(64, 64, 16, filename.toStdString());
+
+    if(ui->signedCheckBox->isChecked())
+    {
+        if(ui->bitSpinBox->value() == 16)
+        {
+            m_mesh = ctman.parse16(ui->xBinSpinBox->value(), ui->yBinSpinBox->value(), ui->zBinSpinBox->value(), filename.toStdString());
+        }
+        else
+        {
+            qDebug() << "Only 16 bit (unsigned) binaries are currently supported";
+        }
+    }
+    else
+    {
+        qDebug() << "Only (16 bit) unsigned binaries are currently supported";
+    }
+
 
     OutWriter::writeArray("/media/Storage/thesis/mcnp.gitignore/ctdensity.dat", m_mesh->density);
 
@@ -255,8 +272,8 @@ void MainWindow::updateLaunchButton()
     {
         ui->launchSolverPushButton->setEnabled(true);
 
-        McnpWriter mcnpwriter;
-        mcnpwriter.writeMcnp("../mcnp.gitignore/mcnp_out.inp", m_mesh, false);
+        //McnpWriter mcnpwriter;
+        //mcnpwriter.writeMcnp("../mcnp.gitignore/mcnp_out.inp", m_mesh, false);
     }
     else
     {
