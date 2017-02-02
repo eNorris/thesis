@@ -8,6 +8,7 @@
 #include <QGraphicsRectItem>
 
 #include "gui/colormappable.h"
+#include "globals.h"
 
 class Mesh;
 
@@ -39,7 +40,9 @@ private:
 
     std::vector<QGraphicsRectItem*> rects;
 
-    std::vector<float> *m_data;
+    //std::vector<float> *m_data;
+    std::vector<RAY_T> *m_raytracerData;
+    std::vector<SOL_T> *m_solverData;
     Mesh *m_mesh;
 
     float m_minvalGlobal, m_maxvalGlobal;
@@ -49,7 +52,9 @@ private:
 protected slots:
     void setSliceLevel(int level);
     void updateMeshSlicePlane();
-    void reRender(std::vector<float>*);
+    //void reRender(std::vector<float>*);
+    void reRenderRaytracer(std::vector<RAY_T>*);
+    void reRenderSolver(std::vector<SOL_T>*);
     void setLinearInterp();
     void setLogInterp();
     void refresh();

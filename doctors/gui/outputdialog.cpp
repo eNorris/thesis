@@ -17,7 +17,9 @@ OutputDialog::OutputDialog(QWidget *parent) :
     scene(NULL),
     m_listModel(NULL),
     rects(),
-    m_data(NULL),
+    //m_data(NULL),
+    m_raytracerData(NULL),
+    m_solverData(NULL),
     m_mesh(NULL),
     m_minvalGlobal(1.0E35f),
     m_maxvalGlobal(-1.0E35f),
@@ -99,10 +101,62 @@ void OutputDialog::updateSolution(std::vector<float> *data)
     m_maxvalGlobalLog = log10(m_maxvalGlobal);
 }
 
-
+/*
 void OutputDialog::reRender(std::vector<float> *data)
 {
     updateSolution(data);
+    setSliceLevel(ui->sliceVerticalSlider->value());
+}
+*/
+
+void OutputDialog::reRenderRaytracer(std::vector<RAY_T> *data)
+{
+    //updateSolution(data);
+
+
+    m_raytracerData = data;
+
+    m_minvalGlobal = 1.0E35f;
+    m_maxvalGlobal = -1.0E35f;
+    float minGtZero = 1.0E35f;
+
+    for(unsigned int i = 0; i < m_data->size(); i++)
+    {
+        if((*m_data)[i] > m_maxvalGlobal)
+            m_maxvalGlobal = (*m_data)[i];
+        if((*m_data)[i] < m_minvalGlobal)
+            m_minvalGlobal = (*m_data)[i];
+        if((*m_data)[i] < minGtZero && (*m_data)[i] > 0)  // Don't allow zero in log scale
+            minGtZero = (*m_data)[i];
+    }
+    m_minvalGlobalLog = log10(minGtZero);
+    m_maxvalGlobalLog = log10(m_maxvalGlobal);
+
+    setSliceLevel(ui->sliceVerticalSlider->value());
+}
+
+void OutputDialog::reRenderSolver(std::vector<SOL_T> *data)
+{
+    //updateSolution(data);
+
+    m_solverData = data;
+
+    m_minvalGlobal = 1.0E35f;
+    m_maxvalGlobal = -1.0E35f;
+    float minGtZero = 1.0E35f;
+
+    for(unsigned int i = 0; i < m_data->size(); i++)
+    {
+        if((*m_data)[i] > m_maxvalGlobal)
+            m_maxvalGlobal = (*m_data)[i];
+        if((*m_data)[i] < m_minvalGlobal)
+            m_minvalGlobal = (*m_data)[i];
+        if((*m_data)[i] < minGtZero && (*m_data)[i] > 0)  // Don't allow zero in log scale
+            minGtZero = (*m_data)[i];
+    }
+    m_minvalGlobalLog = log10(minGtZero);
+    m_maxvalGlobalLog = log10(m_maxvalGlobal);
+
     setSliceLevel(ui->sliceVerticalSlider->value());
 }
 
@@ -174,7 +228,7 @@ void OutputDialog::setSliceLevel(int level)
 
         if(maxvalLevel <= 1E-35)
         {
-            qDebug() << "Zero flux everywhere!";
+            //qDebug() << "Zero flux everywhere!";
             dispErrMap();
             return;
         }
@@ -287,7 +341,7 @@ void OutputDialog::setSliceLevel(int level)
 
         if(maxvalLevel <= 1E-35)
         {
-            qDebug() << "Zero flux everywhere!";
+            //qDebug() << "Zero flux everywhere!";
             dispErrMap();
             return;
         }
@@ -400,7 +454,7 @@ void OutputDialog::setSliceLevel(int level)
 
         if(maxvalLevel <= 1E-35)
         {
-            qDebug() << "Zero flux everywhere!";
+            //qDebug() << "Zero flux everywhere!";
             dispErrMap();
             return;
         }
