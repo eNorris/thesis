@@ -88,11 +88,6 @@ MainWindow::MainWindow(QWidget *parent):
     connect(ui->quadExplorePushButton, SIGNAL(clicked()), quadDialog, SLOT(show()));
     connect(ui->geometryExplorePushButton, SIGNAL(clicked()), geomDialog, SLOT(show()));
 
-
-
-
-
-
     // Set up xs reader threads
     m_parser->moveToThread(&m_xsWorkerThread);
     connect(&m_xsWorkerThread, SIGNAL(finished()), m_parser, SLOT(deleteLater()));
@@ -107,18 +102,19 @@ MainWindow::MainWindow(QWidget *parent):
     connect(&m_xsWorkerThread, SIGNAL(finished()), m_solver, SLOT(deleteLater()));
 
     connect(this, SIGNAL(signalLaunchRaytracerIso(const Quadrature*,const Mesh*,const XSection*)), m_solver, SLOT(raytraceIso(const Quadrature*,const Mesh*,const XSection*)));
-    connect(this, SIGNAL(signalLaunchSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)), m_solver, SLOT(gsSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<float>*)));
+    connect(this, SIGNAL(signalLaunchSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<RAY_T>*)), m_solver, SLOT(gsSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<RAY_T>*)));
 
     connect(this, SIGNAL(signalLaunchRaytracerLegendre(const Quadrature*,const Mesh*,const XSection*, const unsigned int)), m_solver, SLOT(raytraceLegendre(const Quadrature*,const Mesh*,const XSection*, const unsigned int)));
-    connect(this, SIGNAL(signalLaunchSolverLegendre(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<float>*)), m_solver, SLOT(gsSolverLegendre(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<float>*)));
+    connect(this, SIGNAL(signalLaunchSolverLegendre(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*)), m_solver, SLOT(gsSolverLegendre(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*)));
 
     connect(this, SIGNAL(signalLaunchRaytracerHarmonic(const Quadrature*,const Mesh*,const XSection*, const unsigned int)), m_solver, SLOT(raytraceHarmonic(const Quadrature*,const Mesh*,const XSection*, const unsigned int)));
-    connect(this, SIGNAL(signalLaunchSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<float>*)), m_solver, SLOT(gsSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<float>*)));
+    connect(this, SIGNAL(signalLaunchSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*)), m_solver, SLOT(gsSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*)));
 
-    connect(m_solver, SIGNAL(signalRaytracerFinished(std::vector<float>*)), this, SLOT(onRaytracerFinished(std::vector<float>*)));
-    connect(m_solver, SIGNAL(signalSolverFinished(std::vector<float>*)), this, SLOT(onSolverFinished(std::vector<float>*)));
+    connect(m_solver, SIGNAL(signalRaytracerFinished(std::vector<RAY_T>*)), this, SLOT(onRaytracerFinished(std::vector<RAY_T>*)));
+    connect(m_solver, SIGNAL(signalSolverFinished(std::vector<SOL_T>*)), this, SLOT(onSolverFinished(std::vector<SOL_T>*)));
 
-    connect(m_solver, SIGNAL(signalNewIteration(std::vector<float>*)), outputDialog, SLOT(reRender(std::vector<float>*)));
+    connect(m_solver, SIGNAL(signalNewRaytracerIteration(std::vector<RAY_T>*)), outputDialog, SLOT(reRenderRaytracer(std::vector<RAY_T>*)));
+    connect(m_solver, SIGNAL(signalNewSolverIteration(std::vector<SOL_T>*)), outputDialog, SLOT(reRenderSolver(std::vector<SOL_T>*)));
     m_solverWorkerThread.start();
 
     for(int i = 0; i < 10; i++)
@@ -501,7 +497,7 @@ bool MainWindow::buildMaterials(AmpxParser *parser)
     return allPassed;
 }
 
-void MainWindow::onRaytracerFinished(std::vector<float>* uncollided)
+void MainWindow::onRaytracerFinished(std::vector<RAY_T>* uncollided)
 {
     m_raytrace = uncollided;
 
@@ -514,11 +510,11 @@ void MainWindow::onRaytracerFinished(std::vector<float>* uncollided)
         emit signalLaunchSolverIso(m_quad, m_mesh, m_xs, uncollided);
         break;
     case MainWindow::LEGENDRE:
-        OutWriter::writeAngularFluxMesh("raytrace_flux_leg.dat", *m_xs, *m_quad, *m_mesh, *uncollided);
+        OutWriter::writeAngularFlux("raytrace_flux_leg.dat", *m_xs, *m_quad, *m_mesh, *uncollided);
         emit signalLaunchSolverLegendre(m_quad, m_mesh, m_xs, m_pn, uncollided);
         break;
     case MainWindow::HARMONIC:
-        OutWriter::writeAngularFluxMesh("raytrace_flux_harm.dat", *m_xs, *m_quad, *m_mesh, *uncollided);
+        OutWriter::writeAngularFlux("raytrace_flux_harm.dat", *m_xs, *m_quad, *m_mesh, *uncollided);
         emit signalLaunchSolverHarmonic(m_quad, m_mesh, m_xs, m_pn, uncollided);
         break;
     default:
@@ -528,7 +524,7 @@ void MainWindow::onRaytracerFinished(std::vector<float>* uncollided)
     //emit signalLaunchIsoSolver(m_quad, m_mesh, m_xs, uncollided);
 }
 
-void MainWindow::onSolverFinished(std::vector<float> *solution)
+void MainWindow::onSolverFinished(std::vector<SOL_T> *solution)
 {
     m_solution = solution;
 

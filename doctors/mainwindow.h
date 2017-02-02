@@ -8,6 +8,7 @@
 #include <QThread>
 
 #include "xs_reader/ampxparser.h"
+#include "globals.h"
 
 class OutputDialog;
 class GeomDialog;
@@ -65,8 +66,8 @@ private:
     Solver *m_solver;
     QThread m_solverWorkerThread;
 
-    std::vector<float> *m_solution;
-    std::vector<float> *m_raytrace;
+    std::vector<SOL_T> *m_solution;
+    std::vector<RAY_T> *m_raytrace;
 
     unsigned int m_solType;
     unsigned int m_pn;
@@ -96,18 +97,18 @@ protected slots:
 
     bool buildMaterials(AmpxParser *parser);
 
-    void onRaytracerFinished(std::vector<float>* uncollided);
-    void onSolverFinished(std::vector<float>* solution);
+    void onRaytracerFinished(std::vector<RAY_T>* uncollided);
+    void onSolverFinished(std::vector<SOL_T>* solution);
 
 signals:
     void signalLaunchRaytracerIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs);
-    void signalLaunchSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<float> *uflux);
+    void signalLaunchSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<RAY_T> *uflux);
 
     void signalLaunchRaytracerLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn);
-    void signalLaunchSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<float> *uflux);
+    void signalLaunchSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux);
 
     void signalLaunchRaytracerHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn);
-    void signalLaunchSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<float> *uflux);
+    void signalLaunchSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux);
 
     void signalDebugHalt(std::vector<float>);
     void signalBeginXsParse(QString);

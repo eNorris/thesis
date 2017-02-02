@@ -38,7 +38,7 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
     const unsigned short DIRECTION_Y = 2;
     const unsigned short DIRECTION_Z = 3;
 
-    std::vector<float> *uflux = new std::vector<float>;
+    std::vector<SOL_T> *uflux = new std::vector<SOL_T>;
     uflux->resize(groups * mesh->voxelCount());
 
     unsigned int ejmp = mesh->voxelCount();
@@ -47,20 +47,44 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
 
     qDebug() << "Running raytracer";
 
-    float tiny = 1.0E-35f;
-    float huge = 1.0E35f;
-    std::vector<float> meanFreePaths;
+    RAY_T tiny = 1.0E-35f;
+    RAY_T huge = 1.0E35f;
+    std::vector<RAY_T> meanFreePaths;
     meanFreePaths.resize(xs->groupCount());
 
-    float sx = 25.3906f;
-    float sy = 50.0f - 46.4844f;
-    float sz = 6.8906f;
+    RAY_T sx = 25.3906f;
+    RAY_T sy = 50.0f - 46.4844f;
+    RAY_T sz = 6.8906f;
     //                                0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5  6  7  8
-    std::vector<float> srcStrength = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0};
+    std::vector<RAY_T> srcStrength = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0};
 
-    unsigned int srcIndxX = int(sx / mesh->dx[0]);  // TODO: This will only work for evenly spaced grids
-    unsigned int srcIndxY = int(sy / mesh->dy[0]);
-    unsigned int srcIndxZ = int(sz / mesh->dz[0]);
+    if(sx < mesh->xNodes[0] || sy < mesh->yNodes[0] || sz < mesh->zNodes[0])
+    {
+        qCritical() << "Source is ouside the mesh region on the negative side";
+    }
+
+    if(sx > mesh->xNodes[mesh->xNodeCt-1] || sy > mesh->yNodes[mesh->yNodeCt-1] || sz > mesh->zNodes[mesh->zNodeCt-1])
+    {
+        qCritical() << "Source is ouside the mesh region on the positive side";
+    }
+
+    unsigned int srcIndxX = 0;
+    unsigned int srcIndxY = 0;
+    unsigned int srcIndxZ = 0;
+
+    while(mesh->xNodes[srcIndxX+1] < sx)
+        srcIndxX++;
+
+    while(mesh->yNodes[srcIndxY+1] < sy)
+        srcIndxY++;
+
+    while(mesh->zNodes[srcIndxZ+1] < sz)
+        srcIndxZ++;
+
+
+    //unsigned int srcIndxX = int(sx / mesh->dx[0]);  // TODO: This will only work for evenly spaced grids
+    //unsigned int srcIndxY = int(sy / mesh->dy[0]);
+    //unsigned int srcIndxZ = int(sz / mesh->dz[0]);
 
     unsigned int totalMissedVoxels = 0;
 
@@ -69,9 +93,9 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
             for(unsigned int xIndxStart = 0; xIndxStart < mesh->xElemCt; xIndxStart++)  // For every voxel
             {
                 //qDebug() << "voxel " << xIndxStart << " " << yIndxStart << " " << zIndxStart;
-                double x = mesh->xNodes[xIndxStart] + mesh->dx[xIndxStart]/2;
-                double y = mesh->yNodes[yIndxStart] + mesh->dy[yIndxStart]/2;
-                double z = mesh->zNodes[zIndxStart] + mesh->dz[zIndxStart]/2;
+                RAY_T x = mesh->xNodes[xIndxStart] + mesh->dx[xIndxStart]/2;
+                RAY_T y = mesh->yNodes[yIndxStart] + mesh->dy[yIndxStart]/2;
+                RAY_T z = mesh->zNodes[zIndxStart] + mesh->dz[zIndxStart]/2;
 
                 //std::vector<float> tmpdistv;
                 //std::vector<float> tmpxsv;
@@ -79,9 +103,9 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
 
                 if(xIndxStart == srcIndxX && yIndxStart == srcIndxY && zIndxStart == srcIndxZ)  // End condition
                 {
-                    float srcToCellDist = sqrt((x-sx)*(x-sx) + (y-sy)*(y-sy) + (z-sz)*(z-sz));
+                    RAY_T srcToCellDist = sqrt((x-sx)*(x-sx) + (y-sy)*(y-sy) + (z-sz)*(z-sz));
                     unsigned int zid = mesh->zoneId[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
-                    float xsval;
+                    RAY_T xsval;
                     for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
                     {
                         xsval = xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
@@ -95,15 +119,15 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
                 unsigned int yIndx = yIndxStart;
                 unsigned int zIndx = zIndxStart;
 
-                double srcToCellX = sx - x;
-                double srcToCellY = sy - y;
-                double srcToCellZ = sz - z;
+                RAY_T srcToCellX = sx - x;
+                RAY_T srcToCellY = sy - y;
+                RAY_T srcToCellZ = sz - z;
 
-                double srcToCellDist = sqrt(srcToCellX*srcToCellX + srcToCellY*srcToCellY + srcToCellZ*srcToCellZ);
+                RAY_T srcToCellDist = sqrt(srcToCellX*srcToCellX + srcToCellY*srcToCellY + srcToCellZ*srcToCellZ);
 
-                double xcos = srcToCellX/srcToCellDist;  // Fraction of direction biased in x-direction, unitless
-                double ycos = srcToCellY/srcToCellDist;
-                double zcos = srcToCellZ/srcToCellDist;
+                RAY_T xcos = srcToCellX/srcToCellDist;  // Fraction of direction biased in x-direction, unitless
+                RAY_T ycos = srcToCellY/srcToCellDist;
+                RAY_T zcos = srcToCellZ/srcToCellDist;
 
                 int xBoundIndx = (xcos >= 0 ? xIndx+1 : xIndx);
                 int yBoundIndx = (ycos >= 0 ? yIndx+1 : yIndx);
@@ -118,12 +142,12 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
                 {
                     //qDebug() << x << " " << y << " "  << z << " " << xIndx << " " << yIndx << " " << zIndx;
                     // Determine the distance to cell boundaries
-                    double tx = (fabs(xcos) < tiny ? huge : (mesh->xNodes[xBoundIndx] - x)/xcos);  // Distance traveled [cm] when next cell is
-                    double ty = (fabs(ycos) < tiny ? huge : (mesh->yNodes[yBoundIndx] - y)/ycos);  //   entered traveling in x direction
-                    double tz = (fabs(zcos) < tiny ? huge : (mesh->zNodes[zBoundIndx] - z)/zcos);
+                    RAY_T tx = (fabs(xcos) < tiny ? huge : (mesh->xNodes[xBoundIndx] - x)/xcos);  // Distance traveled [cm] when next cell is
+                    RAY_T ty = (fabs(ycos) < tiny ? huge : (mesh->yNodes[yBoundIndx] - y)/ycos);  //   entered traveling in x direction
+                    RAY_T tz = (fabs(zcos) < tiny ? huge : (mesh->zNodes[zBoundIndx] - z)/zcos);
 
                     // Determine the shortest distance traveled [cm] before _any_ surface is crossed
-                    double tmin;
+                    RAY_T tmin;
                     unsigned short dirHitFirst;
 
                     if(tx < ty && tx < tz)
@@ -245,7 +269,7 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
 
                     if((xIndx == srcIndxX && yIndx == srcIndxY && zIndx == srcIndxZ) || exhaustedRay)
                     {
-                        float finalDist = sqrt((x-sx)*(x-sx) + (y-sy)*(y-sy) + (z-sz)*(z-sz));
+                        RAY_T finalDist = sqrt((x-sx)*(x-sx) + (y-sy)*(y-sy) + (z-sz)*(z-sz));
 
                         for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
                         {
@@ -260,7 +284,7 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
 
                 for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
                 {
-                    float flx = srcStrength[ie] * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
+                    RAY_T flx = srcStrength[ie] * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
 
                     if(flx < 0)
                         qDebug() << "solver.cpp: (291): Negative?";
@@ -268,7 +292,7 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
                     if(flx > 1E6)
                         qDebug() << "solver.cpp: (294): Too big!";
 
-                    (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = flx;  //srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
+                    (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = static_cast<SOL_T>(flx);  //srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
                 }
 
             } // End of each voxel
@@ -276,44 +300,44 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
     qDebug() << "Time to complete raytracer: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
     emit signalRaytracerFinished(uflux);
-    emit signalNewIteration(uflux);
+    emit signalNewRaytracerIteration(uflux);
 }
 
 
-void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<float> *uflux)
+void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<SOL_T> *uflux)
 {
 
     std::clock_t startMoment = std::clock();
 
     const int maxIterations = 25;
-    const float epsilon = 0.01f;
+    const SOL_T epsilon = 0.01f;
 
 
-    std::vector<float> angularFlux(xs->groupCount() * quad->angleCount() * mesh->voxelCount());
-    std::vector<float> *scalarFlux = new std::vector<float>(xs->groupCount() * mesh->voxelCount(), 0.0f);
-    std::vector<float> tempFlux(mesh->voxelCount());
-    std::vector<float> preFlux(mesh->voxelCount(), -100.0f);
-    std::vector<float> totalSource(mesh->voxelCount(), -100.0f);
-    std::vector<float> outboundFluxX(mesh->voxelCount(), -100.0f);
-    std::vector<float> outboundFluxY(mesh->voxelCount(), -100.0f);
-    std::vector<float> outboundFluxZ(mesh->voxelCount(), -100.0f);
-    std::vector<float> extSource(xs->groupCount() * mesh->voxelCount(), 0.0f);
+    std::vector<SOL_T> angularFlux(xs->groupCount() * quad->angleCount() * mesh->voxelCount());
+    std::vector<SOL_T> *scalarFlux = new std::vector<float>(xs->groupCount() * mesh->voxelCount(), 0.0f);
+    std::vector<SOL_T> tempFlux(mesh->voxelCount());
+    std::vector<SOL_T> preFlux(mesh->voxelCount(), -100.0f);
+    std::vector<SOL_T> totalSource(mesh->voxelCount(), -100.0f);
+    std::vector<SOL_T> outboundFluxX(mesh->voxelCount(), -100.0f);
+    std::vector<SOL_T> outboundFluxY(mesh->voxelCount(), -100.0f);
+    std::vector<SOL_T> outboundFluxZ(mesh->voxelCount(), -100.0f);
+    std::vector<SOL_T> extSource(xs->groupCount() * mesh->voxelCount(), 0.0f);
 
-    std::vector<float> errMaxList;
-    std::vector<std::vector<float> > errList;
+    std::vector<SOL_T> errMaxList;
+    std::vector<std::vector<SOL_T> > errList;
     std::vector<int> converganceIters;
-    std::vector<float> converganceTracker;
+    std::vector<SOL_T> converganceTracker;
 
     errMaxList.resize(xs->groupCount());
     errList.resize(xs->groupCount());
     converganceIters.resize(xs->groupCount());
     converganceTracker.resize(xs->groupCount());
 
-    const XSection &xsref = *xs;
+    //const XSection &xsref = *xs;
 
-    float influxX = 0.0f;
-    float influxY = 0.0f;
-    float influxZ = 0.0f;
+    SOL_T influxX = 0.0f;
+    SOL_T influxY = 0.0f;
+    SOL_T influxZ = 0.0f;
 
     int ejmp = mesh->voxelCount() * quad->angleCount();
     int ajmp = mesh->voxelCount();
@@ -350,7 +374,7 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
     {
         if(!downscatterFlag)
         {
-            float dmax = 0.0;
+            SOL_T dmax = 0.0;
             int vc = mesh->voxelCount();
             for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
             {
@@ -368,7 +392,7 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
         // Do the solving...
 
         int iterNum = 1;
-        float maxDiff = 1.0;
+        SOL_T maxDiff = 1.0;
 
         while(iterNum <= maxIterations && maxDiff > epsilon)  // while not converged
         {
@@ -390,7 +414,7 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
 
                             //         [#]    +=  [#]          *      [#/cm^2]                               * [b]                          * [1/b-cm]                * [cm^3]
                             //totalSource[indx] += 1.0/(4.0*M_PI)*(*scalarFlux)[iie*mesh->voxelCount() + indx] * xsref.scatXs1d(zidIndx, iie) * mesh->atomDensity[indx] * mesh->vol[indx]; //xsref(ie-1, zidIndx, 0, iie));
-                            totalSource[indx] += 1.0/(4.0*M_PI)*(*scalarFlux)[iie*mesh->voxelCount() + indx] * xsref.scatxs2d(zidIndx, iie, ie, 0) * mesh->atomDensity[indx] * mesh->vol[indx]; //xsref(ie-1, zidIndx, 0, iie));
+                            totalSource[indx] += 1.0/(4.0*M_PI)*(*scalarFlux)[iie*mesh->voxelCount() + indx] * xs->scatxs2d(zidIndx, iie, ie, 0) * mesh->atomDensity[indx] * mesh->vol[indx]; //xsref(ie-1, zidIndx, 0, iie));
                         }
 
             // Calculate the total source
@@ -492,29 +516,29 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
                                     influxZ = outboundFluxZ[ix*xjmp + iy*yjmp + iz+1];
                             }
 
-                            float numer = totalSource[ix*xjmp+iy*yjmp+iz] +                                                                                              // [#]
+                            SOL_T numer = totalSource[ix*xjmp+iy*yjmp+iz] +                                                                                              // [#]
                                     mesh->Ayz[ie*quad->angleCount()*mesh->yElemCt*mesh->zElemCt + iang*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz] * influxX +  // [cm^2 * #/cm^2]  The 2x is already factored in
                                     mesh->Axz[ie*quad->angleCount()*mesh->xElemCt*mesh->zElemCt + iang*mesh->xElemCt*mesh->zElemCt + ix*mesh->zElemCt + iz] * influxY +
                                     mesh->Axy[ie*quad->angleCount()*mesh->xElemCt*mesh->yElemCt + iang*mesh->xElemCt*mesh->yElemCt + ix*mesh->yElemCt + iy] * influxZ;
-                            float denom = mesh->vol[ix*xjmp+iy*yjmp+iz]*xsref.totXs1d(zid, ie)*mesh->atomDensity[ix*xjmp + iy*yjmp + iz] +                               // [cm^3] * [b] * [1/b-cm]
+                            SOL_T denom = mesh->vol[ix*xjmp+iy*yjmp+iz]*xs->totXs1d(zid, ie)*mesh->atomDensity[ix*xjmp + iy*yjmp + iz] +                               // [cm^3] * [b] * [1/b-cm]
                                     mesh->Ayz[ie*quad->angleCount()*mesh->yElemCt*mesh->zElemCt + iang*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz] +            // [cm^2]
                                     mesh->Axz[ie*quad->angleCount()*mesh->xElemCt*mesh->zElemCt + iang*mesh->xElemCt*mesh->zElemCt + ix*mesh->zElemCt + iz] +
                                     mesh->Axy[ie*quad->angleCount()*mesh->xElemCt*mesh->yElemCt + iang*mesh->xElemCt*mesh->yElemCt + ix*mesh->yElemCt + iy];
 
                             //   [#/cm^2] = [#]  / [cm^2]
-                            float angFlux = numer/denom;
+                            SOL_T angFlux = numer/denom;
 
-                            std::vector<float> gxs;
-                            for(unsigned int i = 0; i < xsref.groupCount(); i++)
-                            {
-                                gxs.push_back(xsref.totXs1d(zid, i));
-                            }
+                            //std::vector<SOL_T> gxs;
+                            //for(unsigned int i = 0; i < xsref.groupCount(); i++)
+                            //{
+                            //    gxs.push_back(xsref.totXs1d(zid, i));
+                            //}
 
                             if(std::isnan(angFlux))
                             {
                                 qDebug() << "Found a nan!";
                                 qDebug() << "Vol = " << mesh->vol[ix*xjmp+iy*yjmp+iz];
-                                qDebug() << "xs = " << xsref.totXs1d(zid, ie);
+                                qDebug() << "xs = " << xs->totXs1d(zid, ie);
                                 qDebug() << "Ayz = " << mesh->Ayz[iang*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz];
                                 qDebug() << "Axz = " << mesh->Axz[iang*mesh->xElemCt*mesh->zElemCt + ix*mesh->zElemCt + iz];
                                 qDebug() << "Axy = " << mesh->Axy[iang*mesh->xElemCt*mesh->yElemCt + ix*mesh->yElemCt + iy];
@@ -538,16 +562,16 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
                     iz += diz;
                 } // end of for iz
 
-                float sm = 0.0f;
-                for(unsigned int i = 0; i < tempFlux.size(); i++)
-                    sm += tempFlux[i];
+                //SOL_T sm = 0.0f;
+                //for(unsigned int i = 0; i < tempFlux.size(); i++)
+                //    sm += tempFlux[i];
 
                 for(unsigned int i = 0; i < tempFlux.size(); i++)
                 {
                     //int indx = ie*m_mesh->voxelCount() + i; // TODO - delete
                     (*scalarFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
                 }
-                emit signalNewIteration(scalarFlux);
+                emit signalNewSolverIteration(scalarFlux);
 
                 unsigned int xTracked = mesh->xElemCt/2;
                 unsigned int yTracked = mesh->yElemCt/2;
@@ -600,7 +624,7 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
         std::cout << std::endl;
     }
 
-    emit signalNewIteration(scalarFlux);
+    emit signalNewSolverIteration(scalarFlux);
     emit signalSolverFinished(scalarFlux);
 }
 
@@ -873,11 +897,11 @@ void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XS
     qDebug() << "Raytracer + anisotropic mapping completed in " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
     emit signalRaytracerFinished(ufluxAng);
-    emit signalNewIteration(uflux);
+    emit signalNewRaytracerIteration(uflux);
 }
 
 
-void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<float> *uFlux)
+void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uFlux)
 {
     // Do some input checks
     if(pn > 10)
@@ -1239,7 +1263,7 @@ void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XS
                     //int indx = ie*m_mesh->voxelCount() + i; // TODO - delete
                     (*scalarFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
                 }
-                emit signalNewIteration(scalarFlux);
+                emit signalNewSolverIteration(scalarFlux);
 
                 unsigned int xTracked = mesh->xElemCt/2;
                 unsigned int yTracked = mesh->yElemCt/2;
@@ -1293,6 +1317,7 @@ void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XS
         std::cout << "\n" << std::endl;
     }
 
+    emit signalNewSolverIteration(scalarFlux);
     emit signalSolverFinished(scalarFlux);
 }
 
@@ -1557,11 +1582,11 @@ void Solver::raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XS
     qDebug() << "Raytracer + moment mapping completed in " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
     emit signalRaytracerFinished(moments);
-    emit signalNewIteration(uflux);
+    emit signalNewRaytracerIteration(uflux);
 }
 
 
-void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<float> *umoments)
+void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *umoments)
 {
 
     // Do some input checks
@@ -1856,7 +1881,7 @@ void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XS
                     //int indx = ie*m_mesh->voxelCount() + i; // TODO - delete
                     (*scalarFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
                 }
-                emit signalNewIteration(scalarFlux);
+                emit signalNewSolverIteration(scalarFlux);
 
                 unsigned int xTracked = mesh->xElemCt/2;
                 unsigned int yTracked = mesh->yElemCt/2;
@@ -1910,6 +1935,6 @@ void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XS
         std::cout << "\n" << std::endl;
     }
 
-    emit signalNewIteration(scalarFlux);
+    emit signalNewSolverIteration(scalarFlux);
     emit signalSolverFinished(scalarFlux);
 }
