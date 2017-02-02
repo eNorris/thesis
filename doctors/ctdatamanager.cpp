@@ -31,6 +31,18 @@ Mesh *CtDataManager::parse16(int xbins, int ybins, int zbins, std::string filena
     std::vector<U16_T> zoneIds;
     zoneIds.resize(tbins);
 
+    std::ifstream szChkFin(filename.c_str(), std::ios::binary|std::ios::in|std::ios::ate);
+    unsigned int szFin = szChkFin.tellg();
+    if(szFin != 2*tbins)
+    {
+        qCritical() << "Requested dimensions do not match the data size!";
+        qDebug() << xbins << " x " << ybins << " x " << zbins << " = " << tbins;
+        qDebug() << "File bytes " << szFin;
+    }
+    //qDebug() << "bytes: " << szFin;
+    //qDebug() << "bins: " << xbins*ybins*zbins;
+    szChkFin.close();
+
     std::ifstream fin(filename.c_str(), std::ios::binary);
 
     if(fin.good())
