@@ -10,7 +10,7 @@
 #include <iostream>
 #include "histogram.h"
 
-CtDataManager::CtDataManager() : m_valid(false)
+CtDataManager::CtDataManager() : m_valid(false), m_messageBox()
 {
 
 }
@@ -35,9 +35,17 @@ Mesh *CtDataManager::parse16(int xbins, int ybins, int zbins, std::string filena
     unsigned int szFin = szChkFin.tellg();
     if(szFin != 2*tbins)
     {
-        qCritical() << "Requested dimensions do not match the data size!";
-        qDebug() << xbins << " x " << ybins << " x " << zbins << " = " << tbins;
-        qDebug() << "File bytes " << szFin;
+        QString errmsg = QString("The specified mesh size (");
+                errmsg += QString::number(xbins) + ", " + QString::number(ybins) + ", " + QString::number(zbins) + ") ";
+                errmsg += "requires " + QString::number(2*tbins) + " bytes of data to be populated. ";
+                errmsg += "The binary file specified (" + QString::fromStdString(filename) +  ") only reported " + QString::number(szFin) + " bytes of data.";
+                errmsg += "You may either abort further parsing of the data file or ignore this warning (which may result in corrupted geometry data).";
+        int resp = QMessageBox::warning(NULL, "Data Size Mismatch", errmsg, QMessageBox::Abort | QMessageBox::Ignore);
+        if(resp == QMessageBox::Abort)
+            return NULL;
+        //qCritical() << "Requested dimensions do not match the data size!";
+        //qDebug() << xbins << " x " << ybins << " x " << zbins << " = " << tbins;
+        //qDebug() << "File bytes " << szFin;
     }
     //qDebug() << "bytes: " << szFin;
     //qDebug() << "bins: " << xbins*ybins*zbins;

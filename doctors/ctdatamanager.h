@@ -1,6 +1,8 @@
 #ifndef CTDATAREADER_H
 #define CTDATAREADER_H
 
+#include <QMessageBox>
+
 #include "mesh.h"
 #include "quadrature.h"
 
@@ -8,6 +10,7 @@ class CtDataManager
 {
 protected:
     bool m_valid;
+    QMessageBox m_messageBox;
 
 public:
     CtDataManager();

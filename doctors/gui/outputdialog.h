@@ -67,7 +67,10 @@ protected slots:
     void setLinearInterp();
     void setLogInterp();
     void refresh();
-    void setEnergy(int g);
+    void updateSelectedEnergy(int g);
+
+public slots:
+    void setEnergyGroups(unsigned int groups);
 };
 
 #endif // OUTPUTDIALOG_H

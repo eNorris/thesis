@@ -48,7 +48,7 @@ OutputDialog::OutputDialog(QWidget *parent) :
     connect(ui->xyRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
     connect(ui->xzRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
     connect(ui->yzRadioButton, SIGNAL(clicked()), this, SLOT(updateMeshSlicePlane()));
-    connect(ui->energyComboBox, SIGNAL(activated(int)), this, SLOT(setEnergy(int)));
+    connect(ui->energyComboBox, SIGNAL(activated(int)), this, SLOT(updateSelectedEnergy(int)));
 
     connect(ui->linearInterpRadioButton, SIGNAL(clicked()), this, SLOT(setLinearInterp()));
     connect(ui->logInterpRadioButton, SIGNAL(clicked()), this, SLOT(setLogInterp()));
@@ -65,8 +65,8 @@ OutputDialog::OutputDialog(QWidget *parent) :
     //MainWindow *mainWinParent = static_cast<MainWindow*>(parent);
     //connect(ui->debugNextPushButton, SIGNAL(clicked()), mainWinParent, SLOT(userDebugNext()));
 
-    for(int i = 0; i < 19; i++)
-        ui->energyComboBox->addItem(QString::number(i+1));
+    //for(int i = 0; i < 19; i++)
+    //    ui->energyComboBox->addItem(QString::number(i+1));
 }
 
 OutputDialog::~OutputDialog()
@@ -220,7 +220,8 @@ void OutputDialog::reRender()
     m_minvalGlobalLog = log10(minGtZero);
     m_maxvalGlobalLog = log10(m_maxvalGlobal);
 
-    setSliceLevel(ui->sliceVerticalSlider->value());
+    refresh();
+    //setSliceLevel(ui->sliceVerticalSlider->value());
 }
 
 
@@ -702,11 +703,17 @@ void OutputDialog::refresh()
     setSliceLevel(ui->sliceVerticalSlider->value());
 }
 
-void OutputDialog::setEnergy(int g)
+void OutputDialog::updateSelectedEnergy(int g)
 {
     setSliceLevel(-1);
 }
 
+void OutputDialog::setEnergyGroups(unsigned int groups)
+{
+    ui->energyComboBox->clear();
+    for(unsigned int i = 0; i < groups; i++)
+        ui->energyComboBox->addItem(QString::number(i));
+}
 
 
 

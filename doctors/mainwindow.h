@@ -94,6 +94,7 @@ protected slots:
     void updateLaunchButton();
     void xsParseErrorHandler(QString);
     void xsParseUpdateHandler(int x);
+    void xsParseFinished(AmpxParser *parser);
 
     bool buildMaterials(AmpxParser *parser);
 

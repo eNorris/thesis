@@ -54,7 +54,8 @@ std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *me
     //RAY_T sy = 50.0f - 46.4844f;
     //RAY_T sz = 6.8906f;
     //                                0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5  6  7  8
-    std::vector<RAY_T> srcStrength = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0};
+    std::vector<RAY_T> srcStrength(groups, 0.0);  //{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0};
+    srcStrength[srcStrength.size() - 2] = 1.0;
 
     if(sx < mesh->xNodes[0] || sy < mesh->yNodes[0] || sz < mesh->zNodes[0])
     {

@@ -10,7 +10,7 @@
 #undef U16_T
 #endif
 
-#define SOL_T double
-#define RAY_T double
+#define SOL_T float
+#define RAY_T float
 
 #endif // GLOBALS_H

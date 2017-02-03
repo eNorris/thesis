@@ -103,6 +103,7 @@ MainWindow::MainWindow(QWidget *parent):
     connect(m_parser, SIGNAL(signalXsUpdate(int)), this, SLOT(xsParseUpdateHandler(int)));
     //connect(m_parser, SIGNAL(finishedParsing(AmpxParser*)), this, SLOT(buildMaterials(AmpxParser*)));
     connect(m_parser, SIGNAL(signalNotifyNumberNuclides(int)), ui->mainProgressBar, SLOT(setMaximum(int)));
+    connect(m_parser, SIGNAL(finishedParsing(AmpxParser*)), this, SLOT(xsParseFinished(AmpxParser*)));
     m_xsWorkerThread.start();
 
     // Set up the solver thread
@@ -220,6 +221,12 @@ QMutex &MainWindow::getBlockingMutex()
 
 void MainWindow::on_geometryOpenPushButton_clicked()
 {
+    if(m_mesh != NULL)
+    {
+        delete m_mesh;
+        m_mesh = NULL;
+    }
+
     QString filename = QFileDialog::getOpenFileName(this, "Open CT Data File", "/media/data/thesis/doctors/data/", "Binary Files(*.bin);;All Files (*)");
 
     if(filename.isEmpty())
@@ -243,24 +250,27 @@ void MainWindow::on_geometryOpenPushButton_clicked()
         }
         else
         {
-            qDebug() << "Only 16 bit (unsigned) binaries are currently supported";
+            //qDebug() << "Only 16 bit (unsigned) binaries are currently supported";
+            QString errmsg = "Only 16 bit (unsigned) binaries are currently supported";
+            QMessageBox::warning(NULL, "Not Supported", errmsg, QMessageBox::Close);
         }
     }
     else
     {
-        qDebug() << "Only (16 bit) unsigned binaries are currently supported";
+        //qDebug() << "Only (16 bit) unsigned binaries are currently supported";
+        QString errmsg = "Only (16 bit) unsigned binaries are currently supported";
+        QMessageBox::warning(NULL, "Not Supported", errmsg, QMessageBox::Close);
     }
-
-
-    OutWriter::writeArray("/media/Storage/thesis/mcnp.gitignore/ctdensity.dat", m_mesh->density);
 
     if(m_mesh == NULL)
     {
-        qDebug() << "Error, failed to parse CT Data file";
+        //qDebug() << "Error, failed to parse CT Data file";
         m_geomLoaded = false;
         updateLaunchButton();
         return;
     }
+
+    OutWriter::writeArray("/media/Storage/thesis/mcnp.gitignore/ctdensity.dat", m_mesh->density);
 
     qDebug() << "Here the zslice = " << m_mesh->zElemCt;
     geomDialog->updateMesh(m_mesh);
@@ -276,8 +286,8 @@ void MainWindow::updateLaunchButton()
     {
         ui->launchSolverPushButton->setEnabled(true);
 
-        //McnpWriter mcnpwriter;
-        //mcnpwriter.writeMcnp("../mcnp.gitignore/mcnp_out.inp", m_mesh, false);
+        McnpWriter mcnpwriter;
+        mcnpwriter.writeMcnp("../mcnp.gitignore/mcnp_out.inp", m_mesh, false);
     }
     else
     {
@@ -462,9 +472,9 @@ void MainWindow::on_xsOpenPushButton_clicked()
 
     ui->xsFileLineEdit->setText(filename);
 
-    m_xsLoaded = true;
+    //m_xsLoaded = true;
 
-    updateLaunchButton();
+    //updateLaunchButton();
 
     emit signalBeginXsParse(filename);
 }
@@ -484,6 +494,13 @@ void MainWindow::xsParseUpdateHandler(int x)
 {
     ui->mainProgressBar->setValue(x+1);
     // TODO: should catch signal emitted from the AmpxParser
+}
+
+void MainWindow::xsParseFinished(AmpxParser *parser)
+{
+    m_xsLoaded = true;
+    updateLaunchButton();
+    outputDialog->setEnergyGroups(parser->getGammaEnergyGroups());
 }
 
 bool MainWindow::buildMaterials(AmpxParser *parser)
@@ -536,8 +553,24 @@ void MainWindow::onSolverFinished(std::vector<SOL_T> *solution)
 {
     m_solution = solution;
 
-    OutWriter::writeArray("solution.dat", *solution);
+    //OutWriter::writeArray("solution.dat", *solution);
 
+    switch(m_solType)
+    {
+    case MainWindow::ISOTROPIC:
+        OutWriter::writeScalarFlux("solver_flux_iso.dat", *m_xs, *m_mesh, *solution);
+        break;
+    case MainWindow::LEGENDRE:
+        OutWriter::writeAngularFlux("solver_flux_leg.dat", *m_xs, *m_quad, *m_mesh, *solution);
+        break;
+    case MainWindow::HARMONIC:
+        OutWriter::writeAngularFlux("solver_flux_harm.dat", *m_xs, *m_quad, *m_mesh, *solution);
+        break;
+    default:
+        qCritical() << "No solver of type " << m_solType;
+    }
+
+    /*
     std::vector<float> x;
     std::vector<float> matids;
     std::vector<float> density;
@@ -558,6 +591,7 @@ void MainWindow::onSolverFinished(std::vector<SOL_T> *solution)
     push.push_back(matids);
     push.push_back(density);
     push.push_back(flux);
+    */
 
-    OutWriter::writeFloatArrays("/media/Storage/thesis/doctors/solution.dat", push);
+    //OutWriter::writeFloatArrays("/media/Storage/thesis/doctors/solution.dat", push);
 }
