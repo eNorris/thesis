@@ -34,7 +34,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = doctors
 TEMPLATE = app
 
-
 SOURCES += main.cpp\
     gui/outputdialog.cpp \
     gui/geomdialog.cpp \

@@ -23,6 +23,9 @@ public:
     const float M_4PI = 4.0 * M_PI;
     const float M_4PI_INV = 1.0 / M_4PI;
 
+protected:
+    std::vector<RAY_T> *basicRaytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, RAY_T sx, RAY_T sy, RAY_T sz);
+
 signals:
     //void signalNewIteration(std::vector<float>*);
     void signalNewRaytracerIteration(std::vector<RAY_T>*);

@@ -20,16 +20,18 @@ OutputDialog::OutputDialog(QWidget *parent) :
     //m_data(NULL),
     m_raytracerData(NULL),
     m_solverData(NULL),
+    m_renderData(),
     m_mesh(NULL),
     m_minvalGlobal(1.0E35f),
     m_maxvalGlobal(-1.0E35f),
     m_minvalGlobalLog(-1.0E35f),
     m_maxvalGlobalLog(1.0E35f)
+    //m_renderState(UNC)
 {
     ui->setupUi(this);
 
     m_listModel = new QStringListModel(this);
-    ui->listView->setModel(m_listModel);
+    //ui->listView->setModel(m_listModel);
 
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
@@ -52,6 +54,11 @@ OutputDialog::OutputDialog(QWidget *parent) :
     connect(ui->logInterpRadioButton, SIGNAL(clicked()), this, SLOT(setLogInterp()));
     connect(ui->levelScaleCheckBox, SIGNAL(clicked()), this, SLOT(refresh()));
 
+    connect(ui->collidedRadioButton, SIGNAL(clicked()), this, SLOT(reRender()));
+    connect(ui->uncollidedRadioButton, SIGNAL(clicked()), this, SLOT(reRender()));
+    connect(ui->totalRadioButton, SIGNAL(clicked()), this, SLOT(reRender()));
+
+
     connect(ui->debugModeCheckBox, SIGNAL(toggled(bool)), ui->debugNextPushButton, SLOT(setEnabled(bool)));
     connect(ui->debugModeCheckBox, SIGNAL(toggled(bool)), ui->debugAbortPushButton, SLOT(setEnabled(bool)));
 
@@ -68,8 +75,14 @@ OutputDialog::~OutputDialog()
     if(m_listModel != NULL)
         delete m_listModel;
 
-    if(m_data != NULL)
-        delete m_data;
+    if(m_raytracerData != NULL)
+        delete [] m_raytracerData;
+
+    if(m_solverData != NULL)
+        delete [] m_solverData;
+
+    //if(m_data != NULL)
+    //    delete m_data;
 }
 
 void OutputDialog::updateMesh(Mesh *mesh)
@@ -79,7 +92,7 @@ void OutputDialog::updateMesh(Mesh *mesh)
     // I don't know the geometry anymore, so it doesn't make sense to draw anything
     //updateMeshSlicePlane();
 }
-
+/*
 void OutputDialog::updateSolution(std::vector<float> *data)
 {
     m_data = data;
@@ -100,6 +113,7 @@ void OutputDialog::updateSolution(std::vector<float> *data)
     m_minvalGlobalLog = log10(minGtZero);
     m_maxvalGlobalLog = log10(m_maxvalGlobal);
 }
+*/
 
 /*
 void OutputDialog::reRender(std::vector<float> *data)
@@ -109,50 +123,99 @@ void OutputDialog::reRender(std::vector<float> *data)
 }
 */
 
-void OutputDialog::reRenderRaytracer(std::vector<RAY_T> *data)
+void OutputDialog::updateRaytracerData(std::vector<RAY_T> *data)
 {
-    //updateSolution(data);
-
-
     m_raytracerData = data;
 
-    m_minvalGlobal = 1.0E35f;
-    m_maxvalGlobal = -1.0E35f;
-    float minGtZero = 1.0E35f;
-
-    for(unsigned int i = 0; i < m_data->size(); i++)
-    {
-        if((*m_data)[i] > m_maxvalGlobal)
-            m_maxvalGlobal = (*m_data)[i];
-        if((*m_data)[i] < m_minvalGlobal)
-            m_minvalGlobal = (*m_data)[i];
-        if((*m_data)[i] < minGtZero && (*m_data)[i] > 0)  // Don't allow zero in log scale
-            minGtZero = (*m_data)[i];
-    }
-    m_minvalGlobalLog = log10(minGtZero);
-    m_maxvalGlobalLog = log10(m_maxvalGlobal);
-
-    setSliceLevel(ui->sliceVerticalSlider->value());
+    if(ui->uncollidedRadioButton->isChecked() || ui->totalRadioButton->isChecked())
+        reRender();
 }
 
-void OutputDialog::reRenderSolver(std::vector<SOL_T> *data)
+void OutputDialog::updateSolverData(std::vector<SOL_T> *data)
 {
-    //updateSolution(data);
 
     m_solverData = data;
+    if(ui->collidedRadioButton->isChecked() || ui->totalRadioButton->isChecked())
+        reRender();
+
+}
+
+void OutputDialog::reRender()
+{
+    if(ui->uncollidedRadioButton->isChecked())
+    {
+        if(m_raytracerData == NULL)
+            return;
+        //m_renderData = *m_raytracerData;
+        m_renderData.resize(m_raytracerData->size());
+        for(unsigned int i = 0; i < m_raytracerData->size(); i++)
+            m_renderData[i] = (*m_raytracerData)[i];
+    }
+    else if(ui->collidedRadioButton->isChecked())
+    {
+        if(m_solverData == NULL)
+            return;
+        //m_renderData = *m_solverData;
+        m_renderData.resize(m_solverData->size());
+        for(unsigned int i = 0; i < m_solverData->size(); i++)
+            m_renderData[i] = (*m_solverData)[i];
+    }
+    else if(ui->totalRadioButton->isChecked())
+    {
+        if(m_raytracerData == NULL)
+        {
+            if(m_solverData == NULL)
+                return;  // No data - nothing to render
+            else
+            {
+                m_renderData.resize(m_solverData->size());
+                for(unsigned int i = 0; i < m_solverData->size(); i++)
+                    m_renderData[i] = (*m_solverData)[i];
+            }
+                //m_renderData = *m_solverData;  // Only solver data available
+        }
+        else
+        {
+            if(m_solverData == NULL)
+            {
+                m_renderData.resize(m_raytracerData->size());
+                for(unsigned int i = 0; i < m_raytracerData->size(); i++)
+                    m_renderData[i] = (*m_raytracerData)[i];
+                //m_renderData = *m_raytracerData; // Only raytracer available
+            }
+            else
+            {
+                // Add them together if you can
+                if(m_raytracerData->size() == m_solverData->size())
+                {
+                    //m_renderData = *m_raytracerData;
+                    for(unsigned int i = 0; i < m_solverData->size(); i++)
+                        m_renderData[i] = (*m_raytracerData)[i] + (*m_solverData)[i];
+                }
+                else
+                {
+                    qCritical() << "Requested total flux but uncollided and collided are not equal";
+                }
+            }
+        }
+    }
+    else
+    {
+
+    }
 
     m_minvalGlobal = 1.0E35f;
     m_maxvalGlobal = -1.0E35f;
     float minGtZero = 1.0E35f;
 
-    for(unsigned int i = 0; i < m_data->size(); i++)
+    for(unsigned int i = 0; i < m_renderData.size(); i++)
     {
-        if((*m_data)[i] > m_maxvalGlobal)
-            m_maxvalGlobal = (*m_data)[i];
-        if((*m_data)[i] < m_minvalGlobal)
-            m_minvalGlobal = (*m_data)[i];
-        if((*m_data)[i] < minGtZero && (*m_data)[i] > 0)  // Don't allow zero in log scale
-            minGtZero = (*m_data)[i];
+        if(m_renderData[i] > m_maxvalGlobal)
+            m_maxvalGlobal = m_renderData[i];
+        if(m_renderData[i] < m_minvalGlobal)
+            m_minvalGlobal = m_renderData[i];
+        if(m_renderData[i] < minGtZero && m_renderData[i] > 0)  // Don't allow zero in log scale
+            minGtZero = m_renderData[i];
     }
     m_minvalGlobalLog = log10(minGtZero);
     m_maxvalGlobalLog = log10(m_maxvalGlobal);
@@ -177,14 +240,14 @@ void OutputDialog::setSliceLevel(int level)
         return;
     }
 
-    if(m_data == NULL)
-    {
-        qDebug() << "ERROR: setSliceLevel on a NULL data pointer!";
-        dispErrMap();
-        return;
-    }
+    //if(m_renderData == NULL)
+    //{
+    //    qDebug() << "ERROR: setSliceLevel on a NULL data pointer!";
+    //    dispErrMap();
+    //    return;
+    //}
 
-    if(m_data->size() == 0)
+    if(m_renderData.size() == 0)
     {
         qDebug() << "ERROR: Setting level slice with no solution data";
         dispErrMap();
@@ -216,7 +279,7 @@ void OutputDialog::setSliceLevel(int level)
         for(unsigned int ix = 0; ix < m_mesh->xElemCt; ix++)
             for(unsigned int iy = 0; iy < m_mesh->yElemCt; iy++)
             {
-                float val = (*m_data)[energyGroup*m_mesh->voxelCount() + ix*m_mesh->yElemCt*m_mesh->zElemCt + iy*m_mesh->zElemCt + level];
+                float val = m_renderData[energyGroup*m_mesh->voxelCount() + ix*m_mesh->yElemCt*m_mesh->zElemCt + iy*m_mesh->zElemCt + level];
                 if(val < minvalLevel)
                 {
                     if(!m_logInterp || val > 0)  // Don't count 0 on log scale
@@ -261,7 +324,7 @@ void OutputDialog::setSliceLevel(int level)
         {
             for(unsigned int j = 0; j < m_mesh->yElemCt; j++)
             {
-                float flux = (*m_data)[energyGroup*m_mesh->voxelCount() + i*m_mesh->yElemCt*m_mesh->zElemCt + j*m_mesh->zElemCt + level];
+                float flux = m_renderData[energyGroup*m_mesh->voxelCount() + i*m_mesh->yElemCt*m_mesh->zElemCt + j*m_mesh->zElemCt + level];
 
                 if(m_logInterp)
                 {
@@ -329,7 +392,7 @@ void OutputDialog::setSliceLevel(int level)
         for(unsigned int ix = 0; ix < m_mesh->xElemCt; ix++)
             for(unsigned int iz = 0; iz < m_mesh->zElemCt; iz++)
             {
-                float val = (*m_data)[energyGroup*m_mesh->voxelCount() + ix*m_mesh->xjmp() + iz + level*m_mesh->yjmp()];
+                float val = m_renderData[energyGroup*m_mesh->voxelCount() + ix*m_mesh->xjmp() + iz + level*m_mesh->yjmp()];
                 if(val < minvalLevel)
                 {
                     if(!m_logInterp || val > 0)  // Don't count 0 on log scale
@@ -374,7 +437,7 @@ void OutputDialog::setSliceLevel(int level)
         {
             for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
             {
-                float flux = (*m_data)[energyGroup*m_mesh->voxelCount() + i*m_mesh->xjmp() + j + level*m_mesh->yjmp()];
+                float flux = m_renderData[energyGroup*m_mesh->voxelCount() + i*m_mesh->xjmp() + j + level*m_mesh->yjmp()];
 
                 if(m_logInterp)
                 {
@@ -442,7 +505,7 @@ void OutputDialog::setSliceLevel(int level)
         for(unsigned int iy = 0; iy < m_mesh->yElemCt; iy++)
             for(unsigned int iz = 0; iz < m_mesh->zElemCt; iz++)
             {
-                float val = (*m_data)[energyGroup*m_mesh->voxelCount() + iy*m_mesh->yjmp() + iz + level*m_mesh->xjmp()];
+                float val = m_renderData[energyGroup*m_mesh->voxelCount() + iy*m_mesh->yjmp() + iz + level*m_mesh->xjmp()];
                 if(val < minvalLevel)
                 {
                     if(!m_logInterp || val > 0)  // Don't count 0 on log scale
@@ -487,7 +550,7 @@ void OutputDialog::setSliceLevel(int level)
         {
             for(unsigned int iz = 0; iz < m_mesh->zElemCt; iz++)
             {
-                float flux = (*m_data)[energyGroup*m_mesh->voxelCount() + level*m_mesh->xjmp() + iy*m_mesh->yjmp() + iz];
+                float flux = m_renderData[energyGroup*m_mesh->voxelCount() + level*m_mesh->xjmp() + iy*m_mesh->yjmp() + iz];
 
                 if(m_logInterp)
                 {

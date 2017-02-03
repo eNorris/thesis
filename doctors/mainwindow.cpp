@@ -25,6 +25,14 @@
 
 #include "materialutils.h"  // TODO - Delete, not needed, just for testing
 
+#undef SLOT
+#define _SLOT(a) "1"#a
+#define SLOT(a) _SLOT(a)
+
+#undef SIGNAL
+#define _SIGNAL(a) "2"#a
+#define SIGNAL(a) _SIGNAL(a)
+
 //#include "config.h"
 
 QPalette *MainWindow::m_goodPalette = NULL;
@@ -113,8 +121,8 @@ MainWindow::MainWindow(QWidget *parent):
     connect(m_solver, SIGNAL(signalRaytracerFinished(std::vector<RAY_T>*)), this, SLOT(onRaytracerFinished(std::vector<RAY_T>*)));
     connect(m_solver, SIGNAL(signalSolverFinished(std::vector<SOL_T>*)), this, SLOT(onSolverFinished(std::vector<SOL_T>*)));
 
-    connect(m_solver, SIGNAL(signalNewRaytracerIteration(std::vector<RAY_T>*)), outputDialog, SLOT(reRenderRaytracer(std::vector<RAY_T>*)));
-    connect(m_solver, SIGNAL(signalNewSolverIteration(std::vector<SOL_T>*)), outputDialog, SLOT(reRenderSolver(std::vector<SOL_T>*)));
+    connect(m_solver, SIGNAL(signalNewRaytracerIteration(std::vector<RAY_T>*)), outputDialog, SLOT(updateRaytracerData(std::vector<RAY_T>*)));
+    connect(m_solver, SIGNAL(signalNewSolverIteration(std::vector<SOL_T>*)), outputDialog, SLOT(updateSolverData(std::vector<SOL_T>*)));
     m_solverWorkerThread.start();
 
     for(int i = 0; i < 10; i++)
