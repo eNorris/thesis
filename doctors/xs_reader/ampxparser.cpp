@@ -23,6 +23,7 @@ AmpxParser::~AmpxParser()
 
 bool AmpxParser::openFile(QString filename)
 {
+    m_filename = filename;
     binfile.open(filename.toStdString().c_str(), std::ios::binary | std::ios::in);
 
     if(!binfile.good())
@@ -54,6 +55,11 @@ void AmpxParser::closeFile()
 {
     if(binfile.is_open())
         binfile.close();
+}
+
+QString AmpxParser::getFilename() const
+{
+    return m_filename;
 }
 
 bool AmpxParser::parseHeader()

@@ -14,6 +14,7 @@ class AmpxParser : public QObject
 
 protected:
     ifstream binfile;
+    QString m_filename;
 
     AmpxRecordParserType1 header;
     std::vector<AmpxRecordParserType3*> directories;
@@ -26,6 +27,8 @@ public:
     virtual ~AmpxParser();
 
     void closeFile();
+
+    QString getFilename() const;
 
     std::vector<int> getZaids() const;
     int getNumberNuclides() const;
