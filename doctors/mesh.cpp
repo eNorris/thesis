@@ -1,6 +1,7 @@
 #include "mesh.h"
 #include "xsection.h"
 
+#define _USE_MATH_DEFINES
 #include <cmath>
 
 #include <QDebug>
@@ -207,7 +208,7 @@ void Mesh::calcAreas(const Quadrature *quad, const int eGroups)
     // Calculate the cell face area for each angle as well as volume
     for(int eIndx = 0; eIndx < eGroups; eIndx++)
     {
-        for(int qIndx = 0; qIndx < quad->angleCount(); qIndx++)
+        for(unsigned int qIndx = 0; qIndx < quad->angleCount(); qIndx++)
         {
             float vMu = fabs(quad->mu[qIndx]);
             float vEta = fabs(quad->eta[qIndx]);

@@ -1,8 +1,10 @@
 #include "xsection.h"
 
+//#define _USE_MATH_DEFINES
 #include <cmath>
 
 #include <QDebug>
+#include <QMessageBox>
 
 #include "xs_reader/ampxparser.h"
 #include "materialutils.h"
@@ -47,42 +49,54 @@ float XSection::scatxs2d(const int matid, const int gSrcIndx, const int gSinkInd
 
 bool XSection::allocateMemory(const unsigned int materialCount, const unsigned int groupCount, const unsigned int pn)
 {
+    m_tot1d.clear();
+    m_scat1d.clear();
+    m_scat2d.clear();
+
     m_mats = materialCount;
     m_groups = groupCount;
     m_pn = pn;
     size_t floats1d = materialCount * groupCount;
     size_t floats2d = materialCount * groupCount * groupCount * (m_pn+1);
 
-    qDebug() << "Total 1d bytes: " << (2*floats1d * sizeof(float));
-    qDebug() << "Total 2d bytes: " << (floats2d * sizeof(float));
+    //qDebug() << "Total 1d bytes: " << (2*floats1d * sizeof(float));
+    //qDebug() << "Total 2d bytes: " << (floats2d * sizeof(float));
 
     try{
         m_tot1d.resize(floats1d);
     }
-    catch(std::bad_alloc &bad)
-    {
-        qDebug() << "bad_alloc caught during XS initialization of the 1d total xs data, requested " << (floats1d * sizeof(float)) << " bytes";
-        qDebug() << "Reported error: " << bad.what(); ;
+    catch(std::bad_alloc &bad){
+        QString errmsg = QString("bad_alloc caught during XS initialization of the 1d total xs data, requested ");
+        errmsg += QString::number(floats1d * sizeof(float));
+        errmsg += " bytes. Reported error: ";
+        errmsg += bad.what();
+        QMessageBox::warning(NULL, "Out of Memory", errmsg, QMessageBox::Close);
+
         return false;
     }
 
     try{
         m_scat1d.resize(floats1d);
     }
-    catch(std::bad_alloc &bad)
-    {
-        qDebug() << "bad_alloc caught during XS initialization of the 1d scatter xs data, requested " << (floats1d * sizeof(float)) << " bytes: ";
-        qDebug() << "Reported error: " << bad.what(); ;
+    catch(std::bad_alloc &bad){
+        QString errmsg = QString("bad_alloc caught during XS initialization of the 1d scatter xs data, requested ");
+        errmsg += QString::number(floats1d * sizeof(float));
+        errmsg += " bytes. Reported error: ";
+        errmsg += bad.what();
+        QMessageBox::warning(NULL, "Out of Memory", errmsg, QMessageBox::Close);
+
         return false;
     }
 
     try{
         m_scat2d.resize(floats2d);
     }
-    catch(std::bad_alloc &bad)
-    {
-        qDebug() << "bad_alloc caught during XS initialization of the 2d scatter xs data, requested " << (floats2d * sizeof(float)) << " bytes: ";
-        qDebug() << "Reported error: " << bad.what(); ;
+    catch(std::bad_alloc &bad){
+        QString errmsg = QString("bad_alloc caught during XS initialization of the 2d scatter xs data, requested ");
+        errmsg += QString::number(floats2d * sizeof(float));
+        errmsg += " bytes. Reported error: ";
+        errmsg += bad.what();
+        QMessageBox::warning(NULL, "Out of Memory", errmsg, QMessageBox::Close);
         return false;
     }
 
@@ -91,11 +105,11 @@ bool XSection::allocateMemory(const unsigned int materialCount, const unsigned i
 
 bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &w, const AmpxParser *p)
 {
-
     if(m_matsLoaded >= m_mats)
     {
-        qCritical() << "XSection::addMaterial(): 93: Tried to add another cross section to a full table";
-        qCritical() << "XSection::addMaterial(): 94: Max size = " << m_mats;
+        QString errmsg = QString("There was an internal error, the xs table is already full but another material was added to it.");
+        errmsg += "The table has room for " + QString::number(m_mats) + " materials.";
+        QMessageBox::warning(NULL, "Internal Error", errmsg, QMessageBox::Close);
         return false;
     }
 
@@ -104,7 +118,6 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
     // For each z
     for(unsigned int i = 0; i < z.size(); i++)
     {
-
         float afrac = atom_frac[i];
         unsigned int elemIndx = z[i] - 1;
 
@@ -172,7 +185,6 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
         }
         else  // Look at all isotopes of z[i]
         {
-            //qDebug() << "No natural isotope for z = " << z[i];
             float weightCovered = 0.0f;
 
             // Iterate through all known isotopes
@@ -267,8 +279,20 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
             }
             else
             {
-                qDebug() << "No isotopes of element " << z[i] << " found in data library";
-                //qDebug() << "No isotopes of element " << z[i] << "(" << qPrintable(MaterialUtils::elementNames[z[i]]) << ")" << " found in data library";
+                // No data was found for element
+                if(z[i] > MaterialUtils::elementNames.size())
+                {
+                    QString errmsg = QString("Requested element Z=") + QString::number(z[i]) + ". This element does not exist.";
+                    QMessageBox::warning(NULL, "No Such Element", errmsg, QMessageBox::Close);
+                }
+                else
+                {
+                    QString element = QString::fromStdString(MaterialUtils::elementNames[z[i]]);
+                    QString errmsg = QString("No data was found for ") + element + "(Z=" + QString::number(z[i]) + "). ";
+                    errmsg += "Neither natural nor isotopic information was found in ";
+                    errmsg += p->getFilename() + ".";
+                    QMessageBox::warning(NULL, "No Data Found", errmsg, QMessageBox::Close);
+                }
             }
         }  // if natural not in library
     } // for each z[i]

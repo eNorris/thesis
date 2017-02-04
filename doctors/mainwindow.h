@@ -89,6 +89,7 @@ protected slots:
     void on_launchSolverPushButton_clicked();
     void on_xsOpenPushButton_clicked();
     void on_xsExplorePushButton_clicked();
+    void on_actionMCNP6_Generation_triggered();
 
 
     void updateLaunchButton();

@@ -1,15 +1,10 @@
-#define _USE_MATH_DEFINES
-#include <cmath>
-
 #include "solver.h"
 
+#include <iostream>
 #include <ctime>
 
 #include <QDebug>
-#include <iostream>
 #include <QThread>
-
-
 
 #include "quadrature.h"
 #include "mesh.h"
@@ -108,7 +103,7 @@ std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *me
                     for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
                     {
                         xsval = xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
-                        (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = srcStrength[ie] * exp(-xsval*srcToCellDist) / (4 * M_PI * srcToCellDist * srcToCellDist);
+                        (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = srcStrength[ie] * exp(-xsval*srcToCellDist) / (4 * m_pi * srcToCellDist * srcToCellDist);
                     }
                     continue;
                 }
@@ -283,7 +278,7 @@ std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *me
 
                 for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
                 {
-                    RAY_T flx = srcStrength[ie] * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
+                    RAY_T flx = srcStrength[ie] * exp(-meanFreePaths[ie]) / (m_4pi * srcToCellDist * srcToCellDist);
 
                     if(flx < 0)
                         qDebug() << "solver.cpp: (291): Negative?";
@@ -303,14 +298,14 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
 {
     std::clock_t startMoment = std::clock();
 
-    unsigned int groups = xs->groupCount();
+    //unsigned int groups = xs->groupCount();
     RAY_T sx = 25.3906f;
     RAY_T sy = 50.0f - 46.4844f;
     RAY_T sz = 6.8906f;
 
-    unsigned int ejmp = mesh->voxelCount();
-    unsigned int xjmp = mesh->xjmp();
-    unsigned int yjmp = mesh->yjmp();
+    //unsigned int ejmp = mesh->voxelCount();
+    //unsigned int xjmp = mesh->xjmp();
+    //unsigned int yjmp = mesh->yjmp();
 
     std::vector<SOL_T> *uflux = basicRaytrace(quad, mesh, xs, sx, sy, sz);
 
@@ -431,7 +426,7 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
 
                             //         [#]    +=  [#]          *      [#/cm^2]                               * [b]                          * [1/b-cm]                * [cm^3]
                             //totalSource[indx] += 1.0/(4.0*M_PI)*(*scalarFlux)[iie*mesh->voxelCount() + indx] * xsref.scatXs1d(zidIndx, iie) * mesh->atomDensity[indx] * mesh->vol[indx]; //xsref(ie-1, zidIndx, 0, iie));
-                            totalSource[indx] += 1.0/(4.0*M_PI)*(*scalarFlux)[iie*mesh->voxelCount() + indx] * xs->scatxs2d(zidIndx, iie, ie, 0) * mesh->atomDensity[indx] * mesh->vol[indx]; //xsref(ie-1, zidIndx, 0, iie));
+                            totalSource[indx] += 1.0/(m_4pi)*(*scalarFlux)[iie*mesh->voxelCount() + indx] * xs->scatxs2d(zidIndx, iie, ie, 0) * mesh->atomDensity[indx] * mesh->vol[indx]; //xsref(ie-1, zidIndx, 0, iie));
                         }
 
             // Calculate the total source
@@ -445,7 +440,7 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
             for(unsigned int i = 0; i < tempFlux.size(); i++)
                 tempFlux[i] = 0;
 
-            for(int iang = 0; iang < quad->angleCount(); iang++)  // for every angle
+            for(unsigned int iang = 0; iang < quad->angleCount(); iang++)  // for every angle
             {
                 //qDebug() << "Angle #" << iang;
 
@@ -1106,7 +1101,7 @@ void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XS
                         {
                             // The 2l+1 term is already accounted for in the XS
                             //float legendre_coeff = (2*l + 1) / M_4PI * xs->scatxs2d(mesh->zoneId[ri], epi, ei, l);  // [b]
-                            SOL_T legendre_coeff = M_4PI_INV * xs->scatxs2d(mesh->zoneId[ri], iep, ei, l);  // [b]
+                            SOL_T legendre_coeff = m_4pi_inv * xs->scatxs2d(mesh->zoneId[ri], iep, ei, l);  // [b]
                             SOL_T integral = 0.0f;
                             for(unsigned int iap = 0; iap < quad->angleCount(); iap++) // For every angle
                                 integral += legendre.table(iap, ai, l) * (*uFlux)[iep*ejmp + iap*ajmp + ri] * quad->wt[iap];
@@ -1176,7 +1171,7 @@ void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XS
             //for(unsigned int i = 0; i < tempFlux.size(); i++)
             //    tempFlux[i] = 0;
 
-            for(int iang = 0; iang < quad->angleCount(); iang++)  // for every angle
+            for(unsigned int iang = 0; iang < quad->angleCount(); iang++)  // for every angle
             {
                 qDebug() << "Angle #" << iang;
                 //float theta = acos(quad->zi[iang]);
@@ -1247,7 +1242,7 @@ void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XS
                                 for(unsigned int il = 0; il <= pn; il++)  // For every Legendre projection
                                 {
 
-                                    SOL_T legendre_coeff = (2*il + 1) / M_4PI * xs->scatxs2d(mesh->zoneId[ri], iie, ie, il);  // [b]
+                                    SOL_T legendre_coeff = (2*il + 1) / m_4pi * xs->scatxs2d(mesh->zoneId[ri], iie, ie, il);  // [b]
                                     SOL_T integral = 0.0f;
                                     for(unsigned int api = 0; api < quad->angleCount(); api++) // For every angle
                                         integral += legendre.table(iang, api, il) * angularFlux[iie*ejmp + api*ajmp + ri] * quad->wt[api];
@@ -1898,7 +1893,7 @@ void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XS
                             int zidIndx = mesh->zoneId[indx];
 
                             //         [#]    +=  [#]          *      [#/cm^2]                               * [b]                          * [1/b-cm]                * [cm^3]
-                            totalSource[indx] += 1.0/(4.0*M_PI)*(*scalarFlux)[iie*mesh->voxelCount() + indx] * xsref.scatXs1d(zidIndx, iie) * mesh->atomDensity[indx] * mesh->vol[indx]; //xsref(ie-1, zidIndx, 0, iie));
+                            totalSource[indx] += 1.0/(m_4pi)*(*scalarFlux)[iie*mesh->voxelCount() + indx] * xsref.scatXs1d(zidIndx, iie) * mesh->atomDensity[indx] * mesh->vol[indx]; //xsref(ie-1, zidIndx, 0, iie));
                         }
 
             // Calculate the total source
@@ -1912,7 +1907,7 @@ void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XS
             for(unsigned int i = 0; i < tempFlux.size(); i++)
                 tempFlux[i] = 0;
 
-            for(int iang = 0; iang < quad->angleCount(); iang++)  // for every angle
+            for(unsigned int iang = 0; iang < quad->angleCount(); iang++)  // for every angle
             {
                 qDebug() << "Angle #" << iang;
 

@@ -181,7 +181,14 @@ void MainWindow::on_launchSolverPushButton_clicked()
     m_mesh->calcAreas(m_quad, m_parser->getGammaEnergyGroups());
 
     // Needs XS and Pn information
-    buildMaterials(m_parser);
+    if(!buildMaterials(m_parser))
+    {
+        QString errmsg = QString("One or more materials failed to be built properly. ");
+        errmsg += "You may either abort the run or ignore this warning (which may produce incorrect results).";
+        int resp = QMessageBox::warning(this, "Internal Error", errmsg, QMessageBox::Abort | QMessageBox::Ignore);
+        if(resp == QMessageBox::Abort)
+            return;
+    }
 
     // When the raytracer finishes, the gs solver is automatically launched
     switch(m_solType)
@@ -200,24 +207,6 @@ void MainWindow::on_launchSolverPushButton_clicked()
     }
     return;
 }
-
-/*
-void MainWindow::userDebugNext()
-{
-    m_mutex.unlock();
-}
-
-void MainWindow::userDebugAbort()
-{
-
-}
-
-
-QMutex &MainWindow::getBlockingMutex()
-{
-    return m_mutex;
-}
-*/
 
 void MainWindow::on_geometryOpenPushButton_clicked()
 {
@@ -240,8 +229,6 @@ void MainWindow::on_geometryOpenPushButton_clicked()
     ui->geometryFileLineEdit->setText(filename);
 
     CtDataManager ctman;
-    //m_mesh = ctman.parse16(64, 64, 16, filename.toStdString());
-
     if(ui->signedCheckBox->isChecked())
     {
         if(ui->bitSpinBox->value() == 16)
@@ -250,21 +237,18 @@ void MainWindow::on_geometryOpenPushButton_clicked()
         }
         else
         {
-            //qDebug() << "Only 16 bit (unsigned) binaries are currently supported";
             QString errmsg = "Only 16 bit (unsigned) binaries are currently supported";
             QMessageBox::warning(NULL, "Not Supported", errmsg, QMessageBox::Close);
         }
     }
     else
     {
-        //qDebug() << "Only (16 bit) unsigned binaries are currently supported";
         QString errmsg = "Only (16 bit) unsigned binaries are currently supported";
         QMessageBox::warning(NULL, "Not Supported", errmsg, QMessageBox::Close);
     }
 
     if(m_mesh == NULL)
     {
-        //qDebug() << "Error, failed to parse CT Data file";
         m_geomLoaded = false;
         updateLaunchButton();
         return;
@@ -285,9 +269,6 @@ void MainWindow::updateLaunchButton()
     if(m_geomLoaded && m_quadLoaded && m_xsLoaded && m_paramsLoaded)
     {
         ui->launchSolverPushButton->setEnabled(true);
-
-        McnpWriter mcnpwriter;
-        mcnpwriter.writeMcnp("../mcnp.gitignore/mcnp_out.inp", m_mesh, false);
     }
     else
     {
@@ -432,14 +413,6 @@ void MainWindow::on_quadData2ComboBox_activated(int)
 
 void MainWindow::on_paramsTypeComboBox_activated(int indx)
 {
-    //if(indx > 1)
-    //{
-    //    ui->paramsPnComboBox->setEnabled(true);
-    //}
-    //else
-    //{
-    //    ui->paramsPnComboBox->setEnabled(false);
-    //}
     ui->paramsPnComboBox->setEnabled(indx > 1);
     m_solType = indx - 1; // Resetting to the default (indx = 0) rolls over to UINT_MAX
 
@@ -485,6 +458,19 @@ void MainWindow::on_xsExplorePushButton_clicked()
     xsDialog->show();
 }
 
+void MainWindow::on_actionMCNP6_Generation_triggered()
+{
+    if(m_mesh == NULL)
+    {
+        QString errmsg = QString("The geometry must be loaded before a MCNP6 file can be generated.");
+        QMessageBox::warning(this, "Insufficient Data", errmsg, QMessageBox::Close);
+        return;
+    }
+
+    McnpWriter mcnpwriter;
+    mcnpwriter.writeMcnp("../mcnp.gitignore/mcnp_out.inp", m_mesh, false);
+}
+
 void MainWindow::xsParseErrorHandler(QString msg)
 {
     qDebug() << "Error: " << msg;
@@ -501,6 +487,7 @@ void MainWindow::xsParseFinished(AmpxParser *parser)
     m_xsLoaded = true;
     updateLaunchButton();
     outputDialog->setEnergyGroups(parser->getGammaEnergyGroups());
+    ui->mainProgressBar->setValue(0);
 }
 
 bool MainWindow::buildMaterials(AmpxParser *parser)
@@ -508,16 +495,18 @@ bool MainWindow::buildMaterials(AmpxParser *parser)
     qDebug() << "Generating materials";
 
     // One extra material for the empty material at the end (1u is unsigned 1.0)
-    m_xs->allocateMemory(MaterialUtils::hounsfieldRangePhantom19.size() + 1u, parser->getGammaEnergyGroups(), m_pn);
+    m_xs->allocateMemory(static_cast<const unsigned int>(MaterialUtils::hounsfieldRangePhantom19.size()) + 1, parser->getGammaEnergyGroups(), m_pn);
 
     bool allPassed = true;
 
     // Add the materials to the xs library
     for(unsigned int i = 0; i < MaterialUtils::hounsfieldRangePhantom19.size(); i++)
-        allPassed &= m_xs->addMaterial(MaterialUtils::hounsfieldRangePhantom19Elements, MaterialUtils::hounsfieldRangePhantom19Weights[i], parser);
+        if(allPassed)
+            allPassed &= m_xs->addMaterial(MaterialUtils::hounsfieldRangePhantom19Elements, MaterialUtils::hounsfieldRangePhantom19Weights[i], parser);
 
     // The last material is empty and should never be used
-    allPassed &= m_xs->addMaterial(std::vector<int>{}, std::vector<float>{}, parser);
+    if(allPassed)
+        allPassed &= m_xs->addMaterial(std::vector<int>{}, std::vector<float>{}, parser);
 
     return allPassed;
 }

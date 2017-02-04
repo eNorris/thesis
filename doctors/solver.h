@@ -1,7 +1,7 @@
 #ifndef SOLVER_H
 #define SOLVER_H
 
-#define _USE_MATH_DEFINES
+//#define _USE_MATH_DEFINES
 #include <cmath>
 
 #include <QObject>
@@ -20,8 +20,9 @@ public:
     explicit Solver(QObject *parent = 0);
     ~Solver();
 
-    const float M_4PI = 4.0 * M_PI;
-    const float M_4PI_INV = 1.0 / M_4PI;
+    const SOL_T m_pi = static_cast<SOL_T>(3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679);
+    const SOL_T m_4pi = static_cast<SOL_T>(4.0 * m_pi);
+    const SOL_T m_4pi_inv = static_cast<SOL_T>(1.0 / m_4pi);
 
 protected:
     std::vector<RAY_T> *basicRaytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, RAY_T sx, RAY_T sy, RAY_T sz);
