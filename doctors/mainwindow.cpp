@@ -14,6 +14,7 @@
 #include "gui/geomdialog.h"
 #include "gui/quaddialog.h"
 #include "gui/xsectiondialog.h"
+#include "gui/energydialog.h"
 #include "outwriter.h"
 #include "ctdatamanager.h"
 #include "legendre.h"
@@ -49,6 +50,7 @@ MainWindow::MainWindow(QWidget *parent):
     geomDialog(NULL),
     quadDialog(NULL),
     xsDialog(NULL),
+    energyDialog(NULL),
     m_geomLoaded(false),
     m_xsLoaded(false),
     m_quadLoaded(false),
@@ -80,6 +82,7 @@ MainWindow::MainWindow(QWidget *parent):
     geomDialog = new GeomDialog(this);
     quadDialog = new QuadDialog(this);
     xsDialog = new XSectionDialog(this);
+    energyDialog = new EnergyDialog(this);
 
     m_configSelectDialog = new QFileDialog(this);
     m_configSelectDialog->setAcceptMode(QFileDialog::AcceptOpen);
@@ -95,6 +98,7 @@ MainWindow::MainWindow(QWidget *parent):
     connect(ui->actionSolution_Explorer, SIGNAL(triggered()), outputDialog, SLOT(show()));
     connect(ui->quadExplorePushButton, SIGNAL(clicked()), quadDialog, SLOT(show()));
     connect(ui->geometryExplorePushButton, SIGNAL(clicked()), geomDialog, SLOT(show()));
+    connect(ui->sourceEnergyPushButton, SIGNAL(clicked()), energyDialog, SLOT(show()));
 
     // Set up xs reader threads
     m_parser->moveToThread(&m_xsWorkerThread);
@@ -149,6 +153,12 @@ MainWindow::MainWindow(QWidget *parent):
 MainWindow::~MainWindow()
 {
     delete ui;
+
+    delete outputDialog;
+    delete geomDialog;
+    delete quadDialog;
+    delete xsDialog;
+    delete energyDialog;
 
     if(m_mesh != NULL)
         delete m_mesh;
@@ -487,6 +497,7 @@ void MainWindow::xsParseFinished(AmpxParser *parser)
     m_xsLoaded = true;
     updateLaunchButton();
     outputDialog->setEnergyGroups(parser->getGammaEnergyGroups());
+    energyDialog->setEnergy(parser);
     ui->mainProgressBar->setValue(0);
 }
 

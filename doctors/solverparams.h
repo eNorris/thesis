@@ -3,16 +3,23 @@
 
 #include <vector>
 
-class SolverParams
+#include <QObject>
+
+class SolverParams : public QObject
 {
+    Q_OBJECT
+
 public:
     SolverParams();
     ~SolverParams();
 
     float sourceX, sourceY, sourceZ;
 
-    std::vector<float> spectraEnergy;
+    std::vector<float> spectraEnergyLimits;
     std::vector<float> spectraIntensity;
+
+public slots:
+    void normalize();
 };
 
 #endif // SOLVERPARAMS_H

@@ -14,6 +14,7 @@ class OutputDialog;
 class GeomDialog;
 class QuadDialog;
 class XSectionDialog;
+class EnergyDialog;
 class Solver;
 
 //#include "config.h"
@@ -50,6 +51,7 @@ private:
     GeomDialog *geomDialog;
     QuadDialog *quadDialog;
     XSectionDialog *xsDialog;
+    EnergyDialog *energyDialog;
 
     bool m_geomLoaded, m_xsLoaded, m_quadLoaded, m_paramsLoaded;
 

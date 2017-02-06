@@ -59,6 +59,7 @@ SOURCES += main.cpp\
     solver.cpp \
     histogram.cpp \
     mcnpwriter.cpp \
+    gui/energydialog.cpp
 
 HEADERS  += mainwindow.h \
     gui/outputdialog.h \
@@ -84,7 +85,8 @@ HEADERS  += mainwindow.h \
     solver.h \
     histogram.h \
     mcnpwriter.h \
-    globals.h
+    globals.h \
+    gui/energydialog.h
 
 FORMS    += mainwindow.ui \
     gui/outputdialog.ui \
@@ -92,6 +94,7 @@ FORMS    += mainwindow.ui \
     gui/quaddialog.ui \
     gui/xsectiondialog.ui \
     solverparamsdialog.ui \
+    gui/energydialog.ui
 
 DISTFILES += \
     testinput.cfg
