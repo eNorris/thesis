@@ -21,10 +21,8 @@
 #include "solver.h"
 
 #include "outwriter.h"
-
 #include "mcnpwriter.h"
-
-#include "materialutils.h"  // TODO - Delete, not needed, just for testing
+#include "materialutils.h"
 
 #undef SLOT
 #define _SLOT(a) "1"#a
@@ -553,6 +551,7 @@ void MainWindow::onSolverFinished(std::vector<SOL_T> *solution)
 {
     m_solution = solution;
 
+    std::vector<SOL_T> scalar;
     //OutWriter::writeArray("solution.dat", *solution);
 
     switch(m_solType)
@@ -561,7 +560,19 @@ void MainWindow::onSolverFinished(std::vector<SOL_T> *solution)
         OutWriter::writeScalarFlux("solver_flux_iso.dat", *m_xs, *m_mesh, *solution);
         break;
     case MainWindow::LEGENDRE:
-        OutWriter::writeAngularFlux("solver_flux_leg.dat", *m_xs, *m_quad, *m_mesh, *solution);
+        OutWriter::writeAngularFlux("solver_angular_leg.dat", *m_xs, *m_quad, *m_mesh, *solution);
+        scalar.resize(m_xs->groupCount() * m_mesh->voxelCount(), static_cast<SOL_T>(0));
+        for(unsigned int ie = 0; ie < m_xs->groupCount(); ie++)
+            for(unsigned int ir = 0; ir < m_mesh->voxelCount(); ir++)
+            {
+                unsigned int scalarOffset = ie*m_mesh->voxelCount() + ir;
+                unsigned int angularOffset = ie*m_mesh->voxelCount()*m_quad->angleCount() + ir;
+                for(unsigned int ia = 0; ia < m_quad->angleCount(); ia++)
+                    scalar[scalarOffset] += (*solution)[angularOffset + ia*m_mesh->voxelCount()] * m_quad->wt[ia];
+            }
+        //std::vector<SOL_T> q = scalar;
+        OutWriter::writeScalarFlux("solver_scalar_leg.dat", *m_xs, *m_mesh, scalar);
+
         break;
     case MainWindow::HARMONIC:
         OutWriter::writeAngularFlux("solver_flux_harm.dat", *m_xs, *m_quad, *m_mesh, *solution);
