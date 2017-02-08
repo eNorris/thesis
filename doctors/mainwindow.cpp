@@ -433,7 +433,7 @@ void MainWindow::on_paramsPnComboBox_activated(int indx)
 {
     m_pn = indx - 1;  // Resetting to the default rolls over to UINT_MAX
 
-    m_paramsLoaded = (ui->paramsTypeComboBox->currentIndex() == 1 || (ui->paramsTypeComboBox->currentIndex() > 1 && indx > 1));
+    m_paramsLoaded = (ui->paramsTypeComboBox->currentIndex() == 1 || (ui->paramsTypeComboBox->currentIndex() > 1 && indx >= 1));
 
     updateLaunchButton();
 }
