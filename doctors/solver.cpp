@@ -379,11 +379,12 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
     {
         qDebug() << "Loading uncollided flux into external source";
         // If there is an uncollided flux provided, use it, otherwise, calculate the external source
-        for(unsigned int ei = highestEnergy; ei < xs->groupCount(); ei++)
+        //unsigned int xx= xs->groupCount();
+        for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)  // Sink energy
             for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
-                for(unsigned int epi = highestEnergy; epi <= ei; epi++)
+                for(unsigned int iep = highestEnergy; iep <= ie; iep++) // Source energy
                     //                               [#]   =                        [#/cm^2]      * [cm^3]        *  [b]                               * [1/b-cm]
-                    extSource[ei*mesh->voxelCount() + ri] += (*uFlux)[ei*mesh->voxelCount() + ri] * mesh->vol[ri] * xs->scatxs2d(mesh->zoneId[ri], epi, ei, 0) * mesh->atomDensity[ri];
+                    extSource[ie*mesh->voxelCount() + ri] += (*uFlux)[iep*mesh->voxelCount() + ri] * mesh->vol[ri] * xs->scatxs2d(mesh->zoneId[ri], iep, ie, 0) * mesh->atomDensity[ri];
 
         OutWriter::writeArray("externalSrc.dat", extSource);
     }
@@ -412,16 +413,11 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
         // Calculate the down-scattering source
         for(unsigned int iie = 0; iie < ie; iie++)
             for(unsigned int ir = 0; ir < mesh->voxelCount(); ir++)
-            //for(int iik = 0; iik < (signed) mesh->zElemCt; iik++)
-                //for(int iij = 0; iij < (signed)mesh->yElemCt; iij++)
-                    //for(int iii = 0; iii < (signed)mesh->xElemCt; iii++)
-                    {
-                        //int indx = iii*xjmp + iij*yjmp + iik;
-                        int zidIndx = mesh->zoneId[ir];
-
-                        //         [#]    +=  [#]          *      [#/cm^2]                               * [b]                          * [1/b-cm]                * [cm^3]
-                        totalSource[ir] += 1.0/(m_4pi)*(*scalarFlux)[iie*mesh->voxelCount() + ir] * xs->scatxs2d(zidIndx, iie, ie, 0) * mesh->atomDensity[ir] * mesh->vol[ir]; //xsref(ie-1, zidIndx, 0, iie));
-                    }
+            {
+                int zidIndx = mesh->zoneId[ir];
+                //         [#]    +=  [#]          *      [#/cm^2]                               * [b]                          * [1/b-cm]                * [cm^3]
+                totalSource[ir] += m_4pi_inv*(*scalarFlux)[iie*mesh->voxelCount() + ir] * xs->scatxs2d(zidIndx, iie, ie, 0) * mesh->atomDensity[ir] * mesh->vol[ir]; //xsref(ie-1, zidIndx, 0, iie));
+            }
 
         // Add the external source
         for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)

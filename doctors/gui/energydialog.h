@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QGraphicsScene>
+#include <QGraphicsView>
 #include <QGraphicsRectItem>
 #include <vector>
 
@@ -11,6 +12,18 @@ class AmpxParser;
 namespace Ui {
 class EnergyDialog;
 }
+
+class EnergyGraphicsView : public QGraphicsView
+{
+    Q_OBJECT
+
+public:
+    explicit EnergyGraphicsView(QWidget *parent = 0);
+    ~EnergyGraphicsView();
+
+public slots:
+    void mousePressEvent(QMouseEvent *event);
+};
 
 class EnergyDialog : public QDialog
 {
@@ -34,6 +47,7 @@ private:
 
 public slots:
     void setEnergy(AmpxParser *p);
+    void on_energyLogXCheckBox_toggled(bool s);
 };
 
 #endif // ENERGYDIALOG_H

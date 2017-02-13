@@ -6,6 +6,21 @@
 #include "xs_reader/ampxparser.h"
 #include "gui/colormappable.h"
 
+EnergyGraphicsView::EnergyGraphicsView(QWidget *parent)
+{
+
+}
+
+EnergyGraphicsView::~EnergyGraphicsView()
+{
+
+}
+
+void EnergyGraphicsView::mousePressEvent(QMouseEvent *event)
+{
+    qDebug() << "Got an event!";
+}
+
 EnergyDialog::EnergyDialog(QWidget *parent) :
     QDialog(parent),
     m_xlog(false),
@@ -60,3 +75,63 @@ void EnergyDialog::setEnergy(AmpxParser *p)
     m_scene->setSceneRect(m_energyBins[eBins-1], 0, m_energyBins[0], 1);
     ui->graphicsView->fitInView(m_scene->sceneRect());
 }
+void EnergyDialog::on_energyLogXCheckBox_toggled(bool s)
+{
+    qDebug() << "Fire!" << s;
+
+    unsigned int eBins = m_energyBins.size();
+
+    if(s)
+    {
+        for(unsigned int i = 1; i < m_lines.size(); i++)
+        {
+            QRectF old = m_rects[i-1]->rect();
+            float x = log10(m_energyBins[i-1]);
+            float width = log10(m_energyBins[i]) - log10(m_energyBins[i-1]);
+            m_rects[i-1]->setRect(x, old.y(), width, old.height());
+        }
+        for(unsigned int i = 0; i < m_lines.size(); i++)
+        {
+            QLineF old = m_lines[i]->line();
+            float x = log10(old.x1());
+            m_lines[i]->setLine(x, old.y1(), x, old.y2());
+        }
+        float xmin = log10(m_energyBins[eBins-1]);
+        float xmax = log10(m_energyBins[0]);
+        qDebug() << "Scaling to " << xmin << ", " << xmax;
+        m_scene->setSceneRect(xmin, 0, xmax, 1);
+        ui->graphicsView->fitInView(m_scene->sceneRect());
+    }
+    else
+    {
+        for(unsigned int i = 1; i < m_rects.size(); i++)
+        {
+            QRectF old = m_rects[i-1]->rect();
+            float x = m_energyBins[i-1];
+            float width = m_energyBins[i] - m_energyBins[i-1];
+            m_rects[i-1]->setRect(x, old.y(), width, old.height());
+        }
+        for(unsigned int i = 0; i < m_lines.size(); i++)
+        {
+            QLineF old = m_lines[i]->line();
+            float x = old.x1();
+            m_lines[i]->setLine(x, old.y1(), x, old.y2());
+        }
+        float xmin = m_energyBins[eBins-1];
+        float xmax = m_energyBins[0];
+        qDebug() << "Scaling to " << xmin << ", " << xmax;
+        m_scene->setSceneRect(xmin, 0, xmax, 1);
+        ui->graphicsView->fitInView(m_scene->sceneRect());
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
