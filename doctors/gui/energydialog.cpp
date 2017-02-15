@@ -2,11 +2,12 @@
 #include "ui_energydialog.h"
 
 #include <QDebug>
+#include <QMouseEvent>
 
 #include "xs_reader/ampxparser.h"
 #include "gui/colormappable.h"
 
-EnergyGraphicsView::EnergyGraphicsView(QWidget *parent)
+EnergyGraphicsView::EnergyGraphicsView(QWidget *parent) : m_drag(false)
 {
 
 }
@@ -18,7 +19,31 @@ EnergyGraphicsView::~EnergyGraphicsView()
 
 void EnergyGraphicsView::mousePressEvent(QMouseEvent *event)
 {
-    qDebug() << "Got an event!";
+    qDebug() << "Got an event!" << event->pos() << ", " << event->localPos() << ", " << event->screenPos() << ", " << event->windowPos() << ", " << event->x();
+    qDebug() << "Scene: " << mapToScene(event->pos());
+    m_drag = true;
+}
+
+void EnergyGraphicsView::mouseReleaseEvent(QMouseEvent *event)
+{
+    m_drag = false;
+}
+
+void EnergyGraphicsView::mouseMoveEvent(QMouseEvent *event)
+{
+    if(m_drag)
+    {
+        QGraphicsItem *item = itemAt(event->pos());
+
+        QGraphicsRectItem *rect = dynamic_cast<QGraphicsRectItem*>(item);  //->mapRectFromItem()
+        if(rect == NULL)
+            return;
+        //float width = rect->rect().width();
+        //float y = rect->y();
+        QPointF p = mapToScene(QPoint(0, event->y()));
+        rect->setY(p.y());
+        qDebug() << "Width: " << event->y();
+    }
 }
 
 EnergyDialog::EnergyDialog(QWidget *parent) :
@@ -75,13 +100,14 @@ void EnergyDialog::setEnergy(AmpxParser *p)
     m_scene->setSceneRect(m_energyBins[eBins-1], 0, m_energyBins[0], 1);
     ui->graphicsView->fitInView(m_scene->sceneRect());
 }
-void EnergyDialog::on_energyLogXCheckBox_toggled(bool s)
+
+void EnergyDialog::on_energyLogXCheckBox_toggled(bool isChkd)
 {
-    qDebug() << "Fire!" << s;
+    //qDebug() << "Fire!" << isChkd;
 
     unsigned int eBins = m_energyBins.size();
 
-    if(s)
+    if(isChkd)
     {
         for(unsigned int i = 1; i < m_lines.size(); i++)
         {
@@ -93,13 +119,13 @@ void EnergyDialog::on_energyLogXCheckBox_toggled(bool s)
         for(unsigned int i = 0; i < m_lines.size(); i++)
         {
             QLineF old = m_lines[i]->line();
-            float x = log10(old.x1());
+            float x = log10(m_energyBins[i]);
             m_lines[i]->setLine(x, old.y1(), x, old.y2());
         }
         float xmin = log10(m_energyBins[eBins-1]);
         float xmax = log10(m_energyBins[0]);
         qDebug() << "Scaling to " << xmin << ", " << xmax;
-        m_scene->setSceneRect(xmin, 0, xmax, 1);
+        m_scene->setSceneRect(xmin, 0, xmax-xmin, 1);
         ui->graphicsView->fitInView(m_scene->sceneRect());
     }
     else
@@ -114,13 +140,13 @@ void EnergyDialog::on_energyLogXCheckBox_toggled(bool s)
         for(unsigned int i = 0; i < m_lines.size(); i++)
         {
             QLineF old = m_lines[i]->line();
-            float x = old.x1();
+            float x = m_energyBins[i];
             m_lines[i]->setLine(x, old.y1(), x, old.y2());
         }
         float xmin = m_energyBins[eBins-1];
         float xmax = m_energyBins[0];
         qDebug() << "Scaling to " << xmin << ", " << xmax;
-        m_scene->setSceneRect(xmin, 0, xmax, 1);
+        m_scene->setSceneRect(xmin, 0, xmax-xmin, 1);
         ui->graphicsView->fitInView(m_scene->sceneRect());
     }
 }

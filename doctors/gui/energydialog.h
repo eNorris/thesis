@@ -21,8 +21,13 @@ public:
     explicit EnergyGraphicsView(QWidget *parent = 0);
     ~EnergyGraphicsView();
 
+protected:
+    bool m_drag;
+
 public slots:
     void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
 };
 
 class EnergyDialog : public QDialog

@@ -21,6 +21,7 @@ class Solver;
 class Quadrature;
 class Mesh;
 class XSection;
+class SolverParams;
 //class Config;
 
 namespace Ui {
@@ -46,6 +47,7 @@ private:
     Mesh *m_mesh;
     XSection *m_xs;
     Quadrature *m_quad;
+    SolverParams *m_params;
 
     OutputDialog *outputDialog;
     GeomDialog *geomDialog;

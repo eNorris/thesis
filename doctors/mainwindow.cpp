@@ -44,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent):
     m_mesh(NULL),
     m_xs(NULL),
     m_quad(NULL),
+    m_params(NULL),
     outputDialog(NULL),
     geomDialog(NULL),
     quadDialog(NULL),
@@ -143,7 +144,7 @@ MainWindow::MainWindow(QWidget *parent):
     ui->paramsGroupBox->setStyleSheet("QGroupBox { color: red; } ");
     ui->quadGroupBox->setStyleSheet("QGroupBox { color: red; } ");
 
-    qDebug() << "Loaded default configuration";
+    //qDebug() << "Loaded default configuration";
 
     quadDialog->updateQuad(m_quad);
 }
@@ -475,8 +476,15 @@ void MainWindow::on_actionMCNP6_Generation_triggered()
         return;
     }
 
+    if(m_params == NULL)
+    {
+        QString errmsg = QString("The energy spectra must be loaded before a MCNP6 file can be generated.");
+        QMessageBox::warning(this, "Insufficient Data", errmsg, QMessageBox::Close);
+        return;
+    }
+
     McnpWriter mcnpwriter;
-    mcnpwriter.writeMcnp("../mcnp.gitignore/mcnp_out.inp", m_mesh, false);
+    mcnpwriter.writeMcnp("../mcnp.gitignore/mcnp_out.inp", m_mesh, m_params, false);
 }
 
 void MainWindow::xsParseErrorHandler(QString msg)

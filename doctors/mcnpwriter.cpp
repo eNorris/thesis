@@ -6,6 +6,7 @@
 
 #include "mesh.h"
 #include "materialutils.h"
+#include "solverparams.h"
 
 McnpWriter::McnpWriter() : m_failFlag(false)
 {
@@ -178,22 +179,26 @@ std::string McnpWriter::generateCellString(Mesh *m, bool fineDensity)
     return allCellString;
 }
 
-std::string McnpWriter::generateDataCards(Mesh *m)
+std::string McnpWriter::generateDataCards(SolverParams *p)
 {
     std::string dataString = "c ==================== DATA DECK ====================\n";
 
     dataString += "nps 1E7\n";
     dataString += "mode p\n";
 
-    // The offset prevents the source from landing on a surface plane which can cause particles to get lost
-    //float offset = 0.001f;
+    dataString += "sdef par=p pos=" + std::to_string(p->sourceX) + " " + std::to_string(p->sourceY) + " " + std::to_string(p->sourceZ) + " erg=d1\n";
 
-    //float maxerg = 0.01;
+    std::string si = "SI1 H   ";
+    for(int i = 0; i < p->spectraEnergyLimits.size(); i++)
+        si += std::to_string(p->spectraEnergyLimits[i]) + "  ";
+    si += '\n';
 
-    dataString += "sdef par=p pos=" + std::to_string(25.3906) + " " + std::to_string(3.5156) + " " + std::to_string(6.8906) + " erg=d1\n" +
-            "SI1 H   0.01   0.045   0.1   0.2\n" +
-            "SP1 D 0      1       0     0\n";
+    std::string sp = "SP1 D 0     ";
+    for(int i = 0; i < p->spectraIntensity.size(); i++)
+        sp += std::to_string(p->spectraIntensity[i]) + "  ";
+    sp += '\n';
 
+    dataString += si + sp;
 
     return dataString;
 }
@@ -238,7 +243,7 @@ std::string McnpWriter::generateMeshTally(Mesh *m)
     return tallyString;
 }
 
-void McnpWriter::writeMcnp(std::string filename, Mesh *m, bool fineDensity)
+void McnpWriter::writeMcnp(std::string filename, Mesh *m, SolverParams *p, bool fineDensity)
 {
     std::ofstream fout;
     fout.open(filename.c_str());
@@ -252,7 +257,7 @@ void McnpWriter::writeMcnp(std::string filename, Mesh *m, bool fineDensity)
     fout << "\n";
     fout << generateSurfaceString(m);
     fout << "\n";
-    fout << generateDataCards(m);
+    fout << generateDataCards(p);
     fout << generatePhantom19MaterialString();
     fout << generateMeshTally(m);
 

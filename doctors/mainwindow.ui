@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>781</height>
+    <width>410</width>
+    <height>887</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -516,7 +516,14 @@
             </widget>
            </item>
            <item>
-            <widget class="QDoubleSpinBox" name="sourceXDoubleSpinBox"/>
+            <widget class="QDoubleSpinBox" name="sourceXDoubleSpinBox">
+             <property name="decimals">
+              <number>4</number>
+             </property>
+             <property name="value">
+              <double>25.390599999999999</double>
+             </property>
+            </widget>
            </item>
            <item>
             <spacer name="horizontalSpacer_7">
@@ -539,7 +546,14 @@
             </widget>
            </item>
            <item>
-            <widget class="QDoubleSpinBox" name="sourceYDoubleSpinBox"/>
+            <widget class="QDoubleSpinBox" name="sourceYDoubleSpinBox">
+             <property name="decimals">
+              <number>4</number>
+             </property>
+             <property name="value">
+              <double>3.515600000000000</double>
+             </property>
+            </widget>
            </item>
            <item>
             <spacer name="horizontalSpacer_8">
@@ -562,7 +576,14 @@
             </widget>
            </item>
            <item>
-            <widget class="QDoubleSpinBox" name="sourceZDoubleSpinBox"/>
+            <widget class="QDoubleSpinBox" name="sourceZDoubleSpinBox">
+             <property name="decimals">
+              <number>4</number>
+             </property>
+             <property name="value">
+              <double>6.890600000000000</double>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -660,8 +681,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>400</width>
-     <height>21</height>
+     <width>410</width>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
