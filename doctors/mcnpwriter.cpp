@@ -188,13 +188,19 @@ std::string McnpWriter::generateDataCards(SolverParams *p)
 
     dataString += "sdef par=p pos=" + std::to_string(p->sourceX) + " " + std::to_string(p->sourceY) + " " + std::to_string(p->sourceZ) + " erg=d1\n";
 
+    unsigned iEmax = 0;
+    while(p->spectraIntensity[iEmax] <= 0 && iEmax < p->spectraIntensity.size())
+        iEmax++;
+
     std::string si = "SI1 H   ";
-    for(int i = 0; i < p->spectraEnergyLimits.size(); i++)
-        si += std::to_string(p->spectraEnergyLimits[i]) + "  ";
+    //for(int i = 0; i < p->spectraEnergyLimits.size(); i++)
+    //    si += std::to_string(p->spectraEnergyLimits[i]) + "  ";
+    for(int i = p->spectraEnergyLimits.size()-1; i >= iEmax; i--)
+          si += std::to_string(p->spectraEnergyLimits[i]/1e6) + "  ";
     si += '\n';
 
     std::string sp = "SP1 D 0     ";
-    for(int i = 0; i < p->spectraIntensity.size(); i++)
+    for(int i = p->spectraEnergyLimits.size()-1; i >= iEmax; i--)
         sp += std::to_string(p->spectraIntensity[i]) + "  ";
     sp += '\n';
 

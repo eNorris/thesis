@@ -13,6 +13,8 @@ namespace Ui {
 class EnergyDialog;
 }
 
+class EnergyDialog;
+
 class EnergyGraphicsView : public QGraphicsView
 {
     Q_OBJECT
@@ -23,11 +25,19 @@ public:
 
 protected:
     bool m_drag;
+    int m_button;
+    EnergyDialog *m_parent;
+    //std::vector<float> *m_energyPointer;
+    //std::vector<QGraphicsRectItem*> *m_rectPointer;
+    //std::vector<QGraphicsLineItem*> *m_linePointer;
 
 public slots:
     void mousePressEvent(QMouseEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+    void resizeEvent(QResizeEvent *event);
+    //void link(std::vector<float> *e, std::vector<QGraphicsRectItem*> *r, std::vector<QGraphicsLineItem*> *l);
 };
 
 class EnergyDialog : public QDialog
@@ -37,6 +47,12 @@ class EnergyDialog : public QDialog
 public:
     explicit EnergyDialog(QWidget *parent = 0);
     ~EnergyDialog();
+
+    bool isXLog();
+    std::vector<float> *getEnergy();
+    std::vector<QGraphicsRectItem*> *getRects();
+    std::vector<QGraphicsLineItem*> *getLines();
+    std::vector<float> getUserIntensity();
 
 protected:
     bool m_xlog;
@@ -53,6 +69,8 @@ private:
 public slots:
     void setEnergy(AmpxParser *p);
     void on_energyLogXCheckBox_toggled(bool s);
+    void setMinEnergy(float e);
+    void setMaxEnergy(float e);
 };
 
 #endif // ENERGYDIALOG_H

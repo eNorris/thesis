@@ -5,12 +5,15 @@
 
 #include <QObject>
 
+class AmpxParser;
+
 class SolverParams : public QObject
 {
     Q_OBJECT
 
 public:
-    SolverParams();
+    SolverParams(AmpxParser *parser);
+    //SolverParams(std::vector<float> e, double x, double y, double z);
     ~SolverParams();
 
     float sourceX, sourceY, sourceZ;
@@ -19,7 +22,8 @@ public:
     std::vector<float> spectraIntensity;
 
 public slots:
-    void normalize();
+    bool normalize();
+    bool update(std::vector<float> e, double x, double y, double z);
 };
 
 #endif // SOLVERPARAMS_H

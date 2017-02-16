@@ -19,6 +19,7 @@
 #include "ctdatamanager.h"
 #include "legendre.h"
 #include "solver.h"
+#include "solverparams.h"
 
 #include "outwriter.h"
 #include "mcnpwriter.h"
@@ -478,10 +479,36 @@ void MainWindow::on_actionMCNP6_Generation_triggered()
 
     if(m_params == NULL)
     {
+        /*
+        if(energyDialog->getUserIntensity().size() == 0)
+        {
+            QString errmsg = QString("A cross section datafile must be loaded to determine the energy structure before a MCNP6 file can be generated.");
+            QMessageBox::warning(this, "Insufficient Data", errmsg, QMessageBox::Close);
+            return;
+        }
+
+        m_params = new SolverParams(energyDialog->getUserIntensity(), ui->sourceXDoubleSpinBox->value(), ui->sourceYDoubleSpinBox->value(), ui->sourceZDoubleSpinBox->value());
+        */
         QString errmsg = QString("The energy spectra must be loaded before a MCNP6 file can be generated.");
         QMessageBox::warning(this, "Insufficient Data", errmsg, QMessageBox::Close);
         return;
     }
+
+    if(!m_params->update(energyDialog->getUserIntensity(), ui->sourceXDoubleSpinBox->value(), ui->sourceYDoubleSpinBox->value(), ui->sourceZDoubleSpinBox->value()))
+    {
+        QString errmsg = QString("Could not update the energy intensity data. The energy structure may have changed.");
+        QMessageBox::warning(this, "Invalid Vector Size", errmsg, QMessageBox::Close);
+        return;
+    }
+
+    if(!m_params->normalize())
+    {
+        QString errmsg = QString("The energy spectrum total is zero.");
+        QMessageBox::warning(this, "Divide by zero", errmsg, QMessageBox::Close);
+        return;
+    }
+
+    //m_params->spectraIntensity = energyDialog->getUserIntensity();
 
     McnpWriter mcnpwriter;
     mcnpwriter.writeMcnp("../mcnp.gitignore/mcnp_out.inp", m_mesh, m_params, false);
@@ -504,6 +531,9 @@ void MainWindow::xsParseFinished(AmpxParser *parser)
     updateLaunchButton();
     outputDialog->setEnergyGroups(parser->getGammaEnergyGroups());
     energyDialog->setEnergy(parser);
+
+    m_params = new SolverParams(parser);
+
     ui->mainProgressBar->setValue(0);
 }
 
