@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <stdio.h>
 #include <QDebug>
 
 #include "mesh.h"
@@ -192,19 +193,24 @@ std::string McnpWriter::generateDataCards(SolverParams *p)
     while(p->spectraIntensity[iEmax] <= 0 && iEmax < p->spectraIntensity.size())
         iEmax++;
 
-    std::string si = "SI1 H   ";
+    //"SI1 H   0.01   0.045   0.1   0.2\n" +
+    //"SP1 D 0      1       0     0\n";
+
+    std::string si = "SI1 H   &\n     ";
     //for(int i = 0; i < p->spectraEnergyLimits.size(); i++)
     //    si += std::to_string(p->spectraEnergyLimits[i]) + "  ";
-    for(int i = p->spectraEnergyLimits.size()-1; i >= iEmax; i--)
-          si += std::to_string(p->spectraEnergyLimits[i]/1e6) + "  ";
-    si += '\n';
+    for(unsigned int i = p->spectraEnergyLimits.size()-1; i >= iEmax+1; i--)
+          si += std::to_string(p->spectraEnergyLimits[i]/1e6) + " &\n     ";
+    si += std::to_string(p->spectraEnergyLimits[iEmax]/1e6) + " &\n";
+    //si += '\n';
 
-    std::string sp = "SP1 D 0     ";
-    for(int i = p->spectraEnergyLimits.size()-1; i >= iEmax; i--)
-        sp += std::to_string(p->spectraIntensity[i]) + "  ";
-    sp += '\n';
+    std::string sp = "SP1 D &\n     0     \n     ";
+    for(unsigned int i = p->spectraIntensity.size()-1; i >= iEmax+1; i--)
+        sp += std::to_string(p->spectraIntensity[i]) + " &\n     ";
+    //sp += '\n';
+    sp += std::to_string(p->spectraIntensity[iEmax]) + " &\n";
 
-    dataString += si + sp;
+    dataString += si + sp;  //limit80Char(si) + limit80Char(sp);
 
     return dataString;
 }
@@ -248,6 +254,49 @@ std::string McnpWriter::generateMeshTally(Mesh *m)
 
     return tallyString;
 }
+
+/*
+std::string McnpWriter::limit80Char(std::string s)
+{
+    std::string r;
+    std::string next;
+
+    //unsigned int wordstart = 0;
+    unsigned int ptr = 0;
+    unsigned int linelen = 0;
+
+    while(ptr < s.length())
+    {
+        // while not whitespace, keep adding to the word
+        // if this word would make the line too long:
+        //     newline+space, reset and continue
+        // else
+        //     add the word to the line
+        next = "";
+        while(!std::isspace(s[ptr]) && ptr < s.length())
+        {
+            ptr++;
+            next += s[ptr];
+        }
+
+        if(next.size() + linelen + 1 > 80)
+        {
+            r += '\n';
+            linelen = next.size() + 1;
+            r+= next + " ";
+        }
+        else
+        {
+            r += next + " ";
+            linelen += next.size() + 1;
+        }
+
+        ptr++;
+    }
+
+    return r;
+}
+*/
 
 void McnpWriter::writeMcnp(std::string filename, Mesh *m, SolverParams *p, bool fineDensity)
 {

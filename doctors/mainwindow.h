@@ -107,14 +107,14 @@ protected slots:
     void onSolverFinished(std::vector<SOL_T>* solution);
 
 signals:
-    void signalLaunchRaytracerIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs);
-    void signalLaunchSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<RAY_T> *uflux);
+    void signalLaunchRaytracerIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *params);
+    void signalLaunchSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<RAY_T> *uflux, const SolverParams *params);
 
-    void signalLaunchRaytracerLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn);
-    void signalLaunchSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux);
+    void signalLaunchRaytracerLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SolverParams *params);
+    void signalLaunchSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux, const SolverParams *params);
 
-    void signalLaunchRaytracerHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn);
-    void signalLaunchSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux);
+    void signalLaunchRaytracerHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SolverParams *params);
+    void signalLaunchSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux, const SolverParams *params);
 
     void signalDebugHalt(std::vector<float>);
     void signalBeginXsParse(QString);

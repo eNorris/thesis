@@ -114,14 +114,14 @@ MainWindow::MainWindow(QWidget *parent):
     m_solver->moveToThread(&m_solverWorkerThread);
     connect(&m_xsWorkerThread, SIGNAL(finished()), m_solver, SLOT(deleteLater()));
 
-    connect(this, SIGNAL(signalLaunchRaytracerIso(const Quadrature*,const Mesh*,const XSection*)), m_solver, SLOT(raytraceIso(const Quadrature*,const Mesh*,const XSection*)));
-    connect(this, SIGNAL(signalLaunchSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<RAY_T>*)), m_solver, SLOT(gsSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<RAY_T>*)));
+    connect(this, SIGNAL(signalLaunchRaytracerIso(const Quadrature*,const Mesh*,const XSection*, const SolverParams*)), m_solver, SLOT(raytraceIso(const Quadrature*,const Mesh*,const XSection*, const SolverParams*)));
+    connect(this, SIGNAL(signalLaunchSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<RAY_T>*, const SolverParams*)), m_solver, SLOT(gsSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<RAY_T>*, const SolverParams*)));
 
-    connect(this, SIGNAL(signalLaunchRaytracerLegendre(const Quadrature*,const Mesh*,const XSection*, const unsigned int)), m_solver, SLOT(raytraceLegendre(const Quadrature*,const Mesh*,const XSection*, const unsigned int)));
-    connect(this, SIGNAL(signalLaunchSolverLegendre(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*)), m_solver, SLOT(gsSolverLegendre(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*)));
+    connect(this, SIGNAL(signalLaunchRaytracerLegendre(const Quadrature*,const Mesh*,const XSection*, const unsigned int, const SolverParams*)), m_solver, SLOT(raytraceLegendre(const Quadrature*,const Mesh*,const XSection*, const unsigned int, const SolverParams*)));
+    connect(this, SIGNAL(signalLaunchSolverLegendre(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*, const SolverParams*)), m_solver, SLOT(gsSolverLegendre(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*, const SolverParams*)));
 
-    connect(this, SIGNAL(signalLaunchRaytracerHarmonic(const Quadrature*,const Mesh*,const XSection*, const unsigned int)), m_solver, SLOT(raytraceHarmonic(const Quadrature*,const Mesh*,const XSection*, const unsigned int)));
-    connect(this, SIGNAL(signalLaunchSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*)), m_solver, SLOT(gsSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*)));
+    connect(this, SIGNAL(signalLaunchRaytracerHarmonic(const Quadrature*,const Mesh*,const XSection*, const unsigned int, const SolverParams*)), m_solver, SLOT(raytraceHarmonic(const Quadrature*,const Mesh*,const XSection*, const unsigned int, const SolverParams*)));
+    connect(this, SIGNAL(signalLaunchSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*, const SolverParams*)), m_solver, SLOT(gsSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*, const SolverParams*)));
 
     connect(m_solver, SIGNAL(signalRaytracerFinished(std::vector<RAY_T>*)), this, SLOT(onRaytracerFinished(std::vector<RAY_T>*)));
     connect(m_solver, SIGNAL(signalSolverFinished(std::vector<SOL_T>*)), this, SLOT(onSolverFinished(std::vector<SOL_T>*)));
@@ -200,17 +200,38 @@ void MainWindow::on_launchSolverPushButton_clicked()
             return;
     }
 
+    if(m_params == NULL)
+    {
+        QString errmsg = QString("The energy spectra must be loaded before a MCNP6 file can be generated.");
+        QMessageBox::warning(this, "Insufficient Data", errmsg, QMessageBox::Close);
+        return;
+    }
+
+    if(!m_params->update(energyDialog->getUserIntensity(), ui->sourceXDoubleSpinBox->value(), ui->sourceYDoubleSpinBox->value(), ui->sourceZDoubleSpinBox->value()))
+    {
+        QString errmsg = QString("Could not update the energy intensity data. The energy structure may have changed.");
+        QMessageBox::warning(this, "Invalid Vector Size", errmsg, QMessageBox::Close);
+        return;
+    }
+
+    if(!m_params->normalize())
+    {
+        QString errmsg = QString("The energy spectrum total is zero.");
+        QMessageBox::warning(this, "Divide by zero", errmsg, QMessageBox::Close);
+        return;
+    }
+
     // When the raytracer finishes, the gs solver is automatically launched
     switch(m_solType)
     {
     case MainWindow::ISOTROPIC:
-        emit signalLaunchRaytracerIso(m_quad, m_mesh, m_xs);
+        emit signalLaunchRaytracerIso(m_quad, m_mesh, m_xs, m_params);
         break;
     case MainWindow::LEGENDRE:
-        emit signalLaunchRaytracerLegendre(m_quad, m_mesh, m_xs, m_pn);
+        emit signalLaunchRaytracerLegendre(m_quad, m_mesh, m_xs, m_pn, m_params);
         break;
     case MainWindow::HARMONIC:
-        emit signalLaunchRaytracerHarmonic(m_quad, m_mesh, m_xs, m_pn);
+        emit signalLaunchRaytracerHarmonic(m_quad, m_mesh, m_xs, m_pn, m_params);
         break;
     default:
         qDebug() << "No solver of type " << m_solType;
@@ -568,15 +589,15 @@ void MainWindow::onRaytracerFinished(std::vector<RAY_T>* uncollided)
     {
     case MainWindow::ISOTROPIC:
         OutWriter::writeScalarFlux("raytrace_flux_iso.dat", *m_xs, *m_mesh, *uncollided);
-        emit signalLaunchSolverIso(m_quad, m_mesh, m_xs, uncollided);
+        emit signalLaunchSolverIso(m_quad, m_mesh, m_xs, uncollided, NULL);
         break;
     case MainWindow::LEGENDRE:
         OutWriter::writeAngularFlux("raytrace_flux_leg.dat", *m_xs, *m_quad, *m_mesh, *uncollided);
-        emit signalLaunchSolverLegendre(m_quad, m_mesh, m_xs, m_pn, uncollided);
+        emit signalLaunchSolverLegendre(m_quad, m_mesh, m_xs, m_pn, uncollided, NULL);
         break;
     case MainWindow::HARMONIC:
         OutWriter::writeAngularFlux("raytrace_flux_harm.dat", *m_xs, *m_quad, *m_mesh, *uncollided);
-        emit signalLaunchSolverHarmonic(m_quad, m_mesh, m_xs, m_pn, uncollided);
+        emit signalLaunchSolverHarmonic(m_quad, m_mesh, m_xs, m_pn, uncollided, NULL);
         break;
     default:
         qCritical() << "No solver of type " << m_solType;

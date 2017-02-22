@@ -12,6 +12,7 @@
 class Quadrature;
 class Mesh;
 class XSection;
+class SolverParams;
 
 class Solver : public QObject
 {
@@ -25,7 +26,7 @@ public:
     const SOL_T m_4pi_inv = static_cast<SOL_T>(1.0 / m_4pi);
 
 protected:
-    std::vector<RAY_T> *basicRaytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, RAY_T sx, RAY_T sy, RAY_T sz);
+    std::vector<RAY_T> *basicRaytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *params);
 
 signals:
     //void signalNewIteration(std::vector<float>*);
@@ -39,14 +40,14 @@ signals:
     void signalSolverFinished(std::vector<SOL_T>*);
 
 public slots:
-    void raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs);
-    void gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<RAY_T> *uflux);
+    void raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *params);
+    void gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<RAY_T> *uflux, const SolverParams *params);
 
-    void raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn);
-    void gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux);
+    void raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SolverParams *params);
+    void gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux, const SolverParams *params);
 
-    void raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn);
-    void gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux);
+    void raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SolverParams *params);
+    void gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux, const SolverParams *params);
 
 };
 

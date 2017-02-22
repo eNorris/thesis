@@ -12,6 +12,7 @@
 #include "outwriter.h"
 #include "gui/outputdialog.h"
 #include "legendre.h"
+#include "solverparams.h"
 
 Solver::Solver(QObject *parent) : QObject(parent)
 {
@@ -23,13 +24,17 @@ Solver::~Solver()
 
 }
 
-std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, RAY_T sx, RAY_T sy, RAY_T sz)
+std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *params)
 {
-    int groups = xs->groupCount();
+    unsigned int groups = xs->groupCount();
 
     const unsigned short DIRECTION_X = 1;
     const unsigned short DIRECTION_Y = 2;
     const unsigned short DIRECTION_Z = 3;
+
+    const RAY_T sx = static_cast<RAY_T>(params->sourceX);
+    const RAY_T sy = static_cast<RAY_T>(params->sourceY);
+    const RAY_T sz = static_cast<RAY_T>(params->sourceZ);
 
     std::vector<SOL_T> *uflux = new std::vector<SOL_T>;
     uflux->resize(groups * mesh->voxelCount());
@@ -46,8 +51,11 @@ std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *me
     meanFreePaths.resize(xs->groupCount());
 
     //                                  0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5  6  7  8
-    std::vector<RAY_T> srcStrength(groups, 0.0);  //{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0};
-    srcStrength[srcStrength.size() - 2] = 1.0;
+    //std::vector<RAY_T> srcStrength(groups, 0.0);  //{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0};
+    //srcStrength[srcStrength.size() - 2] = 1.0;
+    std::vector<RAY_T> srcStrength(groups, 0.0);
+    for(unsigned int i = 0; i < groups; i++)
+        srcStrength[i] = params->spectraIntensity[i];
 
     if(sx < mesh->xNodes[0] || sy < mesh->yNodes[0] || sz < mesh->zNodes[0])
     {
@@ -291,20 +299,20 @@ std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *me
     return uflux;
 }
 
-void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs)
+void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *params)
 {
     std::clock_t startMoment = std::clock();
 
     //unsigned int groups = xs->groupCount();
-    RAY_T sx = 25.3906f;
-    RAY_T sy = 50.0f - 46.4844f;
-    RAY_T sz = 6.8906f;
+    //RAY_T sx = 25.3906f;
+    //RAY_T sy = 50.0f - 46.4844f;
+    //RAY_T sz = 6.8906f;
 
     //unsigned int ejmp = mesh->voxelCount();
     //unsigned int xjmp = mesh->xjmp();
     //unsigned int yjmp = mesh->yjmp();
 
-    std::vector<SOL_T> *uflux = basicRaytrace(quad, mesh, xs, sx, sy, sz);
+    std::vector<SOL_T> *uflux = basicRaytrace(quad, mesh, xs, params);
 
     qDebug() << "Time to complete raytracer: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
@@ -313,7 +321,7 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
 }
 
 
-void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<SOL_T> *uFlux)
+void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<SOL_T> *uFlux, const SolverParams *params)
 {
 
     std::clock_t startTime = std::clock();
@@ -352,6 +360,11 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
     int yjmp = mesh->yjmp();
 
     //bool downscatterFlag = false;
+
+    if(uFlux == NULL && params == NULL)
+    {
+        qDebug() << "uFlux and params cannot both be NULL";
+    }
 
     bool noDownscatterYet = true;
     unsigned int highestEnergy = 0;
@@ -608,7 +621,7 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
     qDebug() << "Time to complete: " << (std::clock() - startTime)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
     //qDebug() << "Convergance of 128, 128, 32:";
-    //for(unsigned int i = 0; i < converganceTracker.size(); i++)\
+    //for(unsigned int i = 0; i < converganceTracker.size(); i++)
     //{
     //    qDebug() << i << "\t" << converganceTracker[i];
     //}
@@ -631,21 +644,24 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
 //                           Anisotropic versions of the above solvers                            //
 // ////////////////////////////////////////////////////////////////////////////////////////////// //
 
-void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn)
+void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SolverParams *params)
 {
     std::clock_t startMoment = std::clock();
 
     unsigned int groups = xs->groupCount();
 
-    RAY_T sx = 25.3906f;
-    RAY_T sy = 50.0f - 46.4844f;
-    RAY_T sz = 6.8906f;
+    //RAY_T sx = 25.3906f;
+    //RAY_T sy = 50.0f - 46.4844f;
+    //RAY_T sz = 6.8906f;
+    const RAY_T sx = static_cast<RAY_T>(params->sourceX);
+    const RAY_T sy = static_cast<RAY_T>(params->sourceY);
+    const RAY_T sz = static_cast<RAY_T>(params->sourceZ);
 
     unsigned int ejmp = mesh->voxelCount();
     unsigned int xjmp = mesh->xjmp();
     unsigned int yjmp = mesh->yjmp();
 
-    std::vector<SOL_T> *uflux = basicRaytrace(quad, mesh, xs, sx, sy, sz);
+    std::vector<SOL_T> *uflux = basicRaytrace(quad, mesh, xs, params);
 
     qDebug() << "Time to complete raytracer: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
@@ -699,7 +715,7 @@ void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XS
 }
 
 
-void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uFlux)
+void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uFlux, const SolverParams *params)
 {
     // Do some input checks
     if(pn > 10)
@@ -737,6 +753,11 @@ void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XS
     converganceTracker.resize(xs->groupCount());
 
     //const XSection &xsref = *xs;
+
+    if(uFlux == NULL && params == NULL)
+    {
+        qDebug() << "uFlux and params cannot both be NULL";
+    }
 
     SOL_T influxX = 0.0f;
     SOL_T influxY = 0.0f;
@@ -1064,7 +1085,7 @@ void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XS
     qDebug() << "Time to complete: " << (std::clock() - startTime)/(double)(CLOCKS_PER_SEC/1000.0) << " ms";
 
     //qDebug() << "Convergance of 128, 128, 32:";
-    //for(unsigned int i = 0; i < converganceTracker.size(); i++)\
+    //for(unsigned int i = 0; i < converganceTracker.size(); i++)
     //{
     //    qDebug() << i << "\t" << converganceTracker[i];
     //}
@@ -1083,21 +1104,24 @@ void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XS
     emit signalSolverFinished(angularFlux);
 }
 
-void Solver::raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn)
+void Solver::raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SolverParams *params)
 {
     std::clock_t startMoment = std::clock();
 
     unsigned int groups = xs->groupCount();
 
-    RAY_T sx = 25.3906f;
-    RAY_T sy = 50.0f - 46.4844f;
-    RAY_T sz = 6.8906f;
+    //RAY_T sx = 25.3906f;
+    //RAY_T sy = 50.0f - 46.4844f;
+    //RAY_T sz = 6.8906f;
+    const RAY_T sx = static_cast<RAY_T>(params->sourceX);
+    const RAY_T sy = static_cast<RAY_T>(params->sourceY);
+    const RAY_T sz = static_cast<RAY_T>(params->sourceZ);
 
     unsigned int ejmp = mesh->voxelCount();
     unsigned int xjmp = mesh->xjmp();
     unsigned int yjmp = mesh->yjmp();
 
-    std::vector<RAY_T> *uflux = basicRaytrace(quad, mesh, xs, sx, sy, sz);
+    std::vector<RAY_T> *uflux = basicRaytrace(quad, mesh, xs, params);
 
     qDebug() << "Time to complete raytracer: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
@@ -1153,7 +1177,7 @@ void Solver::raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XS
 }
 
 
-void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *umoments)
+void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *umoments, const SolverParams *params)
 {
 
     // Do some input checks
@@ -1194,12 +1218,17 @@ void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XS
 
     const XSection &xsref = *xs;
 
+    if(umoments == NULL && params == NULL)
+    {
+        qDebug() << "uFlux and params cannot both be NULL";
+    }
+
     SOL_T influxX = 0.0f;
     SOL_T influxY = 0.0f;
     SOL_T influxZ = 0.0f;
 
-    int ejmp = mesh->voxelCount() * quad->angleCount();
-    int ajmp = mesh->voxelCount();
+    //int ejmp = mesh->voxelCount() * quad->angleCount();
+    //int ajmp = mesh->voxelCount();
     int xjmp = mesh->xjmp();
     int yjmp = mesh->yjmp();
 
