@@ -241,6 +241,8 @@ void EnergyDialog::on_energyLogXCheckBox_toggled(bool isChkd)
     //qDebug() << "Fire!" << isChkd;
 
     unsigned int eBins = m_energyBins.size();
+    if(eBins == 0)
+        return;
 
     if(isChkd)
     {

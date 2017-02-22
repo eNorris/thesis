@@ -76,10 +76,10 @@ OutputDialog::~OutputDialog()
         delete m_listModel;
 
     if(m_raytracerData != NULL)
-        delete [] m_raytracerData;
+        delete m_raytracerData;
 
     if(m_solverData != NULL)
-        delete [] m_solverData;
+        delete m_solverData;
 
     //if(m_data != NULL)
     //    delete m_data;
@@ -92,36 +92,6 @@ void OutputDialog::updateMesh(Mesh *mesh)
     // I don't know the geometry anymore, so it doesn't make sense to draw anything
     //updateMeshSlicePlane();
 }
-/*
-void OutputDialog::updateSolution(std::vector<float> *data)
-{
-    m_data = data;
-
-    m_minvalGlobal = 1.0E35f;
-    m_maxvalGlobal = -1.0E35f;
-    float minGtZero = 1.0E35f;
-
-    for(unsigned int i = 0; i < m_data->size(); i++)
-    {
-        if((*m_data)[i] > m_maxvalGlobal)
-            m_maxvalGlobal = (*m_data)[i];
-        if((*m_data)[i] < m_minvalGlobal)
-            m_minvalGlobal = (*m_data)[i];
-        if((*m_data)[i] < minGtZero && (*m_data)[i] > 0)  // Don't allow zero in log scale
-            minGtZero = (*m_data)[i];
-    }
-    m_minvalGlobalLog = log10(minGtZero);
-    m_maxvalGlobalLog = log10(m_maxvalGlobal);
-}
-*/
-
-/*
-void OutputDialog::reRender(std::vector<float> *data)
-{
-    updateSolution(data);
-    setSliceLevel(ui->sliceVerticalSlider->value());
-}
-*/
 
 void OutputDialog::updateRaytracerData(std::vector<RAY_T> *data)
 {
@@ -146,7 +116,6 @@ void OutputDialog::reRender()
     {
         if(m_raytracerData == NULL)
             return;
-        //m_renderData = *m_raytracerData;
         m_renderData.resize(m_raytracerData->size());
         for(unsigned int i = 0; i < m_raytracerData->size(); i++)
             m_renderData[i] = (*m_raytracerData)[i];
@@ -155,7 +124,6 @@ void OutputDialog::reRender()
     {
         if(m_solverData == NULL)
             return;
-        //m_renderData = *m_solverData;
         m_renderData.resize(m_solverData->size());
         for(unsigned int i = 0; i < m_solverData->size(); i++)
             m_renderData[i] = (*m_solverData)[i];
@@ -172,7 +140,6 @@ void OutputDialog::reRender()
                 for(unsigned int i = 0; i < m_solverData->size(); i++)
                     m_renderData[i] = (*m_solverData)[i];
             }
-                //m_renderData = *m_solverData;  // Only solver data available
         }
         else
         {
@@ -181,7 +148,6 @@ void OutputDialog::reRender()
                 m_renderData.resize(m_raytracerData->size());
                 for(unsigned int i = 0; i < m_raytracerData->size(); i++)
                     m_renderData[i] = (*m_raytracerData)[i];
-                //m_renderData = *m_raytracerData; // Only raytracer available
             }
             else
             {
@@ -221,7 +187,6 @@ void OutputDialog::reRender()
     m_maxvalGlobalLog = log10(m_maxvalGlobal);
 
     refresh();
-    //setSliceLevel(ui->sliceVerticalSlider->value());
 }
 
 
@@ -240,13 +205,6 @@ void OutputDialog::setSliceLevel(int level)
         dispErrMap();
         return;
     }
-
-    //if(m_renderData == NULL)
-    //{
-    //    qDebug() << "ERROR: setSliceLevel on a NULL data pointer!";
-    //    dispErrMap();
-    //    return;
-    //}
 
     if(m_renderData.size() == 0)
     {
@@ -299,28 +257,21 @@ void OutputDialog::setSliceLevel(int level)
 
         if(minvalLevel < 0)
         {
-            qDebug() << "WARNING: Negative flux!";
+            //qDebug() << "WARNING: Negative flux!";
         }
 
         if((maxvalLevel - minvalLevel) / maxvalLevel < 1E-5)
         {
-            //qDebug() << "Displaying a flat surface!";
             dispErrMap();
             return;
         }
-
-        //qDebug() << "minvalglobal = " << m_minvalGlobal << "   maxvalGlobal = " << m_maxvalGlobal << "   minvalLevel = " << minvalLevel << "   maxvalLevel = " << maxvalLevel;
 
         if(m_logInterp)
         {
             minvalLevel = log10(minvalLevel);
             maxvalLevel = log10(maxvalLevel);
-            //qDebug() << "log(minvalglobal) = " << m_minvalGlobalLog << "   log(maxvalGlobal) = " << m_maxvalGlobalLog << "log(minvalLevel) = " << minvalLevel << "  log(maxvalLevel) = " << maxvalLevel;
         }
 
-        //QStringList list;
-        //QString datastring = "";
-        //QString fidstring = "";
         for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
         {
             for(unsigned int j = 0; j < m_mesh->yElemCt; j++)
@@ -371,14 +322,8 @@ void OutputDialog::setSliceLevel(int level)
                     rects[i*m_mesh->yElemCt + j]->setBrush(errBrush);
                 else
                     rects[i*m_mesh->yElemCt + j]->setBrush(brushes[fid]);
-                //datastring += "   " + QString::number(flux);
-                //fidstring += "   " + QString::number(fid);
             }
-            //datastring += "\n";
-            //fidstring += "\n";
         }
-        //list << datastring;
-        //list << fidstring;
     }
     else if(ui->xzRadioButton->isChecked())
     {
