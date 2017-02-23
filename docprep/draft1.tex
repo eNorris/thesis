@@ -193,7 +193,7 @@ This document will teach you everything you need to know about the Boltzmann Equ
 
 The time dependent gamma transport equation can be written as
 
-\begin{equation} \label{eq_boltz_t_dep}
+\begin{equation} \label{eq:boltz_t_dep}
 \begin{split}
 	&\left[ \frac{1}{v(E)} \frac{\partial}{\partial t} + \hat{\Omega} \cdot \nabla + \Sigma_t(\boldsymbol{r}, E, t) \right]
 	\psi(\boldsymbol{r}, E, \hat{\Omega}, t) = \\
@@ -201,15 +201,92 @@ The time dependent gamma transport equation can be written as
 \end{split}
 \end{equation}
 
-However, we are typically not concerned with the transient case in medical diagnostic imaging. We are more interested in the steady state case. The time independent form of Eq. \ref{eq_boltz_t_dep} is written as
+However, we are typically not concerned with the transient case in medical diagnostic imaging. We are more interested in the steady state case. The time independent form of Eq. \ref{eq:boltz_t_dep} is written as
 
-\begin{equation} \label{eq_boltz}
+\begin{equation} \label{eq:boltz}
 \begin{split}
 	&\left[ \hat{\Omega} \cdot \nabla + \Sigma_t(\boldsymbol{r}, E) \right]
 	\psi(\boldsymbol{r}, E, \hat{\Omega}) = \\
 	&\int_{4 \pi} \int_0^\infty \Sigma_s(\boldsymbol{r}, E' \rightarrow E, \hat{\Omega}' \rightarrow \hat{\Omega}) \psi(\boldsymbol{r}, E', \hat{\Omega}') dE' d\hat{\Omega}' + S(\boldsymbol{r}, E, \hat{\Omega})
 \end{split}
 \end{equation}
+
+The following sections show how Eq.~\ref{eq:boltz} is discretized.
+
+\subsection{Angular Discretization}
+The coordinate system used in DOCTORS is shown in Fig.~\ref{fig:coord_sys}. A discrete set of $N_a$ angles ($\Omega_{a} \quad a = 0 \ldots N_a-1$) is selected to represent continuous directional space. Particles are transported only along these discrete directions form one voxel to adjacent voxels.
+
+The $S_N$ quadrature is implemented in DOCTORS. There are many different quadrature sets, the $S_N$ quadratures were selected because they are easy to implement, rotationally symmetric, and the most commonly used in production discrete ordinate solvers. This enables simple, direct comparison to other solvers. Arbitrary quadratures are permissible in a plain text file supplied by the user enabling other quadratures.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=3.0in]{figs/coord_sys}
+    \caption{The coordinate system used in DOCTORS. Given an arbitrary direction, $\Omega$, $\mu$, $\eta$, and $\xi$ are its direction cosines with respect to the $x$, $y$, and $z$ axes respectively. $\varphi$ is the azimuthal angle (with respect to $x$ and the d $\theta$ is the polar angle (with respect to $z$).}
+    \label{fig:coord_sys}
+\end{figure}
+
+Each discrete angle is associated a weight. The weights are designed with the angles such that once a discrete quadrature is selected, integration over continuous space becomes integration in discrete space approximated by Eq.~\ref{eq:disc_int}.
+
+\begin{equation} \label{eq:disc_int}
+\int_{4 \pi} f(\hat{\Omega}) d\Omega \approx \sum_{a=0}^{N_a-1} f(\hat{\Omega}_a) \omega_a
+\end{equation}
+
+Discretizing Eq.~\ref{eq:boltz} in angular space gives Eq.~\ref{eq:boltz_a} where the angle is denoted by subscript $a$.
+
+\begin{equation} \label{eq:boltz_a}
+\begin{split}
+	&\left[ \hat{\Omega}_a \cdot \nabla + \Sigma_t(\boldsymbol{r}, E) \right]
+	\psi_{a}(\boldsymbol{r}, E) = \\
+	&\sum_{a=0}^{N_a-1} \int_0^\infty \Sigma_{s, a, a'}(\boldsymbol{r}, E' \rightarrow E) \psi_{a'}(\boldsymbol{r}, E') dE' \omega_a + S_a(\boldsymbol{r}, E)
+\end{split}
+\end{equation}
+
+\subsection{Energy Discretization}
+
+Continuous energy is discretized into $G$ groups indexed from 0 to $G-1$. Upscatter is assumed to be negligible. Therefore, Eq.~\ref{eq:boltz_a} becomes the energy discretized Eq.~\ref{eq:boltz_e} where the group number is indexed by superscript $g$. The group structure is shown in Fig.~\ref{fig:energy_groups}.
+
+\begin{equation} \label{eq:boltz_e}
+	\left[ \hat{\Omega}_a \cdot \nabla + \Sigma_t^g(\boldsymbol{r}) \right]
+	\psi_{a}^{g}(\boldsymbol{r}) = 
+	\sum_{a=0}^{N_a-1} \sum_{g'=g}^{G-1} \Sigma_{s, a, a'}^{g, g'}(\boldsymbol{r}) \psi_{a'}^{g'}(\boldsymbol{r}) \omega_a + S_a^g(\boldsymbol{r})
+\end{equation}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=3.0in]{figs/energy_groups}
+    \caption{The energy grid structure used in DOCTORS. The highest energy group is group 0 and the lowest energy is group $G-1$.}
+    \label{fig:energy_groups}
+\end{figure}
+
+\subsection{Spatial Discretization}
+
+Finally, Eq.~\ref{eq:boltz_e} is discretized in space to give Eq.~\ref{eq:boltz_r} which is fully discretized. The problem domain is split into an evenly spaced Cartesian grid. The grid spacing between each of the spatial dimensions does not necessarily need to be uniform, but it often is in the case of CT voxel phantoms.
+
+The problem domain must be a regular rectangular parallelpiped of size $D_x$, $D_y$, and $D_z$ in the $x$, $y$, and $z$ directions respectively. The mesh is partitioned into $N_x$, $N_y$, and $N_z$ evenly spaced bins along each direction. The total number of voxels, $N_V$ is easily computed as the multiple of each of the component directions given in Eq.~\ref{eq:n_v}.
+
+\begin{equation} \label{eq:n_v}
+	N_V = N_x N_y N_z
+\end{equation}
+
+Voxel indices are flattened according to the rule given in Eq.~\ref{eq:indx_flat}. Note that all indeces always start at zero.
+
+\begin{equation} \label{eq:indx_flat}
+	i = i_x (N_z + N_y) + i_y N_z + i_z
+\end{equation}
+
+The spatial mesh is shown in Fig.~\ref{fig:spatial_disc}. The size of each voxel in each dimension is computed by dividing the size of the problem domain along in that dimension by the number of mesh elements along the same direction. Eq.~\ref{eq:mesh_x} shows this computation for the $x$ direction. Analagous equations apply in the $y$ and $z$ directions as well.
+
+\begin{equation} \label{eq:mesh_x}
+\Delta x = \frac{D_x}{N_x}
+\end{equation}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=3.0in]{figs/spatial_disc}
+    \caption{The spatial mesh imposed on the problem domain.}
+    \label{fig:spatial_disc}
+\end{figure}
+
 
 \subsection{Harmonic Approximation}
 Equation \ref{eq_boltz} has a number of terms that cannot be solved directly. Instead, some numerical approximation must be used. The macroscopic scattering cross section, $\Sigma_s$ is typically expanded with a Legendre polynomial (for more information of Legendre polynomials, refer to Section \ref{sec_legendre}). The expansion is as follows:
