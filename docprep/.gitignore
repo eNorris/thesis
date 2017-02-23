@@ -3,3 +3,7 @@
 *.synctex.gz
 *.toc
 *.tex
+*.lof
+*.lot
+*.nlo
+/norris_phd_dissertation.pdf
