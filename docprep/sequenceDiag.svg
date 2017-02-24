@@ -14,7 +14,7 @@
    viewBox="0 0 744.09448819 1052.3622047"
    id="svg2"
    version="1.1"
-   inkscape:version="0.91 r13725"
+   inkscape:version="0.48.4 r9939"
    sodipodi:docname="sequenceDiag.svg">
   <defs
      id="defs4">
@@ -100,15 +100,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.35"
-     inkscape:cx="2482.1173"
-     inkscape:cy="226.23087"
+     inkscape:cx="934.42702"
+     inkscape:cy="-689.44621"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1017"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:window-width="1855"
+     inkscape:window-height="1056"
+     inkscape:window-x="65"
+     inkscape:window-y="24"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -1008,5 +1008,583 @@
          x="1125.269"
          y="1125.5437"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">writeFloatArrays()</tspan></text>
+    <g
+       transform="translate(-200.00002,1467.1409)"
+       id="g11067"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_sync.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300">
+      <rect
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         id="rect11069"
+         width="305.49078"
+         height="54.062206"
+         x="95.826035"
+         y="138.75967" />
+      <text
+         xml:space="preserve"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+         x="111.11049"
+         y="180.68335"
+         id="text11071"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan11073"
+           x="111.11049"
+           y="180.68335">:MainWindow</tspan></text>
+    </g>
+    <path
+       sodipodi:nodetypes="cc"
+       inkscape:connector-curvature="0"
+       id="path11075"
+       d="m 48.571462,1659.5031 0,272.2856"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_sync.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       sodipodi:linespacing="125%"
+       id="text11113"
+       y="1538.0765"
+       x="-131.42856"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       xml:space="preserve"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_sync.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         y="1538.0765"
+         x="-131.42856"
+         id="tspan11115"
+         sodipodi:role="line">UI Thread</tspan></text>
+    <g
+       transform="translate(-656.78844,1590)"
+       id="g11117"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_sync.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300">
+      <rect
+         y="15.898604"
+         x="990.10785"
+         height="54.070049"
+         width="235.49861"
+         id="rect11119"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text11121"
+         y="57.826199"
+         x="997.50562"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+         xml:space="preserve"><tspan
+           y="57.826199"
+           x="997.50562"
+           id="tspan11123"
+           sodipodi:role="line">:OutWriter</tspan></text>
+    </g>
+    <path
+       sodipodi:nodetypes="cc"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 451.0687,1659.505 0,272.2857"
+       id="path11125"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_sync.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path11127"
+       d="m 48.348862,1776.9569 401.504928,0"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_sync.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       sodipodi:linespacing="125%"
+       id="text11133"
+       y="1765.6545"
+       x="62.065186"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       xml:space="preserve"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_sync.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman, '"
+         y="1765.6545"
+         x="62.065186"
+         id="tspan11135"
+         sodipodi:role="line">doWrite()</tspan></text>
+    <g
+       id="g11385"
+       transform="translate(-612.14227,1467.1409)"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_sync.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300">
+      <rect
+         y="138.75967"
+         x="95.826035"
+         height="54.062206"
+         width="305.49078"
+         id="rect11387"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text11389"
+         y="180.68335"
+         x="201.22768"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+         xml:space="preserve"><tspan
+           y="180.68335"
+           x="201.22768"
+           id="tspan11391"
+           sodipodi:role="line">User</tspan></text>
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m -363.57078,1659.5031 0,272.2856"
+       id="path11393"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_sync.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       x="-341.28516"
+       y="1715.3623"
+       id="text11395"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_sync.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan11397"
+         x="-341.28516"
+         y="1715.3623"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman, '">actionHandle()</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="m -364.02798,1726.5795 411.594215,0"
+       id="path11399"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_sync.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="m 450.52804,1789.7735 79.80205,0 0,90.9138 -78.7919,0"
+       id="path11401"
+       inkscape:connector-curvature="0"
+       transform="translate(-4.9229925e-6,0)"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_sync.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       d="m 449.51788,1893.8193 c -4.04061,-1.0102 -402.04071,0 -402.04071,0"
+       id="path12511"
+       inkscape:connector-curvature="0"
+       transform="translate(-4.9229925e-6,0)"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_sync.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       x="83.278389"
+       y="1886.8728"
+       id="text12703"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_sync.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan12705"
+         x="83.278389"
+         y="1886.8728"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman, '">return success</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text12707"
+       y="1844.4464"
+       x="543.90796"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       xml:space="preserve"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_sync.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman, '"
+         y="1844.4464"
+         x="543.90796"
+         id="tspan12709"
+         sodipodi:role="line">writing...</tspan></text>
+    <g
+       id="g12764"
+       transform="translate(1268.5714,1424.2838)"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300">
+      <rect
+         y="138.75967"
+         x="95.826035"
+         height="54.062206"
+         width="305.49078"
+         id="rect12766"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <text
+         sodipodi:linespacing="125%"
+         id="text12768"
+         y="180.68335"
+         x="111.11049"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+         xml:space="preserve"><tspan
+           y="180.68335"
+           x="111.11049"
+           id="tspan12770"
+           sodipodi:role="line">:MainWindow</tspan></text>
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 1517.1429,1616.646 0,272.2856"
+       id="path12772"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       x="1337.1429"
+       y="1495.2194"
+       id="text12774"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan12776"
+         x="1337.1429"
+         y="1495.2194">UI Thread</tspan></text>
+    <g
+       id="g12778"
+       transform="translate(1062.3009,1547.1429)"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300">
+      <rect
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         id="rect12780"
+         width="235.49861"
+         height="54.070049"
+         x="990.10785"
+         y="15.898604" />
+      <text
+         xml:space="preserve"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+         x="997.50562"
+         y="57.826199"
+         id="text12782"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan12784"
+           x="997.50562"
+           y="57.826199">:OutWriter</tspan></text>
+    </g>
+    <path
+       inkscape:connector-curvature="0"
+       id="path12786"
+       d="m 2170.158,1616.6479 0,272.2857"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       sodipodi:nodetypes="cc"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:none;marker-end:none"
+       d="m 1516.9203,1734.0998 333.7238,0"
+       id="path12788"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       x="2004.3981"
+       y="1721.7872"
+       id="text12790"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan12792"
+         x="2004.3981"
+         y="1721.7872"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman, '">doWrite()</tspan></text>
+    <g
+       transform="translate(856.42919,1424.2838)"
+       id="g12794"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300">
+      <rect
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         id="rect12796"
+         width="305.49078"
+         height="54.062206"
+         x="95.826035"
+         y="138.75967" />
+      <text
+         xml:space="preserve"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+         x="201.22768"
+         y="180.68335"
+         id="text12798"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan12800"
+           x="201.22768"
+           y="180.68335">User</tspan></text>
+    </g>
+    <path
+       sodipodi:nodetypes="cc"
+       inkscape:connector-curvature="0"
+       id="path12802"
+       d="m 1105.0007,1616.646 0,272.2856"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       sodipodi:linespacing="125%"
+       id="text12804"
+       y="1672.5051"
+       x="1127.2863"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       xml:space="preserve"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman, '"
+         y="1672.5051"
+         x="1127.2863"
+         id="tspan12806"
+         sodipodi:role="line">actionHandle()</tspan></text>
+    <path
+       sodipodi:nodetypes="cc"
+       inkscape:connector-curvature="0"
+       id="path12808"
+       d="m 1104.5435,1683.7224 411.5942,0"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path12810"
+       d="m 2169.6173,1746.9164 79.802,0 0,90.9138 -78.7919,0"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path12812"
+       d="m 1845.1465,1850.9622 c -4.0406,-1.0102 -329.0979,0 -329.0979,0"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:none;marker-end:none"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       sodipodi:linespacing="125%"
+       id="text12814"
+       y="1838.9648"
+       x="1523.5656"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       xml:space="preserve"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman, '"
+         y="1838.9648"
+         x="1523.5656"
+         id="tspan12816"
+         sodipodi:role="line">handleFinished()</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       x="2262.9973"
+       y="1801.5892"
+       id="text12818"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan12820"
+         x="2262.9973"
+         y="1801.5892"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman, '">writing...</tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text12822"
+       y="1495.2194"
+       x="2037.1429"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       xml:space="preserve"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         y="1495.2194"
+         x="2037.1429"
+         id="tspan12824"
+         sodipodi:role="line">Worker Thread</tspan></text>
+    <path
+       inkscape:connector-curvature="0"
+       id="path12826"
+       d="m 1887.1152,1428.2723 0,457.627"
+       style="fill:none;stroke:#000000;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:16, 32;stroke-dashoffset:0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <g
+       id="g12828"
+       transform="translate(345.31794,1479.9995)"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300">
+      <path
+         sodipodi:nodetypes="czc"
+         inkscape:connector-curvature="0"
+         id="path12830"
+         d="m 1500.0268,241.79142 c 0,0 6.2321,4.37828 6,13.83928 -0.2321,9.46101 -6,13.83928 -6,13.83928"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 1504.4462,241.79142 c 0,0 6.2321,4.37828 6,13.83928 -0.2321,9.46101 -6,13.83929 -6,13.83929"
+         id="path12832"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="czc" />
+    </g>
+    <g
+       transform="translate(411.74651,1479.9995)"
+       id="g12834"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300">
+      <path
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 1500.0268,241.79142 c 0,0 6.2321,4.37828 6,13.83928 -0.2321,9.46101 -6,13.83928 -6,13.83928"
+         id="path12836"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="czc" />
+      <path
+         sodipodi:nodetypes="czc"
+         inkscape:connector-curvature="0"
+         id="path12838"
+         d="m 1504.4462,241.79142 c 0,0 6.2321,4.37828 6,13.83928 -0.2321,9.46101 -6,13.83929 -6,13.83929"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <g
+       transform="translate(339.22747,1593.9995)"
+       id="g12840"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300">
+      <g
+         id="g12842"
+         transform="matrix(-1,0,0,-1,3016.5698,511.78625)">
+        <path
+           sodipodi:nodetypes="czc"
+           inkscape:connector-curvature="0"
+           id="path12844"
+           d="m 1500.0268,241.79142 c 0,0 6.2321,4.37828 6,13.83928 -0.2321,9.46101 -6,13.83928 -6,13.83928"
+           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        <path
+           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           d="m 1504.4462,241.79142 c 0,0 6.2321,4.37828 6,13.83928 -0.2321,9.46101 -6,13.83929 -6,13.83929"
+           id="path12846"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="czc" />
+      </g>
+    </g>
+    <g
+       id="g13228"
+       transform="translate(405.65604,1593.9995)"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300">
+      <g
+         transform="matrix(-1,0,0,-1,3016.5698,511.78625)"
+         id="g13230">
+        <path
+           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           d="m 1500.0268,241.79142 c 0,0 6.2321,4.37828 6,13.83928 -0.2321,9.46101 -6,13.83928 -6,13.83928"
+           id="path13232"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="czc" />
+        <path
+           sodipodi:nodetypes="czc"
+           inkscape:connector-curvature="0"
+           id="path13234"
+           d="m 1504.4462,241.79142 c 0,0 6.2321,4.37828 6,13.83928 -0.2321,9.46101 -6,13.83929 -6,13.83929"
+           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      </g>
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 1922.5728,1735.2253 247.2349,0"
+       id="path13236"
+       inkscape:connector-curvature="0"
+       transform="translate(-4.9229925e-6,0)"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 1916.2594,1849.8776 253.0432,0"
+       id="path13238"
+       inkscape:connector-curvature="0"
+       transform="translate(-4.9229925e-6,0)"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       sodipodi:linespacing="125%"
+       id="text13240"
+       y="1721.7871"
+       x="1524.5757"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       xml:space="preserve"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman, '"
+         y="1721.7871"
+         x="1524.5757"
+         id="tspan13242"
+         sodipodi:role="line">emit beginWrite()</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       x="1931.6671"
+       y="1836.9446"
+       id="text13244"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/writer_async.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan13246"
+         x="1931.6671"
+         y="1836.9446"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman, '">emit finished()</tspan></text>
   </g>
 </svg>

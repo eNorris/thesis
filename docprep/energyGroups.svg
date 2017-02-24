@@ -14,7 +14,7 @@
    id="svg3828"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="New document 7">
+   sodipodi:docname="energyGroups.svg">
   <defs
      id="defs3830">
     <marker
@@ -69,54 +69,81 @@
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 29.294424,318.48634 0,71.72083"
        id="path3836"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/energy_groups.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 29.294424,354.34676 691.954496,0"
        id="path3838"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/energy_groups.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        inkscape:connector-curvature="0"
        id="path3840"
        d="m 721.24892,318.48634 0,71.72083"
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/energy_groups.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 92.199379,331.11325 0,46.46702"
        id="path3842"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/energy_groups.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
        id="path3844"
        d="m 218.00928,331.11325 0,46.46702"
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/energy_groups.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
        id="path3856"
        d="m 155.10432,331.11325 0,46.46702"
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/energy_groups.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 595.43903,331.11325 0,46.46702"
        id="path3870"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/energy_groups.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
        id="path3872"
        d="m 658.34402,331.11325 0,46.46702"
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/energy_groups.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        x="51.132702"
        y="399.25912"
        id="text3876"
-       sodipodi:linespacing="125%"><tspan
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/energy_groups.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
          sodipodi:role="line"
          id="tspan3878"
          x="51.132702"
@@ -129,7 +156,10 @@
        x="748.63037"
        style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        xml:space="preserve"
-       transform="matrix(0.70710678,0.70710678,-0.70710678,0.70710678,0,0)"><tspan
+       transform="matrix(0.70710678,0.70710678,-0.70710678,0.70710678,0,0)"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/energy_groups.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
          style="font-family:Times New Roman;-inkscape-font-specification:Times New Roman"
          y="-197.90408"
          x="748.63037"
@@ -143,7 +173,10 @@
        y="399.25912"
        x="113.80277"
        style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       xml:space="preserve"><tspan
+       xml:space="preserve"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/energy_groups.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
          style="font-family:Times New Roman;-inkscape-font-specification:Times New Roman"
          y="399.25912"
          x="113.80277"
@@ -155,7 +188,10 @@
        x="178.41193"
        y="399.25912"
        id="text3890"
-       sodipodi:linespacing="125%"><tspan
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/energy_groups.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
          sodipodi:role="line"
          id="tspan3892"
          x="178.41193"
@@ -168,7 +204,10 @@
        y="-150.36998"
        id="text3894"
        sodipodi:linespacing="125%"
-       transform="matrix(0.70710678,0.70710678,-0.70710678,0.70710678,0,0)"><tspan
+       transform="matrix(0.70710678,0.70710678,-0.70710678,0.70710678,0,0)"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/energy_groups.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
          sodipodi:role="line"
          id="tspan3896"
          x="701.09625"
@@ -182,7 +221,10 @@
        y="347.74133"
        x="379.43228"
        style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       xml:space="preserve"><tspan
+       xml:space="preserve"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/energy_groups.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
          style="font-family:Times New Roman;-inkscape-font-specification:Times New Roman"
          y="347.74133"
          x="379.43228"
@@ -194,7 +236,10 @@
        y="272.24387"
        x="28.11083"
        style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       xml:space="preserve"><tspan
+       xml:space="preserve"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/energy_groups.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
          style="font-family:Times New Roman;-inkscape-font-specification:Times New Roman"
          y="272.24387"
          x="28.11083"
@@ -206,7 +251,10 @@
        x="479.32706"
        y="272.24387"
        id="text3908"
-       sodipodi:linespacing="125%"><tspan
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/energy_groups.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
          sodipodi:role="line"
          id="tspan3910"
          x="479.32706"
@@ -216,11 +264,17 @@
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
        d="m 29.294424,283.6361 0,30.30457"
        id="path3912"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/energy_groups.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        inkscape:connector-curvature="0"
        id="path5128"
        d="m 721.24892,283.6361 0,30.30457"
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)" />
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/energy_groups.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
   </g>
 </svg>
