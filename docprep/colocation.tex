@@ -1,0 +1,671 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{bm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[toc,page]{appendix}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{fullpage}
+\usepackage{mathtools}
+\numberwithin{equation}{subsection}
+
+\begin{document}
+
+%%---------------------------------------------------------------------------%%
+%% collocation_methods.tex
+%%---------------------------------------------------------------------------%%
+
+%%---------------------------------------------------------------------------%%
+\chapter{Collocation Angular Methods}
+\label{cha:coll-angul-meth}
+%%---------------------------------------------------------------------------%%
+
+Many deterministic transport methods treat the angular terms on the left-hand
+side of Eq.~(\ref{eq:mg-transport}) using a finite-element collocation method.
+Foremost among these are discrete ordinates (\Sn), method of characteristics
+(MOC), and short characteristics schemes. In each of these methods, the
+right-hand side scattering kernel is expanded using Spherical Harmonics.  A
+finite element collocation discretization is then applied to the angular
+terms. The expansion of the scattering and source terms are described in
+\S\S~\ref{sec:angul-discr-scatt-1}--\ref{sec:angul-discr-extern}.  The angular
+collocation scheme is explained in \S~\ref{sec:angul-coll-discr}.
+
+%%---------------------------------------------------------------------------%%
+\section{Angular Discretization of Scattering Terms}
+\label{sec:angul-discr-scatt-1}
+%%---------------------------------------------------------------------------%%
+
+Equation~(\ref{eq:mg-transport}) is still an integro-differential equation in
+which the principal unknown, $\psi$, is present in the scattering integral.
+Additionally, the multigroup scattering cross section is a function of angle.
+Accordingly, we need some method for dealing with the angular dependence of
+the scattering source.  We tackle this problem by recognizing that
+$\sigma_{\text{s}}$ is only a function of the cosine between the incoming and
+outgoing angles (the polar scattering angle assuming azimuthal symmetry).
+Therefore, we can expand the scattering cross section in Legendre polynomials,
+\begin{equation}
+  \sigg{}(\vOmega'\cdot\vOmega)=\sum_{l=0}^{N}
+  \frac{2l+1}{4\pi}P_{l}(\vOmega'\cdot\vOmega)
+  \sigg{l}\:.
+  \label{eq:legendre-expansion-scattering}
+\end{equation}
+Integrating over all angles we calculate the total scattering cross section as
+follows:
+\begin{equation}
+  \begin{split}
+    \sigma_{\text{s}}^{gg'} &=
+    \int_{4\pi}\sigg{}(\vOmega'\cdot\vOmega)\:d\vOmega \equiv
+    2\pi\int_{-1}^{1}\sigg{}(\mu_o)\:d\mu_o\\
+    %%
+    &=\sum_{l=0}^{N}\frac{2l+1}{2}\sigg{l}\int_{-1}^{1}
+    P_0(\mu_o)P_l(\mu_o)\:d\mu_o\\
+    %%
+    &=\sigg{0}\:,
+  \end{split}
+\end{equation}
+where we have used the orthogonality of Legendre polynomials listed in
+Chap.~\ref{cha:math-prop-ident}.
+
+Applying Eq.~(\ref{eq:legendre-expansion-scattering}) in
+Eq.~(\ref{eq:mg-transport}) gives a scattering source defined by
+\begin{equation}
+  q^g_{s}(\vOmega) = \sum_{g'=0}^G \int_{4\pi}
+  \sum_{l=0}^N\frac{2l+1}{4\pi}P_{l}(\vOmega'\cdot\vOmega)\sigg{l}
+  \psi^{g'}(\vOmega')\:d\vOmega'\:,
+  \label{eq:scattering-source-before-addition}
+\end{equation}
+where we have suppressed the spatial dependence, $\ve{r}$.  The
+addition theorem of Spherical Harmonics can be used to evaluate the
+Legendre function, $P_l(\vOmega'\cdot\vOmega)$,
+\begin{equation}
+  P_l(\vOmega'\cdot\vOmega) = \frac{4\pi}{2l+1}\sum_{m=-l}^l
+  Y_{lm}(\vOmega)Y^{\ast}_{lm}(\vOmega')\:,
+\end{equation}
+where the $Y_{lm}$ are defined in Eq.~(\ref{eq:complete-spherical-harmonics}).
+The scattering must be real; therefore, we can follow a methodology similar to
+the techniques described in Chap.~\ref{cha:spher-harm-expans} that shows how
+to expand a real-valued function using complex Spherical Harmonics.  First,
+the expansion is split into positive and negative components of $m$,
+\begin{equation}
+  P_l(\vOmega'\cdot\vOmega) = \frac{4\pi}{2l+1}
+  \Bigl[
+  Y_{l0}(\vOmega)Y_{l0}(\vOmega') +
+  \sum_{m=1}^l
+  \bigl(Y_{lm}(\vOmega)Y^{\ast}_{lm}(\vOmega') +
+  Y_{l-m}(\vOmega)Y^{\ast}_{l-m}(\vOmega')\bigr)\Bigr]\:.
+\end{equation}
+Examining the $m=0$ term gives the following result
+\begin{equation}
+  Y_{l0} = \sqrt{\frac{2l+1}{4\pi}}\,P_{l0} = Y^e_{l0}\:,
+\end{equation}
+where the $Y^e$ are defined in Eq.~(\ref{eq:Ye}).
+
+Expanding the Spherical Harmonics into real and imaginary components as shown
+in Eq.~(\ref{eq:complex-Y}), the sum over $m>0$ becomes
+\begin{equation}
+  \sum_{m=1}^l\Bigl(
+  \hat{Y}^e_{lm}(\vOmega)\hat{Y}^e_{lm}(\vOmega') +
+  \hat{Y}^o_{lm}(\vOmega)\hat{Y}^o_{lm}(\vOmega') +
+  \hat{Y}^e_{l-m}(\vOmega)\hat{Y}^e_{l-m}(\vOmega') +
+  \hat{Y}^o_{l-m}(\vOmega)\hat{Y}^o_{l-m}(\vOmega')\Bigr)\:,
+\end{equation}
+where the imaginary terms have been set to zero because the scattering must be
+real.  Using Eqs.~(\ref{eq:Yem-Ye-m}) and (\ref{eq:Yom-Yo-m}), the summation
+becomes
+\begin{equation}
+  \sum_{m=1}^l\Bigl(
+  2\hat{Y}^e_{lm}(\vOmega)\hat{Y}^e_{lm}(\vOmega') +
+  2\hat{Y}^o_{lm}(\vOmega)\hat{Y}^o_{lm}(\vOmega')\Bigr)
+\end{equation}
+Comparing Eqs.~(\ref{eq:hat-Ye}) and (\ref{eq:hat-Yo}) with Eqs.~(\ref{eq:Ye})
+and (\ref{eq:Yo}) leads to the following relationships,
+\begin{equation}
+  \hat{Y}^e_{lm} = \frac{1}{\sqrt{2}}Y^e_{lm}\:,\quad
+  \hat{Y}^o_{lm} = \frac{1}{\sqrt{2}}Y^o_{lm}\:.
+\end{equation}
+After applying these equations in the $m>0$ terms and combining with the $m=0$
+term described above, the expression for $P_l(\vOmega\cdot\vOmega')$ is
+\begin{equation}
+  P_l(\vOmega'\cdot\vOmega) = \frac{4\pi}{2l+1}
+  \Bigl[
+  Y^e_{l0}(\vOmega)Y^e_{l0}(\vOmega') +
+  \sum_{m=1}^l
+  \bigl(Y^e_{lm}(\vOmega)Y^e_{lm}(\vOmega') +
+  Y^o_{lm}(\vOmega)Y^o_{lm}(\vOmega')\bigr)\Bigr]\:,
+  \label{eq:P_l(mu_o)}
+\end{equation}
+where, as shown in Chap.~\ref{cha:spher-harm-expans}, the $Y^e$ and $Y^o$ form
+an orthonormal basis.
+
+Returning to the scattering source defined in
+Eq.~(\ref{eq:scattering-source-before-addition}), Eq.~(\ref{eq:P_l(mu_o)})
+provides the Legendre polynomial for the cosine of the scattering angle, and
+\begin{equation}
+    q^g_{s}(\vOmega) = \sum_{g'=0}^G \int_{4\pi}
+    \sum_{l=0}^N
+    \Bigl[Y^e_{l0}(\vOmega)Y^e_{l0}(\vOmega')
+    +\sum_{m=1}^l
+    \bigl(Y^e_{lm}(\vOmega)Y^e_{lm}(\vOmega') +
+    Y^o_{lm}(\vOmega)Y^o_{lm}(\vOmega')\bigr)\Bigr]
+    \sigg{l}
+    \psi^{g'}(\vOmega')\:d\vOmega'\:.
+\end{equation}
+Rearranging terms and defining
+\begin{alignat}{3}
+  \even_{lm} &= \int_{4\pi}Y^e_{lm}(\vOmega)\psi^g(\vOmega)\:d\vOmega\:,
+  \quad& m\ge 0\:,\label{eq:even-flux}\\
+  %%
+  \odd_{lm} &= \int_{4\pi}Y^o_{lm}(\vOmega)\psi^g(\vOmega)\:d\vOmega\:,
+  \quad& m>0\:,\label{eq:odd-flux}
+\end{alignat}
+which follows directly from Eqs.~(\ref{eq:even_moment}) and
+(\ref{eq:odd_moment}), the scattering source becomes
+\begin{equation}
+  q^g_{s}(\ve{r},\vOmega) = \sum_{g'=0}^G
+  \sum_{l=0}^N
+  \sigg{l}(\ve{r})
+  \Bigl[
+  Y^e_{l0}(\vOmega)\evenp_{l0}(\ve{r}) +
+  \sum_{m=1}^l
+  \bigl(
+  Y^e_{lm}(\vOmega)\evenp_{lm}(\ve{r}) +
+  Y^o_{lm}(\vOmega)\oddp_{lm}(\ve{r})
+  \bigr)\Bigr]\:.
+  \label{eq:mg-scattering-source}
+\end{equation}
+Equation~(\ref{eq:mg-scattering-source}) is the multigroup anisotropic
+scattering source that is defined by the order of the Legendre expansion,
+$P_N$, of the scattering.  For a given $P_N$ order, $(N+1)^2$ moments are
+required to integrate the scattering operator.  The moments in
+Eqs.~(\ref{eq:even-flux}) and (\ref{eq:odd-flux}) are the \textit{angular flux
+  moments} or, simply, flux moments.
+
+The scalar flux is defined in Eq.(\ref{eq:scalar_flux}) as the zeroth moment
+of the angular flux.  Therefore, we have
+\begin{equation}
+  \phi^g = \int_{4\pi}\psi^g\:d\vOmega = \sqrt{4\pi}\int_{4\pi}Y^e_{00}
+  \psi^g\:d\vOmega = \sqrt{4\pi}\even_{00}\:.
+\end{equation}
+The current is defined
+\begin{equation}
+  \begin{split}
+    \ve{J}^g &= \int_{4\pi}\Bigl[\mu\psi^g\hat{\ve{e}}_x +
+    \eta\psi^g\hat{\ve{e}}_y +
+    \xi\psi^g\hat{\ve{e}}_z\Bigr]\:d\vOmega\\
+    %%
+    &=-\sqrt{\frac{4\pi}{3}}\even_{11}\hat{\ve{e}}_x -
+    \sqrt{\frac{4\pi}{3}}\odd_{11}\hat{\ve{e}}_y +
+    \sqrt{\frac{4\pi}{3}}\even_{10}\hat{\ve{e}}_z\:.
+  \end{split}
+\end{equation}
+More concisely,
+\begin{equation}
+  J_x^g = -\sqrt{\frac{4\pi}{3}}\even_{11}\:,\quad
+  J_y^g = -\sqrt{\frac{4\pi}{3}}\odd_{11}\:,\quad
+  J_z^g = \sqrt{\frac{4\pi}{3}}\even_{10}\:,
+\end{equation}
+for $\ve{J}= J_x\hat{\ve{e}}_x + J_y\hat{\ve{e}}_y
++J_z\hat{\ve{e}}_z$.
+
+%%---------------------------------------------------------------------------%%
+\subsection{Scattering Expansions in 2D Geometry}
+\label{sec:scatt-expans-2d}
+%%---------------------------------------------------------------------------%%
+
+To expand the scattering kernel in 2D geometry, we must define a symmetry
+plane.  We choose the $XY$-plane as the symmetry plane; although the
+$XZ$-plane could be chosen as well.  The resulting 2D $XY$ coordinate system
+is shown in Fig.~\ref{fig:2D_coord}.
+\begin{figure}
+  \begin{center}
+    \input{2D_coord.pdftex_t}
+  \end{center}
+  \caption{2D coordinate system used in \denovo.  Symmetry is defined about
+    the $XY$ plane.}
+  \label{fig:2D_coord}
+\end{figure}
+The anisotropic scattering source is defined in
+Eq.~(\ref{eq:mg-scattering-source}).  Using symmetry, the number of terms
+required to define this source can be reduced.  The symmetry illustrated in
+Fig.~\ref{fig:2D_coord} yields the following constraint equation
+\begin{equation}
+  \psi(\theta, \varphi) = \psi(\pi - \theta, \varphi)\:,\quad
+  0\le\theta\le\frac{\pi}{2}\:.
+\end{equation}
+With this constraint in mind, we expand the integral in
+Eq.~(\ref{eq:even-flux}) as follows
+\begin{equation}
+  \phi_{lm} = \int_{0}^{2\pi}d\varphi\int_{0}^{\pi}
+  Y^e_{lm}(\theta,\varphi)\psi(\theta,\varphi)\sin\theta\,d\theta\:.
+  \label{eq:expanded-even-moment}
+\end{equation}
+The inner integral over the polar angle can be split into 2 components,
+\begin{equation}
+    \int_{0}^{\pi}
+    Y^e_{lm}(\theta,\varphi)\psi(\theta,\varphi)\sin\theta\,d\theta =
+    \int_{0}^{\pi/2}Y^e_{lm}(\theta,\varphi)\psi(\theta,\varphi)
+    \sin\theta\,d\theta +
+    \int_{\pi/2}^{\pi}Y^e_{lm}(\theta,\varphi)\psi(\theta,\varphi)
+    \sin\theta\,d\theta\:.
+\end{equation}
+Transforming variables to $\theta'=\pi-\theta$ in the second integral on the
+right-hand side gives
+\begin{equation}
+  \int_{\pi/2}^{\pi}Y^e_{lm}(\theta,\varphi)\psi(\theta,\varphi)
+  \sin\theta\,d\theta = \int_{0}^{\pi/2}
+  Y^e_{lm}(\pi-\theta,\varphi)\psi(\pi-\theta,\varphi)
+  \sin(\pi-\theta)\,d\theta\:.
+\end{equation}
+Applying $\sin(\pi-\theta) = \sin\theta$ and the symmetry constraint to the
+preceding two equations and substituting into
+Eq.~(\ref{eq:expanded-even-moment}), the even angular flux moments become
+\begin{equation}
+  \phi_{lm} = \int_{0}^{2\pi}d\varphi
+  \int_{0}^{\pi/2}\bigl(Y^e_{lm}(\theta,\varphi) +
+  Y^e_{lm}(\pi-\theta,\varphi)\bigr)\psi(\theta,\varphi)
+    \sin\theta\,d\theta\:.
+\end{equation}
+Substituting Eq.~(\ref{eq:Ye}) into the preceding expression gives
+\begin{equation}
+  \phi_{lm} = \int_{0}^{2\pi}d\varphi
+  \int_{0}^{\pi/2}
+  D_{lm}\cos m\varphi\Bigl(
+  P_{lm}(\cos\theta) +
+  P_{lm}\bigl(\cos(\pi-\theta)\bigr)
+  \Bigr)
+  \psi(\theta,\varphi)\sin\theta\,d\theta\:.
+\end{equation}
+Using $\cos(\pi-\theta)=-\cos\theta$ and applying the following identity
+\cite{arfken},
+\begin{equation}
+  P_{lm}(-x) = (-1)^{l+m}P_{lm}(x)\:,
+\end{equation}
+we derive the following formula for calculating the even angular flux moments,
+\begin{equation}
+  \phi_{lm} = \int_{0}^{2\pi}d\varphi
+  \int_{0}^{\pi/2}
+  \bigl(1 + (-1)^{l+m}\bigr)
+  Y^e_{lm}(\theta,\varphi)\psi(\theta,\varphi)\sin\theta\,d\theta\:.
+\end{equation}
+Using the same procedure for the odd moments, the angular flux moments are
+defined
+\begin{align}
+  \phi_{lm} &= \int_{0}^{2\pi}d\varphi
+  \int_{0}^{1}
+  \bigl(1 + (-1)^{l+m}\bigr)
+  Y^e_{lm}(\theta,\varphi)\psi(\theta,\varphi)\,d\xi\:,
+  \label{eq:2D-even-moments}\\
+  \vartheta_{lm} &= \int_{0}^{2\pi}d\varphi
+  \int_{0}^{1}
+  \bigl(1 + (-1)^{l+m}\bigr)
+  Y^o_{lm}(\theta,\varphi)\psi(\theta,\varphi)\,d\xi\:,
+  \label{eq:2D-odd-moments}
+\end{align}
+where we have written the integrals over $d\theta$ using the substitution
+$\xi=\cos\theta$.  Equations~(\ref{eq:2D-even-moments}) and
+(\ref{eq:2D-odd-moments}) are the 2D equivalents of Eqs.~(\ref{eq:even-flux})
+and (\ref{eq:odd-flux}) when symmetry is defined about the $XY$ plane.
+
+A brief examination of Eqs.~(\ref{eq:2D-even-moments}) and
+(\ref{eq:2D-odd-moments}) reveals that for all odd sums of $l+m$ (ie.
+$l+m\in\{2k+1; \forall k\in Z\}$) the angular moments vanish. This results in
+$(N+1)(N+2)/2$ angular moments for $P_N$ scattering whereas 3D calculations
+require $(N+1)^2$ moments.  Furthermore, we only need to consider quadrature
+angles in the $0\le\xi\le 1$ directions and the factor of 2 that results when
+$l+m$ is even preserves the integration over $4\pi$; this is a natural result
+of symmetry in the polar direction.  Three-dimensional space contains 8
+octants that consist of 4 octants for $+\xi$ and 4 octants for $-\xi$.  In 2D
+space, only the 4 octants in $+\xi$ are required.  In 2D geometry these 4
+octants are referred to as quadrants.
+
+%%---------------------------------------------------------------------------%%
+\section{Angular Discretization of External Sources}
+\label{sec:angul-discr-extern}
+%%---------------------------------------------------------------------------%%
+
+In most cases, the external source will be a known function of angle.  For
+example, an isotropic external source is
+\begin{equation}
+  q^g_e(\vOmega) = \frac{s^g}{4\pi}\:.
+\end{equation}
+However, in certain cases (e.g. coupling to a $k$-eigenvalue calculation) the
+external source is defined in moments.
+Equation~(\ref{eq:Spherical_Harmonic_Expansion_f}) gives the Spherical
+Harmonics expansion of a real-valued function.  Applying the same methodology
+gives the expansion of the external source
+\begin{equation}
+  q^g_e(\vOmega) = \sum_{l=0}^{N}\Bigl[
+  Y^e_{l0}(\vOmega)\qe_{l0} +
+  \sum_{m=1}^{l}
+  \bigr(
+  Y^e_{lm}(\vOmega)\qe_{lm} + Y^o_{lm}(\vOmega)\qo_{lm}\bigr)
+  \Bigr]\:,
+  \label{eq:mg-external-source}
+\end{equation}
+where the spatial dependence has been suppressed.  The even and odd source
+moments are defined
+\begin{alignat}{3}
+  \qe_{lm} &= \int_{4\pi}Y^e_{lm}(\vOmega)q^g_e(\vOmega)\:d\vOmega\:,
+  \quad&m\ge 0\:,\label{eq:even-source}\\
+  \qo_{lm} &= \int_{4\pi}Y^o_{lm}(\vOmega)q^g_e(\vOmega)\:d\vOmega\:,
+  \quad&m>0\:.\label{eq:odd-source}
+\end{alignat}
+Now, using Eqs.(\ref{eq:mg-scattering-source}) and
+(\ref{eq:mg-external-source}), we write the entire source as
+\begin{equation}
+  \begin{split}
+    Q^g(\ve{r},\vOmega) &= q^g_s(\ve{r},\vOmega) +
+    q^g_e(\ve{r},\vOmega)\\
+    %%
+    &=\sum_{g'=0}^G
+    \sum_{l=0}^N
+    \sigg{l}(\ve{r})
+    \Bigl[
+    Y^e_{l0}(\vOmega)\evenp_{l0}(\ve{r}) +
+    \sum_{m=1}^l
+    \bigl(
+    Y^e_{lm}(\vOmega)\evenp_{lm}(\ve{r}) +
+    Y^o_{lm}(\vOmega)\oddp_{lm}(\ve{r})
+    \bigr)\Bigr]\\
+    %%
+    &\quad+
+    \sum_{l=0}^{N}\Bigl[
+    Y^e_{l0}(\vOmega)\qe_{l0}(\ve{r}) +
+    \sum_{m=1}^{l}
+    \bigl(
+    Y^e_{lm}(\vOmega)\qe_{lm}(\ve{r}) +
+    Y^o_{lm}(\vOmega)\qo_{lm}(\ve{r})\bigr)
+    \Bigr]\:.
+  \end{split}
+  \label{eq:mg-source}
+\end{equation}
+
+%%---------------------------------------------------------------------------%%
+\section{Angular Collocation Discretization}
+\label{sec:angul-coll-discr}
+%%---------------------------------------------------------------------------%%
+
+Combining Eqs.~(\ref{eq:mg-transport}) and (\ref{eq:mg-source}) gives the
+multigroup transport equation with the scattering expanded in Spherical
+Harmonics,
+\begin{equation}
+  \hOmega\cdot\grad\psi^g(\vOmega) +
+  \sigma^g\psi^g(\vOmega) = Q^g(\vOmega)\:
+  \label{eq:mg-transport-scattering+source}
+\end{equation}
+where the spatial dependence has been suppressed.  While Spherical Harmonics
+have been used to expand the scattering sources (and possibly the external
+source), we still have a dependence on $\vOmega$ that needs to be resolved.
+We apply the discrete ordinates ($S_N$) approximation, which is a collocation
+method in angle.  Solving Eq.~(\ref{eq:mg-transport-scattering+source}) at
+discrete angular locations requires the following equation,
+\begin{equation}
+    \hOmega_a\cdot\grad\psi^g_a +
+    \sigma^g\psi^g_a
+    =\sum_{g'=0}^G
+    \sum_{l=0}^N
+    \sigg{l}
+    \Bigl[
+    Y^e_{l0}(\vOmega_a)\evenp_{l0} +
+    \sum_{m=1}^l
+    \bigl(
+    Y^e_{lm}(\vOmega_a)\evenp_{lm} +
+    Y^o_{lm}(\vOmega_a)\oddp_{lm}
+    \bigr)\Bigr]\\
+    + q_e^g(\vOmega_a)\:,
+    \label{eq:MG-SN-Equation}
+ \end{equation}
+where $\psi^g_a \equiv\psi^g(\vOmega_a)$.  The angles are integrated by a
+quadrature rule such that
+\begin{equation}
+  \int_{4\pi}d\vOmega = \sum_{a=1}^{n}w_a = 4\pi\:,
+\end{equation}
+where $w_a$ are the quadrature weights, and $n$ is the total number of angles.
+Different quadrature sets have different numbers of unknowns.  The
+Level-Symmetric quadrature set has $n = N(N+2)$ unknowns for an $S_N$
+approximation.
+
+Given that many angles result from even low-order $S_N$ approximations, we see
+why the source has been expanded in Spherical Harmonics.  Consider, an $S_8$
+calculation has 80 angles per unknown location per group.  For a $P_3$
+expansion 16 moments are required to define the source, a factor of 5
+reduction in memory storage.  An $S_{16}$ calculation could be used for more
+accuracy with a $P_3$ calculation resulting in a factor of 18 savings in
+memory.
+
+Using the quadrature integration rule the flux moments in
+Eqs.~(\ref{eq:even-flux}) and (\ref{eq:odd-flux}) are evaluated using
+\begin{align}
+  \even_{lm} &= \sum_{a=1}^{n}Y^e_{lm}(\vOmega_a)\psi^g_a w_a\:,
+  \label{eq:even-flux-quad-int}\\
+  \odd_{lm} &= \sum_{a=1}^{n}Y^o_{lm}(\vOmega_a)\psi^g_a w_a\:.
+  \label{eq:odd-flux-quad-int}
+\end{align}
+Similarly, the source moments in Eqs.~(\ref{eq:even-source}) and
+(\ref{eq:odd-source}) are calculated using
+\begin{align}
+  \qe_{lm} &= \sum_{a=1}^{n}Y^e_{lm}(\vOmega_a)q^g_e(\vOmega_a) w_a\:,\\
+  \qo_{lm} &= \sum_{a=1}^{n}Y^o_{lm}(\vOmega_a)q^g_e(\vOmega_a) w_a\:.
+\end{align}
+The $S_N$ method will be conservative if the quadrature set effectively
+integrates the even and odd Spherical Harmonics.  If the orthogonality
+conditions in Eqs.~(\ref{eq:Ye-orthogonality}) and (\ref{eq:Yo-orthogonality})
+are preserved, then integrating the anisotropic scattering should yield,
+\begin{equation}
+  \int_{4\pi}q_s^g(\vOmega)\,d\vOmega =
+  \sum_{a=1}^{n}q_s^g(\vOmega_a)w_a = \sqrt{4\pi}\sigg{0}\evenp_{00}
+    = \sigma^{gg'}_{s}\phi^{g'}\:,
+\end{equation}
+which will yield a conservative particle balance equation.
+
+%%---------------------------------------------------------------------------%%
+\section{Operator Form of the Discrete Ordinates Equation}
+\label{sec:oper-form-discr-1}
+%%---------------------------------------------------------------------------%%
+
+The multigroup discrete ordinates, or \Sn\, equation is (see
+Eq.~(\ref{eq:MG-SN-Equation}))
+\begin{multline}
+    \hOmega_a\cdot\grad\psi^g_a(\ve{r}) +
+    \sigma^g(\ve{r})\psi^g_a(\ve{r})
+    \\=\sum_{g'=0}^G
+    \sum_{l=0}^N
+    \sigg{l}(\ve{r})
+    \Bigl[
+    Y^e_{l0}(\vOmega_a)\evenp_{l0}(\ve{r})
+    +
+    \sum_{m=1}^l
+    \bigl(
+    Y^e_{lm}(\vOmega_a)\evenp_{lm}(\ve{r}) +
+    Y^o_{lm}(\vOmega_a)\oddp_{lm}(\ve{r})
+    \bigr)\Bigr]
+    +
+    q_e^g(\ve{r}, \vOmega_a)
+    \:.
+    \tag{\ref{eq:MG-SN-Equation}}
+\end{multline}
+We defer the spatial treatment of Eq.~(\ref{eq:MG-SN-Equation}) until
+Chap.~\ref{cha:spat-discr-sn}.  This equation can be written using a concise
+operator notation that helps illuminate numerical solution techniques.  The
+operator form of Eq.~(\ref{eq:MG-SN-Equation}) is
+\begin{equation}
+  \ve{L}\Psi = \ve{M}\ve{S}\Phi + Q\:.
+  \label{eq:operator-transport}
+\end{equation}
+Here we use the convention that bold letters represent discrete operators or
+matrices and script symbols and letters represent vectors.
+
+The sizes of the operators in Eq.~(\ref{eq:operator-transport}) are determined
+from the following dimensions:
+\begin{equation}
+  \begin{aligned}
+    N_g &= \text{number of groups}\:,\\
+    t   &= \text{number of moments}\:,\\
+    n   &= \text{number of angles}\:,\\
+    N   &= \text{$P_N$ order}\:,\\
+    N_c &= \text{number of cells}\:,\\
+    N_e &= \text{number of unknowns per cell}\:.
+  \end{aligned}
+\end{equation}
+Now, we define
+\begin{align}
+  a &= N_g\times n\times N_c\times N_e\:,\\
+  f &= N_g\times t\times N_c\times N_e\:.
+\end{align}
+Equation~(\ref{eq:operator-transport}) can then be defined in terms of
+the sizes of the operators,
+\begin{equation}
+  (a\times a)(a\times 1) = (a\times f)(f\times f)(f\times 1) +
+  (a\times 1)\:.
+  \label{eq:operator-sizes}
+\end{equation}
+More specifically, with the groups defined over the range $g\in[0,G]$,
+at each spatial unknown we can write
+\begin{equation}
+    \ve{L}
+    \begin{pmatrix}
+      \Psi_0 \\
+      \Psi_1 \\
+      \Psi_2 \\
+      \vdots   \\
+      \Psi_G
+    \end{pmatrix} =
+    \begin{pmatrix}
+      \ve{M} & 0 & 0 & 0 & 0 \\
+      0 & \ve{M} & 0 & 0 & 0 \\
+      0 & 0 & \ve{M} & 0 & 0 \\
+      0 & 0 & 0 & \ddots & 0 \\
+      0 & 0 & 0 & 0 & \ve{M} \\
+    \end{pmatrix}
+    %%
+    \begin{pmatrix}
+      \ve{S}_{00} & \ve{S}_{01} & \ve{S}_{02} & \cdots &
+      \ve{S}_{0G} \\
+      \ve{S}_{10} & \ve{S}_{11} & \ve{S}_{12} & \cdots &
+      \ve{S}_{1G} \\
+      \ve{S}_{20} & \ve{S}_{21} & \ve{S}_{22} & \cdots &
+      \ve{S}_{2G} \\
+      \vdots & \vdots & \vdots & \ddots & \vdots \\
+      \ve{S}_{G0} & \ve{S}_{G1} & \ve{S}_{G2} & \cdots &
+      \ve{S}_{GG}
+    \end{pmatrix}
+    \begin{pmatrix}
+      \Phi_0 \\
+      \Phi_1 \\
+      \Phi_2 \\
+      \vdots   \\
+      \Phi_G
+    \end{pmatrix}
+    %%
+    +
+    \begin{pmatrix}
+      Q_0 \\
+      Q_1 \\
+      Q_2 \\
+      \vdots   \\
+      Q_G
+    \end{pmatrix}\:,
+    \label{eq:matrix-transport}
+\end{equation}
+Here, $\Psi_g$ and $Q_g$ are vectors of size $n$,
+\begin{align}
+  \Psi_g &= \begin{pmatrix}
+    \psi^g_1 & \psi^g_2 & \psi^g_3 & \cdots \psi^g_n
+  \end{pmatrix}^T\:,\\
+  Q_g &= \begin{pmatrix}
+    Q^g_1 & Q^g_2 & Q^g_3 & \cdots Q^g_n
+  \end{pmatrix}^T\:.
+\end{align}
+The spatial unknowns are implicit in the above matrices and will be
+investigated in Chaps.~\ref{cha:spat-discr-sn} and
+\ref{cha:transp-solut-meth}.
+
+The operator $\ve{M}$ is the moment-to-discrete matrix. It is used to project
+harmonic moments onto discrete angle space, and it is defined
+\begin{equation}
+  {\small
+    \ve{M} = \begin{pmatrix}
+      \Ye{00}{1} & \Ye{10}{1} & \Yo{11}{1} & \Ye{11}{1} &
+      \Ye{20}{1} & \cdots & \Yo{NN}{1} & \Ye{NN}{1} \\
+      \Ye{00}{2} & \Ye{10}{2} & \Yo{11}{2} & \Ye{11}{2} &
+      \Ye{20}{2} & \cdots & \Yo{NN}{2} & \Ye{NN}{2} \\
+      \Ye{00}{3} & \Ye{10}{3} & \Yo{11}{3} & \Ye{11}{3} &
+      \Ye{20}{3} & \cdots & \Yo{NN}{3} & \Ye{NN}{3} \\
+      \vdots     & \vdots     & \vdots     & \vdots     &
+      \vdots     &        & \vdots     & \vdots     \\
+      \Ye{00}{n} & \Ye{10}{n} & \Yo{11}{n} & \Ye{11}{n} &
+      \Ye{20}{n} & \cdots & \Yo{NN}{n} & \Ye{NN}{n}
+  \end{pmatrix}}\:.
+\end{equation}
+The moments of the angular flux are calculated from discrete angular fluxes
+using the moment-to-discrete matrix,
+\begin{equation}
+  \phi = \ve{D}\psi\:.
+\end{equation}
+Clearly, the discrete form of $\ve{D}$ is defined by the quadrature
+integration rules in Eqs.~(\ref{eq:even-flux-quad-int}) and
+(\ref{eq:odd-flux-quad-int}),
+\begin{equation}
+    \ve{D} = \ve{M}^{T}\ve{W}\:.
+\end{equation}
+where $\ve{W}$ is an $(a\times a)$ diagonal matrix of the quadrature weights.
+Using the definition of $\ve{M}$ from Eq.~(\ref{eq:operator-sizes}), the size
+of $\ve{D}$ can be determined from
+\begin{equation}
+  \ve{D} \equiv (f\times a)(a\times a) = (f\times a)\:.
+\end{equation}
+The $\ve{D}$ matrix has the following form
+\begin{equation}
+  \ve{D} = \begin{pmatrix}
+    w_1\Ye{00}{1} & w_2\Ye{00}{2} & w_3\Ye{00}{3} & \cdots & w_n\Ye{00}{n} \\
+    w_1\Ye{10}{1} & w_2\Ye{10}{2} & w_3\Ye{10}{3} & \cdots & w_n\Ye{10}{n} \\
+    w_1\Yo{11}{1} & w_2\Yo{11}{2} & w_3\Yo{11}{3} & \cdots & w_n\Yo{11}{n} \\
+    w_1\Ye{11}{1} & w_2\Ye{11}{2} & w_3\Ye{11}{3} & \cdots & w_n\Ye{11}{n} \\
+    w_1\Ye{20}{1} & w_2\Ye{20}{2} & w_3\Ye{20}{3} & \cdots & w_n\Ye{20}{n} \\
+    \vdots & \vdots & \vdots & & \vdots \\
+    w_1\Yo{NN}{1} & w_2\Yo{NN}{2} & w_3\Yo{NN}{3} & \cdots & w_n\Yo{NN}{n} \\
+    w_1\Ye{NN}{1} & w_2\Ye{NN}{2} & w_3\Ye{NN}{3} & \cdots & w_n\Ye{NN}{n}
+  \end{pmatrix}\:.
+\end{equation}
+Also, even though $\ve{M}$ projects angular flux moments onto discrete angular
+flux space, in general $\psi\ne\ve{M}\phi$ unless $\ve{M} = \ve{D}^{-1}$.
+This condition is met when using the \textit{Galerkin} quadrature set, but
+most quadrature sets do not satisfy this requirement. The moments of the
+angular flux vector are defined
+\begin{equation}
+  \Phi_g = \begin{pmatrix}
+    \even_{00} & \even_{10} & \odd_{11} & \even_{11} & \even_{20}
+    & \cdots & \odd_{NN} & \even_{NN}
+  \end{pmatrix}^T\:,
+\end{equation}
+
+The scattering cross sections are defined
+\begin{equation}
+  \ve{S}_{gg'} = \begin{pmatrix}
+    \sigg{0} & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & \sigg{1} & 0 & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & \sigg{1} & 0 & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & \sigg{1} & 0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & \sigg{2} & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & \ddots   & 0 & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & \sigg{N} & 0 \\
+    0 & 0 & 0 & 0 & 0 & 0 & 0 & \sigg{N}
+  \end{pmatrix}\:.
+\end{equation}
+Here the block-matrix $\ve{S}_{gg'}$ defines scattering cross sections for
+particles that scatter from group $g'$ into group $g$.  The lower triangular
+part of $\ve{S}$ represents down-scattering, the diagonal represents in-group
+scattering, and the upper diagonal is up-scattering.
+
+%%---------------------------------------------------------------------------%%
+%% end of collocation_methods.tex
+%%---------------------------------------------------------------------------%%
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "exnihilo"
+%%% End:
+
+\end{document}

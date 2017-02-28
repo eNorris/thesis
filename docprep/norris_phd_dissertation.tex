@@ -1,0 +1,112 @@
+ % -*- mode: LaTeX -*-
+ % ... preamble ...
+\documentclass[times,12pt,titlepage]{mstthesis}
+\doublespacing
+\usepackage{threeparttable}
+\usepackage[final]{graphicx}
+\usepackage{psfrag}
+\usepackage[noprefix]{nomencl}
+\makenomenclature
+\renewcommand{\nomgroup}[1]{
+   \ifthenelse{\equal{#1}{A}}{\medskip \item \textbf{Roman}}{}%
+   \ifthenelse{\equal{#1}{G}}{\medskip \item \textbf{Greek}}{}%
+   \ifthenelse{\equal{#1}{S}}{\medskip \item \textbf{Subscripts}}{}%
+}
+\usepackage[nopar]{lipsum} % ... provides dummy text ...
+
+ % ... end preamble ...
+
+\begin{document}
+
+ % ... specify: ms or phd ...
+
+\begin{ThesisTitlePage}{phd}
+
+ % ... title page info ...
+
+\author{\MakeUppercase{Edward T. Norris}}
+
+\thesistitle{\MakeUppercase{Discrete Ordinates CT Organ Dose Simulator (DOCTORS)}}
+
+\department{Nuclear Engineering}
+
+ % ... thesis committee ...
+
+\ThesisAdviser{Xin Liu}
+
+ % If you have a co-advisor, enter the name in the
+ % curly braces below and uncomment.
+ % Otherwise, leave commented out.
+ %\cothadviser{} % If you have 2 thesis advisers
+
+\memberone{Ayodeji Alajo}
+\membertwo{Hyoung Koo Lee}
+\memberthree{Gary Mueller}
+\memberfour{Fikret Ercal}
+%\memberfive{Prandtl}
+
+ % ... Graduation date - NOT your submission date ...
+\graddate{2017}
+
+\end{ThesisTitlePage}
+ % ... copyright page - true|false ...
+
+\copyrightyear{2017}
+\ThesisCopyrightPage{true}
+
+ % ... front matter - thesis abstract ...
+
+\begin{ThesisAbstract}
+I went to the park one day. It was rainy.
+\end{ThesisAbstract}
+
+ % ... front matter - thesis acknowledgements ...
+
+\begin{ThesisAcknowledgment}
+I would like to thank these people. They are all so super cool. So much coolness. So much so that this is now over a line long.
+
+And these funding agencies.
+\end{ThesisAcknowledgment}
+\begin{ThesisFrontMatter}
+\tableofcontents
+\listoffigures
+\listoftables
+\listofsymbols
+\end{ThesisFrontMatter}
+
+\begin{ThesisBody}
+
+ % ... introduction chapter ...
+\ThesisBodyChapter{Introduction}\input{chapintro}
+ % ... chapter ...
+\ThesisBodyChapter{Literature Review}\input{chapbib}
+ % ... chapter ...
+\ThesisBodyChapter{Methods}\input{chapmeth}
+
+\ThesisBodyChapter{Implementation}\input{chapimpl}
+ % ... conclusions chapter ...
+\ThesisBodyChapter{Conclusions}\input{chapconc}
+
+\end{ThesisBody}
+ % ... appendix - specify number of appendix chapters ...
+
+\begin{ThesisAppendix}{two}
+\ThesisAppendixChapter{One}\input{appdx_a}
+\ThesisAppendixChapter{Two}\input{appdx_b}
+\end{ThesisAppendix}
+
+ % ... references - comma separated list of bib files ...
+
+\begin{ThesisBibliography}{BIBLIOGRAPHY}
+\bibliographystyle{plainnat}
+\bibliography{add.bib}
+\end{ThesisBibliography}
+
+ % ... vita ...
+
+\begin{Vita}
+\lipsum[4-5]
+\end{Vita}
+
+\end{document}
+
