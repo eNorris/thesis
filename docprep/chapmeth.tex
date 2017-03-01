@@ -320,7 +320,7 @@ Scatter is assumed to be a function of only the scatter angle between the initia
 The data files containing the scatter cross sections are distributed using a Legendre polynomial expansion. The use of a Legendre expansion removes the dependence on the quadrature from the data. This allows any quadrature to work with any dataset. A $l$-order Legendre polynomial is donoted by $P_l$. The anisotropic scatter cross section can then be rewritten as a Legendre expansion given in Eq.~\ref{eq:leg_1} where the scatter cosine is defined in Eq.~\ref{eq:scat_cos}
 
 \begin{equation} \label{eq:leg_1}
-\Sigma_{s, i, a, a'}^{g, g'} = \sum_l=0^L \frac{2l+1}{4 \pi}\Sigma_{s, i, l}^{g, g'} P_l(\mu_s)
+\Sigma_{s, i, a, a'}^{g, g'} = \sum_{l=0}^L \frac{2l+1}{4 \pi}\Sigma_{s, i, l}^{g, g'} P_l(\mu_s)
 \end{equation}
 
 \begin{equation} \label{eq:scat_cos}
