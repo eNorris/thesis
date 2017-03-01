@@ -8,3 +8,6 @@
 /norris_phd_dissertation.pdf
 *.pdf
 *.tex~
+*.bbl
+*.blg
+*.bib~

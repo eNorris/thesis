@@ -105,7 +105,7 @@ Continuous energy is discretized into $G$ groups indexed from 0 to $G-1$. Upscat
 
 \subsection{Spatial Discretization}
 
-Finally, Eq.~\ref{eq:boltz_e} is discretized in space to give Eq.~\ref{eq:boltz_r} which is fully discretized. The problem domain is split into an evenly spaced Cartesian grid. The grid spacing between each of the spatial dimensions does not necessarily need to be uniform, but it often is in the case of CT voxel phantoms.
+Finally, Eq.~\ref{eq:boltz_e} is discretized in space to give Eq.~\ref{eq:boltz_i} which is fully discretized. The problem domain is split into an evenly spaced Cartesian grid. The grid spacing between each of the spatial dimensions does not necessarily need to be uniform, but it often is in the case of CT voxel phantoms.
 
 The problem domain must be a regular rectangular parallelpiped of size $D_x$, $D_y$, and $D_z$ in the $x$, $y$, and $z$ directions respectively. The mesh is partitioned into $N_x$, $N_y$, and $N_z$ evenly spaced bins along each direction. The total number of voxels, $N_V$ is easily computed as the multiple of each of the component directions given in Eq.~\ref{eq:n_v}.
 
@@ -157,7 +157,7 @@ To the first order, a partial derivitive can be computed using Eq.~\ref{eq:deriv
 
 Using the definition of $\Omega$ and Eq.~\ref{eq:grad} the $\hat{\Omega} \cdot \nabla \psi$ term can be rewritten using Eq.~\ref{eq:spatial_1}
 
-\begin{equation} \label{eq:deriv_1}
+\begin{equation} \label{eq:spatial_1}
 \begin{split}
 \Omega \cdot \nabla \psi & \approx 
 \left\langle \mu, \eta, \xi \right\rangle \cdot
