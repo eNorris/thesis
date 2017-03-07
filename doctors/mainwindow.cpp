@@ -89,9 +89,7 @@ MainWindow::MainWindow(QWidget *parent):
     m_configSelectDialog->setFileMode(QFileDialog::ExistingFile);
 
     m_parser = new AmpxParser;
-
     m_solver = new Solver;
-
     m_xs = new XSection();
 
     // Connect explore buttons
