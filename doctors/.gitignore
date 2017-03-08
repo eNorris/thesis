@@ -5,3 +5,6 @@
 *.dat
 *.png
 *.pro.user.b7091d2
+/Obj/
+/cuda_common/
+/doctors

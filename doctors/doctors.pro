@@ -59,7 +59,12 @@ SOURCES += main.cpp\
     solver.cpp \
     histogram.cpp \
     mcnpwriter.cpp \
-    gui/energydialog.cpp
+    gui/energydialog.cpp \
+    cuda_link.cu \
+    cuda_kernels.cu
+
+SOURCES -= cuda_kernels.cu \
+           cuda_link.cu
 
 HEADERS  += mainwindow.h \
     gui/outputdialog.h \
@@ -86,7 +91,13 @@ HEADERS  += mainwindow.h \
     histogram.h \
     mcnpwriter.h \
     globals.h \
-    gui/energydialog.h
+    gui/energydialog.h \
+    cuda_link.h \
+    cuda_kernels.h
+
+
+HEADERS -= cuda_link.h \
+    cuda_kernels.h
 
 FORMS    += mainwindow.ui \
     gui/outputdialog.ui \
@@ -101,10 +112,49 @@ DISTFILES += \
 
 # Copies testinput.cfg from the source directory to the build directory (where the executable lives) so that it can be found and parsed
 #   properly.
-install_it.path = $$OUT_PWD
-install_it.files = testinput.cfg
-INSTALLS += install_it
+#install_it.path = $$OUT_PWD
+#install_it.files = testinput.cfg
+#INSTALLS += install_it
 
-# This project relies on libconfig++ being installed. To install it, download libconfig-X.X.tar.gz from http://www.hyperrealm.com/libconfig/  unzip.
-#   Follow the directions in the INSTALL file. Then run "sudo ldconfig" to update the LD path variables so it can be found.
-#unix|win32: LIBS += -lconfig++
+
+# ===== Extra stuff for CUDA =====
+# From: https://cudaspace.wordpress.com/2012/07/05/qt-creator-cuda-linux-review/
+DESTDIR     = $$system(pwd)
+OBJECTS_DIR = $$DESTDIR/Obj
+# C++ flags
+QMAKE_CXXFLAGS_RELEASE =-O3  # C++ flags
+
+# Cuda sources
+CUDA_SOURCES += cuda_kernels.cu \
+                cuda_link.cu
+
+# Path to cuda toolkit install
+CUDA_DIR      = /usr/local/cuda-7.0
+CUDA_SDK =
+# Path to header and libs files
+INCLUDEPATH  += $$CUDA_DIR/include
+QMAKE_LIBDIR += $$CUDA_DIR/lib64     # For a 64 bits Operating system
+# libs used in your code
+LIBS += -lcudart -lcuda
+# GPU architecture
+CUDA_ARCH     = sm_35                # This depends of the GPU
+# Here are some NVCC flags I've always used by default.
+NVCCFLAGS     = --compiler-options -fno-strict-aliasing -use_fast_math --ptxas-options=-v
+
+# Prepare the extra compiler configuration (taken from the nvidia forum - i'm not an expert in this part)
+CUDA_INC = $$join(INCLUDEPATH,' -I','-I',' ')
+
+cuda.commands = $$CUDA_DIR/bin/nvcc -m64 -O3 -arch=$$CUDA_ARCH -c $$NVCCFLAGS \
+                $$CUDA_INC $$LIBS  ${QMAKE_FILE_NAME} -o ${QMAKE_FILE_OUT} \
+                2>&1 | sed -r \"s/\\(([0-9]+)\\)/:\\1/g\" 1>&2
+# nvcc error printout format ever so slightly different from gcc
+# http://forums.nvidia.com/index.php?showtopic=171651
+
+cuda.dependency_type = TYPE_C # there was a typo here. Thanks workmate!
+cuda.depend_command = $$CUDA_DIR/bin/nvcc -O3 -M $$CUDA_INC $$NVCCFLAGS   ${QMAKE_FILE_NAME}
+
+cuda.input = CUDA_SOURCES
+cuda.output = ${OBJECTS_DIR}${QMAKE_FILE_BASE}_cuda.o
+# Tell Qt that we want add more stuff to the Makefile
+QMAKE_EXTRA_COMPILERS += cuda
+
