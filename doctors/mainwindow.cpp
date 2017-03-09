@@ -9,6 +9,7 @@
 #include "quadrature.h"
 #include "mesh.h"
 #include "xsection.h"
+#include "solverparams.h"
 
 #include "gui/outputdialog.h"
 #include "gui/geomdialog.h"
@@ -44,7 +45,8 @@ MainWindow::MainWindow(QWidget *parent):
     m_mesh(NULL),
     m_xs(NULL),
     m_quad(NULL),
-    m_params(NULL),
+    m_solvParams(NULL),
+    m_srcParams(NULL),
     outputDialog(NULL),
     geomDialog(NULL),
     quadDialog(NULL),
@@ -84,7 +86,8 @@ MainWindow::MainWindow(QWidget *parent):
 
     m_parser = new AmpxParser;
     m_solver = new Solver;
-    m_xs = new XSection();
+    m_xs = new XSection;
+    m_solvParams = new SolverParams;
 
     // Connect explore buttons
     connect(ui->actionSolution_Explorer, SIGNAL(triggered()), outputDialog, SLOT(show()));
@@ -164,6 +167,13 @@ MainWindow::~MainWindow()
     if(m_parser != NULL)
         delete m_parser;
 
+    if(m_solvParams != NULL)
+        delete m_solvParams;
+
+
+    if(m_srcParams != NULL)
+        delete m_srcParams;
+
     delete m_goodPalette;
     delete m_badPalette;
 
@@ -192,21 +202,21 @@ void MainWindow::on_launchSolverPushButton_clicked()
             return;
     }
 
-    if(m_params == NULL)
+    if(m_srcParams == NULL)
     {
         QString errmsg = QString("The energy spectra must be loaded before a MCNP6 file can be generated.");
         QMessageBox::warning(this, "Insufficient Data", errmsg, QMessageBox::Close);
         return;
     }
 
-    if(!m_params->update(energyDialog->getUserIntensity(), ui->sourceXDoubleSpinBox->value(), ui->sourceYDoubleSpinBox->value(), ui->sourceZDoubleSpinBox->value()))
+    if(!m_srcParams->update(energyDialog->getUserIntensity(), ui->sourceXDoubleSpinBox->value(), ui->sourceYDoubleSpinBox->value(), ui->sourceZDoubleSpinBox->value()))
     {
         QString errmsg = QString("Could not update the energy intensity data. The energy structure may have changed.");
         QMessageBox::warning(this, "Invalid Vector Size", errmsg, QMessageBox::Close);
         return;
     }
 
-    if(!m_params->normalize())
+    if(!m_srcParams->normalize())
     {
         QString errmsg = QString("The energy spectrum total is zero.");
         QMessageBox::warning(this, "Divide by zero", errmsg, QMessageBox::Close);
@@ -217,13 +227,13 @@ void MainWindow::on_launchSolverPushButton_clicked()
     switch(m_solType)
     {
     case MainWindow::ISOTROPIC:
-        emit signalLaunchRaytracerIso(m_quad, m_mesh, m_xs, m_params);
+        emit signalLaunchRaytracerIso(m_quad, m_mesh, m_xs, m_srcParams);
         break;
     case MainWindow::LEGENDRE:
-        emit signalLaunchRaytracerLegendre(m_quad, m_mesh, m_xs, m_pn, m_params);
+        emit signalLaunchRaytracerLegendre(m_quad, m_mesh, m_xs, m_pn, m_srcParams);
         break;
     case MainWindow::HARMONIC:
-        emit signalLaunchRaytracerHarmonic(m_quad, m_mesh, m_xs, m_pn, m_params);
+        emit signalLaunchRaytracerHarmonic(m_quad, m_mesh, m_xs, m_pn, m_srcParams);
         break;
     default:
         qDebug() << "No solver of type " << m_solType;
@@ -490,7 +500,7 @@ void MainWindow::on_actionMCNP6_Generation_triggered()
         return;
     }
 
-    if(m_params == NULL)
+    if(m_srcParams == NULL)
     {
         /*
         if(energyDialog->getUserIntensity().size() == 0)
@@ -507,14 +517,14 @@ void MainWindow::on_actionMCNP6_Generation_triggered()
         return;
     }
 
-    if(!m_params->update(energyDialog->getUserIntensity(), ui->sourceXDoubleSpinBox->value(), ui->sourceYDoubleSpinBox->value(), ui->sourceZDoubleSpinBox->value()))
+    if(!m_srcParams->update(energyDialog->getUserIntensity(), ui->sourceXDoubleSpinBox->value(), ui->sourceYDoubleSpinBox->value(), ui->sourceZDoubleSpinBox->value()))
     {
         QString errmsg = QString("Could not update the energy intensity data. The energy structure may have changed.");
         QMessageBox::warning(this, "Invalid Vector Size", errmsg, QMessageBox::Close);
         return;
     }
 
-    if(!m_params->normalize())
+    if(!m_srcParams->normalize())
     {
         QString errmsg = QString("The energy spectrum total is zero.");
         QMessageBox::warning(this, "Divide by zero", errmsg, QMessageBox::Close);
@@ -524,7 +534,7 @@ void MainWindow::on_actionMCNP6_Generation_triggered()
     //m_params->spectraIntensity = energyDialog->getUserIntensity();
 
     McnpWriter mcnpwriter;
-    mcnpwriter.writeMcnp("../mcnp.gitignore/mcnp_out.inp", m_mesh, m_params, false);
+    mcnpwriter.writeMcnp("../mcnp.gitignore/mcnp_out.inp", m_mesh, m_srcParams, false);
 }
 
 void MainWindow::xsParseErrorHandler(QString msg)
@@ -545,7 +555,7 @@ void MainWindow::xsParseFinished(AmpxParser *parser)
     outputDialog->setEnergyGroups(parser->getGammaEnergyGroups());
     energyDialog->setEnergy(parser);
 
-    m_params = new SourceParams(parser);
+    m_srcParams = new SourceParams(parser);
 
     ui->mainProgressBar->setValue(0);
 }

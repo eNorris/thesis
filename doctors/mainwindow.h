@@ -22,6 +22,7 @@ class Quadrature;
 class Mesh;
 class XSection;
 class SourceParams;
+class SolverParams;
 //class Config;
 
 namespace Ui {
@@ -47,7 +48,8 @@ private:
     Mesh *m_mesh;
     XSection *m_xs;
     Quadrature *m_quad;
-    SourceParams *m_params;
+    SourceParams *m_srcParams;
+    SolverParams *m_solvParams;
 
     OutputDialog *outputDialog;
     GeomDialog *geomDialog;
@@ -82,8 +84,6 @@ public:
     QMutex &getBlockingMutex();
 
 protected slots:
-    //void userDebugNext();
-    //void userDebugAbort();
     void on_geometryOpenPushButton_clicked();
     void on_quadTypeComboBox_activated(int);
     void on_quadData1ComboBox_activated(int);

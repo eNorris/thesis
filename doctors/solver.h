@@ -12,6 +12,7 @@
 class Quadrature;
 class Mesh;
 class XSection;
+class SolverParams;
 class SourceParams;
 
 class Solver : public QObject
@@ -29,36 +30,33 @@ protected:
     std::vector<RAY_T> *basicRaytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SourceParams *params);
 
 signals:
-    //void signalNewIteration(std::vector<float>*);
     void signalNewRaytracerIteration(std::vector<RAY_T>*);
     void signalNewSolverIteration(std::vector<SOL_T>*);
-    //void signalNewSolverIteration(std::vector<RAY_T>*);
-    //void signalRaytracerIsoFinished(std::vector<float>*);
-    //void signalSolverIsoFinished(std::vector<float>*);
 
     void signalRaytracerFinished(std::vector<RAY_T>*);
     void signalSolverFinished(std::vector<SOL_T>*);
 
 public slots:
 
-    void raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SourceParams *params);
-    void gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<RAY_T> *uflux, const SourceParams *params);
+    // Base launcher
+    void raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar);
+    void gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux);
 
-    void raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SourceParams *params);
-    void gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux, const SourceParams *params);
+    void raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar);
+    void gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux);
 
-    void raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SourceParams *params);
-    void gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux, const SourceParams *params);
+    void raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar);
+    void gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux);
 
     // CPU versions
-    void raytraceIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SourceParams *params);
-    void gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<RAY_T> *uflux, const SourceParams *params);
+    void raytraceIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar);
+    void gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux);
 
-    void raytraceLegendreCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SourceParams *params);
-    void gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux, const SourceParams *params);
+    void raytraceLegendreCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar);
+    void gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux);
 
-    void raytraceHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SourceParams *params);
-    void gsSolverHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux, const SourceParams *params);
+    void raytraceHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar);
+    void gsSolverHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux);
 
     // The GPU versions are implemented in cuda_link which is compiled by nvcc
 

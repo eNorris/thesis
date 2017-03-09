@@ -13,6 +13,7 @@
 #include "gui/outputdialog.h"
 #include "legendre.h"
 #include "sourceparams.h"
+#include "solverparams.h"
 
 Solver::Solver(QObject *parent) : QObject(parent)
 {
@@ -24,37 +25,37 @@ Solver::~Solver()
 
 }
 
-void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SourceParams *params)
+void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar)
 {
 
 }
 
-void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<RAY_T> *uflux, const SourceParams *params)
+void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux)
 {
 
 }
 
-void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SourceParams *params)
+void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar,  const SourceParams *srcPar)
 {
 
 }
 
-void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux, const SourceParams *params)
+void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux)
 {
 
 }
 
-void Solver::raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SourceParams *params)
+void Solver::raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar,  const SourceParams *srcPar)
 {
 
 }
 
-void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux, const SourceParams *params)
+void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux)
 {
 
 }
 
-std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SourceParams *params)
+std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SourceParams *srcPar)
 {
     unsigned int groups = xs->groupCount();
 
@@ -62,9 +63,9 @@ std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *me
     const unsigned short DIRECTION_Y = 2;
     const unsigned short DIRECTION_Z = 3;
 
-    const RAY_T sx = static_cast<RAY_T>(params->sourceX);
-    const RAY_T sy = static_cast<RAY_T>(params->sourceY);
-    const RAY_T sz = static_cast<RAY_T>(params->sourceZ);
+    const RAY_T sx = static_cast<RAY_T>(srcPar->sourceX);
+    const RAY_T sy = static_cast<RAY_T>(srcPar->sourceY);
+    const RAY_T sz = static_cast<RAY_T>(srcPar->sourceZ);
 
     std::vector<SOL_T> *uflux = new std::vector<SOL_T>;
     uflux->resize(groups * mesh->voxelCount());
@@ -85,7 +86,7 @@ std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *me
     //srcStrength[srcStrength.size() - 2] = 1.0;
     std::vector<RAY_T> srcStrength(groups, 0.0);
     for(unsigned int i = 0; i < groups; i++)
-        srcStrength[i] = params->spectraIntensity[i];
+        srcStrength[i] = srcPar->spectraIntensity[i];
 
     if(sx < mesh->xNodes[0] || sy < mesh->yNodes[0] || sz < mesh->zNodes[0])
     {
@@ -315,7 +316,7 @@ std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *me
     return uflux;
 }
 
-void Solver::raytraceIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SourceParams *params)
+void Solver::raytraceIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar)
 {
     std::clock_t startMoment = std::clock();
 
@@ -328,7 +329,7 @@ void Solver::raytraceIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
     //unsigned int xjmp = mesh->xjmp();
     //unsigned int yjmp = mesh->yjmp();
 
-    std::vector<SOL_T> *uflux = basicRaytrace(quad, mesh, xs, params);
+    std::vector<SOL_T> *uflux = basicRaytrace(quad, mesh, xs, srcPar);
 
     qDebug() << "Time to complete raytracer: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
@@ -337,7 +338,7 @@ void Solver::raytraceIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
 }
 
 
-void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<SOL_T> *uFlux, const SourceParams *params)
+void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<SOL_T> *uFlux)
 {
 
     std::clock_t startTime = std::clock();
@@ -377,7 +378,7 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
 
     //bool downscatterFlag = false;
 
-    if(uFlux == NULL && params == NULL)
+    if(uFlux == NULL && srcPar == NULL)
     {
         qDebug() << "uFlux and params cannot both be NULL";
     }
@@ -660,7 +661,7 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
 //                           Anisotropic versions of the above solvers                            //
 // ////////////////////////////////////////////////////////////////////////////////////////////// //
 
-void Solver::raytraceLegendreCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SourceParams *params)
+void Solver::raytraceLegendreCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *params)
 {
     std::clock_t startMoment = std::clock();
 
@@ -731,12 +732,12 @@ void Solver::raytraceLegendreCPU(const Quadrature *quad, const Mesh *mesh, const
 }
 
 
-void Solver::gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uFlux, const SourceParams *params)
+void Solver::gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uFlux)
 {
     // Do some input checks
-    if(pn > 10)
+    if(solPar->pn > 10)
     {
-        qDebug() << "pn check failed, pn = " << pn;
+        qDebug() << "pn check failed, pn = " << solPar->pn;
         return;
     }
 
@@ -745,7 +746,7 @@ void Solver::gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const
     const int maxIterations = 25;
     const SOL_T epsilon = static_cast<SOL_T>(0.01);
     Legendre legendre;
-    legendre.precompute(quad, pn);
+    legendre.precompute(quad, solPar->pn);
 
 
     std::vector<SOL_T> *angularFlux = new std::vector<SOL_T>(xs->groupCount() * quad->angleCount() * mesh->voxelCount());
@@ -770,7 +771,7 @@ void Solver::gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const
 
     //const XSection &xsref = *xs;
 
-    if(uFlux == NULL && params == NULL)
+    if(uFlux == NULL && srcPar == NULL)
     {
         qDebug() << "uFlux and params cannot both be NULL";
     }
@@ -816,7 +817,7 @@ void Solver::gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const
                     float firstColSrc = 0.0f;
                     // TODO - should the equality condition be there?
                     for(unsigned int iep = highestEnergy; iep <= ie; iep++)  // For every higher energy that can downscatter
-                        for(unsigned int il = 0; il <= pn; il++)  // For every Legendre expansion coeff
+                        for(unsigned int il = 0; il <= solPar->pn; il++)  // For every Legendre expansion coeff
                         {
                             // The 2l+1 term is already accounted for in the XS
                             //float legendre_coeff = (2*l + 1) / M_4PI * xs->scatxs2d(mesh->zoneId[ri], epi, ei, l);  // [b]
@@ -861,7 +862,7 @@ void Solver::gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const
             for(unsigned int ia = 0; ia < quad->angleCount(); ia++)
                 for(unsigned int iap = 0; iap < quad->angleCount(); iap++)
                     for(unsigned int ir = 0; ir < mesh->voxelCount(); ir++)
-                        for(unsigned int il = 0; il <= pn; il++)
+                        for(unsigned int il = 0; il <= solPar->pn; il++)
                         {
                             unsigned int zid = mesh->zoneId[ir];
                             totalSource[ia*mesh->voxelCount() + ir] += m_4pi_inv*legendre.table(ia, iap, il) *
@@ -927,7 +928,7 @@ void Solver::gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const
 
                             SOL_T inscatter = 0;
                             for(unsigned int iap = 0; iap < quad->angleCount(); iap++)
-                                for(unsigned int il = 0; il <= pn; il++)
+                                for(unsigned int il = 0; il <= solPar->pn; il++)
                                     inscatter += m_4pi_inv*legendre.table(ia, iap, il) *
                                             xs->scatxs2d(zid, ie, ie, il) *
                                             (*angularFlux)[ie*ejmp + iap*ajmp + ri] *
@@ -986,7 +987,6 @@ void Solver::gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const
                             {
                                 qDebug() << "Zoom";
                                 SOL_T v = totalSource[ia*mesh->voxelCount() + ri];
-
                             }
 
                             SOL_T numer = totalSource[ia*mesh->voxelCount() + ri] + inscatter +                                                                                             // [#]
@@ -1120,7 +1120,7 @@ void Solver::gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const
     emit signalSolverFinished(angularFlux);
 }
 
-void Solver::raytraceHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SourceParams *params)
+void Solver::raytraceHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar)
 {
     std::clock_t startMoment = std::clock();
 
@@ -1129,20 +1129,20 @@ void Solver::raytraceHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const
     //RAY_T sx = 25.3906f;
     //RAY_T sy = 50.0f - 46.4844f;
     //RAY_T sz = 6.8906f;
-    const RAY_T sx = static_cast<RAY_T>(params->sourceX);
-    const RAY_T sy = static_cast<RAY_T>(params->sourceY);
-    const RAY_T sz = static_cast<RAY_T>(params->sourceZ);
+    const RAY_T sx = static_cast<RAY_T>(srcPar->sourceX);
+    const RAY_T sy = static_cast<RAY_T>(srcPar->sourceY);
+    const RAY_T sz = static_cast<RAY_T>(srcPar->sourceZ);
 
     unsigned int ejmp = mesh->voxelCount();
     unsigned int xjmp = mesh->xjmp();
     unsigned int yjmp = mesh->yjmp();
 
-    std::vector<RAY_T> *uflux = basicRaytrace(quad, mesh, xs, params);
+    std::vector<RAY_T> *uflux = basicRaytrace(quad, mesh, xs, srcPar);
 
     qDebug() << "Time to complete raytracer: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
     std::vector<RAY_T> *moments = new std::vector<RAY_T>;
-    unsigned int momentCount = (pn + 1) * (pn + 1);
+    unsigned int momentCount = (solPar->pn + 1) * (solPar->pn + 1);
     moments->resize(groups * mesh->voxelCount() * momentCount, 0.0f);
 
     int epjmp = mesh->voxelCount() * momentCount;
@@ -1174,7 +1174,7 @@ void Solver::raytraceHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const
                     RAY_T theta = atan(deltaY / deltaX);
                     RAY_T phi = acos(deltaZ);
 
-                    for(unsigned int il = 0; il <= pn; il++)
+                    for(unsigned int il = 0; il <= solPar->pn; il++)
                     {
                         //const unsigned int il2 = il * il;
                         (*moments)[ie*epjmp + ix*xpjmp + iy*ypjmp + iz*zpjmp + il*il] = (*uflux)[ie*ejmp + ix*xjmp + iy*yjmp + iz] * harmonic.yl0(il, theta, phi);
@@ -1193,13 +1193,13 @@ void Solver::raytraceHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const
 }
 
 
-void Solver::gsSolverHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *umoments, const SourceParams *params)
+void Solver::gsSolverHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *umoments)
 {
 
     // Do some input checks
-    if(pn > 10)
+    if(solPar->pn > 10)
     {
-        qDebug() << "pn check failed, pn = " << pn;
+        qDebug() << "pn check failed, pn = " << solPar->pn;
         return;
     }
 
@@ -1207,7 +1207,7 @@ void Solver::gsSolverHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const
 
     const int maxIterations = 25;
     const SOL_T epsilon = 0.01f;
-    const unsigned int momentCount = (pn + 1) * (pn + 1);
+    const unsigned int momentCount = (solPar->pn + 1) * (solPar->pn + 1);
     SphericalHarmonic harmonic;
 
     //std::vector<SOL_T> angularFlux(xs->groupCount() * quad->angleCount() * mesh->voxelCount());
@@ -1234,7 +1234,7 @@ void Solver::gsSolverHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const
 
     const XSection &xsref = *xs;
 
-    if(umoments == NULL && params == NULL)
+    if(umoments == NULL && srcPar == NULL)
     {
         qDebug() << "uFlux and params cannot both be NULL";
     }
@@ -1254,7 +1254,7 @@ void Solver::gsSolverHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const
         SOL_T theta = acos(quad->zi[ia]);
         SOL_T phi = atan(quad->eta[ia] / quad->mu[ia]);
 
-        for(unsigned int il = 0; il <= pn; il++)
+        for(unsigned int il = 0; il <= solPar->pn; il++)
         {
             momentToDiscrete[ia * momentCount + il*il] = harmonic.yl0(il, theta, phi);
             for(unsigned int im = 1; im <= il; im++)

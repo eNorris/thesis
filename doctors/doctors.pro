@@ -61,7 +61,8 @@ SOURCES += main.cpp\
     gui/energydialog.cpp \
     cuda_link.cu \
     cuda_kernels.cu \
-    sourceparams.cpp
+    sourceparams.cpp \
+    solverparams.cpp
 
 SOURCES -= cuda_kernels.cu \
            cuda_link.cu
@@ -93,7 +94,8 @@ HEADERS  += mainwindow.h \
     gui/energydialog.h \
     cuda_link.h \
     cuda_kernels.h \
-    sourceparams.h
+    sourceparams.h \
+    solverparams.h
 
 
 HEADERS -= cuda_link.h \
