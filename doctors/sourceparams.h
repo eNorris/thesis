@@ -7,12 +7,12 @@
 
 class AmpxParser;
 
-class SolverParams
+class SourceParams
 {
 public:
-    SolverParams(AmpxParser *parser);
+    SourceParams(AmpxParser *parser);
     //SolverParams(std::vector<float> e, double x, double y, double z);
-    ~SolverParams();
+    ~SourceParams();
 
     float sourceX, sourceY, sourceZ;
 

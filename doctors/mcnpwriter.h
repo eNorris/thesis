@@ -4,7 +4,7 @@
 #include <string>
 
 class Mesh;
-class SolverParams;
+class SourceParams;
 
 class McnpWriter
 {
@@ -16,12 +16,12 @@ public:
 
     std::string generateSurfaceString(Mesh *m);
     std::string generateCellString(Mesh *m, bool fineDensity);
-    std::string generateDataCards(SolverParams *p);
+    std::string generateDataCards(SourceParams *p);
     std::string generatePhantom19MaterialString();
     std::string generateMeshTally(Mesh *m);
     //std::string limit80Char(std::string s);
 
-    void writeMcnp(std::string filename, Mesh *m, SolverParams *p, bool fineDensity);
+    void writeMcnp(std::string filename, Mesh *m, SourceParams *p, bool fineDensity);
 
 protected:
     bool m_failFlag;

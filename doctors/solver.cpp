@@ -12,7 +12,7 @@
 #include "outwriter.h"
 #include "gui/outputdialog.h"
 #include "legendre.h"
-#include "solverparams.h"
+#include "sourceparams.h"
 
 Solver::Solver(QObject *parent) : QObject(parent)
 {
@@ -24,7 +24,37 @@ Solver::~Solver()
 
 }
 
-std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *params)
+void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SourceParams *params)
+{
+
+}
+
+void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<RAY_T> *uflux, const SourceParams *params)
+{
+
+}
+
+void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SourceParams *params)
+{
+
+}
+
+void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux, const SourceParams *params)
+{
+
+}
+
+void Solver::raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SourceParams *params)
+{
+
+}
+
+void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux, const SourceParams *params)
+{
+
+}
+
+std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SourceParams *params)
 {
     unsigned int groups = xs->groupCount();
 
@@ -285,7 +315,7 @@ std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *me
     return uflux;
 }
 
-void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *params)
+void Solver::raytraceIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SourceParams *params)
 {
     std::clock_t startMoment = std::clock();
 
@@ -307,7 +337,7 @@ void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSectio
 }
 
 
-void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<SOL_T> *uFlux, const SolverParams *params)
+void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<SOL_T> *uFlux, const SourceParams *params)
 {
 
     std::clock_t startTime = std::clock();
@@ -630,7 +660,7 @@ void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSectio
 //                           Anisotropic versions of the above solvers                            //
 // ////////////////////////////////////////////////////////////////////////////////////////////// //
 
-void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SolverParams *params)
+void Solver::raytraceLegendreCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SourceParams *params)
 {
     std::clock_t startMoment = std::clock();
 
@@ -701,7 +731,7 @@ void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XS
 }
 
 
-void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uFlux, const SolverParams *params)
+void Solver::gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uFlux, const SourceParams *params)
 {
     // Do some input checks
     if(pn > 10)
@@ -1090,7 +1120,7 @@ void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XS
     emit signalSolverFinished(angularFlux);
 }
 
-void Solver::raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SolverParams *params)
+void Solver::raytraceHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SourceParams *params)
 {
     std::clock_t startMoment = std::clock();
 
@@ -1163,7 +1193,7 @@ void Solver::raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XS
 }
 
 
-void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *umoments, const SolverParams *params)
+void Solver::gsSolverHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *umoments, const SourceParams *params)
 {
 
     // Do some input checks

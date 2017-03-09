@@ -52,7 +52,6 @@ SOURCES += main.cpp\
     quadglwidget.cpp \
     outwriter.cpp \
     ctdatamanager.cpp \
-    solverparams.cpp \
     solverparamsdialog.cpp \
     legendre.cpp \
     materialutils.cpp \
@@ -61,7 +60,8 @@ SOURCES += main.cpp\
     mcnpwriter.cpp \
     gui/energydialog.cpp \
     cuda_link.cu \
-    cuda_kernels.cu
+    cuda_kernels.cu \
+    sourceparams.cpp
 
 SOURCES -= cuda_kernels.cu \
            cuda_link.cu
@@ -83,7 +83,6 @@ HEADERS  += mainwindow.h \
     quadglwidget.h \
     outwriter.h \
     ctdatamanager.h \
-    solverparams.h \
     solverparamsdialog.h \
     legendre.h \
     materialutils.h \
@@ -93,7 +92,8 @@ HEADERS  += mainwindow.h \
     globals.h \
     gui/energydialog.h \
     cuda_link.h \
-    cuda_kernels.h
+    cuda_kernels.h \
+    sourceparams.h
 
 
 HEADERS -= cuda_link.h \

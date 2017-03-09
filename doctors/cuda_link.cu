@@ -3,7 +3,7 @@
 #include "quadrature.h"
 #include "mesh.h"
 #include "xsection.h"
-#include "solverparams.h"
+#include "sourceparams.h"
 
 float **init_gpu(int groups, int voxels, int angles)
 {
@@ -32,8 +32,6 @@ float **init_gpu(int groups, int voxels, int angles)
 
     float **gpu_datas = new float*[nDevices+1];
     *(gpu_datas[0]) = nDevices;
-    //gpu_datas[0] = gpu_data1;
-    //gpu_datas[1] = gpu_data2;
 
     for(unsigned int i = 0; i < nDevices; i++)
     {
@@ -41,11 +39,6 @@ float **init_gpu(int groups, int voxels, int angles)
             std::cout << "init_gpu threw an error while allocating CUDA memory" << std::endl;
     }
 
-    //float *gpu_data1;
-    //float *gpu_data2;
-    //cudaMalloc(&gpu_data1, groups*voxels*angles*sizeof(float));
-    //cudaMemcpyAsync(gpu_data1, cpu_data, nx*ny*sizeof(float), cudaMemcpyHostToDevice);
-    //cudaMalloc(&gpu_data2, nx*ny*sizeof(float));
     std::cout << "Alloc Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC/1000)
          << " ms" << std::endl;
 
@@ -58,7 +51,7 @@ void updateCpuData(float *data_cpu, float *data_gpu, size_t elements)
         printf("updateCpuData: Cuda Error!");
 }
 
-int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<RAY_T> *uflux, const SolverParams *params)
+int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<RAY_T> *uflux, const SourceParams *params)
 {
     dim3 dimGrid(5);
     dim3 dimBlock(5);

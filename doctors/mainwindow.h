@@ -21,7 +21,7 @@ class Solver;
 class Quadrature;
 class Mesh;
 class XSection;
-class SolverParams;
+class SourceParams;
 //class Config;
 
 namespace Ui {
@@ -47,7 +47,7 @@ private:
     Mesh *m_mesh;
     XSection *m_xs;
     Quadrature *m_quad;
-    SolverParams *m_params;
+    SourceParams *m_params;
 
     OutputDialog *outputDialog;
     GeomDialog *geomDialog;
@@ -107,14 +107,14 @@ protected slots:
     void onSolverFinished(std::vector<SOL_T>* solution);
 
 signals:
-    void signalLaunchRaytracerIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *params);
-    void signalLaunchSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<RAY_T> *uflux, const SolverParams *params);
+    void signalLaunchRaytracerIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SourceParams *params);
+    void signalLaunchSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<RAY_T> *uflux, const SourceParams *params);
 
-    void signalLaunchRaytracerLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SolverParams *params);
-    void signalLaunchSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux, const SolverParams *params);
+    void signalLaunchRaytracerLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SourceParams *params);
+    void signalLaunchSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux, const SourceParams *params);
 
-    void signalLaunchRaytracerHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SolverParams *params);
-    void signalLaunchSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux, const SolverParams *params);
+    void signalLaunchRaytracerHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const SourceParams *params);
+    void signalLaunchSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const unsigned int pn, const std::vector<RAY_T> *uflux, const SourceParams *params);
 
     void signalDebugHalt(std::vector<float>);
     void signalBeginXsParse(QString);

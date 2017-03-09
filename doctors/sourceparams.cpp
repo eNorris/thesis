@@ -1,8 +1,8 @@
-#include "solverparams.h"
+#include "sourceparams.h"
 
 #include "xs_reader/ampxparser.h"
 
-SolverParams::SolverParams(AmpxParser *parser)
+SourceParams::SourceParams(AmpxParser *parser)
 {
     //spectraEnergyLimits.resize(parser->getGammaEnergyGroups()+1);
     spectraIntensity.resize(parser->getGammaEnergyGroups(), 0);
@@ -12,12 +12,12 @@ SolverParams::SolverParams(AmpxParser *parser)
     //    spectra
 }
 
-SolverParams::~SolverParams()
+SourceParams::~SourceParams()
 {
 
 }
 
-bool SolverParams::normalize()
+bool SourceParams::normalize()
 {
     float t = 0;
 
@@ -40,7 +40,7 @@ bool SolverParams::normalize()
     return true;
 }
 
-bool SolverParams::update(std::vector<float> e, double x, double y, double z)
+bool SourceParams::update(std::vector<float> e, double x, double y, double z)
 {
     if(spectraIntensity.size() != e.size())
     {

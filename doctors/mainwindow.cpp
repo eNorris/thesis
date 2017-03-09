@@ -19,7 +19,7 @@
 #include "ctdatamanager.h"
 #include "legendre.h"
 #include "solver.h"
-#include "solverparams.h"
+#include "sourceparams.h"
 
 #include "outwriter.h"
 #include "mcnpwriter.h"
@@ -106,14 +106,14 @@ MainWindow::MainWindow(QWidget *parent):
     m_solver->moveToThread(&m_solverWorkerThread);
     connect(&m_xsWorkerThread, SIGNAL(finished()), m_solver, SLOT(deleteLater()));
 
-    connect(this, SIGNAL(signalLaunchRaytracerIso(const Quadrature*,const Mesh*,const XSection*, const SolverParams*)), m_solver, SLOT(raytraceIso(const Quadrature*,const Mesh*,const XSection*, const SolverParams*)));
-    connect(this, SIGNAL(signalLaunchSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<RAY_T>*, const SolverParams*)), m_solver, SLOT(gsSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<RAY_T>*, const SolverParams*)));
+    connect(this, SIGNAL(signalLaunchRaytracerIso(const Quadrature*,const Mesh*,const XSection*, const SourceParams*)), m_solver, SLOT(raytraceIso(const Quadrature*,const Mesh*,const XSection*, const SourceParams*)));
+    connect(this, SIGNAL(signalLaunchSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<RAY_T>*, const SourceParams*)), m_solver, SLOT(gsSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<RAY_T>*, const SourceParams*)));
 
-    connect(this, SIGNAL(signalLaunchRaytracerLegendre(const Quadrature*,const Mesh*,const XSection*, const unsigned int, const SolverParams*)), m_solver, SLOT(raytraceLegendre(const Quadrature*,const Mesh*,const XSection*, const unsigned int, const SolverParams*)));
-    connect(this, SIGNAL(signalLaunchSolverLegendre(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*, const SolverParams*)), m_solver, SLOT(gsSolverLegendre(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*, const SolverParams*)));
+    connect(this, SIGNAL(signalLaunchRaytracerLegendre(const Quadrature*,const Mesh*,const XSection*, const unsigned int, const SourceParams*)), m_solver, SLOT(raytraceLegendre(const Quadrature*,const Mesh*,const XSection*, const unsigned int, const SourceParams*)));
+    connect(this, SIGNAL(signalLaunchSolverLegendre(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*, const SourceParams*)), m_solver, SLOT(gsSolverLegendre(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*, const SourceParams*)));
 
-    connect(this, SIGNAL(signalLaunchRaytracerHarmonic(const Quadrature*,const Mesh*,const XSection*, const unsigned int, const SolverParams*)), m_solver, SLOT(raytraceHarmonic(const Quadrature*,const Mesh*,const XSection*, const unsigned int, const SolverParams*)));
-    connect(this, SIGNAL(signalLaunchSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*, const SolverParams*)), m_solver, SLOT(gsSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*, const SolverParams*)));
+    connect(this, SIGNAL(signalLaunchRaytracerHarmonic(const Quadrature*,const Mesh*,const XSection*, const unsigned int, const SourceParams*)), m_solver, SLOT(raytraceHarmonic(const Quadrature*,const Mesh*,const XSection*, const unsigned int, const SourceParams*)));
+    connect(this, SIGNAL(signalLaunchSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*, const SourceParams*)), m_solver, SLOT(gsSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*, const SourceParams*)));
 
     connect(m_solver, SIGNAL(signalRaytracerFinished(std::vector<RAY_T>*)), this, SLOT(onRaytracerFinished(std::vector<RAY_T>*)));
     connect(m_solver, SIGNAL(signalSolverFinished(std::vector<SOL_T>*)), this, SLOT(onSolverFinished(std::vector<SOL_T>*)));
@@ -545,7 +545,7 @@ void MainWindow::xsParseFinished(AmpxParser *parser)
     outputDialog->setEnergyGroups(parser->getGammaEnergyGroups());
     energyDialog->setEnergy(parser);
 
-    m_params = new SolverParams(parser);
+    m_params = new SourceParams(parser);
 
     ui->mainProgressBar->setValue(0);
 }

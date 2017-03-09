@@ -16,12 +16,12 @@
 class Quadrature;
 class Mesh;
 class XSection;
-class SolverParams;
+class SourceParams;
 
 float **init_gpu(int Nx, int Ny, float *cpu_data);
 void updateCpuData(float *data_cpu, float *data_gpu1, int nx, int ny);
 
-int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<RAY_T> *uflux, const SolverParams *params);
+int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<RAY_T> *uflux, const SourceParams *params);
 
 #endif // CUDA_LINK
 

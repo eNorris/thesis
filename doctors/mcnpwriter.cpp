@@ -7,7 +7,7 @@
 
 #include "mesh.h"
 #include "materialutils.h"
-#include "solverparams.h"
+#include "sourceparams.h"
 
 McnpWriter::McnpWriter() : m_failFlag(false)
 {
@@ -180,7 +180,7 @@ std::string McnpWriter::generateCellString(Mesh *m, bool fineDensity)
     return allCellString;
 }
 
-std::string McnpWriter::generateDataCards(SolverParams *p)
+std::string McnpWriter::generateDataCards(SourceParams *p)
 {
     std::string dataString = "c ==================== DATA DECK ====================\n";
 
@@ -298,7 +298,7 @@ std::string McnpWriter::limit80Char(std::string s)
 }
 */
 
-void McnpWriter::writeMcnp(std::string filename, Mesh *m, SolverParams *p, bool fineDensity)
+void McnpWriter::writeMcnp(std::string filename, Mesh *m, SourceParams *p, bool fineDensity)
 {
     std::ofstream fout;
     fout.open(filename.c_str());
