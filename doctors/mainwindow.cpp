@@ -109,14 +109,14 @@ MainWindow::MainWindow(QWidget *parent):
     m_solver->moveToThread(&m_solverWorkerThread);
     connect(&m_xsWorkerThread, SIGNAL(finished()), m_solver, SLOT(deleteLater()));
 
-    connect(this, SIGNAL(signalLaunchRaytracerIso(const Quadrature*,const Mesh*,const XSection*, const SourceParams*)), m_solver, SLOT(raytraceIso(const Quadrature*,const Mesh*,const XSection*, const SourceParams*)));
-    connect(this, SIGNAL(signalLaunchSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<RAY_T>*, const SourceParams*)), m_solver, SLOT(gsSolverIso(const Quadrature*,const Mesh*,const XSection*,const std::vector<RAY_T>*, const SourceParams*)));
+    connect(this, SIGNAL(signalLaunchRaytracerIso(const Quadrature*,const Mesh*,const XSection*,const SolverParams*,const SourceParams*)), m_solver, SLOT(raytraceIso(const Quadrature*,const Mesh*,const XSection*,const SolverParams*,const SourceParams*)));
+    connect(this, SIGNAL(signalLaunchSolverIso(const Quadrature*,const Mesh*,const XSection*,const SolverParams*, const SourceParams*,const std::vector<RAY_T>*)), m_solver, SLOT(gsSolverIso(const Quadrature*,const Mesh*,const XSection*,const SolverParams*, const SourceParams*,const std::vector<RAY_T>*)));
 
-    connect(this, SIGNAL(signalLaunchRaytracerLegendre(const Quadrature*,const Mesh*,const XSection*, const unsigned int, const SourceParams*)), m_solver, SLOT(raytraceLegendre(const Quadrature*,const Mesh*,const XSection*, const unsigned int, const SourceParams*)));
-    connect(this, SIGNAL(signalLaunchSolverLegendre(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*, const SourceParams*)), m_solver, SLOT(gsSolverLegendre(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*, const SourceParams*)));
+    connect(this, SIGNAL(signalLaunchRaytracerLegendre(const Quadrature*,const Mesh*,const XSection*, const SolverParams*,const SourceParams*)), m_solver, SLOT(raytraceLegendre(const Quadrature*,const Mesh*,const XSection*, const SolverParams*,const SourceParams*)));
+    connect(this, SIGNAL(signalLaunchSolverLegendre(const Quadrature*,const Mesh*,const XSection*,const SolverParams*, const SourceParams*,const std::vector<RAY_T>*)), m_solver, SLOT(gsSolverLegendre(const Quadrature*,const Mesh*,const XSection*,const SolverParams*,const SourceParams*,const std::vector<RAY_T>*)));
 
-    connect(this, SIGNAL(signalLaunchRaytracerHarmonic(const Quadrature*,const Mesh*,const XSection*, const unsigned int, const SourceParams*)), m_solver, SLOT(raytraceHarmonic(const Quadrature*,const Mesh*,const XSection*, const unsigned int, const SourceParams*)));
-    connect(this, SIGNAL(signalLaunchSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*, const SourceParams*)), m_solver, SLOT(gsSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const unsigned int,const std::vector<RAY_T>*, const SourceParams*)));
+    connect(this, SIGNAL(signalLaunchRaytracerHarmonic(const Quadrature*,const Mesh*,const XSection*, const SolverParams*,const SourceParams*)), m_solver, SLOT(raytraceHarmonic(const Quadrature*,const Mesh*,const XSection*,const SolverParams*,const SourceParams*)));
+    connect(this, SIGNAL(signalLaunchSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const SolverParams*, const SourceParams*,const std::vector<RAY_T>*)), m_solver, SLOT(gsSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const SolverParams*,const SourceParams*,const std::vector<RAY_T>*)));
 
     connect(m_solver, SIGNAL(signalRaytracerFinished(std::vector<RAY_T>*)), this, SLOT(onRaytracerFinished(std::vector<RAY_T>*)));
     connect(m_solver, SIGNAL(signalSolverFinished(std::vector<SOL_T>*)), this, SLOT(onSolverFinished(std::vector<SOL_T>*)));
@@ -227,13 +227,13 @@ void MainWindow::on_launchSolverPushButton_clicked()
     switch(m_solType)
     {
     case MainWindow::ISOTROPIC:
-        emit signalLaunchRaytracerIso(m_quad, m_mesh, m_xs, m_srcParams);
+        emit signalLaunchRaytracerIso(m_quad, m_mesh, m_xs, m_solvParams, m_srcParams);
         break;
     case MainWindow::LEGENDRE:
-        emit signalLaunchRaytracerLegendre(m_quad, m_mesh, m_xs, m_pn, m_srcParams);
+        emit signalLaunchRaytracerLegendre(m_quad, m_mesh, m_xs, m_solvParams, m_srcParams);
         break;
     case MainWindow::HARMONIC:
-        emit signalLaunchRaytracerHarmonic(m_quad, m_mesh, m_xs, m_pn, m_srcParams);
+        emit signalLaunchRaytracerHarmonic(m_quad, m_mesh, m_xs, m_solvParams, m_srcParams);
         break;
     default:
         qDebug() << "No solver of type " << m_solType;
@@ -591,15 +591,15 @@ void MainWindow::onRaytracerFinished(std::vector<RAY_T>* uncollided)
     {
     case MainWindow::ISOTROPIC:
         OutWriter::writeScalarFlux("raytrace_flux_iso.dat", *m_xs, *m_mesh, *uncollided);
-        emit signalLaunchSolverIso(m_quad, m_mesh, m_xs, uncollided, NULL);
+        emit signalLaunchSolverIso(m_quad, m_mesh, m_xs, m_solvParams, m_srcParams, uncollided);
         break;
     case MainWindow::LEGENDRE:
         OutWriter::writeAngularFlux("raytrace_flux_leg.dat", *m_xs, *m_quad, *m_mesh, *uncollided);
-        emit signalLaunchSolverLegendre(m_quad, m_mesh, m_xs, m_pn, uncollided, NULL);
+        emit signalLaunchSolverLegendre(m_quad, m_mesh, m_xs, m_solvParams, m_srcParams, uncollided);
         break;
     case MainWindow::HARMONIC:
         OutWriter::writeAngularFlux("raytrace_flux_harm.dat", *m_xs, *m_quad, *m_mesh, *uncollided);
-        emit signalLaunchSolverHarmonic(m_quad, m_mesh, m_xs, m_pn, uncollided, NULL);
+        emit signalLaunchSolverHarmonic(m_quad, m_mesh, m_xs, m_solvParams, m_srcParams, uncollided);
         break;
     default:
         qCritical() << "No solver of type " << m_solType;
