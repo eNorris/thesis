@@ -32,7 +32,37 @@ This code does ...
 
 \section{Raytracer}
 
-This code does ...
+\begin{listing}
+%\begin{minted}[frame=lines,linenos,escapeinside=||,mathescape=true]{cpp}
+\begin{minted}[frame=lines,linenos]{cpp}
+// Given isx, isy, isz  source index
+// Given sx, sy, sz source location
+// Given node locations
+// Given Deltas
+
+// For every voxel
+for iz = 0 .. Z-1
+  for iy = 0 .. Y-1
+    for ix = 0 .. X-1
+    
+      ir = ix*NY*NZ + iy*NZ + iz
+    
+      // Start from the center of the cell containing the source
+      x = xNodes[ir] + Dx[isx]/2
+      y = yNodes[ir] + Dy[isy]/2
+      z = zNodes[ir] + Dz[isz]/2
+      
+      // End condition
+      if ix == isx and iy == isy and iz == isz
+        d = sqrt((x-sx)^2 + (y-sy)^2 + (z-sz)^2)
+        for ie = 0 .. G-1
+          mu = xsTot[ie, ir] * atomDen[ir]
+          uflux[ie, ir] = S_0 * exp(-mu * d) / (4 * PI * d^2)
+        SKIP TO NEXT CELL
+
+\end{minted}
+\caption{Blah blah blah.}\label{lst:sync1}
+\end{listing}
 
 \section{Solver}
 
