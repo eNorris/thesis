@@ -667,3 +667,8 @@ void MainWindow::onSolverFinished(std::vector<SOL_T> *solution)
 
     //OutWriter::writeFloatArrays("/media/Storage/thesis/doctors/solution.dat", push);
 }
+
+void MainWindow::on_solverGpuCheckBox_toggled(bool gpuOn)
+{
+    m_solvParams->gpu_accel = gpuOn;
+}

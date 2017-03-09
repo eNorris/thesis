@@ -27,32 +27,74 @@ Solver::~Solver()
 
 void Solver::raytraceIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar)
 {
-
+    if(solPar->gpu_accel)
+    {
+        qDebug() << "Gpu is going";
+    }
+    else
+    {
+        raytraceIsoCPU(quad, mesh, xs, solPar, srcPar);
+    }
 }
 
 void Solver::gsSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux)
 {
-
+    if(solPar->gpu_accel)
+    {
+        qDebug() << "Gpu is going";
+    }
+    else
+    {
+        gsSolverIsoCPU(quad, mesh, xs, solPar, srcPar, uflux);
+    }
 }
 
 void Solver::raytraceLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar,  const SourceParams *srcPar)
 {
-
+    if(solPar->gpu_accel)
+    {
+        qDebug() << "Gpu is going";
+    }
+    else
+    {
+        raytraceLegendreCPU(quad, mesh, xs, solPar, srcPar);
+    }
 }
 
 void Solver::gsSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux)
 {
-
+    if(solPar->gpu_accel)
+    {
+        qDebug() << "Gpu is going";
+    }
+    else
+    {
+        gsSolverLegendreCPU(quad, mesh, xs, solPar, srcPar, uflux);
+    }
 }
 
 void Solver::raytraceHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar,  const SourceParams *srcPar)
 {
-
+    if(solPar->gpu_accel)
+    {
+        qDebug() << "Gpu is going";
+    }
+    else
+    {
+        raytraceHarmonicCPU(quad, mesh, xs, solPar, srcPar);
+    }
 }
 
 void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux)
 {
-
+    if(solPar->gpu_accel)
+    {
+        qDebug() << "Gpu is going";
+    }
+    else
+    {
+        gsSolverHarmonicCPU(quad, mesh, xs, solPar, srcPar, uflux);
+    }
 }
 
 std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SourceParams *srcPar)

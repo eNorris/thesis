@@ -94,7 +94,7 @@ protected slots:
     void on_xsOpenPushButton_clicked();
     void on_xsExplorePushButton_clicked();
     void on_actionMCNP6_Generation_triggered();
-
+    void on_solverGpuCheckBox_toggled(bool);
 
     void updateLaunchButton();
     void xsParseErrorHandler(QString);
@@ -107,14 +107,14 @@ protected slots:
     void onSolverFinished(std::vector<SOL_T>* solution);
 
 signals:
-    void signalLaunchRaytracerIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *params);
-    void signalLaunchSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *params, const std::vector<RAY_T> *uflux);
+    void signalLaunchRaytracerIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar);
+    void signalLaunchSolverIso(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux);
 
-    void signalLaunchRaytracerLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs,  const SolverParams *solPar, const SourceParams *params);
-    void signalLaunchSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs,  const SolverParams *solPar, const SourceParams *params, const std::vector<RAY_T> *uflux);
+    void signalLaunchRaytracerLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs,  const SolverParams *solPar, const SourceParams *srcPar);
+    void signalLaunchSolverLegendre(const Quadrature *quad, const Mesh *mesh, const XSection *xs,  const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux);
 
-    void signalLaunchRaytracerHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs,  const SolverParams *solPar, const SourceParams *params);
-    void signalLaunchSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs,  const SolverParams *solPar, const SourceParams *params, const std::vector<RAY_T> *uflux);
+    void signalLaunchRaytracerHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs,  const SolverParams *solPar, const SourceParams *srcPar);
+    void signalLaunchSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs,  const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux);
 
     void signalDebugHalt(std::vector<float>);
     void signalBeginXsParse(QString);

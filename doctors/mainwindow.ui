@@ -655,6 +655,13 @@
            </item>
           </layout>
          </item>
+         <item>
+          <widget class="QCheckBox" name="solverGpuCheckBox">
+           <property name="text">
+            <string>GPU</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
