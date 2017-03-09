@@ -1,10 +1,12 @@
 #include "cuda_link.h"
 
-float **init_gpu(int nx, int ny, float *cpu_data)
-{
-    if(nx <= 0 || ny <= 0)
-        return NULL;
+#include "quadrature.h"
+#include "mesh.h"
+#include "xsection.h"
+#include "solverparams.h"
 
+float **init_gpu(int groups, int voxels, int angles)
+{
     std::cout << "Initializing GPU resources" << std::endl;
 
     // Check the number of GPU resources
@@ -27,36 +29,41 @@ float **init_gpu(int nx, int ny, float *cpu_data)
     }
 
     std::clock_t start = std::clock();
-    float *gpu_data1;
-    float *gpu_data2;
-    cudaMalloc(&gpu_data1, nx*ny*sizeof(float));
-    cudaMemcpyAsync(gpu_data1, cpu_data, nx*ny*sizeof(float), cudaMemcpyHostToDevice);
-    cudaMalloc(&gpu_data2, nx*ny*sizeof(float));
-    std::cout << "Copy Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC/1000)
-         << " ms" << std::endl;
 
-    float **gpu_datas = new float*[2];
-    gpu_datas[0] = gpu_data1;
-    gpu_datas[1] = gpu_data2;
+    float **gpu_datas = new float*[nDevices+1];
+    *(gpu_datas[0]) = nDevices;
+    //gpu_datas[0] = gpu_data1;
+    //gpu_datas[1] = gpu_data2;
+
+    for(unsigned int i = 0; i < nDevices; i++)
+    {
+        if(cudaMalloc(&gpu_datas[i+1], groups*voxels*angles*sizeof(float)) != cudaSuccess)
+            std::cout << "init_gpu threw an error while allocating CUDA memory" << std::endl;
+    }
+
+    //float *gpu_data1;
+    //float *gpu_data2;
+    //cudaMalloc(&gpu_data1, groups*voxels*angles*sizeof(float));
+    //cudaMemcpyAsync(gpu_data1, cpu_data, nx*ny*sizeof(float), cudaMemcpyHostToDevice);
+    //cudaMalloc(&gpu_data2, nx*ny*sizeof(float));
+    std::cout << "Alloc Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC/1000)
+         << " ms" << std::endl;
 
     return gpu_datas;
 }
 
-void updateCpuData(float *data_cpu, float *data_gpu, int nx, int ny)
+void updateCpuData(float *data_cpu, float *data_gpu, size_t elements)
 {
-    if(cudaMemcpyAsync(data_cpu, data_gpu, nx*ny*sizeof(float), cudaMemcpyDeviceToHost) != cudaSuccess)
+    if(cudaMemcpyAsync(data_cpu, data_gpu, elements*sizeof(float), cudaMemcpyDeviceToHost) != cudaSuccess)
         printf("updateCpuData: Cuda Error!");
 }
 
-int launch_diffusionKernel(int nx, int ny, float *prevdata, float *data)
+int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<RAY_T> *uflux, const SolverParams *params)
 {
-    if(nx > 1024 || ny > 2014)
-        printf("launch_diffusionKernel() GPU dimension exceeded!!!!");
+    dim3 dimGrid(5);
+    dim3 dimBlock(5);
 
-    dim3 dimGrid(nx);
-    dim3 dimBlock(ny);
-
-    testKernel4<<<dimGrid, dimBlock>>>(prevdata, data, nx, ny);
+    isoRayKernel<<<dimGrid, dimBlock>>>(NULL, NULL, 1, 2);
     cudaDeviceSynchronize();
 
     return EXIT_SUCCESS;

@@ -41,7 +41,6 @@ QPalette *MainWindow::m_badPalette = NULL;
 MainWindow::MainWindow(QWidget *parent):
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    //m_config(NULL),
     m_mesh(NULL),
     m_xs(NULL),
     m_quad(NULL),
@@ -56,8 +55,6 @@ MainWindow::MainWindow(QWidget *parent):
     m_quadLoaded(false),
     m_paramsLoaded(false),
     m_configSelectDialog(NULL),
-    //m_pendingUserContinue(),
-    //m_mutex(),
     m_parser(NULL),
     m_xsWorkerThread(NULL),
     m_solver(NULL),
@@ -68,9 +65,6 @@ MainWindow::MainWindow(QWidget *parent):
     m_pn(0)
 {
     ui->setupUi(this);
-
-    //m_solType = MainWindow::LEGENDRE;
-    //m_pn = 3;
 
     // Initialize static member variables
     MainWindow::m_badPalette = new QPalette();

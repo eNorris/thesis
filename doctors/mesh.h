@@ -5,16 +5,16 @@
 
 #include <vector>
 
-#include <QObject>
+//#include <QObject>
 
-#include <cstdint>
+//#include <cstdint>
 
 #include "config.h"
 #include "quadrature.h"
 
-class Mesh : public QObject
+class Mesh
 {
-    Q_OBJECT
+
 public:
     Mesh();
     Mesh(const Config *config, const Quadrature *quad);
@@ -58,10 +58,6 @@ public:
     int xjmp() const;
     int yjmp() const;
 
-public slots:
-    void remesh(int xelems, int yelems, int zelems, const Config *config, const Quadrature *quad);
-    void uniform(const int xelems, const int yelems, const int zelems, const float xLen, const float yLen, const float zLen);
-
 public:
     void calcAreas(const Quadrature *quad, const int eGroups);
     void initCtVariables();
@@ -70,6 +66,9 @@ public:
     int getZoneIdAt(int xindx, int yindx, int zindx) const;
     float getPhysicalDensityAt(int xindx, int yindx, int zindx) const;
     float getAtomDensityAt(int xindx, int yindx, int zindx) const;
+
+    void remesh(int xelems, int yelems, int zelems, const Config *config, const Quadrature *quad);
+    void uniform(const int xelems, const int yelems, const int zelems, const float xLen, const float yLen, const float zLen);
 
 
 private:

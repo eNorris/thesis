@@ -80,11 +80,6 @@ std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *me
     while(mesh->zNodes[srcIndxZ+1] < sz)
         srcIndxZ++;
 
-
-    //unsigned int srcIndxX = int(sx / mesh->dx[0]);  // TODO: This will only work for evenly spaced grids
-    //unsigned int srcIndxY = int(sy / mesh->dy[0]);
-    //unsigned int srcIndxZ = int(sz / mesh->dz[0]);
-
     unsigned int totalMissedVoxels = 0;
 
     for(unsigned int zIndxStart = 0; zIndxStart < mesh->zElemCt; zIndxStart++)
@@ -95,10 +90,6 @@ std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *me
                 RAY_T x = mesh->xNodes[xIndxStart] + mesh->dx[xIndxStart]/2;
                 RAY_T y = mesh->yNodes[yIndxStart] + mesh->dy[yIndxStart]/2;
                 RAY_T z = mesh->zNodes[zIndxStart] + mesh->dz[zIndxStart]/2;
-
-                //std::vector<float> tmpdistv;
-                //std::vector<float> tmpxsv;
-                //std::vector<float> mfpv;
 
                 if(xIndxStart == srcIndxX && yIndxStart == srcIndxY && zIndxStart == srcIndxZ)  // End condition
                 {
@@ -139,7 +130,6 @@ std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *me
                 bool exhaustedRay = false;
                 while(!exhaustedRay)
                 {
-                    //qDebug() << x << " " << y << " "  << z << " " << xIndx << " " << yIndx << " " << zIndx;
                     // Determine the distance to cell boundaries
                     RAY_T tx = (fabs(xcos) < tiny ? huge : (mesh->xNodes[xBoundIndx] - x)/xcos);  // Distance traveled [cm] when next cell is
                     RAY_T ty = (fabs(ycos) < tiny ? huge : (mesh->yNodes[yBoundIndx] - y)/ycos);  //   entered traveling in x direction
@@ -175,10 +165,6 @@ std::vector<RAY_T> *Solver::basicRaytrace(const Quadrature *quad, const Mesh *me
                         //                   [cm] * [b] * [atom/b-cm]
                         meanFreePaths[ie] += tmin * xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
                     }
-                    //tmpdistv.push_back(tmin);
-                    //tmpxsv.push_back(xs->m_tot1d[zid*groups + 18] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx]);
-                    //float gain = tmin * xs->m_tot1d[zid*groups + 17] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
-                    //mfpv.push_back(gain);
 
                     // Update cell indices and positions
                     if(dirHitFirst == DIRECTION_X) // x direction

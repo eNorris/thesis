@@ -59,9 +59,6 @@ bool XSection::allocateMemory(const unsigned int materialCount, const unsigned i
     size_t floats1d = materialCount * groupCount;
     size_t floats2d = materialCount * groupCount * groupCount * (m_pn+1);
 
-    //qDebug() << "Total 1d bytes: " << (2*floats1d * sizeof(float));
-    //qDebug() << "Total 2d bytes: " << (floats2d * sizeof(float));
-
     try{
         m_tot1d.resize(floats1d);
     }
