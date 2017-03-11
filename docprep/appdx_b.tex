@@ -41,24 +41,76 @@ This code does ...
 // Given Deltas
 
 // For every voxel
-for iz = 0 .. Z-1
-  for iy = 0 .. Y-1
-    for ix = 0 .. X-1
+for iz0 = 0 .. Z-1
+  for iy0 = 0 .. Y-1
+    for ix0 = 0 .. X-1
     
-      ir = ix*NY*NZ + iy*NZ + iz
+      ir0 = ix0*NY*NZ + iy0*NZ + iz0
     
       // Start from the center of the cell containing the source
-      x = xNodes[ir] + Dx[isx]/2
-      y = yNodes[ir] + Dy[isy]/2
-      z = zNodes[ir] + Dz[isz]/2
+      x = xNodes[ir0] + Dx[isx]/2
+      y = yNodes[ir0] + Dy[isy]/2
+      z = zNodes[ir0] + Dz[isz]/2
       
       // End condition
-      if ix == isx and iy == isy and iz == isz
+      if ix0 == isx and iy0 == isy and iz0 == isz
         d = sqrt((x-sx)^2 + (y-sy)^2 + (z-sz)^2)
         for ie = 0 .. G-1
-          mu = xsTot[ie, ir] * atomDen[ir]
-          uflux[ie, ir] = S_0 * exp(-mu * d) / (4 * PI * d^2)
+          mu = xsTot[ie, ir0] * atomDen[ir]
+          uflux[ie, ir0] = S_0 * exp(-mu * d) / (4 * PI * d^2)
         SKIP TO NEXT CELL
+        
+      ix = ix0
+      iy = iy0
+      iz = iz0
+      
+      dx = sx - x
+      dy = sy - y
+      dz = sz - z
+      
+      d = sqrt((x-sx)^2 + (y-sy)^2 + (z-sz)^2)
+      
+      xcos = dx/d
+      ycos = dy/d
+      zcos = dz/d
+      
+      ixBound = NEXT X BOUNDARY INDEX
+      iyBound = NEXT Y BOUNDARY INDEX
+      izBound = NEXT Z BOUNDARY INDEX
+      
+      mfp[0 .. G-1] = 0
+      
+      exhausted = FALSE
+      while not exhausted
+        ir = ix*NY*NZ + iy*NZ + iz      
+      
+        tx = ...
+        
+        tmin = min(tx, ty, tz)
+        dir = DIRECTION HIT
+        
+        for ie = 0 .. G-1
+          mpf[ie] += tmin * xsTot[ir, ie] * atomDen[ir]
+          
+        if dir == X DIRECTION
+          x = xNodes[ixBound]
+          y += tmin*ycos
+          z += tmin*zcos
+          if xcos >= 0
+            ix++
+            ixBound++
+          else
+            ix--
+            ixBound--
+            
+        if ix == ix0 and iy == iy0 and iz == iz0
+          d = sqrt()
+          for ie = 0 .. G-1
+            mpf[ie] += d * xsTot[ie, ir] * atomDen[ir]
+          exhausted = TRUE
+          
+      for ie = 0 .. G-1
+        uflux[ir0, ie] = S0 * exp() / (4 * PI * d^2)
 
 \end{minted}
 \caption{Blah blah blah.}\label{lst:sync1}
