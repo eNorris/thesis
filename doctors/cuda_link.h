@@ -18,7 +18,10 @@ class Mesh;
 class XSection;
 class SourceParams;
 
-float **init_gpu(int Nx, int Ny, float *cpu_data);
+void reportGpuData();
+int *alloc_gpuInt(int gpuId, int elements);
+float *alloc_gpuFloat(int gpuId, int elements);
+void release_gpu(int gpuId, float **gpus);
 void updateCpuData(float *data_cpu, float *data_gpu1, int nx, int ny);
 
 int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const std::vector<RAY_T> *uflux, const SourceParams *params);

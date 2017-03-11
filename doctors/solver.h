@@ -27,7 +27,8 @@ public:
     const SOL_T m_4pi_inv = static_cast<SOL_T>(1.0 / m_4pi);
 
 protected:
-    std::vector<RAY_T> *basicRaytrace(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SourceParams *params);
+    std::vector<RAY_T> *basicRaytraceCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SourceParams *params);
+    std::vector<RAY_T> *basicRaytraceGPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SourceParams *params);
 
 signals:
     void signalNewRaytracerIteration(std::vector<RAY_T>*);
@@ -58,7 +59,15 @@ public slots:
     void raytraceHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar);
     void gsSolverHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux);
 
-    // The GPU versions are implemented in cuda_link which is compiled by nvcc
+    // The GPU versions
+    void raytraceIsoGPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar);
+    void gsSolverIsoGPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux);
+
+    void raytraceLegendreGPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar);
+    void gsSolverLegendreGPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux);
+
+    void raytraceHarmonicGPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar);
+    void gsSolverHarmonicGPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux);
 
 };
 
