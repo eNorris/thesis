@@ -446,6 +446,12 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
         {
             noDownscatterYet = false;
         }
+
+        if(highestEnergy >= xs->groupCount())
+        {
+            qDebug() << "Zero flux everywhere from the raytracer";
+            return;
+        }
     }
 
     if(uFlux != NULL)
@@ -1604,75 +1610,10 @@ void Solver::gsSolverHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const
  * ========================================= GPU Code ========================================= *
  ************************************************************************************************/
 
-std::vector<RAY_T> *Solver::basicRaytraceGPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SourceParams *srcPar)
+std::vector<RAY_T> *Solver::basicRaytraceGPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar)
 {
-    unsigned int groups = xs->groupCount();
-
-    const unsigned short DIRECTION_X = 1;
-    const unsigned short DIRECTION_Y = 2;
-    const unsigned short DIRECTION_Z = 3;
-
-    const RAY_T sx = static_cast<RAY_T>(srcPar->sourceX);
-    const RAY_T sy = static_cast<RAY_T>(srcPar->sourceY);
-    const RAY_T sz = static_cast<RAY_T>(srcPar->sourceZ);
-
-    std::vector<SOL_T> *uflux = new std::vector<SOL_T>;
-    uflux->resize(groups * mesh->voxelCount());
-
-    float **gpus = alloc_gpu(groups * mesh->voxelCount());
-    int nGpu; // = static_cast<int>(gpus[0]);
-    memcpy(&nGpu, gpus[0], sizeof(int));
-
-    std::cout << "Got " << nGpu << " gpus" << std::endl;
-
-    release_gpu(gpus);
-
-    unsigned int ejmp = mesh->voxelCount();
-    unsigned int xjmp = mesh->xjmp();
-    unsigned int yjmp = mesh->yjmp();
-
-    qDebug() << "Running GPU raytracer";
-
-    RAY_T tiny = 1.0E-35f;
-    RAY_T huge = 1.0E35f;
-    std::vector<RAY_T> meanFreePaths;
-    meanFreePaths.resize(xs->groupCount());
-
-    std::vector<RAY_T> srcStrength(groups, 0.0);
-    for(unsigned int i = 0; i < groups; i++)
-        srcStrength[i] = srcPar->spectraIntensity[i];
-
-    if(sx < mesh->xNodes[0] || sy < mesh->yNodes[0] || sz < mesh->zNodes[0])
-    {
-        qCritical() << "Source is ouside the mesh region on the negative side";
-    }
-
-    if(sx > mesh->xNodes[mesh->xNodeCt-1] || sy > mesh->yNodes[mesh->yNodeCt-1] || sz > mesh->zNodes[mesh->zNodeCt-1])
-    {
-        qCritical() << "Source is ouside the mesh region on the positive side";
-    }
-
-    unsigned int srcIndxX = 0;
-    unsigned int srcIndxY = 0;
-    unsigned int srcIndxZ = 0;
-
-    while(mesh->xNodes[srcIndxX+1] < sx)
-        srcIndxX++;
-
-    while(mesh->yNodes[srcIndxY+1] < sy)
-        srcIndxY++;
-
-    while(mesh->zNodes[srcIndxZ+1] < sz)
-        srcIndxZ++;
-
-    unsigned int totalMissedVoxels = 0;
-
-    for(unsigned int zIndxStart = 0; zIndxStart < mesh->zElemCt; zIndxStart++)
-        for(unsigned int yIndxStart = 0; yIndxStart < mesh->yElemCt; yIndxStart++)
-            for(unsigned int xIndxStart = 0; xIndxStart < mesh->xElemCt; xIndxStart++)  // For every voxel
-            {
-
-
+    std::vector<RAY_T> *uflux = new std::vector<RAY_T>;
+    launch_isoRayKernel(quad, mesh, xs, solPar, srcPar, uflux);
     return uflux;
 }
 
@@ -1680,7 +1621,7 @@ void Solver::raytraceIsoGPU(const Quadrature *quad, const Mesh *mesh, const XSec
 {
     std::clock_t startMoment = std::clock();
 
-    std::vector<SOL_T> *uflux = basicRaytraceGPU(quad, mesh, xs, srcPar);
+    std::vector<SOL_T> *uflux = basicRaytraceGPU(quad, mesh, xs, solPar, srcPar);
 
     qDebug() << "Time to complete raytracer: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
 
@@ -1690,7 +1631,8 @@ void Solver::raytraceIsoGPU(const Quadrature *quad, const Mesh *mesh, const XSec
 
 void Solver::gsSolverIsoGPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux)
 {
-
+    qDebug() << "Launching the gs solver iso";
+    gsSolverIsoCPU(quad, mesh, xs, solPar, srcPar, uflux);
 }
 
 void Solver::raytraceLegendreGPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar)

@@ -32,121 +32,139 @@ void reportGpuData()
     }
 }
 
-int *alloc_gpuInt(int gpuId, int elements, int *data)
+int *alloc_gpuInt(const int gpuId, const int elements, const int *data)
 {
-    if(cudaSetDevice(gpuId) != cudaSuccess)
-        std::cout << "alloc_gpu failed to set the device" << std::endl;
+    int cudaerr;
+    if((cudaerr = cudaSetDevice(gpuId)) != cudaSuccess)
+        std::cout << "alloc_gpuInt failed to set the device with error code: " << cudaerr << std::endl;
 
-    //for(unsigned int i = 0; i < nDevices; i++)
-    //{
     int *gpu_data;
-    if(cudaMalloc(&gpu_data, elements*sizeof(int)) != cudaSuccess)
-        std::cout << "alloc_gpuInt threw an error while allocating CUDA memory" << std::endl;
+    if((cudaerr = cudaMalloc(&gpu_data, elements*sizeof(int))) != cudaSuccess)
+        std::cout << "alloc_gpuInt threw an error while allocating CUDA memory with error code: " << cudaerr << std::endl;
 
     if(data != NULL)
     {
-        if(cudaMemcpy(gpu_data, data, elements*sizeof(int), HOST_TO_DEVICE) != cudaSuccess)
-            std::cout << "alloc_gpuInt failed while copying data" << std::endl;
-    }
-    //}
-
-    return gpu_data;
-}
-
-float *alloc_gpuFloat(int gpuId, int elements)
-{
-    if(cudaSetDevice(gpuId) != cudaSuccess)
-        std::cout << "alloc_gpu failed to set the device" << std::endl;
-
-    int *gpu_data;
-    if(cudaMalloc(&gpu_data, elements*sizeof(float)) != cudaSuccess)
-        std::cout << "alloc_gpuFloat threw an error while allocating CUDA memory" << std::endl;
-
-    if(data != NULL)
-    {
-        if(cudaMemcpy(gpu_data, data, elements*sizeof(float), HOST_TO_DEVICE) != cudaSuccess)
-            std::cout << "alloc_gpuFloat failed while copying data" << std::endl;
+        if((cudaerr = cudaMemcpyAsync(gpu_data, data, elements*sizeof(int), cudaMemcpyHostToDevice)) != cudaSuccess)
+            std::cout << "alloc_gpuInt failed while copying data with error code: " << cudaerr << std::endl;
     }
 
     return gpu_data;
 }
 
-void release_gpu(float *gpu_data)
+float *alloc_gpuFloat(const int gpuId, const int elements, const float *cpuData)
 {
-    //int nGpu = (*gpus[0]);
-    //for(int i = 0; i < nGpu; i++)
-    //{
-    if(cudaFree(&gpu_data) != cudaSuccess)
-        std::cout << "relase_gpu threw an error while deallocating CUDA memory" << std::endl;
-    //}
-    //int **gpu_datas = new int*[nDevices+1];
-    //(*gpu_datas[0]) = nDevices;
-    //memcpy(gpu_datas[0], &nDevices, sizeof(int));
-    //(*gpu_datas[0]) = nDevices;  // Turns nDevices into an address of a float
+    int cudaerr;
+    if((cudaerr = cudaSetDevice(gpuId)) != cudaSuccess)
+        std::cout << "alloc_gpuFloat failed to set the device with error code: " << cudaerr << std::endl;
 
-    //for(unsigned int i = 0; i < nDevices; i++)
-    //{
-    //    if(cudaMalloc(&gpu_datas[i+1], elements/2*sizeof(float)) != cudaSuccess)
-    //        std::cout << "init_gpu threw an error while allocating CUDA memory" << std::endl;
-    //}
+    float *gpuData;
+    if((cudaerr = cudaMalloc(&gpuData, elements*sizeof(float))) != cudaSuccess)
+        std::cout << "alloc_gpuFloat threw an error while allocating CUDA memory with error code: " << cudaerr << std::endl;
+
+    if(cpuData != NULL)
+    {
+        if((cudaerr = cudaMemcpyAsync(gpuData, cpuData, elements*sizeof(float), cudaMemcpyHostToDevice)) != cudaSuccess)
+            std::cout << "alloc_gpuFloat failed while copying data with error code: " << cudaerr << std::endl;
+    }
+
+    return gpuData;
 }
 
-void updateCpuData(float *data_cpu, float *data_gpu, size_t elements)
+void release_gpu(int gpuId, float *gpu_data)
 {
-    if(cudaMemcpyAsync(data_cpu, data_gpu, elements*sizeof(float), cudaMemcpyDeviceToHost) != cudaSuccess)
-        printf("updateCpuData: Cuda Error!");
+    int cudaerr;
+    if((cudaerr = cudaSetDevice(gpuId)) != cudaSuccess)
+        std::cout << "release_gpu (float) failed to set the device with error code: " << cudaerr << std::endl;
+
+    if((cudaerr = cudaFree(gpu_data)) != cudaSuccess)
+        std::cout << "relase_gpu (float) threw an error while deallocating CUDA memory with error code: " << cudaerr << std::endl;
 }
 
-int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux)
+void release_gpu(int gpuId, int *gpu_data)
 {
-    dim3 dimGrid(5);
-    dim3 dimBlock(5);
+    int cudaerr;
+    if((cudaerr = cudaSetDevice(gpuId)) != cudaSuccess)
+        std::cout << "release_gpu (int) failed to set the device with error code: " << cudaerr << std::endl;
 
-    /*
-    float *uflux,
-    float *xNodes, float *yNodes, float zNodes,
-    float *dx, float *dy, float *dz,
-    int *zoneId,
-    float *atomDensity,
-    float *tot1d,
-    float *srcStrength
-    int groups,
-    flost sx, float sy, float sz,
-    srcIndxX, int srcIndxY, int srcIndxZ,
-    */
+    if((cudaerr = cudaFree(gpu_data)) != cudaSuccess)
+        std::cout << "relase_gpu (int) threw an error while deallocating int CUDA memory with error code: " << cudaerr << std::endl;
+}
+
+void updateCpuData(int gpuId, float *cpuData, float *gpuData, size_t elements, int cpuOffset)
+{
+    int cudaerr;
+    if((cudaerr = cudaSetDevice(gpuId)) != cudaSuccess)
+        std::cout << "updateCpuData (float) failed to set the device with error code: " << cudaerr << std::endl;
+
+    if((cudaerr = cudaMemcpyAsync(cpuData+cpuOffset, gpuData, elements*sizeof(float), cudaMemcpyDeviceToHost)) != cudaSuccess)
+        std::cout << "updateCpuData (float) MemcpyAsync failed with error code: " << cudaerr << std::endl;
+}
+
+void updateCpuData(int gpuId, int *cpuData, int *gpuData, size_t elements, int cpuOffset)
+{
+    int cudaerr;
+    if((cudaerr = cudaSetDevice(gpuId)) != cudaSuccess)
+        std::cout << "updateCpuData (int) failed to set the device with error code: " << cudaerr << std::endl;
+
+    if((cudaerr = cudaMemcpyAsync(cpuData+cpuOffset, gpuData, elements*sizeof(int), cudaMemcpyDeviceToHost)) != cudaSuccess)
+        std::cout << "updateCpuData (int) MemcpyAsync failed with error code: " << cudaerr << std::endl;
+}
+
+int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, std::vector<RAY_T> *uflux)
+{
+
+    if(uflux == NULL)
+    {
+        std::cout << "STOP!" << std::endl;
+        return -1;
+    }
 
     int gpuId = 0;
 
     // Allocate memory space for the solution vector
-    float *gpuUflux = alloc_gpuFloat(gpuId, mesh->voxelCount() * xs->groupCount());
+    float *gpuUflux = alloc_gpuFloat(gpuId, mesh->voxelCount() * xs->groupCount(), NULL);
 
     // Copy the xyzNode values
-    float gpuXNodes = alloc_gpuFloat(gpuId, mesh->xNodes.size(), &mesh->xNodes[0]);
-    float gpuYNodes = alloc_gpuFloat(gpuId, mesh->xNodes.size(), &mesh->yNodes[0]);
-    float gpuZNodes = alloc_gpuFloat(gpuId, mesh->xNodes.size(), &mesh->zNodes[0]);
+    float *gpuXNodes = alloc_gpuFloat(gpuId, mesh->xNodes.size(), &mesh->xNodes[0]);
+    float *gpuYNodes = alloc_gpuFloat(gpuId, mesh->xNodes.size(), &mesh->yNodes[0]);
+    float *gpuZNodes = alloc_gpuFloat(gpuId, mesh->xNodes.size(), &mesh->zNodes[0]);
 
     // Copy the dxyz values
-    float gpuDx = alloc_gpuFloat(gpuId, mesh->dx.size(), &mesh->dx[0]);
-    float gpuDy = alloc_gpuFloat(gpuId, mesh->dy.size(), &mesh->dy[0]);
-    float gpuDz = alloc_gpuFloat(gpuId, mesh->dz.size(), &mesh->dz[0]);
+    float *gpuDx = alloc_gpuFloat(gpuId, mesh->dx.size(), &mesh->dx[0]);
+    float *gpuDy = alloc_gpuFloat(gpuId, mesh->dy.size(), &mesh->dy[0]);
+    float *gpuDz = alloc_gpuFloat(gpuId, mesh->dz.size(), &mesh->dz[0]);
 
     // Copy the zone id number
-    int gpuZoneId = alloc_gpuInt(gpuId, mesh->zoneId.size(), &mesh->zoneId[0]);
+    int *gpuZoneId = alloc_gpuInt(gpuId, mesh->zoneId.size(), &mesh->zoneId[0]);
 
     // Copy the atom density
-    float gpuAtomDensity = alloc_gpuFloat(gpuId, mesh->zoneId.size(), &mesh->zoneId[0]);
+    float *gpuAtomDensity = alloc_gpuFloat(gpuId, mesh->atomDensity.size(), &mesh->atomDensity[0]);
 
     // Copy the xs data
-    float gpuTot1d = alloc_gpuFloat(gpuId, xs->m_tot1d.size(), &xs->m_tot1d[0]);
+    float *gpuTot1d = alloc_gpuFloat(gpuId, xs->m_tot1d.size(), &xs->m_tot1d[0]);
 
     // Copy the source strength
-    float gpuSrcStrength = alloc_gpuFloat(gpuId, srcPar->spectraIntensity.size(), &srcPar->spectraIntensity[0]);
+    float *gpuSrcStrength = alloc_gpuFloat(gpuId, srcPar->spectraIntensity.size(), &srcPar->spectraIntensity[0]);
 
-    int ixSrc, iySrc, izSrc;
+    //int ixSrc, iySrc, izSrc;
 
-    ixSrc = 5;
-    iySrc = 5;
-    izSrc = 5;
+    unsigned int ixSrc = 0;
+    unsigned int iySrc = 0;
+    unsigned int izSrc = 0;
+
+    while(mesh->xNodes[ixSrc+1] < srcPar->sourceX)
+        ixSrc++;
+
+    while(mesh->yNodes[iySrc+1] < srcPar->sourceY)
+        iySrc++;
+
+    while(mesh->zNodes[izSrc+1] < srcPar->sourceZ)
+        izSrc++;
+
+    dim3 dimGrid(mesh->xElemCt, mesh->yElemCt);
+    dim3 dimBlock(mesh->zElemCt);
+
+    std::cout << "Grid: " << dimGrid.x << "x" << dimGrid.y << ",   Block: " << dimBlock.x << "x" << dimBlock.y << std::endl;
 
     isoRayKernel<<<dimGrid, dimBlock>>>(
                 gpuUflux,
@@ -157,9 +175,33 @@ int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection
                 gpuTot1d,
                 gpuSrcStrength,
                 xs->groupCount(),
+                mesh->xElemCt, mesh->yElemCt, mesh->zElemCt,
                 srcPar->sourceX, srcPar->sourceY, srcPar->sourceZ,
                 ixSrc, iySrc, izSrc);
-    cudaDeviceSynchronize();
+
+    size_t elements = mesh->voxelCount() * xs->groupCount();
+    //uflux = new RAY_T[elements];
+    uflux->resize(elements);
+    //cudaDeviceSynchronize();
+
+    updateCpuData(gpuId, &(*uflux)[0], gpuUflux, elements);
+    //int cudaerr;
+    //if((cudaerr = cudaMemcpy(gpuUflux, &(*uflux)[0], elements*sizeof(float), cudaMemcpyDeviceToHost)) != cudaSuccess)
+    //    std::cout << "launch_isoRayKernel failed while copying flux from GPU to CPU with error code "<< cudaerr << std::endl;
+
+    release_gpu(gpuId, gpuUflux);
+    release_gpu(gpuId, gpuXNodes);
+    release_gpu(gpuId, gpuYNodes);
+    release_gpu(gpuId, gpuZNodes);
+    release_gpu(gpuId, gpuDx);
+    release_gpu(gpuId, gpuDy);
+    release_gpu(gpuId, gpuDz);
+    release_gpu(gpuId, gpuZoneId);
+    release_gpu(gpuId, gpuAtomDensity);
+    release_gpu(gpuId, gpuTot1d);
+    release_gpu(gpuId, gpuSrcStrength);
+    //if(cudaFree(gpu_data) != cudaSuccess)
+    //    std::cout << "alloc_gpuInt failed while copying data" << std::endl;
 
     return EXIT_SUCCESS;
 }

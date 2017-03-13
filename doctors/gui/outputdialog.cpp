@@ -61,12 +61,6 @@ OutputDialog::OutputDialog(QWidget *parent) :
 
     connect(ui->debugModeCheckBox, SIGNAL(toggled(bool)), ui->debugNextPushButton, SLOT(setEnabled(bool)));
     connect(ui->debugModeCheckBox, SIGNAL(toggled(bool)), ui->debugAbortPushButton, SLOT(setEnabled(bool)));
-
-    //MainWindow *mainWinParent = static_cast<MainWindow*>(parent);
-    //connect(ui->debugNextPushButton, SIGNAL(clicked()), mainWinParent, SLOT(userDebugNext()));
-
-    //for(int i = 0; i < 19; i++)
-    //    ui->energyComboBox->addItem(QString::number(i+1));
 }
 
 OutputDialog::~OutputDialog()
@@ -80,17 +74,11 @@ OutputDialog::~OutputDialog()
 
     if(m_solverData != NULL)
         delete m_solverData;
-
-    //if(m_data != NULL)
-    //    delete m_data;
 }
 
 void OutputDialog::updateMesh(Mesh *mesh)
 {
     m_mesh = mesh;
-
-    // I don't know the geometry anymore, so it doesn't make sense to draw anything
-    //updateMeshSlicePlane();
 }
 
 void OutputDialog::updateRaytracerData(std::vector<RAY_T> *data)
@@ -103,11 +91,9 @@ void OutputDialog::updateRaytracerData(std::vector<RAY_T> *data)
 
 void OutputDialog::updateSolverData(std::vector<SOL_T> *data)
 {
-
     m_solverData = data;
     if(ui->collidedRadioButton->isChecked() || ui->totalRadioButton->isChecked())
         reRender();
-
 }
 
 void OutputDialog::reRender()
@@ -250,14 +236,8 @@ void OutputDialog::setSliceLevel(int level)
 
         if(maxvalLevel <= 1E-35)
         {
-            //qDebug() << "Zero flux everywhere!";
             dispErrMap();
             return;
-        }
-
-        if(minvalLevel < 0)
-        {
-            //qDebug() << "WARNING: Negative flux!";
         }
 
         if((maxvalLevel - minvalLevel) / maxvalLevel < 1E-5)
@@ -350,7 +330,6 @@ void OutputDialog::setSliceLevel(int level)
 
         if(maxvalLevel <= 1E-35)
         {
-            //qDebug() << "Zero flux everywhere!";
             dispErrMap();
             return;
         }
@@ -362,23 +341,16 @@ void OutputDialog::setSliceLevel(int level)
 
         if((maxvalLevel - minvalLevel) / maxvalLevel < 1E-5)
         {
-            //qDebug() << "Displaying a flat surface!";
             dispErrMap();
             return;
         }
-
-        //qDebug() << "minvalglobal = " << m_minvalGlobal << "   maxvalGlobal = " << m_maxvalGlobal << "   minvalLevel = " << minvalLevel << "   maxvalLevel = " << maxvalLevel;
 
         if(m_logInterp)
         {
             minvalLevel = log10(minvalLevel);
             maxvalLevel = log10(maxvalLevel);
-            //qDebug() << "log(minvalglobal) = " << m_minvalGlobalLog << "   log(maxvalGlobal) = " << m_maxvalGlobalLog << "log(minvalLevel) = " << minvalLevel << "  log(maxvalLevel) = " << maxvalLevel;
         }
 
-        //QStringList list;
-        //QString datastring = "";
-        //QString fidstring = "";
         for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
         {
             for(unsigned int j = 0; j < m_mesh->zElemCt; j++)
@@ -429,14 +401,8 @@ void OutputDialog::setSliceLevel(int level)
                     rects[i*m_mesh->zElemCt + j]->setBrush(errBrush);
                 else
                     rects[i*m_mesh->zElemCt + j]->setBrush(brushes[fid]);
-                //datastring += "   " + QString::number(flux);
-                //fidstring += "   " + QString::number(fid);
             }
-            //datastring += "\n";
-            //fidstring += "\n";
         }
-        //list << datastring;
-        //list << fidstring;
     }
     else if(ui->yzRadioButton->isChecked())
     {
@@ -463,7 +429,6 @@ void OutputDialog::setSliceLevel(int level)
 
         if(maxvalLevel <= 1E-35)
         {
-            //qDebug() << "Zero flux everywhere!";
             dispErrMap();
             return;
         }
@@ -475,23 +440,16 @@ void OutputDialog::setSliceLevel(int level)
 
         if((maxvalLevel - minvalLevel) / maxvalLevel < 1E-5)
         {
-            //qDebug() << "Displaying a flat surface!";
             dispErrMap();
             return;
         }
-
-        //qDebug() << "minvalglobal = " << m_minvalGlobal << "   maxvalGlobal = " << m_maxvalGlobal << "   minvalLevel = " << minvalLevel << "   maxvalLevel = " << maxvalLevel;
 
         if(m_logInterp)
         {
             minvalLevel = log10(minvalLevel);
             maxvalLevel = log10(maxvalLevel);
-            //qDebug() << "log(minvalglobal) = " << m_minvalGlobalLog << "   log(maxvalGlobal) = " << m_maxvalGlobalLog << "log(minvalLevel) = " << minvalLevel << "  log(maxvalLevel) = " << maxvalLevel;
         }
 
-        //QStringList list;
-        //QString datastring = "";
-        //QString fidstring = "";
         for(unsigned int iy = 0; iy < m_mesh->yElemCt; iy++)
         {
             for(unsigned int iz = 0; iz < m_mesh->zElemCt; iz++)
@@ -542,14 +500,8 @@ void OutputDialog::setSliceLevel(int level)
                     rects[iy*m_mesh->yjmp() + iz]->setBrush(errBrush);
                 else
                     rects[iy*m_mesh->yjmp() + iz]->setBrush(brushes[fid]);
-                //datastring += "   " + QString::number(flux);
-                //fidstring += "   " + QString::number(fid);
             }
-            //datastring += "\n";
-            //fidstring += "\n";
         }
-        //list << datastring;
-        //list << fidstring;
     }
     else
     {

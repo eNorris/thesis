@@ -2,20 +2,38 @@
 
 __global__ void isoRayKernel(
         float *uflux,
-        //int xIndxStart, int yIndxStart, int zIndxStart, // These are from block/thread id
-        float *xNodes, float *yNodes, float zNodes,
+        float *xNodes, float *yNodes, float *zNodes,
         float *dx, float *dy, float *dz,
         int *zoneId,
         float *atomDensity,
-        int groups,
         float *tot1d,
-        flost sx, float sy, float sz,
-        srcIndxX, int srcIndxY, int srcIndxZ,
-        float *srcStrength)
+        float *srcStrength,
+        int groups,
+        int Nx, int Ny, int Nz,
+        float sx, float sy, float sz,
+        int srcIndxX, int srcIndxY, int srcIndxZ
+        )
 {
-    int xIndxStart = blockId.x;
-    int yIndxStart = blockId.y;
-    int zIndxStart = threadId.x;
+    int xIndxStart = blockIdx.x;
+    int yIndxStart = blockIdx.y;
+    int zIndxStart = threadIdx.x;
+
+    printf("<<<%i, %i, %i>>>\n", xIndxStart, yIndxStart, zIndxStart);
+
+    bool DEBUG_ = false;
+    if(xIndxStart == 35 && yIndxStart == 0 && zIndxStart == 8)
+    {
+        DEBUG_ = true;
+    }
+
+    const unsigned short DIRECTION_X = 1;
+    const unsigned short DIRECTION_Y = 2;
+    const unsigned short DIRECTION_Z = 3;
+
+    RAY_T tiny = 1.0E-35f;
+    RAY_T huge = 1.0E35f;
+
+    int ir0 = xIndxStart*Ny*Nz + yIndxStart*Nz + zIndxStart;
 
     float *meanFreePaths;
     cudaMalloc(&meanFreePaths, groups*sizeof(float));
@@ -25,17 +43,24 @@ __global__ void isoRayKernel(
     RAY_T y = yNodes[yIndxStart] + dy[yIndxStart]/2;
     RAY_T z = zNodes[zIndxStart] + dz[zIndxStart]/2;
 
+    if(DEBUG_)
+    {
+        printf("CUDA: x = %f", x);
+        printf("CUDA: y = %f", y);
+        printf("CUDA: z = %f", z);
+    }
+
     if(xIndxStart == srcIndxX && yIndxStart == srcIndxY && zIndxStart == srcIndxZ)  // End condition
     {
         RAY_T srcToCellDist = sqrt((x-sx)*(x-sx) + (y-sy)*(y-sy) + (z-sz)*(z-sz));
-        unsigned int zid = zoneId[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
+        unsigned int zid = zoneId[ir0];
         RAY_T xsval;
         for(unsigned int ie = 0; ie < groups; ie++)
         {
-            xsval = tot1d[zid*groups + ie] * atomDensity[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
-            uflux[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = srcStrength[ie] * exp(-xsval*srcToCellDist) / (4 * m_pi * srcToCellDist * srcToCellDist);
+            xsval = tot1d[zid*groups + ie] * atomDensity[ir0];
+            uflux[ie*Nx*Ny*Nz + ir0] = srcStrength[ie] * exp(-xsval*srcToCellDist) / (CUDA_4PI * srcToCellDist * srcToCellDist);
         }
-        continue;
+        return;
     }
 
     // Start raytracing through the geometry
@@ -64,10 +89,20 @@ __global__ void isoRayKernel(
     bool exhaustedRay = false;
     while(!exhaustedRay)
     {
+        int ir = xIndx*Ny*Nz + yIndx*Nz + zIndx;
+
+        if(DEBUG_)
+        {
+            printf("CUDA: ir=%i", ir);
+            printf("CUDA: ix=%i", xIndx);
+            printf("CUDA: iy=%i", yIndx);
+            printf("CUDA: iz=%i", zIndx);
+        }
+
         // Determine the distance to cell boundaries
-        RAY_T tx = (fabs(xcos) < tiny ? huge : (mesh->xNodes[xBoundIndx] - x)/xcos);  // Distance traveled [cm] when next cell is
-        RAY_T ty = (fabs(ycos) < tiny ? huge : (mesh->yNodes[yBoundIndx] - y)/ycos);  //   entered traveling in x direction
-        RAY_T tz = (fabs(zcos) < tiny ? huge : (mesh->zNodes[zBoundIndx] - z)/zcos);
+        RAY_T tx = (fabs(xcos) < tiny ? huge : (xNodes[xBoundIndx] - x)/xcos);  // Distance traveled [cm] when next cell is
+        RAY_T ty = (fabs(ycos) < tiny ? huge : (yNodes[yBoundIndx] - y)/ycos);  //   entered traveling in x direction
+        RAY_T tz = (fabs(zcos) < tiny ? huge : (zNodes[zBoundIndx] - z)/zcos);
 
         // Determine the shortest distance traveled [cm] before _any_ surface is crossed
         RAY_T tmin;
@@ -89,15 +124,15 @@ __global__ void isoRayKernel(
             dirHitFirst = DIRECTION_Z;
         }
 
-        if(tmin < -3E-8)  // Include a little padding for hitting an edge
-            qDebug() << "Reversed space!";
+        //if(tmin < -3E-8)  // Include a little padding for hitting an edge
+        //    qDebug() << "Reversed space!";
 
         // Update mpf array
-        unsigned int zid = zoneId[xIndx*xjmp + yIndx*yjmp + zIndx];
+        unsigned int zid = zoneId[ir];
         for(unsigned int ie = 0; ie < groups; ie++)
         {
             //                   [cm] * [b] * [atom/b-cm]
-            meanFreePaths[ie] += tmin * tot1d[zid*groups + ie] * atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
+            meanFreePaths[ie] += tmin * tot1d[zid*groups + ie] * atomDensity[ir];
         }
 
         // Update cell indices and positions
@@ -120,7 +155,7 @@ __global__ void isoRayKernel(
         else if(dirHitFirst == DIRECTION_Y) // y direction
         {
             x += tmin*xcos;
-            y = mesh->yNodes[yBoundIndx];
+            y = yNodes[yBoundIndx];
             z += tmin*zcos;
             if(ycos >= 0)
             {
@@ -137,12 +172,11 @@ __global__ void isoRayKernel(
         {
             x += tmin*xcos;
             y += tmin*ycos;
-            z = mesh->zNodes[zBoundIndx];
+            z = zNodes[zBoundIndx];
             if(zcos >= 0)
             {
                 zIndx++;
                 zBoundIndx++;
-                if(zIndx > srcIndxZ)
             }
             else
             {
@@ -158,7 +192,7 @@ __global__ void isoRayKernel(
             for(unsigned int ie = 0; ie < groups; ie++)
             {
                 //       [#]       = [cm] * [b] * [1/cm-b]
-                meanFreePaths[ie] += finalDist * tot1d[zid*groups + ie] * atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
+                meanFreePaths[ie] += finalDist * tot1d[zid*groups + ie] * atomDensity[ir];
             }
 
             exhaustedRay = true;
@@ -168,8 +202,8 @@ __global__ void isoRayKernel(
 
     for(unsigned int ie = 0; ie < groups; ie++)
     {
-        RAY_T flx = srcStrength[ie] * exp(-meanFreePaths[ie]) / (m_4pi * srcToCellDist * srcToCellDist);
-        uflux[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = static_cast<SOL_T>(flx);  //srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
+        RAY_T flx = srcStrength[ie] * exp(-meanFreePaths[ie]) / (CUDA_4PI * srcToCellDist * srcToCellDist);
+        uflux[ie*Nx*Ny*Nz + ir0] = static_cast<SOL_T>(flx);  //srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
     }
 }
 

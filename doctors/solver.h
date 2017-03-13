@@ -28,7 +28,7 @@ public:
 
 protected:
     std::vector<RAY_T> *basicRaytraceCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SourceParams *params);
-    std::vector<RAY_T> *basicRaytraceGPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SourceParams *params);
+    std::vector<RAY_T> *basicRaytraceGPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar);
 
 signals:
     void signalNewRaytracerIteration(std::vector<RAY_T>*);

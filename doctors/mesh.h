@@ -40,7 +40,8 @@ public:
     std::vector<float> Axz;  // Replaces DC
 
     // Always initialized
-    std::vector<unsigned short> zoneId;
+    //std::vector<unsigned short> zoneId;
+    std::vector<int> zoneId;
     std::vector<float> vol;
 
     // Only initialized when reading CT data

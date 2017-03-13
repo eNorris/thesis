@@ -20,12 +20,14 @@ class SourceParams;
 class SolverParams;
 
 void reportGpuData();
-int *alloc_gpuInt(int gpuId, int elements, int *data);
-float *alloc_gpuFloat(int gpuId, int elements, float *data);
-void release_gpu(int gpuId, float **gpus);
-void updateCpuData(float *data_cpu, float *data_gpu1, int nx, int ny);
+int *alloc_gpuInt(const int gpuId, const int elements, const int *data);
+float *alloc_gpuFloat(const int gpuId, const int elements, const float *data);
+void release_gpu(int gpuId, float *gpus);
+void release_gpu(int gpuId, int *gpus);
+void updateCpuData(int gpuId, float *data_cpu, float *data_gpu, size_t elements, int cpuOffset=0);
+void updateCpuData(int gpuId, int *data_cpu, int *data_gpu, size_t elements, int cpuOffset=0);
 
-int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux);
+int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, std::vector<RAY_T> *uflux);
 
 #endif // CUDA_LINK
 
