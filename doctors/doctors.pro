@@ -132,7 +132,8 @@ CUDA_SOURCES += cuda_kernels.cu \
                 cuda_link.cu
 
 # Path to cuda toolkit install
-CUDA_DIR      = /usr/local/cuda-7.0
+#CUDA_DIR      = /usr/local/cuda-7.0
+CUDA_DIR      = D:/CUDA/win/v8.0/sdk
 CUDA_SDK =
 
 # Path to header and libs files
@@ -141,7 +142,8 @@ QMAKE_LIBDIR += $$CUDA_DIR/lib64     # For a 64 bits Operating system
 LIBS += -lcudart -lcuda
 
 # GPU architecture
-CUDA_ARCH     = sm_35                # This depends of the GPU
+#CUDA_ARCH     = sm_35                # Titan Z
+CUDA_ARCH = 52     # GTX 960
 
 # Here are some NVCC flags I've always used by default.
 NVCCFLAGS     = --compiler-options -fno-strict-aliasing -use_fast_math --ptxas-options=-v

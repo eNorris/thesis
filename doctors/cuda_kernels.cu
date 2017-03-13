@@ -2,7 +2,7 @@
 
 __global__ void isoRayKernel(
         float *uflux,
-        int xIndxStart, int yIndxStart, int zIndxStart,
+        //int xIndxStart, int yIndxStart, int zIndxStart, // These are from block/thread id
         float *xNodes, float *yNodes, float zNodes,
         float *dx, float *dy, float *dz,
         int *zoneId,
@@ -13,6 +13,9 @@ __global__ void isoRayKernel(
         srcIndxX, int srcIndxY, int srcIndxZ,
         float *srcStrength)
 {
+    int xIndxStart = blockId.x;
+    int yIndxStart = blockId.y;
+    int zIndxStart = threadId.x;
 
     float *meanFreePaths;
     cudaMalloc(&meanFreePaths, groups*sizeof(float));
