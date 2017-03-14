@@ -8,3 +8,12 @@
 /Obj/
 /cuda_common/
 /doctors
+/Debug/
+/GeneratedFiles/
+/Release/
+/x64/
+/.vs/
+/doctors.sln
+/doctors.vcxproj
+/doctors.vcxproj.filters
+/doctors.vcxproj.user
