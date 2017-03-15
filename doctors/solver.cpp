@@ -197,6 +197,7 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
                 RAY_T srcToCellZ = sz - z;
 
                 RAY_T srcToCellDist = sqrt(srcToCellX*srcToCellX + srcToCellY*srcToCellY + srcToCellZ*srcToCellZ);
+                RAY_T srcToPtDist;
 
                 RAY_T xcos = srcToCellX/srcToCellDist;  // Fraction of direction biased in x-direction, unitless
                 RAY_T ycos = srcToCellY/srcToCellDist;
@@ -213,6 +214,16 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
                 bool exhaustedRay = false;
                 while(!exhaustedRay)
                 {
+
+                    // This ensures that roundoff error doesn't cause the ray to miss the source cell
+                    srcToCellX = sx - x;
+                    srcToCellY = sy - y;
+                    srcToCellZ = sz - z;
+                    srcToPtDist = sqrt(srcToCellX*srcToCellX + srcToCellY*srcToCellY + srcToCellZ*srcToCellZ);
+                    xcos = srcToCellX/srcToPtDist;  // Fraction of direction biased in x-direction, unitless
+                    ycos = srcToCellY/srcToPtDist;
+                    zcos = srcToCellZ/srcToPtDist;
+
                     // Determine the distance to cell boundaries
                     RAY_T tx = (fabs(xcos) < tiny ? huge : (mesh->xNodes[xBoundIndx] - x)/xcos);  // Distance traveled [cm] when next cell is
                     RAY_T ty = (fabs(ycos) < tiny ? huge : (mesh->yNodes[yBoundIndx] - y)/ycos);  //   entered traveling in x direction

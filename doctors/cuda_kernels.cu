@@ -1,9 +1,5 @@
 #include "cuda_kernels.h"
 
-
-//const SOL_T CUDA_4PI = static_cast<SOL_T>(4.0 * CUDA_PI);
-
-
 __global__ void isoRayKernel(
         float *uflux,
         float *xNodes, float *yNodes, float *zNodes,
@@ -18,21 +14,13 @@ __global__ void isoRayKernel(
         int srcIndxX, int srcIndxY, int srcIndxZ
         )
 {
+    //int xIndxStart = blockIdx.x;
+    //int yIndxStart = 2*blockIdx.y + threadIdx.y;
+    //int zIndxStart = threadIdx.x;
+
     int xIndxStart = blockIdx.x;
     int yIndxStart = blockIdx.y;
     int zIndxStart = threadIdx.x;
-
-    printf("<<<%i, %i, %i>>>\n", xIndxStart, yIndxStart, zIndxStart);
-
-    bool DEBUG_ = false;
-    if(xIndxStart == 50 && yIndxStart == 47 && zIndxStart == 8)
-    {
-        DEBUG_ = true;
-        printf("<<<%i, %i, %i>>> is a debug thread\n", xIndxStart, yIndxStart, zIndxStart);
-    }
-    //else
-    //    return;
-    DEBUG_ = true;
 
     const unsigned short DIRECTION_X = 1;
     const unsigned short DIRECTION_Y = 2;
@@ -43,31 +31,15 @@ __global__ void isoRayKernel(
 
     int ir0 = xIndxStart*Ny*Nz + yIndxStart*Nz + zIndxStart;
 
-    if(DEBUG_)
-    {
-        printf("<<<%i, %i, %i>>> About to call new\n", xIndxStart, yIndxStart, zIndxStart);
-    }
     float *meanFreePaths = new float[groups];
-    //float *meanFreePaths;
-    //cudaMalloc(&meanFreePaths, groups*sizeof(float));
 
     // This runs for a single voxel
     RAY_T x = xNodes[xIndxStart] + dx[xIndxStart]/2;
     RAY_T y = yNodes[yIndxStart] + dy[yIndxStart]/2;
     RAY_T z = zNodes[zIndxStart] + dz[zIndxStart]/2;
 
-    if(DEBUG_)
-    {
-        printf("<<<%i, %i, %i>>> -> %f, %f, %f\n", xIndxStart, yIndxStart, zIndxStart, x, y, z);
-    }
-
     if(xIndxStart == srcIndxX && yIndxStart == srcIndxY && zIndxStart == srcIndxZ)  // End condition
     {
-
-        if(DEBUG_)
-        {
-            printf("<<<%i, %i, %i>>> Got to the end condition\n", xIndxStart, yIndxStart, zIndxStart);
-        }
 
         RAY_T srcToCellDist = sqrt((x-sx)*(x-sx) + (y-sy)*(y-sy) + (z-sz)*(z-sz));
         unsigned int zid = zoneId[ir0];
@@ -90,6 +62,7 @@ __global__ void isoRayKernel(
     RAY_T srcToCellZ = sz - z;
 
     RAY_T srcToCellDist = sqrt(srcToCellX*srcToCellX + srcToCellY*srcToCellY + srcToCellZ*srcToCellZ);
+    RAY_T srcToPtDist;  // Used later in the while loop
 
     RAY_T xcos = srcToCellX/srcToCellDist;  // Fraction of direction biased in x-direction, unitless
     RAY_T ycos = srcToCellY/srcToCellDist;
@@ -99,19 +72,9 @@ __global__ void isoRayKernel(
     int yBoundIndx = (ycos >= 0 ? yIndx+1 : yIndx);
     int zBoundIndx = (zcos >= 0 ? zIndx+1 : zIndx);
 
-    if(DEBUG_)
-    {
-        printf("<<<%i, %i, %i>>> About to access mfp\n", xIndxStart, yIndxStart, zIndxStart);
-    }
-
     // Clear the MPF array to zeros
     for(unsigned int i = 0; i < groups; i++)
         meanFreePaths[i] = 0.0f;
-
-    if(DEBUG_)
-    {
-        printf("<<<%i, %i, %i>>> Got through mfp\n", xIndxStart, yIndxStart, zIndxStart);
-    }
 
     bool exhaustedRay = false;
     int iter = 0;
@@ -119,10 +82,13 @@ __global__ void isoRayKernel(
     {
         int ir = xIndx*Ny*Nz + yIndx*Nz + zIndx;
 
-        if(DEBUG_)
-        {
-            printf("<<<%i, %i, %i>>> @ %i, %i, %i, %i @ iter = %i\n", xIndxStart, yIndxStart, zIndxStart, ir, xIndx, yIndx, zIndx, iter);
-        }
+        srcToCellX = sx - x;
+        srcToCellY = sy - y;
+        srcToCellZ = sz - z;
+        srcToPtDist = sqrt(srcToCellX*srcToCellX + srcToCellY*srcToCellY + srcToCellZ*srcToCellZ);
+        xcos = srcToCellX/srcToPtDist;  // Fraction of direction biased in x-direction, unitless
+        ycos = srcToCellY/srcToPtDist;
+        zcos = srcToCellZ/srcToPtDist;
 
         // Determine the distance to cell boundaries
         RAY_T tx = (fabs(xcos) < tiny ? huge : (xNodes[xBoundIndx] - x)/xcos);  // Distance traveled [cm] when next cell is
@@ -148,14 +114,6 @@ __global__ void isoRayKernel(
             tmin = tz;
             dirHitFirst = DIRECTION_Z;
         }
-
-        if(DEBUG_)
-        {
-            printf("<<<%i, %i, %i>>> tmin = %f @ iter = %i\n", xIndxStart, yIndxStart, zIndxStart, tmin, iter);
-        }
-
-        //if(tmin < -3E-8)  // Include a little padding for hitting an edge
-        //    qDebug() << "Reversed space!";
 
         // Update mpf array
         unsigned int zid = zoneId[ir];
@@ -233,10 +191,6 @@ __global__ void isoRayKernel(
 
     for(unsigned int ie = 0; ie < groups; ie++)
     {
-        if(DEBUG_)
-        {
-            printf("<<<%i, %i, %i>>> will access %i\n", xIndxStart, yIndxStart, zIndxStart, ie*Nx*Ny*Nz + ir0);
-        }
         RAY_T flx = srcStrength[ie] * exp(-meanFreePaths[ie]) / (CUDA_4PI * srcToCellDist * srcToCellDist);
         uflux[ie*Nx*Ny*Nz + ir0] = static_cast<SOL_T>(flx);  //srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
     }
@@ -244,266 +198,113 @@ __global__ void isoRayKernel(
     delete [] meanFreePaths;
 }
 
-__global__ void isoSolKernel(float *prevdata, float *data, int nx, int ny)
+__global__ void isoSolKernel(
+        float *scalarFlux,
+        float *tempFlux,
+        float *totalSource,
+
+        int *zoneId,
+        float *mu, float *eta, float *xi, float *wt,
+
+        float *totXs1d, float *scatxs2d,
+        float *atomDensity, float *vol,
+
+        float *Axy, float *Axz, float *Ayz,
+
+        float *outboundFluxX, float *outboundFluxY, float *outboundFluxZ,
+
+        int ie, int iang,
+        int Nx, int Ny, int Nz, int angleCount
+        )
 {
-    /*
-    unsigned int groups = xs->groupCount();
+    int ix = blockIdx.x;
+    int iy = blockIdx.y;
+    int iz = threadIdx.x;
+    int ir = ix*Ny*Nz + iy*Nz + iz;
 
-    const unsigned short DIRECTION_X = 1;
-    const unsigned short DIRECTION_Y = 2;
-    const unsigned short DIRECTION_Z = 3;
+    float influxX, influxY, influxZ;
 
-    const RAY_T sx = static_cast<RAY_T>(params->sourceX);
-    const RAY_T sy = static_cast<RAY_T>(params->sourceY);
-    const RAY_T sz = static_cast<RAY_T>(params->sourceZ);
+    int zid = zoneId[ir];  // Get the zone id of this element
 
-    std::vector<SOL_T> *uflux = new std::vector<SOL_T>;
-    uflux->resize(groups * mesh->voxelCount());
-
-    unsigned int ejmp = mesh->voxelCount();
-    unsigned int xjmp = mesh->xjmp();
-    unsigned int yjmp = mesh->yjmp();
-
-    qDebug() << "Running raytracer";
-
-    RAY_T tiny = 1.0E-35f;
-    RAY_T huge = 1.0E35f;
-    std::vector<RAY_T> meanFreePaths;
-    meanFreePaths.resize(xs->groupCount());
-
-    //                                  0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5  6  7  8
-    //std::vector<RAY_T> srcStrength(groups, 0.0);  //{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0};
-    //srcStrength[srcStrength.size() - 2] = 1.0;
-    std::vector<RAY_T> srcStrength(groups, 0.0);
-    for(unsigned int i = 0; i < groups; i++)
-        srcStrength[i] = params->spectraIntensity[i];
-
-    if(sx < mesh->xNodes[0] || sy < mesh->yNodes[0] || sz < mesh->zNodes[0])
+    // Handle the x influx
+    if(mu[iang] >= 0)                                       // Approach x = 0 -> xMesh
     {
-        qCritical() << "Source is ouside the mesh region on the negative side";
+        if(ix == 0)                                               // If this is a boundary cell
+            influxX = 0.0f;                                       // then the in-flux is zero
+        else                                                      // otherwise
+            influxX = outboundFluxX[ir - Ny*Nz];  // the in-flux is the out-flux from the previous cell
+    }
+    else                                                          // Approach x = xMesh-1 -> 0
+    {
+        if(ix == Nx - 1)
+            influxX = 0.0f;
+        else
+            influxX = outboundFluxX[ir + Ny*Nz];
     }
 
-    if(sx > mesh->xNodes[mesh->xNodeCt-1] || sy > mesh->yNodes[mesh->yNodeCt-1] || sz > mesh->zNodes[mesh->zNodeCt-1])
+    // Handle the y influx
+    if(xi[iang] >= 0)                                       // Approach y = 0 -> yMesh
     {
-        qCritical() << "Source is ouside the mesh region on the positive side";
+        if(iy == 0)
+            influxY = 0.0f;
+        else
+            influxY = outboundFluxY[ir - Nz];
+    }
+    else                                                          // Approach y = yMesh-1 -> 0
+    {
+        if(iy == (signed) Ny - 1)
+            influxY = 0.0f;
+        else
+            influxY = outboundFluxY[ir + Nz];
     }
 
-    unsigned int srcIndxX = 0;
-    unsigned int srcIndxY = 0;
-    unsigned int srcIndxZ = 0;
+    // Handle the z influx
+    if(eta[iang] >= 0)
+    {
+        if(iz == 0)
+            influxZ = 0.0f;
+        else
+            influxZ = outboundFluxZ[ir - 1];
+    }
+    else
+    {
+        if(iz == (signed) Nz - 1)
+            influxZ = 0.0f;
+        else
+            influxZ = outboundFluxZ[ir + 1];
+    }
 
-    while(mesh->xNodes[srcIndxX+1] < sx)
-        srcIndxX++;
+    SOL_T inscatter = CUDA_4PI_INV*scalarFlux[ie*Nx*Ny*Nz + ir] * scatxs2d(zid, ie, ie, 0) * atomDensity[ir] * vol[ir];
 
-    while(mesh->yNodes[srcIndxY+1] < sy)
-        srcIndxY++;
+    SOL_T numer = totalSource[ir] +  inscatter +                                                                                            // [#]
+            Ayz[ie*angleCount*Ny*Nz + iang*Ny*Nz + iy*Nz + iz] * influxX +  // [cm^2 * #/cm^2]  The 2x is already factored in
+            Axz[ie*angleCount*Nx*Nz + iang*Nx*Nz + ix*Nz + iz] * influxY +
+            Axy[ie*angleCount*Nx*Ny + iang*Nx*Ny + ix*Ny + iy] * influxZ;
+    SOL_T denom = mesh->vol[ir] * totXs1d(zid, ie) * atomDensity[ir] +                               // [cm^3] * [b] * [1/b-cm]
+            Ayz[ie*angleCount*Ny*Nz + iang*Ny*Nz + iy*Nz + iz] +            // [cm^2]
+            Axz[ie*angleCount*Nx*Nz + iang*Nx*Nz + ix*Nz + iz] +
+            Axy[ie*angleCount*Nx*Ny + iang*Nx*Ny + ix*Ny + iy];
 
-    while(mesh->zNodes[srcIndxZ+1] < sz)
-        srcIndxZ++;
+    //   [#/cm^2] = [#]  / [cm^2]
+    SOL_T angFlux = numer/denom;
 
-    unsigned int totalMissedVoxels = 0;
+    //if(std::isnan(angFlux))
+    //{
+    //    qDebug() << "Found a nan!";
+    //    qDebug() << "Vol = " << mesh->vol[ix*xjmp+iy*yjmp+iz];
+    //    qDebug() << "xs = " << xs->totXs1d(zid, ie);
+    //    qDebug() << "Ayz = " << mesh->Ayz[iang*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz];
+    //    qDebug() << "Axz = " << mesh->Axz[iang*mesh->xElemCt*mesh->zElemCt + ix*mesh->zElemCt + iz];
+    //    qDebug() << "Axy = " << mesh->Axy[iang*mesh->xElemCt*mesh->yElemCt + ix*mesh->yElemCt + iy];
+    //}
 
-    for(unsigned int zIndxStart = 0; zIndxStart < mesh->zElemCt; zIndxStart++)
-        for(unsigned int yIndxStart = 0; yIndxStart < mesh->yElemCt; yIndxStart++)
-            for(unsigned int xIndxStart = 0; xIndxStart < mesh->xElemCt; xIndxStart++)  // For every voxel
-            {
-                //qDebug() << "voxel " << xIndxStart << " " << yIndxStart << " " << zIndxStart;
-                RAY_T x = mesh->xNodes[xIndxStart] + mesh->dx[xIndxStart]/2;
-                RAY_T y = mesh->yNodes[yIndxStart] + mesh->dy[yIndxStart]/2;
-                RAY_T z = mesh->zNodes[zIndxStart] + mesh->dz[zIndxStart]/2;
+    //angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz] = angFlux;
 
-                if(xIndxStart == srcIndxX && yIndxStart == srcIndxY && zIndxStart == srcIndxZ)  // End condition
-                {
-                    RAY_T srcToCellDist = sqrt((x-sx)*(x-sx) + (y-sy)*(y-sy) + (z-sz)*(z-sz));
-                    unsigned int zid = mesh->zoneId[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
-                    RAY_T xsval;
-                    for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
-                    {
-                        xsval = xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
-                        (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = srcStrength[ie] * exp(-xsval*srcToCellDist) / (4 * m_pi * srcToCellDist * srcToCellDist);
-                    }
-                    continue;
-                }
+    outboundFluxX[ir] = 2*angFlux - influxX;
+    outboundFluxY[ir] = 2*angFlux - influxY;
+    outboundFluxZ[ir] = 2*angFlux - influxZ;
 
-                // Start raytracing through the geometry
-                unsigned int xIndx = xIndxStart;
-                unsigned int yIndx = yIndxStart;
-                unsigned int zIndx = zIndxStart;
+    // Sum all the angular fluxes
+    tempFlux[ir] += wt[iang]*angFlux;
 
-                RAY_T srcToCellX = sx - x;
-                RAY_T srcToCellY = sy - y;
-                RAY_T srcToCellZ = sz - z;
-
-                RAY_T srcToCellDist = sqrt(srcToCellX*srcToCellX + srcToCellY*srcToCellY + srcToCellZ*srcToCellZ);
-
-                RAY_T xcos = srcToCellX/srcToCellDist;  // Fraction of direction biased in x-direction, unitless
-                RAY_T ycos = srcToCellY/srcToCellDist;
-                RAY_T zcos = srcToCellZ/srcToCellDist;
-
-                int xBoundIndx = (xcos >= 0 ? xIndx+1 : xIndx);
-                int yBoundIndx = (ycos >= 0 ? yIndx+1 : yIndx);
-                int zBoundIndx = (zcos >= 0 ? zIndx+1 : zIndx);
-
-                // Clear the MPF array to zeros
-                for(unsigned int i = 0; i < xs->groupCount(); i++)
-                    meanFreePaths[i] = 0.0f;
-
-                bool exhaustedRay = false;
-                while(!exhaustedRay)
-                {
-                    // Determine the distance to cell boundaries
-                    RAY_T tx = (fabs(xcos) < tiny ? huge : (mesh->xNodes[xBoundIndx] - x)/xcos);  // Distance traveled [cm] when next cell is
-                    RAY_T ty = (fabs(ycos) < tiny ? huge : (mesh->yNodes[yBoundIndx] - y)/ycos);  //   entered traveling in x direction
-                    RAY_T tz = (fabs(zcos) < tiny ? huge : (mesh->zNodes[zBoundIndx] - z)/zcos);
-
-                    // Determine the shortest distance traveled [cm] before _any_ surface is crossed
-                    RAY_T tmin;
-                    unsigned short dirHitFirst;
-
-                    if(tx < ty && tx < tz)
-                    {
-                        tmin = tx;
-                        dirHitFirst = DIRECTION_X;
-                    }
-                    else if(ty < tz)
-                    {
-                        tmin = ty;
-                        dirHitFirst = DIRECTION_Y;
-                    }
-                    else
-                    {
-                        tmin = tz;
-                        dirHitFirst = DIRECTION_Z;
-                    }
-
-                    if(tmin < -3E-8)  // Include a little padding for hitting an edge
-                        qDebug() << "Reversed space!";
-
-                    // Update mpf array
-                    unsigned int zid = mesh->zoneId[xIndx*xjmp + yIndx*yjmp + zIndx];
-                    for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
-                    {
-                        //                   [cm] * [b] * [atom/b-cm]
-                        meanFreePaths[ie] += tmin * xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
-                    }
-
-                    // Update cell indices and positions
-                    if(dirHitFirst == DIRECTION_X) // x direction
-                    {
-                        x = mesh->xNodes[xBoundIndx];
-                        y += tmin*ycos;
-                        z += tmin*zcos;
-                        if(xcos >= 0)
-                        {
-                            xIndx++;
-                            xBoundIndx++;
-                            if(xIndx > srcIndxX)
-                            {
-                                totalMissedVoxels++;
-                                qCritical() << "Missed the target x+ bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
-                                exhaustedRay = true;
-                            }
-                        }
-                        else
-                        {
-                            xIndx--;
-                            xBoundIndx--;
-                            if(xIndx < srcIndxX)
-                            {
-                                totalMissedVoxels++;
-                                qCritical() << "Missed the target x- bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
-                                exhaustedRay = true;
-                            }
-                        }
-                    }
-                    else if(dirHitFirst == DIRECTION_Y) // y direction
-                    {
-                        x += tmin*xcos;
-                        y = mesh->yNodes[yBoundIndx];
-                        z += tmin*zcos;
-                        if(ycos >= 0)
-                        {
-                            yIndx++;
-                            yBoundIndx++;
-                            if(yIndx > srcIndxY)
-                            {
-                                totalMissedVoxels++;
-                                qCritical() << "Missed the target y+ bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
-                                exhaustedRay = true;
-                            }
-                        }
-                        else
-                        {
-                            yIndx--;
-                            yBoundIndx--;
-                            if(yIndx < srcIndxY)
-                            {
-                                totalMissedVoxels++;
-                                qCritical() << "Missed the target y- bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
-                                exhaustedRay = true;
-                            }
-                        }
-                    }
-                    else if(dirHitFirst == DIRECTION_Z) // z direction
-                    {
-                        x += tmin*xcos;
-                        y += tmin*ycos;
-                        z = mesh->zNodes[zBoundIndx];
-                        if(zcos >= 0)
-                        {
-                            zIndx++;
-                            zBoundIndx++;
-                            if(zIndx > srcIndxZ)
-                            {
-                                totalMissedVoxels++;
-                                qCritical() << "Missed the target z+ bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
-                                exhaustedRay = true;
-                            }
-                        }
-                        else
-                        {
-                            zIndx--;
-                            zBoundIndx--;
-                            if(zIndx < srcIndxZ)
-                            {
-                                totalMissedVoxels++;
-                                qCritical() << "Missed the target z- bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
-                                exhaustedRay = true;
-                            }
-                        }
-                    }
-
-                    if((xIndx == srcIndxX && yIndx == srcIndxY && zIndx == srcIndxZ) || exhaustedRay)
-                    {
-                        RAY_T finalDist = sqrt((x-sx)*(x-sx) + (y-sy)*(y-sy) + (z-sz)*(z-sz));
-
-                        for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
-                        {
-                            //       [#]       = [cm] * [b] * [1/cm-b]
-                            meanFreePaths[ie] += finalDist * xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
-                        }
-
-                        exhaustedRay = true;
-                    }
-
-                } // End of while loop
-
-                for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
-                {
-                    RAY_T flx = srcStrength[ie] * exp(-meanFreePaths[ie]) / (m_4pi * srcToCellDist * srcToCellDist);
-
-                    if(flx < 0)
-                        qDebug() << "solver.cpp: (291): Negative?";
-
-                    if(flx > 1E6)
-                        qDebug() << "solver.cpp: (294): Too big!";
-
-                    (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = static_cast<SOL_T>(flx);  //srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
-                }
-
-            } // End of each voxel
-
-    return uflux;
-
-    */
 }

@@ -134,8 +134,8 @@ DESTDIR = $$PWD #$$system("echo %cd%")
 OBJECTS_DIR = $$DESTDIR/Obj
 
 # Path to cuda toolkit install
-#CUDA_DIR      = /usr/local/cuda-7.0
-CUDA_DIR      = D:/CUDA/win/v8.0/sdk
+CUDA_DIR      = /usr/local/cuda-7.0
+#CUDA_DIR      = D:/CUDA/win/v8.0/sdk
 #CUDA_SDK =
 
 # Visual Studio 2015 full CUDA compile command for compiling kernel.cu in the default save location
@@ -160,19 +160,19 @@ CUDA_DIR      = D:/CUDA/win/v8.0/sdk
 # Path to header and libs files
 INCLUDEPATH  += $$CUDA_DIR/include
 INCLUDEPATH  += $$DESTDIR/cuda_common/inc
-#QMAKE_LIBDIR += $$CUDA_DIR/lib64     # For a 64 bits Linux
-QMAKE_LIBDIR += $$CUDA_DIR/lib/x64      # For 64 bit Windows
+QMAKE_LIBDIR += $$CUDA_DIR/lib64     # For a 64 bits Linux
+#QMAKE_LIBDIR += $$CUDA_DIR/lib/x64      # For 64 bit Windows
 LIBS += -lcudart -lcuda
 
 #VS2015_CUDA = --use-local-env --cl-version 2015 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin" -G --keep-dir Debug -maxrregcount=0 --machine 32 --compile -cudart static -g -DWIN32 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /FS /Zi /RTC1 /MDd "
 
 # GPU architecture
-#CUDA_ARCH     = sm_35                # Titan Z
-CUDA_ARCH = sm_52     # GTX 960
+CUDA_ARCH     = sm_35                # Titan Z
+#CUDA_ARCH = sm_52     # GTX 960
 
 # Here are some NVCC flags I've always used by default.
-#NVCCFLAGS     = --compiler-options -fno-strict-aliasing -use_fast_math --ptxas-options=-v
-NVCCFLAGS     = --compiler-options -fno-strict-aliasing -use_fast_math --ptxas-options=-v -D_DEBUG --cudart=shared  -Xcompiler "/EHsc /W3 /nologo /FS /Zi /MDd"
+NVCCFLAGS     = --compiler-options -fno-strict-aliasing -use_fast_math --ptxas-options=-v -lineinfo
+#NVCCFLAGS     = --compiler-options -fno-strict-aliasing -use_fast_math --ptxas-options=-v -D_DEBUG --cudart=shared  -Xcompiler "/EHsc /W3 /nologo /FS /Zi /MDd"
 
 # Prepend with -I
 CUDA_INC = $$join(INCLUDEPATH,' -I','-I',' ')
@@ -187,11 +187,12 @@ cuda.commands = $$CUDA_DIR/bin/nvcc -m64 -O3 -arch=$$CUDA_ARCH -c $$NVCCFLAGS \
                 2>&1 | sed -r \"s/\\(([0-9]+)\\)/:\\1/g\" 1>&2
 cuda.dependency_type = TYPE_C
 cuda.depend_command = $$CUDA_DIR/bin/nvcc -O3 -M $$CUDA_INC $$NVCCFLAGS  ${QMAKE_FILE_NAME}
-#cuda.input = CUDA_SOURCES
-#cuda.output = ${OBJECTS_DIR}/${QMAKE_FILE_BASE}_cuda.o
-
 cuda.input = CUDA_SOURCES
-cuda.output = $$OBJECTS_DIR/${QMAKE_FILE_BASE}_cuda.obj
+cuda.output = ${OBJECTS_DIR}/${QMAKE_FILE_BASE}_cuda.o
+
+# Windows version
+#cuda.input = CUDA_SOURCES
+#cuda.output = $$OBJECTS_DIR/${QMAKE_FILE_BASE}_cuda.obj
 
 message(QMAKE_FILE_BASE: $$QMAKE_FILE_BASE)
 

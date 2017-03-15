@@ -23,7 +23,19 @@ __global__ void isoRayKernel(
         int srcIndxX, int srcIndxY, int srcIndxZ
         );
 
-__global__ void isoSolKernel(float *data1, float *data2, int nx, int ny);
+__global__ void isoSolKernel(
+        float *uflux,
+        float *xNodes, float *yNodes, float *zNodes,
+        float *dx, float *dy, float *dz,
+        int *zoneId,
+        float *atomDensity,
+        float *tot1d,
+        float *srcStrength,
+        int groups,
+        int Nx, int Ny, int Nz,
+        float sx, float sy, float sz,
+        int srcIndxX, int srcIndxY, int srcIndxZ
+        );
 
 #endif // CUDA_KERNALS
 
