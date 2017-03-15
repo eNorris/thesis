@@ -17,3 +17,7 @@
 /doctors.vcxproj
 /doctors.vcxproj.filters
 /doctors.vcxproj.user
+*.exe
+*.ilk
+*.VC.db
+*.pdb

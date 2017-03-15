@@ -109,6 +109,10 @@ FORMS    += mainwindow.ui \
     solverparamsdialog.ui \
     gui/energydialog.ui
 
+# Cuda sources
+CUDA_SOURCES += cuda_kernels.cu \
+                cuda_link.cu
+	
 #DISTFILES += \
 #    testinput.cfg
 
@@ -118,38 +122,63 @@ FORMS    += mainwindow.ui \
 #install_it.files = testinput.cfg
 #INSTALLS += install_it
 
-
-# ===== Extra stuff for CUDA =====
-# From: https://cudaspace.wordpress.com/2012/07/05/qt-creator-cuda-linux-review/
-DESTDIR     = $$system(pwd)
-OBJECTS_DIR = $$DESTDIR/Obj
-
 # C++ flags
 QMAKE_CXXFLAGS_RELEASE =-O3
 
-# Cuda sources
-CUDA_SOURCES += cuda_kernels.cu \
-                cuda_link.cu
+
+# ===== Extra stuff for CUDA =====
+# From: https://cudaspace.wordpress.com/2012/07/05/qt-creator-cuda-linux-review/
+#DESTDIR     = $$system(pwd)
+DESTDIR = $$PWD #$$system("echo %cd%")
+#DESTDIR = D:/thesis/doctors
+OBJECTS_DIR = $$DESTDIR/Obj
 
 # Path to cuda toolkit install
 #CUDA_DIR      = /usr/local/cuda-7.0
 CUDA_DIR      = D:/CUDA/win/v8.0/sdk
-CUDA_SDK =
+#CUDA_SDK =
+
+# Visual Studio 2015 full CUDA compile command for compiling kernel.cu in the default save location
+#  "D:\CUDA\win\v8.0\sdk\bin\nvcc.exe" 
+#  -gencode=arch=compute_20,code=\"sm_20,compute_20\" 
+#  --use-local-env 
+#  --cl-version 2015 
+#  -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin"  
+#  -ID:\CUDA\win\v8.0\sdk\include 
+#  -ID:\CUDA\win\v8.0\sdk\include  
+#  -G   
+#  --keep-dir Debug 
+#  -maxrregcount=0  
+#  --machine 32 
+#  --compile -cudart static  
+#  -g   
+#  -DWIN32 -D_DEBUG -D_CONSOLE -D_MBCS 
+#  -Xcompiler "/EHsc /W3 /nologo /Od /FS /Zi /RTC1 /MDd " 
+#  -o Debug\kernel.cu.obj 
+#  "C:\Users\Edward\Documents\Visual Studio 2015\Projects\cuda_test1\cuda_test1\kernel.cu"
 
 # Path to header and libs files
 INCLUDEPATH  += $$CUDA_DIR/include
-QMAKE_LIBDIR += $$CUDA_DIR/lib64     # For a 64 bits Operating system
+INCLUDEPATH  += $$DESTDIR/cuda_common/inc
+#QMAKE_LIBDIR += $$CUDA_DIR/lib64     # For a 64 bits Linux
+QMAKE_LIBDIR += $$CUDA_DIR/lib/x64      # For 64 bit Windows
 LIBS += -lcudart -lcuda
+
+#VS2015_CUDA = --use-local-env --cl-version 2015 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin" -G --keep-dir Debug -maxrregcount=0 --machine 32 --compile -cudart static -g -DWIN32 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /FS /Zi /RTC1 /MDd "
 
 # GPU architecture
 #CUDA_ARCH     = sm_35                # Titan Z
-CUDA_ARCH = 52     # GTX 960
+CUDA_ARCH = sm_52     # GTX 960
 
 # Here are some NVCC flags I've always used by default.
-NVCCFLAGS     = --compiler-options -fno-strict-aliasing -use_fast_math --ptxas-options=-v
+#NVCCFLAGS     = --compiler-options -fno-strict-aliasing -use_fast_math --ptxas-options=-v
+NVCCFLAGS     = --compiler-options -fno-strict-aliasing -use_fast_math --ptxas-options=-v -D_DEBUG --cudart=shared  -Xcompiler "/EHsc /W3 /nologo /FS /Zi /MDd"
 
-# Prepare the extra compiler configuration (taken from the nvidia forum - i'm not an expert in this part)
+# Prepend with -I
 CUDA_INC = $$join(INCLUDEPATH,' -I','-I',' ')
+
+# RUNNING THE BELOW COMMAND IN CMD WORKS
+#D:/CUDA/win/v8.0/sdk/bin/nvcc -m64 -O3 -arch=sm_52 -c --compiler-options --cudart=shared --ptxas-options=-v -ID:/CUDA/win/v8.0/sdk/include -ID:/thesis/doctors/cuda_common/inc  -lcudart -lcuda -D_DEBUG -Xcompiler "/EHsc /W3 /nologo /FS /Zi /MDd" ..\doctors\cuda_link.cu -o ..\doctors\Obj\cuda_link_cuda.obj
 
 # nvcc error printout format ever so slightly different from gcc
 # http://forums.nvidia.com/index.php?showtopic=171651
@@ -157,13 +186,20 @@ cuda.commands = $$CUDA_DIR/bin/nvcc -m64 -O3 -arch=$$CUDA_ARCH -c $$NVCCFLAGS \
                 $$CUDA_INC $$LIBS  ${QMAKE_FILE_NAME} -o ${QMAKE_FILE_OUT} \
                 2>&1 | sed -r \"s/\\(([0-9]+)\\)/:\\1/g\" 1>&2
 cuda.dependency_type = TYPE_C
-cuda.depend_command = $$CUDA_DIR/bin/nvcc -O3 -M $$CUDA_INC $$NVCCFLAGS   ${QMAKE_FILE_NAME}
+cuda.depend_command = $$CUDA_DIR/bin/nvcc -O3 -M $$CUDA_INC $$NVCCFLAGS  ${QMAKE_FILE_NAME}
+#cuda.input = CUDA_SOURCES
+#cuda.output = ${OBJECTS_DIR}/${QMAKE_FILE_BASE}_cuda.o
+
 cuda.input = CUDA_SOURCES
-cuda.output = ${OBJECTS_DIR}${QMAKE_FILE_BASE}_cuda.o
+cuda.output = $$OBJECTS_DIR/${QMAKE_FILE_BASE}_cuda.obj
+
+message(QMAKE_FILE_BASE: $$QMAKE_FILE_BASE)
 
 message(cuda.commands: $$cuda.commands)
 message(cuda.depend_command: $$cuda.depend_command)
+message(cuda.input: $$cuda.input)
+message(cuda.output: $$cuda.output)
 
-# Tell Qt that we want add more stuff to the Makefile
+# Tell Qt how to handle the cuda compiler
 QMAKE_EXTRA_COMPILERS += cuda
 

@@ -1,5 +1,9 @@
 #include "cuda_kernels.h"
 
+
+//const SOL_T CUDA_4PI = static_cast<SOL_T>(4.0 * CUDA_PI);
+
+
 __global__ void isoRayKernel(
         float *uflux,
         float *xNodes, float *yNodes, float *zNodes,
@@ -21,10 +25,14 @@ __global__ void isoRayKernel(
     printf("<<<%i, %i, %i>>>\n", xIndxStart, yIndxStart, zIndxStart);
 
     bool DEBUG_ = false;
-    if(xIndxStart == 35 && yIndxStart == 0 && zIndxStart == 8)
+    if(xIndxStart == 50 && yIndxStart == 47 && zIndxStart == 8)
     {
         DEBUG_ = true;
+        printf("<<<%i, %i, %i>>> is a debug thread\n", xIndxStart, yIndxStart, zIndxStart);
     }
+    //else
+    //    return;
+    DEBUG_ = true;
 
     const unsigned short DIRECTION_X = 1;
     const unsigned short DIRECTION_Y = 2;
@@ -35,8 +43,13 @@ __global__ void isoRayKernel(
 
     int ir0 = xIndxStart*Ny*Nz + yIndxStart*Nz + zIndxStart;
 
-    float *meanFreePaths;
-    cudaMalloc(&meanFreePaths, groups*sizeof(float));
+    if(DEBUG_)
+    {
+        printf("<<<%i, %i, %i>>> About to call new\n", xIndxStart, yIndxStart, zIndxStart);
+    }
+    float *meanFreePaths = new float[groups];
+    //float *meanFreePaths;
+    //cudaMalloc(&meanFreePaths, groups*sizeof(float));
 
     // This runs for a single voxel
     RAY_T x = xNodes[xIndxStart] + dx[xIndxStart]/2;
@@ -45,13 +58,17 @@ __global__ void isoRayKernel(
 
     if(DEBUG_)
     {
-        printf("CUDA: x = %f", x);
-        printf("CUDA: y = %f", y);
-        printf("CUDA: z = %f", z);
+        printf("<<<%i, %i, %i>>> -> %f, %f, %f\n", xIndxStart, yIndxStart, zIndxStart, x, y, z);
     }
 
     if(xIndxStart == srcIndxX && yIndxStart == srcIndxY && zIndxStart == srcIndxZ)  // End condition
     {
+
+        if(DEBUG_)
+        {
+            printf("<<<%i, %i, %i>>> Got to the end condition\n", xIndxStart, yIndxStart, zIndxStart);
+        }
+
         RAY_T srcToCellDist = sqrt((x-sx)*(x-sx) + (y-sy)*(y-sy) + (z-sz)*(z-sz));
         unsigned int zid = zoneId[ir0];
         RAY_T xsval;
@@ -82,21 +99,29 @@ __global__ void isoRayKernel(
     int yBoundIndx = (ycos >= 0 ? yIndx+1 : yIndx);
     int zBoundIndx = (zcos >= 0 ? zIndx+1 : zIndx);
 
+    if(DEBUG_)
+    {
+        printf("<<<%i, %i, %i>>> About to access mfp\n", xIndxStart, yIndxStart, zIndxStart);
+    }
+
     // Clear the MPF array to zeros
     for(unsigned int i = 0; i < groups; i++)
         meanFreePaths[i] = 0.0f;
 
+    if(DEBUG_)
+    {
+        printf("<<<%i, %i, %i>>> Got through mfp\n", xIndxStart, yIndxStart, zIndxStart);
+    }
+
     bool exhaustedRay = false;
+    int iter = 0;
     while(!exhaustedRay)
     {
         int ir = xIndx*Ny*Nz + yIndx*Nz + zIndx;
 
         if(DEBUG_)
         {
-            printf("CUDA: ir=%i", ir);
-            printf("CUDA: ix=%i", xIndx);
-            printf("CUDA: iy=%i", yIndx);
-            printf("CUDA: iz=%i", zIndx);
+            printf("<<<%i, %i, %i>>> @ %i, %i, %i, %i @ iter = %i\n", xIndxStart, yIndxStart, zIndxStart, ir, xIndx, yIndx, zIndx, iter);
         }
 
         // Determine the distance to cell boundaries
@@ -122,6 +147,11 @@ __global__ void isoRayKernel(
         {
             tmin = tz;
             dirHitFirst = DIRECTION_Z;
+        }
+
+        if(DEBUG_)
+        {
+            printf("<<<%i, %i, %i>>> tmin = %f @ iter = %i\n", xIndxStart, yIndxStart, zIndxStart, tmin, iter);
         }
 
         //if(tmin < -3E-8)  // Include a little padding for hitting an edge
@@ -197,14 +227,21 @@ __global__ void isoRayKernel(
 
             exhaustedRay = true;
         }
+        iter++;
 
     } // End of while loop
 
     for(unsigned int ie = 0; ie < groups; ie++)
     {
+        if(DEBUG_)
+        {
+            printf("<<<%i, %i, %i>>> will access %i\n", xIndxStart, yIndxStart, zIndxStart, ie*Nx*Ny*Nz + ir0);
+        }
         RAY_T flx = srcStrength[ie] * exp(-meanFreePaths[ie]) / (CUDA_4PI * srcToCellDist * srcToCellDist);
         uflux[ie*Nx*Ny*Nz + ir0] = static_cast<SOL_T>(flx);  //srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
     }
+
+    delete [] meanFreePaths;
 }
 
 __global__ void isoSolKernel(float *prevdata, float *data, int nx, int ny)

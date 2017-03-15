@@ -112,7 +112,6 @@ void updateCpuData(int gpuId, int *cpuData, int *gpuData, size_t elements, int c
 
 int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, std::vector<RAY_T> *uflux)
 {
-
     if(uflux == NULL)
     {
         std::cout << "STOP!" << std::endl;
@@ -200,6 +199,8 @@ int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     release_gpu(gpuId, gpuAtomDensity);
     release_gpu(gpuId, gpuTot1d);
     release_gpu(gpuId, gpuSrcStrength);
+
+    std::cout << "Most recent CUDA Error: " << cudaGetErrorString(cudaGetLastError()) << std::endl;
     //if(cudaFree(gpu_data) != cudaSuccess)
     //    std::cout << "alloc_gpuInt failed while copying data" << std::endl;
 

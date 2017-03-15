@@ -5,9 +5,9 @@
 #include "globals.h"
 #include <stdio.h>
 
-const SOL_T CUDA_PI = static_cast<SOL_T>(3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679);
-const SOL_T CUDA_4PI = static_cast<SOL_T>(4.0 * CUDA_PI);
-const SOL_T CUDA_4PI_INV = static_cast<SOL_T>(1.0 / CUDA_4PI);
+#define CUDA_PI 3.14159
+#define CUDA_4PI 12.5663706144
+#define CUDA_4PI_INV 0.07957747154
 
 __global__ void isoRayKernel(
         float *uflux,
