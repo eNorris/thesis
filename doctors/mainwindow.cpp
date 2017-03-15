@@ -10,19 +10,18 @@
 #include "mesh.h"
 #include "xsection.h"
 #include "solverparams.h"
+#include "sourceparams.h"
 
 #include "gui/outputdialog.h"
 #include "gui/geomdialog.h"
 #include "gui/quaddialog.h"
 #include "gui/xsectiondialog.h"
 #include "gui/energydialog.h"
+
 #include "outwriter.h"
 #include "ctdatamanager.h"
 #include "legendre.h"
 #include "solver.h"
-#include "sourceparams.h"
-
-#include "outwriter.h"
 #include "mcnpwriter.h"
 #include "materialutils.h"
 
@@ -33,8 +32,6 @@
 #undef SIGNAL
 #define _SIGNAL(a) "2"#a
 #define SIGNAL(a) _SIGNAL(a)
-
-//#include "config.h"
 
 QPalette *MainWindow::m_goodPalette = NULL;
 QPalette *MainWindow::m_badPalette = NULL;
@@ -100,7 +97,6 @@ MainWindow::MainWindow(QWidget *parent):
     connect(&m_xsWorkerThread, SIGNAL(finished()), m_parser, SLOT(deleteLater()));
     connect(this, SIGNAL(signalBeginXsParse(QString)), m_parser, SLOT(parseFile(QString)));
     connect(m_parser, SIGNAL(signalXsUpdate(int)), this, SLOT(xsParseUpdateHandler(int)));
-    //connect(m_parser, SIGNAL(finishedParsing(AmpxParser*)), this, SLOT(buildMaterials(AmpxParser*)));
     connect(m_parser, SIGNAL(signalNotifyNumberNuclides(int)), ui->mainProgressBar, SLOT(setMaximum(int)));
     connect(m_parser, SIGNAL(finishedParsing(AmpxParser*)), this, SLOT(xsParseFinished(AmpxParser*)));
     m_xsWorkerThread.start();
@@ -139,8 +135,6 @@ MainWindow::MainWindow(QWidget *parent):
     ui->xsGroupBox->setStyleSheet("QGroupBox { color: red; } ");
     ui->paramsGroupBox->setStyleSheet("QGroupBox { color: red; } ");
     ui->quadGroupBox->setStyleSheet("QGroupBox { color: red; } ");
-
-    //qDebug() << "Loaded default configuration";
 
     quadDialog->updateQuad(m_quad);
 }
@@ -344,12 +338,10 @@ void MainWindow::updateLaunchButton()
     if(m_paramsLoaded)
     {
         ui->paramsGroupBox->setStyleSheet("QGroupBox { color: black; } ");
-        //ui->paramsExplorePushButton->setEnabled(true);
     }
     else
     {
         ui->paramsGroupBox->setStyleSheet("QGroupBox { color: red; } ");
-        //ui->paramsExplorePushButton->setEnabled(false);
     }
 
     ui->geometryGroupBox->update();
@@ -478,10 +470,6 @@ void MainWindow::on_xsOpenPushButton_clicked()
 
     ui->xsFileLineEdit->setText(filename);
 
-    //m_xsLoaded = true;
-
-    //updateLaunchButton();
-
     emit signalBeginXsParse(filename);
 }
 
@@ -502,16 +490,6 @@ void MainWindow::on_actionMCNP6_Generation_triggered()
 
     if(m_srcParams == NULL)
     {
-        /*
-        if(energyDialog->getUserIntensity().size() == 0)
-        {
-            QString errmsg = QString("A cross section datafile must be loaded to determine the energy structure before a MCNP6 file can be generated.");
-            QMessageBox::warning(this, "Insufficient Data", errmsg, QMessageBox::Close);
-            return;
-        }
-
-        m_params = new SolverParams(energyDialog->getUserIntensity(), ui->sourceXDoubleSpinBox->value(), ui->sourceYDoubleSpinBox->value(), ui->sourceZDoubleSpinBox->value());
-        */
         QString errmsg = QString("The energy spectra must be loaded before a MCNP6 file can be generated.");
         QMessageBox::warning(this, "Insufficient Data", errmsg, QMessageBox::Close);
         return;
@@ -530,8 +508,6 @@ void MainWindow::on_actionMCNP6_Generation_triggered()
         QMessageBox::warning(this, "Divide by zero", errmsg, QMessageBox::Close);
         return;
     }
-
-    //m_params->spectraIntensity = energyDialog->getUserIntensity();
 
     McnpWriter mcnpwriter;
     mcnpwriter.writeMcnp("../mcnp.gitignore/mcnp_out.inp", m_mesh, m_srcParams, false);
@@ -585,8 +561,6 @@ void MainWindow::onRaytracerFinished(std::vector<RAY_T>* uncollided)
 {
     m_raytrace = uncollided;
 
-    //OutWriter::writeScalarFluxMesh("uncol_flux.dat", *m_xs, *m_mesh, *uncollided);
-
     switch(m_solType)
     {
     case MainWindow::ISOTROPIC:
@@ -604,8 +578,6 @@ void MainWindow::onRaytracerFinished(std::vector<RAY_T>* uncollided)
     default:
         qCritical() << "No solver of type " << m_solType;
     }
-
-    //emit signalLaunchIsoSolver(m_quad, m_mesh, m_xs, uncollided);
 }
 
 void MainWindow::onSolverFinished(std::vector<SOL_T> *solution)
@@ -613,7 +585,6 @@ void MainWindow::onSolverFinished(std::vector<SOL_T> *solution)
     m_solution = solution;
 
     std::vector<SOL_T> scalar;
-    //OutWriter::writeArray("solution.dat", *solution);
 
     switch(m_solType)
     {
@@ -631,7 +602,6 @@ void MainWindow::onSolverFinished(std::vector<SOL_T> *solution)
                 for(unsigned int ia = 0; ia < m_quad->angleCount(); ia++)
                     scalar[scalarOffset] += (*solution)[angularOffset + ia*m_mesh->voxelCount()] * m_quad->wt[ia];
             }
-        //std::vector<SOL_T> q = scalar;
         OutWriter::writeScalarFlux("solver_scalar_leg.dat", *m_xs, *m_mesh, scalar);
 
         break;
@@ -641,31 +611,6 @@ void MainWindow::onSolverFinished(std::vector<SOL_T> *solution)
     default:
         qCritical() << "No solver of type " << m_solType;
     }
-
-    /*
-    std::vector<float> x;
-    std::vector<float> matids;
-    std::vector<float> density;
-    std::vector<float> flux;
-
-    std::vector<std::vector<float> > push;
-
-    for(unsigned int i = 0; i < m_mesh->xElemCt; i++)
-    {
-        float centerpt = (m_mesh->xNodes[i] + m_mesh->xNodes[i+1])/2.0;
-        x.push_back(centerpt);
-        matids.push_back(m_mesh->getZoneIdAt(i, 5, 9));
-        density.push_back(m_mesh->getPhysicalDensityAt(i, 5, 9));
-        flux.push_back((*m_solution)[18*m_mesh->voxelCount() + m_mesh->getFlatIndex(i, 5, 9)]);
-    }
-
-    push.push_back(x);
-    push.push_back(matids);
-    push.push_back(density);
-    push.push_back(flux);
-    */
-
-    //OutWriter::writeFloatArrays("/media/Storage/thesis/doctors/solution.dat", push);
 }
 
 void MainWindow::on_solverGpuCheckBox_toggled(bool gpuOn)

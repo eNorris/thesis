@@ -21,7 +21,6 @@ double fastFactorial(int x)
     const std::vector<double> facts = {1.0, 1.0, 2.0, 6.0, 24.0, 120.0,
                                       720.0, 5040.0, 40320.0, 362880.0, 3628800.0,
                                       39916800.0, };
-
     return facts[x];
 }
 
@@ -33,15 +32,9 @@ double doubleFactorial(double x)
     return x * doubleFactorial(x-2.0);
 }
 
-Legendre::Legendre() : m_precomputed(false), m_angles(0), m_pn(0), m_table()
-{
+Legendre::Legendre() : m_precomputed(false), m_angles(0), m_pn(0), m_table(){}
 
-}
-
-Legendre::~Legendre()
-{
-
-}
+Legendre::~Legendre(){}
 
 SOL_T Legendre::operator()(const unsigned int l, const SOL_T mu)
 {
@@ -86,7 +79,6 @@ SOL_T Legendre::operator()(const unsigned int l, const SOL_T mu)
     };
 
     return static_cast<SOL_T>(result);
-
 }
 
 SOL_T Legendre::table(const unsigned int ia1, const unsigned int ia2, const unsigned int il)
@@ -135,15 +127,9 @@ void Legendre::precompute(const Quadrature *quad, const unsigned int pn)
     m_precomputed = true;
 }
 
-AssocLegendre::AssocLegendre()
-{
+AssocLegendre::AssocLegendre(){}
 
-}
-
-AssocLegendre::~AssocLegendre()
-{
-
-}
+AssocLegendre::~AssocLegendre(){}
 
 
 float AssocLegendre::operator()(const int l, const int m, const float x)
@@ -172,15 +158,9 @@ float AssocLegendre::operator()(const int l, const int m, const float x)
 }
 
 
-SphericalHarmonic::SphericalHarmonic()
-{
+SphericalHarmonic::SphericalHarmonic(){}
 
-}
-
-SphericalHarmonic::~SphericalHarmonic()
-{
-
-}
+SphericalHarmonic::~SphericalHarmonic(){}
 
 float SphericalHarmonic::normConst(const int l, const int m)
 {
@@ -198,24 +178,6 @@ float SphericalHarmonic::normConst(const int l, const int m)
     //}
     return sqrt(t1 * t2);
 }
-/*
-float SphericalHarmonic::operator()(const int l, const int m, const float theta, const float phi)
-{
-    // Y_l^m(\theta, \phi)
-    if(m > 0)
-    {
-        return sqrt(2.0) * normConst(l, m) * cos(m * phi) * m_assoc(l, m, cos(theta));
-    }
-    else if(m == 0)
-    {
-        return normConst(l, 0) * m_assoc(l, 0, cos(theta));
-    }
-    else
-    {
-        return sqrt(2.0) * normConst(l, m) * sin(-m*phi) * m_assoc(l, -m, cos(theta));
-    }
-}
-*/
 
 float SphericalHarmonic::ylm_e(const int l, const int m, const float theta, const float phi)
 {

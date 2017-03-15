@@ -10,15 +10,9 @@
 #include <iostream>
 #include "histogram.h"
 
-CtDataManager::CtDataManager() : m_valid(false), m_messageBox()
-{
+CtDataManager::CtDataManager() : m_valid(false), m_messageBox(){}
 
-}
-
-CtDataManager::~CtDataManager()
-{
-
-}
+CtDataManager::~CtDataManager(){}
 
 Mesh *CtDataManager::parse16(int xbins, int ybins, int zbins, std::string filename)
 {
@@ -43,12 +37,7 @@ Mesh *CtDataManager::parse16(int xbins, int ybins, int zbins, std::string filena
         int resp = QMessageBox::warning(NULL, "Data Size Mismatch", errmsg, QMessageBox::Abort | QMessageBox::Ignore);
         if(resp == QMessageBox::Abort)
             return NULL;
-        //qCritical() << "Requested dimensions do not match the data size!";
-        //qDebug() << xbins << " x " << ybins << " x " << zbins << " = " << tbins;
-        //qDebug() << "File bytes " << szFin;
     }
-    //qDebug() << "bytes: " << szFin;
-    //qDebug() << "bins: " << xbins*ybins*zbins;
     szChkFin.close();
 
     std::ifstream fin(filename.c_str(), std::ios::binary);
