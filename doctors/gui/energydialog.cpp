@@ -28,9 +28,6 @@ void EnergyGraphicsView::mousePressEvent(QMouseEvent *event)
     std::vector<float> *energy = m_parent->getEnergy();
     std::vector<QGraphicsRectItem*> *rects = m_parent->getRects();
 
-    //if(energy == NULL || rects == NULL)
-    //    return;
-
     if(energy->size() == 0 || rects->size() == 0)
         return;
 
@@ -84,17 +81,11 @@ void EnergyGraphicsView::mouseDoubleClickEvent(QMouseEvent *event)
         return;
     }
 
-    qDebug() << "processed";
-
-    //QGraphicsRectItem *rect = (*rects)[indx-1];
-    //QRectF r = rect->rect();
-    //rect->setRect(r.x(), r.y(), r.width(), 10.0);
+    //qDebug() << "processed";
 
     QGraphicsRectItem *rect = (*rects)[indx-1];
 
     QRectF r = rect->rect();
-    //QPointF p = mapToScene(event->pos());
-    //qDebug() << event->button();
     rect->setRect(r.x(), r.y(), r.width(), 1);
 }
 
@@ -139,20 +130,16 @@ void EnergyGraphicsView::mouseMoveEvent(QMouseEvent *event)
 
         QRectF r = rect->rect();
         QPointF p = mapToScene(event->pos());
-        //qDebug() << event->button();
         if(m_button == Qt::MouseButton::LeftButton)
             rect->setRect(r.x(), r.y(), r.width(), p.y());  //setY(p.y());
         else if(m_button == Qt::MouseButton::RightButton)
             rect->setRect(r.x(), r.y(), r.width(), 0);
-        //qDebug() << "Width: " << " " << p.y();
     }
 }
 
 void EnergyGraphicsView::resizeEvent(QResizeEvent *event)
 {
     fitInView(scene()->sceneRect());
-    //m_scene->setSceneRect(m_energyBins[eBins-1], 0, m_energyBins[0], 1);
-    //ui->graphicsView->fitInView(m_scene->sceneRect());
 }
 
 EnergyDialog::EnergyDialog(QWidget *parent) :
@@ -238,8 +225,6 @@ std::vector<float> EnergyDialog::getUserIntensity()
 
 void EnergyDialog::on_energyLogXCheckBox_toggled(bool isChkd)
 {
-    //qDebug() << "Fire!" << isChkd;
-
     unsigned int eBins = m_energyBins.size();
     if(eBins == 0)
         return;
