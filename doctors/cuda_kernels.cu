@@ -199,20 +199,13 @@ __global__ void isoRayKernel(
 }
 
 __global__ void isoSolKernel(
-        float *scalarFlux,
-        float *tempFlux,
+        float *scalarFlux, float *tempFlux,
         float *totalSource,
-
-        int *zoneId,
-        float *mu, float *eta, float *xi, float *wt,
-
         float *totXs1d, float *scatxs2d,
-        float *atomDensity, float *vol,
-
         float *Axy, float *Axz, float *Ayz,
-
+        int *zoneId, float *atomDensity, float *vol,
+        float *mu, float *eta, float *xi, float *wt,
         float *outboundFluxX, float *outboundFluxY, float *outboundFluxZ,
-
         int ie, int iang,
         int Nx, int Ny, int Nz, int angleCount
         )

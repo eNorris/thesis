@@ -24,17 +24,15 @@ __global__ void isoRayKernel(
         );
 
 __global__ void isoSolKernel(
-        float *uflux,
-        float *xNodes, float *yNodes, float *zNodes,
-        float *dx, float *dy, float *dz,
-        int *zoneId,
-        float *atomDensity,
-        float *tot1d,
-        float *srcStrength,
-        int groups,
-        int Nx, int Ny, int Nz,
-        float sx, float sy, float sz,
-        int srcIndxX, int srcIndxY, int srcIndxZ
+        float *scalarFlux, float *tempFlux,
+        float *totalSource,
+        float *totXs1d, float *scatxs2d,
+        float *Axy, float *Axz, float *Ayz,
+        int *zoneId, float *atomDensity, float *vol,
+        float *mu, float *eta, float *xi, float *wt,
+        float *outboundFluxX, float *outboundFluxY, float *outboundFluxZ,
+        int ie, int iang,
+        int Nx, int Ny, int Nz, int angleCount
         );
 
 __global__ void isoSrcKernel(

@@ -401,23 +401,24 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
                 }
 
                 isoSolKernel<<<dimGrid, dimBlock>>>(
-                            gpuUflux,
-                            gpuXNodes, gpuYNodes, gpuZNodes,
-                            gpuDx, gpuDy, gpuDz,
-                            gpuZoneId,
-                            gpuAtomDensity,
-                            gpuTot1d,
-                            gpuSrcStrength,
-                            xs->groupCount(),
-                            mesh->xElemCt, mesh->yElemCt, mesh->zElemCt,
-                            srcPar->sourceX, srcPar->sourceY, srcPar->sourceZ,
-                            ixSrc, iySrc, izSrc);
+                      gpuScalarFlux, gpuTempFlux,
+                      gpuTotalSource,
+                      gpuTotXs1d, gpuScatxs2d,
+                      gpuAxy, gpuAxz, gpuAyz,
+                      gpuZoneId, gpuAtomDensity, gpuVol,
+                      gpuMu, gpuEta, gpuXi, gpuWt,
+                      gpuOutboundFluxX, gpuOutboundFluxY, gpuOutboundFluxZ,
+                      ie, iang,
+                      mesh->xElemCt, mesh->yElemCt, mesh->zElemCt, quad->angleCount());
 
                 // TODO: Why is this done twice?
-                for(unsigned int i = 0; i < tempFlux.size(); i++)
-                {
-                    (*scalarFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
-                }
+                //for(unsigned int i = 0; i < tempFlux.size(); i++)
+                //{
+                //    (*scalarFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
+                //}
+
+                updateCpuData(gpuId, scalarFlux, gpuTempFlux, mesh->voxelCount(), ie*mesh->voxelCount());
+                //cudaMemCpy(gpuTempFlux, scalarFlux+ie*mesh->voxelCount(), Cuda)
 
                 // TODO: launch gpu copy kernel
                 // TODO: launch async memcpy
@@ -446,11 +447,13 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
             errMaxList[ie] = maxDiff;
             converganceIters[ie] = iterNum;
 
+            // TODO shouldn't something involving preflux and tempflux be here?
+
             // It's done again here...
-            for(unsigned int i = 0; i < tempFlux.size(); i++)
-            {
-                (*scalarFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
-            }
+            //for(unsigned int i = 0; i < tempFlux.size(); i++)
+            //{
+            //    (*scalarFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
+            //}
 
             iterNum++;
         } // end not converged
@@ -469,16 +472,17 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     emit signalNewSolverIteration(scalarFlux);
     emit signalSolverFinished(scalarFlux);
 
-    size_t elements = mesh->voxelCount() * xs->groupCount();
+    //size_t elements = mesh->voxelCount() * xs->groupCount();
     //uflux = new RAY_T[elements];
-    uflux->resize(elements);
+    //uflux->resize(elements);
     //cudaDeviceSynchronize();
 
-    updateCpuData(gpuId, &(*uflux)[0], gpuUflux, elements);
+    //updateCpuData(gpuId, &(*uflux)[0], gpuUflux, elements);
     //int cudaerr;
     //if((cudaerr = cudaMemcpy(gpuUflux, &(*uflux)[0], elements*sizeof(float), cudaMemcpyDeviceToHost)) != cudaSuccess)
     //    std::cout << "launch_isoRayKernel failed while copying flux from GPU to CPU with error code "<< cudaerr << std::endl;
 
+    // Release the GPU resources
     release_gpu(gpuId, gpuUflux);
     release_gpu(gpuId, gpuXNodes);
     release_gpu(gpuId, gpuYNodes);
