@@ -37,5 +37,28 @@ __global__ void isoSolKernel(
         int srcIndxX, int srcIndxY, int srcIndxZ
         );
 
+__global__ void isoSrcKernel(
+        float *uFlux,
+        float *extSource,
+        float *vol, float *atomDensity, int *zoneId,
+        float *scatxs2d,
+        int voxels, int groups, int pn, int highestEnergyGroup, int sinkGroup);
+
+__global__ void zeroKernel(int Nx, int Ny, int Nz, float *ptr);
+
+__global__ void downscatterKernel(
+        float *totalSource,
+        int highestEnergyGroup, int sinkGroup,
+        int Nx, int Ny, int Nz, int groups, int pn,
+        int *zoneId,
+        float *scalarFlux,
+        float *scatxs2d,
+        float *atomDensity, float *vol,
+        float extSource);
+
+__global__ void clearSweepKernel(
+        float *preFlux, float *tempFlux,
+        int Nx, int Ny, int Nz);
+
 #endif // CUDA_KERNALS
 

@@ -217,48 +217,12 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
     int gpuId = 0;
 
-    /*
-    // Allocate memory space for the solution vector
-    float *gpuUflux = alloc_gpuFloat(gpuId, mesh->voxelCount() * xs->groupCount(), NULL);
-
-    // Copy the xyzNode values
-    float *gpuXNodes = alloc_gpuFloat(gpuId, mesh->xNodes.size(), &mesh->xNodes[0]);
-    float *gpuYNodes = alloc_gpuFloat(gpuId, mesh->xNodes.size(), &mesh->yNodes[0]);
-    float *gpuZNodes = alloc_gpuFloat(gpuId, mesh->xNodes.size(), &mesh->zNodes[0]);
-
-    // Copy the dxyz values
-    float *gpuDx = alloc_gpuFloat(gpuId, mesh->dx.size(), &mesh->dx[0]);
-    float *gpuDy = alloc_gpuFloat(gpuId, mesh->dy.size(), &mesh->dy[0]);
-    float *gpuDz = alloc_gpuFloat(gpuId, mesh->dz.size(), &mesh->dz[0]);
-
-    // Copy the zone id number
-    int *gpuZoneId = alloc_gpuInt(gpuId, mesh->zoneId.size(), &mesh->zoneId[0]);
-
-    // Copy the atom density
-    float *gpuAtomDensity = alloc_gpuFloat(gpuId, mesh->atomDensity.size(), &mesh->atomDensity[0]);
-
-    // Copy the xs data
-    float *gpuTot1d = alloc_gpuFloat(gpuId, xs->m_tot1d.size(), &xs->m_tot1d[0]);
-
-    // Copy the source strength
-    float *gpuSrcStrength = alloc_gpuFloat(gpuId, srcPar->spectraIntensity.size(), &srcPar->spectraIntensity[0]);
-    */
-
-    //int ixSrc, iySrc, izSrc;
-
     std::clock_t startTime = std::clock();
 
     const int maxIterations = 25;
     const SOL_T epsilon = 0.01f;
 
-    std::vector<SOL_T> *scalarFlux = new std::vector<SOL_T>(xs->groupCount() * mesh->voxelCount(), 0.0f);
-    std::vector<SOL_T> tempFlux(mesh->voxelCount(), 0.0f);
-    std::vector<SOL_T> preFlux(mesh->voxelCount(), -100.0f);
-    std::vector<SOL_T> totalSource(mesh->voxelCount(), -100.0f);
-    std::vector<SOL_T> outboundFluxX(mesh->voxelCount(), -100.0f);
-    std::vector<SOL_T> outboundFluxY(mesh->voxelCount(), -100.0f);
-    std::vector<SOL_T> outboundFluxZ(mesh->voxelCount(), -100.0f);
-    std::vector<SOL_T> extSource(xs->groupCount() * mesh->voxelCount(), 0.0f);
+    std::vector<SOL_T> *scalarFlux = new std::vector<SOL_T>(xs->groupCount() * mesh->voxelCount());
 
     std::vector<SOL_T> errMaxList;
     std::vector<std::vector<SOL_T> > errList;
@@ -269,17 +233,6 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     errList.resize(xs->groupCount());
     converganceIters.resize(xs->groupCount());
     converganceTracker.resize(xs->groupCount());
-
-    //SOL_T influxX = 0.0f;
-    //SOL_T influxY = 0.0f;
-    //SOL_T influxZ = 0.0f;
-
-    //int ejmp = mesh->voxelCount() * quad->angleCount();
-    //int ajmp = mesh->voxelCount();
-    //int xjmp = mesh->xjmp();
-    //int yjmp = mesh->yjmp();
-
-    //bool downscatterFlag = false;
 
     if(uFlux == NULL && srcPar == NULL)
     {
@@ -295,9 +248,9 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     {
         SOL_T dmax = 0.0;
         unsigned int vc = mesh->voxelCount();
-        for(unsigned int ira = 0; ira < vc; ira++)
+        for(unsigned int ir = 0; ir < vc; ir++)
         {
-            dmax = (dmax > (*uFlux)[highestEnergy*vc + ira]) ? dmax : (*uFlux)[highestEnergy*vc + ira];
+            dmax = (dmax > (*uFlux)[highestEnergy*vc + ir]) ? dmax : (*uFlux)[highestEnergy*vc + ir];
         }
         if(dmax <= 0.0)
         {
@@ -316,67 +269,107 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
         }
     }
 
+    // Allocate GPU resources for the external source computation
+
+    float *gpuUFlux = alloc_gpuFloat(gpuId, mesh->voxelCount(), &(*uFlux)[0]);
+    float *gpuExtSource = alloc_gpuFloat(gpuId, mesh->voxelCount() * xs->groupCount(), NULL);
+
+    float *gpuVol = alloc_gpuFloat(gpuId, mesh->vol.size(), &mesh->vol[0]);
+    float *gpuAtomDensity = alloc_gpuFloat(gpuId, mesh->atomDensity.size(), &mesh->atomDensity[0]);
+    int   *gpuZoneId = alloc_gpuInt(gpuId, mesh->zoneId.size(), &mesh->zoneId[0]);
+
+    float *gpuScatXs2d = alloc_gpuFloat(gpuId, xs->m_scat2d.size(), &xs->m_scat2d[0]);
+
     if(uFlux != NULL)
     {
-        std::cout << "Loading uncollided flux into external source" << std::endl;
-        // If there is an uncollided flux provided, use it, otherwise, calculate the external source
-        //unsigned int xx= xs->groupCount();
-        for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)  // Sink energy
-            for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
-                for(unsigned int iep = highestEnergy; iep <= ie; iep++) // Source energy
-                    //                               [#]   =                        [#/cm^2]      * [cm^3]        *  [b]                               * [1/b-cm]
-                    extSource[ie*mesh->voxelCount() + ri] += (*uFlux)[iep*mesh->voxelCount() + ri] * mesh->vol[ri] * xs->scatxs2d(mesh->zoneId[ri], iep, ie, 0) * mesh->atomDensity[ri];
+        //std::cout << "Loading uncollided flux into external source" << std::endl;
+
+        for(unsigned int iSink = highestEnergy; iSink < xs->groupCount(); iSink++)
+            isoSrcKernel<<<dimGrid, dimBlock>>>(
+                                              gpuUFlux,
+                                              gpuExtSource,
+                                              gpuVol, gpuAtomDensity, gpuZoneId,
+                                              gpuScatXs2d,
+                                              mesh->voxelCount(), xs->groupCount(), solPar->pn, highestEnergy, iSink);
+
+        cudaDeviceSynchronize();
+        release_gpu(gpuId, gpuUFlux);
 
         OutWriter::writeArray("externalSrc.dat", extSource);
     }
     else
     {
-        std::cout << "Building external source" << std::endl;
-        int srcIndxE = xs->groupCount() - 1;
-        int srcIndxX = 32;
-        int srcIndxY = 4;  //mesh->yElemCt/2;
-        int srcIndxZ = 8;
+        abort();
+        //std::cout << "Building external source" << std::endl;
+        //int srcIndxE = xs->groupCount() - 1;
+        //int srcIndxX = 32;
+        //int srcIndxY = 4;  //mesh->yElemCt/2;
+        //int srcIndxZ = 8;
         //                                                                              [#] = [#]
-        extSource[srcIndxE * mesh->voxelCount() + srcIndxX*xjmp + srcIndxY*yjmp + srcIndxZ] = 1.0;
+        //extSource[srcIndxE * mesh->voxelCount() + srcIndxX*xjmp + srcIndxY*yjmp + srcIndxZ] = 1.0;
     }
 
     std::cout << "Solving " << mesh->voxelCount() * quad->angleCount() * xs->groupCount() << " elements in phase space" << std::endl;
 
+    float *gpuTempFlux = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
+    float *gpuPreFlux = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
+    float *gpuTotalSource = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
+    float *gpuOutboundFluxX = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
+    float *gpuOutboundFluxY = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
+    float *gpuOutboundFluxZ = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
+
+    dim3 dimGrid(mesh->xElemCt, mesh->yElemCt);
+    dim3 dimBlock(mesh->zElemCt);
+    std::cout << "Grid: " << dimGrid.x << "x" << dimGrid.y << ",   Block: " << dimBlock.x << "x" << dimBlock.y << std::endl;
 
     for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)  // for every energy group
     {
         int iterNum = 1;
         SOL_T maxDiff = 1.0;
 
-        for(unsigned int i = 0; i < totalSource.size(); i++)
-            totalSource[i] = 0;
+        zeroKernel<<<dimGrid, dimBlock>>>(mesh->xElemCt, mesh->yElemCt, mesh->zElemCt, gpuTotalSource);
+
+        //for(unsigned int i = 0; i < totalSource.size(); i++)
+        //    totalSource[i] = 0;
 
         // Calculate the down-scattering source
-        for(unsigned int iie = highestEnergy; iie < ie; iie++)
-            for(unsigned int ir = 0; ir < mesh->voxelCount(); ir++)
-            {
-                int zidIndx = mesh->zoneId[ir];
-                //         [#]    +=  [#]          *      [#/cm^2]                               * [b]                          * [1/b-cm]                * [cm^3]
-                totalSource[ir] += m_4pi_inv*(*scalarFlux)[iie*mesh->voxelCount() + ir] * xs->scatxs2d(zidIndx, iie, ie, 0) * mesh->atomDensity[ir] * mesh->vol[ir]; //xsref(ie-1, zidIndx, 0, iie));
-            }
+        downscatterKernel<<<dimGrid, dimBlock>>>(
+                gpuTotalSource,
+                highestEnergy, SINK_GRP,
+                mesh->xElemCt, mesh->yElemCt, mesh->zElemCt, xs->groupCount(), solPar->pn,
+                gpuZoneId,
+                gpuSc,
+                gpuScatXs2d,
+                gpuAtomDensity, gpuVol,
+                gpuExtSource);
+        //for(unsigned int iie = highestEnergy; iie < ie; iie++)
+        //    for(unsigned int ir = 0; ir < mesh->voxelCount(); ir++)
+        //    {
+        //        int zidIndx = mesh->zoneId[ir];
+        //        //         [#]    +=  [#]          *      [#/cm^2]                               * [b]                          * [1/b-cm]                * [cm^3]
+        //        totalSource[ir] += m_4pi_inv*(*scalarFlux)[iie*mesh->voxelCount() + ir] * xs->scatxs2d(zidIndx, iie, ie, 0) * mesh->atomDensity[ir] * mesh->vol[ir]; //xsref(ie-1, zidIndx, 0, iie));
+        //    }
 
         // Add the external source
-        for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
-        {
+        //for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
+        //{
             //  [#]         +=  [#]
-            totalSource[ri] += extSource[ie*mesh->voxelCount() + ri];
-        }
+        //    totalSource[ri] += extSource[ie*mesh->voxelCount() + ri];
+        //}
 
         while(iterNum <= maxIterations && maxDiff > epsilon)  // while not converged
         {
             //qDebug() << "Iteration #" << iterNum;
 
-            preFlux = tempFlux;  // Store flux for previous iteration
+            //preFlux = tempFlux;  // Store flux for previous iteration
 
+            clearSweepKernel<<<dimGrid, dimBlock>>>(
+                    gpuPreFlux, gpuTempFlux,
+                    mesh->xElemCt, mesh->yElemCt, mesh->zElemCt);
 
             // Clear for a new sweep
-            for(unsigned int i = 0; i < tempFlux.size(); i++)
-                tempFlux[i] = 0;
+            //for(unsigned int i = 0; i < tempFlux.size(); i++)
+            //    tempFlux[i] = 0;
 
             for(unsigned int iang = 0; iang < quad->angleCount(); iang++)  // for every angle
             {
@@ -407,10 +400,6 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
                     dix = -1;
                 }
 
-                dim3 dimGrid(mesh->xElemCt, mesh->yElemCt);
-                dim3 dimBlock(mesh->zElemCt);
-                std::cout << "Grid: " << dimGrid.x << "x" << dimGrid.y << ",   Block: " << dimBlock.x << "x" << dimBlock.y << std::endl;
-
                 isoSolKernel<<<dimGrid, dimBlock>>>(
                             gpuUflux,
                             gpuXNodes, gpuYNodes, gpuZNodes,
@@ -424,10 +413,14 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
                             srcPar->sourceX, srcPar->sourceY, srcPar->sourceZ,
                             ixSrc, iySrc, izSrc);
 
+                // TODO: Why is this done twice?
                 for(unsigned int i = 0; i < tempFlux.size(); i++)
                 {
                     (*scalarFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
                 }
+
+                // TODO: launch gpu copy kernel
+                // TODO: launch async memcpy
 
                 emit signalNewSolverIteration(scalarFlux);
 
@@ -453,6 +446,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
             errMaxList[ie] = maxDiff;
             converganceIters[ie] = iterNum;
 
+            // It's done again here...
             for(unsigned int i = 0; i < tempFlux.size(); i++)
             {
                 (*scalarFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];

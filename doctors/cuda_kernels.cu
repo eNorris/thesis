@@ -306,5 +306,60 @@ __global__ void isoSolKernel(
 
     // Sum all the angular fluxes
     tempFlux[ir] += wt[iang]*angFlux;
-
 }
+
+__global__ void isoSrcKernel(
+        float *uFlux,
+        float *extSource,
+        float *vol, float *atomDensity, int *zoneId,
+        float *scatxs2d,
+        int voxels, int groups, int pn, int highestEnergyGroup, int sinkGroup)
+{
+    int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx;
+    for(unsigned int iep = highestEnergyGroup; iep <= sinkGroup; iep++)  // Sink energy
+        extSource[sinkGroup*voxels + ir] += uFlux[iep*voxels + ir] * vol[ir] * scatxs2d(zoneId[ir] + iep*groups*pn + sinkGroup*pn) * atomDensity[ir];
+}
+__global__ void zeroKernel(int Nx, int Ny, int Nz, float *ptr)
+{
+    int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx;
+    ptr[ir] = 0.0f;
+}
+
+__global__ void downscatterKernel(
+        float *totalSource,
+        int highestEnergyGroup, int sinkGroup,
+        int Nx, int Ny, int Nz, int groups, int pn,
+        int *zoneId,
+        float *scalarFlux,
+        float *scatxs2d,
+        float *atomDensity, float *vol,
+        float *extSource)
+{
+    int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx;
+
+    for(unsigned int iie = highestEnergyGroup; iie < sinkGroup; iie++)
+    {
+        //int zidIndx = zoneId[ir];
+        //         [#]  +=  [#]         *  [#/cm^2]                     *  [b]                                                                 *  [1/b-cm]       *  [cm^3]
+        totalSource[ir] += CUDA_4PI_INV * scalarFlux[iie*Nx*Ny*Nz + ir] * scatxs2d[zoneId[ir]*groups*groups*pn + iie*groups*pn + sinkGroup*pn] * atomDensity[ir] * vol[ir];
+    }
+    totalSource[ir] += extSource[sinkGroup*Nx*Ny*Nz + ir];
+}
+
+__global__ void clearSweepKernel(
+        float *preFlux, float *tempFlux,
+        int Nx, int Ny, int Nz)
+{
+    int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx;
+
+    preFlux[ir] = tempFlux[ir];
+    tempFlux[ir] = 0.0f;
+
+    //preFlux = tempFlux;  // Store flux for previous iteration
+
+
+    // Clear for a new sweep
+    //for(unsigned int i = 0; i < tempFlux.size(); i++)
+    //    tempFlux[i] = 0;
+}
+
