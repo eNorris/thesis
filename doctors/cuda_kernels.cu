@@ -207,7 +207,7 @@ __global__ void isoSolKernel(
         float *mu, float *eta, float *xi, float *wt,
         float *outboundFluxX, float *outboundFluxY, float *outboundFluxZ,
         int ie, int iang,
-        int Nx, int Ny, int Nz, int angleCount
+        int Nx, int Ny, int Nz, int groups, int angleCount, int pn
         )
 {
     int ix = blockIdx.x;
@@ -267,13 +267,14 @@ __global__ void isoSolKernel(
             influxZ = outboundFluxZ[ir + 1];
     }
 
-    SOL_T inscatter = CUDA_4PI_INV*scalarFlux[ie*Nx*Ny*Nz + ir] * scatxs2d(zid, ie, ie, 0) * atomDensity[ir] * vol[ir];
+    //SOL_T inscatter = CUDA_4PI_INV*scalarFlux[ie*Nx*Ny*Nz + ir] * scatxs2d(zid, ie, ie, 0) * atomDensity[ir] * vol[ir];
+    SOL_T inscatter = CUDA_4PI_INV*scalarFlux[ie*Nx*Ny*Nz + ir] * scatxs2d[zid*groups*groups*pn + ie*groups * pn +  ie*groups] * atomDensity[ir] * vol[ir];
 
     SOL_T numer = totalSource[ir] +  inscatter +                                                                                            // [#]
             Ayz[ie*angleCount*Ny*Nz + iang*Ny*Nz + iy*Nz + iz] * influxX +  // [cm^2 * #/cm^2]  The 2x is already factored in
             Axz[ie*angleCount*Nx*Nz + iang*Nx*Nz + ix*Nz + iz] * influxY +
             Axy[ie*angleCount*Nx*Ny + iang*Nx*Ny + ix*Ny + iy] * influxZ;
-    SOL_T denom = mesh->vol[ir] * totXs1d(zid, ie) * atomDensity[ir] +                               // [cm^3] * [b] * [1/b-cm]
+    SOL_T denom = vol[ir] * totXs1d[zid*groups + ie] * atomDensity[ir] +                               // [cm^3] * [b] * [1/b-cm]
             Ayz[ie*angleCount*Ny*Nz + iang*Ny*Nz + iy*Nz + iz] +            // [cm^2]
             Axz[ie*angleCount*Nx*Nz + iang*Nx*Nz + ix*Nz + iz] +
             Axy[ie*angleCount*Nx*Ny + iang*Nx*Ny + ix*Ny + iy];
@@ -306,15 +307,16 @@ __global__ void isoSrcKernel(
         float *extSource,
         float *vol, float *atomDensity, int *zoneId,
         float *scatxs2d,
-        int voxels, int groups, int pn, int highestEnergyGroup, int sinkGroup)
+        int voxels, int groups, int pn, int highestEnergyGroup, int sinkGroup,
+        int Nx, int Ny, int Nz)
 {
-    int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx;
+    int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx.x;
     for(unsigned int iep = highestEnergyGroup; iep <= sinkGroup; iep++)  // Sink energy
-        extSource[sinkGroup*voxels + ir] += uFlux[iep*voxels + ir] * vol[ir] * scatxs2d(zoneId[ir] + iep*groups*pn + sinkGroup*pn) * atomDensity[ir];
+        extSource[sinkGroup*voxels + ir] += uFlux[iep*voxels + ir] * vol[ir] * scatxs2d[zoneId[ir]*groups*groups*pn + iep*groups*pn + sinkGroup*pn] * atomDensity[ir];
 }
 __global__ void zeroKernel(int Nx, int Ny, int Nz, float *ptr)
 {
-    int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx;
+    int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx.x;
     ptr[ir] = 0.0f;
 }
 
@@ -328,7 +330,7 @@ __global__ void downscatterKernel(
         float *atomDensity, float *vol,
         float *extSource)
 {
-    int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx;
+    int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx.x;
 
     for(unsigned int iie = highestEnergyGroup; iie < sinkGroup; iie++)
     {
@@ -343,7 +345,7 @@ __global__ void clearSweepKernel(
         float *preFlux, float *tempFlux,
         int Nx, int Ny, int Nz)
 {
-    int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx;
+    int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx.x;
 
     preFlux[ir] = tempFlux[ir];
     tempFlux[ir] = 0.0f;

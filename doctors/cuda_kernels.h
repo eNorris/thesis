@@ -32,7 +32,7 @@ __global__ void isoSolKernel(
         float *mu, float *eta, float *xi, float *wt,
         float *outboundFluxX, float *outboundFluxY, float *outboundFluxZ,
         int ie, int iang,
-        int Nx, int Ny, int Nz, int angleCount
+        int Nx, int Ny, int Nz, int groups, int angleCount, int pn
         );
 
 __global__ void isoSrcKernel(
@@ -40,7 +40,8 @@ __global__ void isoSrcKernel(
         float *extSource,
         float *vol, float *atomDensity, int *zoneId,
         float *scatxs2d,
-        int voxels, int groups, int pn, int highestEnergyGroup, int sinkGroup);
+        int voxels, int groups, int pn, int highestEnergyGroup, int sinkGroup,
+        int Nx, int Ny, int Nz);
 
 __global__ void zeroKernel(int Nx, int Ny, int Nz, float *ptr);
 
@@ -52,7 +53,7 @@ __global__ void downscatterKernel(
         float *scalarFlux,
         float *scatxs2d,
         float *atomDensity, float *vol,
-        float extSource);
+        float *extSource);
 
 __global__ void clearSweepKernel(
         float *preFlux, float *tempFlux,
