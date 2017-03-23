@@ -32,8 +32,8 @@ __global__ void isoSolKernel(
         float *mu, float *eta, float *xi, float *wt,
         float *outboundFluxX, float *outboundFluxY, float *outboundFluxZ,
         int ie, int iang,
-        int Nx, int Ny, int Nz, int groups, int angleCount, int pn
-        );
+        int Nx, int Ny, int Nz, int groups, int angleCount, int pn,
+        int sweepNumber, int voxThisLevel);
 
 __global__ void isoSrcKernel(
         float *uFlux,

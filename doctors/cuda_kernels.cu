@@ -207,12 +207,21 @@ __global__ void isoSolKernel(
         float *mu, float *eta, float *xi, float *wt,
         float *outboundFluxX, float *outboundFluxY, float *outboundFluxZ,
         int ie, int iang,
-        int Nx, int Ny, int Nz, int groups, int angleCount, int pn
-        )
+        int Nx, int Ny, int Nz, int groups, int angleCount, int pn,
+        int sweepNumber, int voxThisSubSweep)
 {
-    int ix = blockIdx.x;
-    int iy = blockIdx.y;
-    int iz = threadIdx.x;
+
+    int i = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx.x;
+
+    if(i >= voxThisSubSweep)
+        return;
+
+    int level = static_cast<int>((1 + sqrtf(1 + 8*i))/2.0);
+    int prior = level * (level + 1) / 2;
+
+    int ix = sweepNumber - level;
+    int iy = 5; // TODO
+    int iz = 5; // TODO
     int ir = ix*Ny*Nz + iy*Nz + iz;
 
     float influxX, influxY, influxZ;
@@ -281,16 +290,6 @@ __global__ void isoSolKernel(
 
     //   [#/cm^2] = [#]  / [cm^2]
     SOL_T angFlux = numer/denom;
-
-    //if(std::isnan(angFlux))
-    //{
-    //    qDebug() << "Found a nan!";
-    //    qDebug() << "Vol = " << mesh->vol[ix*xjmp+iy*yjmp+iz];
-    //    qDebug() << "xs = " << xs->totXs1d(zid, ie);
-    //    qDebug() << "Ayz = " << mesh->Ayz[iang*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz];
-    //    qDebug() << "Axz = " << mesh->Axz[iang*mesh->xElemCt*mesh->zElemCt + ix*mesh->zElemCt + iz];
-    //    qDebug() << "Axy = " << mesh->Axy[iang*mesh->xElemCt*mesh->yElemCt + ix*mesh->yElemCt + iy];
-    //}
 
     //angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz] = angFlux;
 
