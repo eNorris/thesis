@@ -211,13 +211,19 @@ int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     return EXIT_SUCCESS;
 }
 
-int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, std::vector<RAY_T> *uFlux)
+int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uFlux, std::vector<SOL_T> *scalarFlux)
 {
     std::cout << "Launching solver kernel" << std::endl;
     if(uFlux == NULL)
     {
         std::cout << "STOP!" << std::endl;
         return -1;
+    }
+
+    if(scalarFlux == NULL)
+    {
+        std::cout << "STOP!" << std::endl;
+        return -2;
     }
 
     int gpuId = 0;
@@ -227,7 +233,8 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     const int maxIterations = 25;
     const SOL_T epsilon = 0.01f;
 
-    std::vector<SOL_T> *scalarFlux = new std::vector<SOL_T>(xs->groupCount() * mesh->voxelCount());
+    //scalarFlux = new std::vector<SOL_T>(xs->groupCount() * mesh->voxelCount());
+    scalarFlux->resize(xs->groupCount() * mesh->voxelCount());
 
     std::vector<SOL_T> errMaxList;
     //std::vector<std::vector<SOL_T> > errList;
@@ -251,6 +258,8 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
     bool noDownscatterYet = true;
     unsigned int highestEnergy = 0;
+
+    std::cout << "About to do high check" << std::endl;
 
     while(noDownscatterYet)
     {
@@ -289,6 +298,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
     if(uFlux != NULL)
     {
+        std::cout << "About to launch isoSrcKernels" << std::endl;
         for(unsigned int iSink = highestEnergy; iSink < xs->groupCount(); iSink++)
             isoSrcKernel<<<dimGrid, dimBlock>>>(
                                               gpuUFlux,
@@ -335,74 +345,94 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     // Generate the sweep index block
     std::vector<int> threadIndexToGlobalIndex(mesh->voxelCount());
     std::vector<int> subSweepStartIndex(totalSubsweeps);
+    std::vector<int> subSweepVoxelCount(totalSubsweeps);
+
+    // Trivial edge cases that aren't computed during the loop
+    subSweepStartIndex[0] = 0;
+    threadIndexToGlobalIndex[0] = 0;
+    subSweepVoxelCount[totalSubsweeps-1] = 1;
 
     for(unsigned int iSubSweep = 0; iSubSweep < totalSubsweeps; iSubSweep++)
     {
+        std::cout << "subsweep " << iSubSweep << std::endl;
+        //if(iSubSweep == 0)
+        //{
+        //    subSweepStartIndex[0] = 0;
+        //    threadIndexToGlobalIndex[0] = 0;
+        //}
+        //else
+        //{
+        int iSubSweepPrev = iSubSweep - 1;
+        int C = (iSubSweepPrev+1) * (iSubSweepPrev+2) / 2;
 
-        if(iSubSweep == 0)
-        {
-            subSweepStartIndex[0] = 0;
-            threadIndexToGlobalIndex[0] = 0;
-        }
-        else
-        {
-            int iSubSweepPrev = iSubSweep - 1;
-            int C = (iSubSweepPrev+1) * (iSubSweepPrev+2) / 2;
+        int dx = max(iSubSweepPrev+1 - (signed)mesh->xElemCt, 0);
+        int dy = max(iSubSweepPrev+1 - (signed)mesh->yElemCt, 0);
+        int dz = max(iSubSweepPrev+1 - (signed)mesh->zElemCt, 0);
+        int dxy = max(iSubSweepPrev+1 - (signed)mesh->xElemCt - (signed)mesh->yElemCt, 0);
+        int dxz = max(iSubSweepPrev+1 - (signed)mesh->xElemCt - (signed)mesh->zElemCt, 0);
+        int dyz = max(iSubSweepPrev+1 - (signed)mesh->yElemCt - (signed)mesh->zElemCt, 0);
 
-            int dx = max(iSubSweepPrev+1 - mesh->xElemCt, 0);
-            int dy = max(iSubSweepPrev+1 - mesh->yElemCt, 0);
-            int dz = max(iSubSweepPrev+1 - mesh->zElemCt, 0);
-            int dxy = max(iSubSweepPrev+1 - mesh->xElemCt - mesh->yElemCt, 0);
-            int dxz = max(iSubSweepPrev+1 - mesh->xElemCt - mesh->zElemCt, 0);
-            int dyz = max(iSubSweepPrev+1 - mesh->yElemCt - mesh->zElemCt, 0);
+        //std::cout << "The max is " << max(-35, 0) << std::endl;
+        //std::cout << "dx=" << dx << std::endl;
 
-            int Lx = dx * (dx + 1) / 2;
-            int Ly = dy * (dy + 1) / 2;
-            int Lz = dz * (dz + 1) / 2;
+        int Lx = dx * (dx + 1) / 2;
+        int Ly = dy * (dy + 1) / 2;
+        int Lz = dz * (dz + 1) / 2;
 
-            int Gxy = dxy * (dxy + 1) / 2;
-            int Gxz = dxz * (dxz + 1) / 2;
-            int Gyz = dyz * (dyz + 1) / 2;
+        int Gxy = dxy * (dxy + 1) / 2;
+        int Gxz = dxz * (dxz + 1) / 2;
+        int Gyz = dyz * (dyz + 1) / 2;
 
-            int voxPrevSubSweep = C - Lx - Ly - Lz + Gxy + Gxz + Gyz;
-            subSweepStartIndex[iSubSweep] = subSweepStartIndex[iSubSweepPrev] + voxPrevSubSweep;
+        int voxPrevSubSweep = C - Lx - Ly - Lz + Gxy + Gxz + Gyz;
+        subSweepStartIndex[iSubSweep] = subSweepStartIndex[iSubSweepPrev] + voxPrevSubSweep;
+        subSweepVoxelCount[iSubSweepPrev] = voxPrevSubSweep;
 
-            int voxelsSoFar = 0;
-            for(int ix = 0; ix < min(mesh->xElemCt-1, iSubSweep); ix++)
-                for(int iy = 0; iy < min(mesh->yElemCt-1, iSubSweep-ix); iy++)
-                {
-                    int iz = iSubSweep - ix - iy;
-                    if(iz >= mesh->zElemCt)
-                        continue;
+        //std::cout << "Voxels in the previous subsweep: " << voxPrevSubSweep << std::endl;
+        //std::cout << "C=" << C << ", Lx=" << Lx << ", Ly=" << Ly << ", Lz=" << Lz << ", Gxy=" << Gxy << ", Gxz=" << Gxz << ", Gyz=" << Gyz << std::endl;
 
-                    int ir = ix*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz;
+        int voxelsSoFar = 0;
+        for(int ix = 0; ix <= min(mesh->xElemCt-1, iSubSweep); ix++)
+            for(int iy = 0; iy <= min(mesh->yElemCt-1, iSubSweep-ix); iy++)
+            {
+                int iz = iSubSweep - ix - iy;
+                //if(iSubSweep <= 3)
+                //    std::cout << "Computed: " << ix << ", " << iy << ", " << iz << std::endl;
+                if(iz >= mesh->zElemCt)
+                    continue;
 
-                    if(iSubSweep == 0)
-                    {
-                        std::cout << voxelsSoFar << ": " << ix << ", " << iy << ", " << iz << ": " << ir << std::endl;
-                    }
+                int ir = ix*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz;
 
-                    threadIndexToGlobalIndex[subSweepStartIndex[iSubSweep] + voxelsSoFar] = ir;
-                    voxelsSoFar++;
-                }
-        }
+                //if(iSubSweep <= 7)
+                //{
+                //    std::cout << voxelsSoFar << ": " << ix << ", " << iy << ", " << iz << ": " << ir << " -> index = " << (subSweepStartIndex[iSubSweep] + voxelsSoFar) << std::endl;
+                //}
+
+                threadIndexToGlobalIndex[subSweepStartIndex[iSubSweep] + voxelsSoFar] = ir;
+                voxelsSoFar++;
+            }
+        //}
     }
 
-    for(unsigned int i = 0; i < subSweepStartIndex.size(); i++)
-        std::cout << i << " " << subSweepStartIndex[i] << std::endl;
+    //for(unsigned int i = 0; i < subSweepStartIndex.size(); i++)
+    //    std::cout << i << " " << subSweepStartIndex[i] << std::endl;
 
     int *gpuThreadIndexToGlobalIndex = alloc_gpuInt(gpuId, threadIndexToGlobalIndex.size(), &threadIndexToGlobalIndex[0]);
-    int *gpuSubsweepStartIndex = alloc_gpuInt(gpuId, subSweepStartIndex.size(), &subSweepStartIndex[0]);
+    //int *gpuSubsweepStartIndex = alloc_gpuInt(gpuId, subSweepStartIndex.size(), &subSweepStartIndex[0]);
+
+    std::cout << "Got here" << std::endl;
 
     for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)  // for every energy group
     {
+        std::cout << "ie=" << ie << std::endl;
         int iterNum = 1;
         SOL_T maxDiff = 1.0;
 
         // Zero the source array
+        std::cout << "Launching zero kernel" << std::endl;
         zeroKernel<<<dimGrid, dimBlock>>>(mesh->xElemCt, mesh->yElemCt, mesh->zElemCt, gpuTotalSource);
 
         // Calculate the down-scattering source + external source
+        std::cout << "Launching scatter kernel" << std::endl;
         downscatterKernel<<<dimGrid, dimBlock>>>(
                 gpuTotalSource,
                 highestEnergy, ie,
@@ -415,6 +445,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
         while(iterNum <= maxIterations && maxDiff > epsilon)  // while not converged
         {
+            std::cout << "iteration: " << iterNum << std::endl;
             clearSweepKernel<<<dimGrid, dimBlock>>>(
                     gpuPreFlux, gpuTempFlux,
                     mesh->xElemCt, mesh->yElemCt, mesh->zElemCt);
@@ -422,6 +453,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
             for(unsigned int iang = 0; iang < quad->angleCount(); iang++)  // for every angle
             {
 
+                //std::cout << "iang=" << iang << std::endl;
                 // Find the correct direction to sweep
                 int izStart = 0;                  // Sweep start index
                 int diz = 1;                      // Sweep direction
@@ -447,19 +479,20 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
                     dix = -1;
                 }
 
-
-
                 for(unsigned int subSweepId = 0; subSweepId < totalSubsweeps; subSweepId++)
                 {
-                    int voxThisSubSweep;
-                    int edgeLength = subSweepId + 1;
-                    if(edgeLength <= totalSubsweeps/2)
-                        voxThisSubSweep = edgeLength * (edgeLength+1) / 2;
-                    else
-                        voxThisSubSweep = (totalSubsweeps - subSweepId) * ((totalSubsweeps - subSweepId)+1) / 2;
+                    //std::cout << "subSweepId=" << subSweepId << std::endl;
+                    //int voxThisSubSweep;
+                    //int edgeLength = subSweepId + 1;
+                    //if(edgeLength <= totalSubsweeps/2)
+                    //    voxThisSubSweep = edgeLength * (edgeLength+1) / 2;
+                    //else
+                    //    voxThisSubSweep = (totalSubsweeps - subSweepId) * ((totalSubsweeps - subSweepId)+1) / 2;
 
-                    dim3 dimGridS(voxThisSubSweep / 64 + 1);
+                    dim3 dimGridS(subSweepVoxelCount[subSweepId] / 64 + 1);
                     dim3 dimBlockS(64);
+
+                    //std::cout << "Launching the subsweep Kernel" << std::endl;
 
                     isoSolKernel<<<dimGridS, dimBlockS>>>(
                           gpuScalarFlux, gpuTempFlux,
@@ -471,7 +504,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
                           gpuOutboundFluxX, gpuOutboundFluxY, gpuOutboundFluxZ,
                           ie, iang,
                           mesh->xElemCt, mesh->yElemCt, mesh->zElemCt, xs->groupCount(), quad->angleCount(), solPar->pn,
-                          subSweepId, voxThisSubSweep);
+                          subSweepStartIndex[subSweepId], subSweepVoxelCount[subSweepId], gpuThreadIndexToGlobalIndex);
                 }
 
                 // TODO: Why is this done twice?
@@ -480,6 +513,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
                 //    (*scalarFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
                 //}
 
+                //std::cout << "Updating CPU" << std::endl;
                 updateCpuData(gpuId, &(*scalarFlux)[0], gpuTempFlux, mesh->voxelCount(), ie*mesh->voxelCount());
                 //cudaMemCpy(gpuTempFlux, scalarFlux+ie*mesh->voxelCount(), Cuda)
 
@@ -494,6 +528,9 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
                 //converganceTracker.push_back((*scalarFlux)[ie*mesh->voxelCount() + xTracked*xjmp + yTracked*yjmp + zTracked]);
 
             } // end of all angles
+
+            isoDiffKernel<<<dimGrid, dimBlock>>>(
+                  );
 
             /*
             maxDiff = -1.0E35f;

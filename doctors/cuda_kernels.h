@@ -33,7 +33,7 @@ __global__ void isoSolKernel(
         float *outboundFluxX, float *outboundFluxY, float *outboundFluxZ,
         int ie, int iang,
         int Nx, int Ny, int Nz, int groups, int angleCount, int pn,
-        int sweepNumber, int voxThisLevel);
+        int startIndx, int voxThisLevel, int *gpuIdxToMesh);
 
 __global__ void isoSrcKernel(
         float *uFlux,
@@ -58,6 +58,8 @@ __global__ void downscatterKernel(
 __global__ void clearSweepKernel(
         float *preFlux, float *tempFlux,
         int Nx, int Ny, int Nz);
+
+__global__ void isoDiffKernel();
 
 #endif // CUDA_KERNALS
 

@@ -1643,7 +1643,19 @@ void Solver::raytraceIsoGPU(const Quadrature *quad, const Mesh *mesh, const XSec
 void Solver::gsSolverIsoGPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux)
 {
     qDebug() << "Launching the gs solver iso";
-    gsSolverIsoGPU(quad, mesh, xs, solPar, srcPar, uflux);
+    //gsSolverIsoGPU(quad, mesh, xs, solPar, srcPar, uflux);
+
+    std::clock_t startMoment = std::clock();
+
+    //std::vector<RAY_T> *uflux = new std::vector<RAY_T>;
+    std::vector<SOL_T> *scalarFlux = new std::vector<SOL_T>;
+    launch_isoSolKernel(quad, mesh, xs, solPar, srcPar, uflux, scalarFlux);
+    //return uflux;
+
+    qDebug() << "Time to complete solver: " << (std::clock() - startMoment)/(double)(CLOCKS_PER_SEC/1000) << " ms";
+
+    emit signalSolverFinished(scalarFlux);
+    emit signalNewSolverIteration(scalarFlux);
 }
 
 void Solver::raytraceLegendreGPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar)

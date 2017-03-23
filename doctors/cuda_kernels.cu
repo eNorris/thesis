@@ -208,21 +208,24 @@ __global__ void isoSolKernel(
         float *outboundFluxX, float *outboundFluxY, float *outboundFluxZ,
         int ie, int iang,
         int Nx, int Ny, int Nz, int groups, int angleCount, int pn,
-        int sweepNumber, int voxThisSubSweep)
+        int startIndx, int voxThisSubSweep, int *gpuIdxToMesh)
 {
 
-    int i = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx.x;
-
-    if(i >= voxThisSubSweep)
+    int iGpu = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx.x;
+    if(iGpu >= voxThisSubSweep)
         return;
 
-    int level = static_cast<int>((1 + sqrtf(1 + 8*i))/2.0);
-    int prior = level * (level + 1) / 2;
+    int ir = gpuIdxToMesh[startIndx + iGpu];
 
-    int ix = sweepNumber - level;
-    int iy = 5; // TODO
-    int iz = 5; // TODO
-    int ir = ix*Ny*Nz + iy*Nz + iz;
+    //if(i >= voxThisSubSweep)
+    //    return;
+
+    //int level = static_cast<int>((1 + sqrtf(1 + 8*i))/2.0);
+    //int prior = level * (level + 1) / 2;
+
+    int ix = ir / (Ny*Nz);
+    int iy = (ir-ix*Ny*Nz) / Nz;
+    int iz = ir - ix*Ny*Nz - iy*Nz;
 
     float influxX, influxY, influxZ;
 
@@ -355,5 +358,10 @@ __global__ void clearSweepKernel(
     // Clear for a new sweep
     //for(unsigned int i = 0; i < tempFlux.size(); i++)
     //    tempFlux[i] = 0;
+}
+
+__global__ void isoDiffKernel()
+{
+    return;
 }
 
