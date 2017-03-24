@@ -356,13 +356,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     for(unsigned int iSubSweep = 0; iSubSweep < totalSubsweeps; iSubSweep++)
     {
         std::cout << "subsweep " << iSubSweep << std::endl;
-        //if(iSubSweep == 0)
-        //{
-        //    subSweepStartIndex[0] = 0;
-        //    threadIndexToGlobalIndex[0] = 0;
-        //}
-        //else
-        //{
+
         int iSubSweepPrev = iSubSweep - 1;
         int C = (iSubSweepPrev+1) * (iSubSweepPrev+2) / 2;
 
@@ -372,9 +366,6 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
         int dxy = max(iSubSweepPrev+1 - (signed)mesh->xElemCt - (signed)mesh->yElemCt, 0);
         int dxz = max(iSubSweepPrev+1 - (signed)mesh->xElemCt - (signed)mesh->zElemCt, 0);
         int dyz = max(iSubSweepPrev+1 - (signed)mesh->yElemCt - (signed)mesh->zElemCt, 0);
-
-        //std::cout << "The max is " << max(-35, 0) << std::endl;
-        //std::cout << "dx=" << dx << std::endl;
 
         int Lx = dx * (dx + 1) / 2;
         int Ly = dy * (dy + 1) / 2;
@@ -388,38 +379,23 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
         subSweepStartIndex[iSubSweep] = subSweepStartIndex[iSubSweepPrev] + voxPrevSubSweep;
         subSweepVoxelCount[iSubSweepPrev] = voxPrevSubSweep;
 
-        //std::cout << "Voxels in the previous subsweep: " << voxPrevSubSweep << std::endl;
-        //std::cout << "C=" << C << ", Lx=" << Lx << ", Ly=" << Ly << ", Lz=" << Lz << ", Gxy=" << Gxy << ", Gxz=" << Gxz << ", Gyz=" << Gyz << std::endl;
-
         int voxelsSoFar = 0;
         for(int ix = 0; ix <= min(mesh->xElemCt-1, iSubSweep); ix++)
             for(int iy = 0; iy <= min(mesh->yElemCt-1, iSubSweep-ix); iy++)
             {
                 int iz = iSubSweep - ix - iy;
-                //if(iSubSweep <= 3)
-                //    std::cout << "Computed: " << ix << ", " << iy << ", " << iz << std::endl;
                 if(iz >= mesh->zElemCt)
                     continue;
 
                 int ir = ix*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz;
 
-                //if(iSubSweep <= 7)
-                //{
-                //    std::cout << voxelsSoFar << ": " << ix << ", " << iy << ", " << iz << ": " << ir << " -> index = " << (subSweepStartIndex[iSubSweep] + voxelsSoFar) << std::endl;
-                //}
-
                 threadIndexToGlobalIndex[subSweepStartIndex[iSubSweep] + voxelsSoFar] = ir;
                 voxelsSoFar++;
             }
-        //}
     }
-
-    //for(unsigned int i = 0; i < subSweepStartIndex.size(); i++)
-    //    std::cout << i << " " << subSweepStartIndex[i] << std::endl;
 
     int *gpuThreadIndexToGlobalIndex = alloc_gpuInt(gpuId, threadIndexToGlobalIndex.size(), &threadIndexToGlobalIndex[0]);
     float *gpuDiffMatrix = alloc_gpuFloat(gpuId, mesh->xElemCt*mesh->yElemCt, NULL);
-    //int *gpuSubsweepStartIndex = alloc_gpuInt(gpuId, subSweepStartIndex.size(), &subSweepStartIndex[0]);
 
     std::cout << "Got here" << std::endl;
 
@@ -457,39 +433,32 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
                 //std::cout << "iang=" << iang << std::endl;
                 // Find the correct direction to sweep
-                int izStart = 0;                  // Sweep start index
+                //int izStart = 0;                  // Sweep start index
                 int diz = 1;                      // Sweep direction
                 if(quad->eta[iang] < 0)           // Condition to sweep backward
                 {
-                    izStart = mesh->zElemCt - 1;  // Start at the far end
+                    //izStart = mesh->zElemCt - 1;  // Start at the far end
                     diz = -1;                     // Sweep toward zero
                 }
 
-                int iyStart = 0;
+                //int iyStart = 0;
                 int diy = 1;
                 if(quad->zi[iang] < 0)
                 {
-                    iyStart = mesh->yElemCt - 1;
+                    //iyStart = mesh->yElemCt - 1;
                     diy = -1;
                 }
 
-                int ixStart = 0;
+                //int ixStart = 0;
                 int dix = 1;
                 if(quad->mu[iang] < 0)
                 {
-                    ixStart = mesh->xElemCt - 1;
+                    //ixStart = mesh->xElemCt - 1;
                     dix = -1;
                 }
 
                 for(unsigned int subSweepId = 0; subSweepId < totalSubsweeps; subSweepId++)
                 {
-                    //std::cout << "subSweepId=" << subSweepId << std::endl;
-                    //int voxThisSubSweep;
-                    //int edgeLength = subSweepId + 1;
-                    //if(edgeLength <= totalSubsweeps/2)
-                    //    voxThisSubSweep = edgeLength * (edgeLength+1) / 2;
-                    //else
-                    //    voxThisSubSweep = (totalSubsweeps - subSweepId) * ((totalSubsweeps - subSweepId)+1) / 2;
 
                     dim3 dimGridS(subSweepVoxelCount[subSweepId] / 64 + 1);
                     dim3 dimBlockS(64);
@@ -506,6 +475,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
                           gpuOutboundFluxX, gpuOutboundFluxY, gpuOutboundFluxZ,
                           ie, iang,
                           mesh->xElemCt, mesh->yElemCt, mesh->zElemCt, xs->groupCount(), quad->angleCount(), solPar->pn,
+                          dix, diy, diz,
                           subSweepStartIndex[subSweepId], subSweepVoxelCount[subSweepId], gpuThreadIndexToGlobalIndex);
                 }
 
@@ -562,7 +532,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
             */
 
-            float maxDiff = -1.0e35f;
+            maxDiff = -1.0e35f;
             for(unsigned int i = 0; i < mesh->voxelCount(); i++)
                 maxDiff = max(((*scalarFlux)[ie*mesh->voxelCount() + i]-prevFlux[i])/(*scalarFlux)[ie*mesh->voxelCount()+i], maxDiff);
 

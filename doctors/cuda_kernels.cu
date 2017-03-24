@@ -210,6 +210,7 @@ __global__ void isoSolKernel(
         float *outboundFluxX, float *outboundFluxY, float *outboundFluxZ,
         int ie, int iang,
         int Nx, int Ny, int Nz, int groups, int angleCount, int pn,
+        int dix, int diy, int diz,
         int startIndx, int voxThisSubSweep, int *gpuIdxToMesh)
 {
 
@@ -229,12 +230,25 @@ __global__ void isoSolKernel(
     int iy = (ir-ix*Ny*Nz) / Nz;
     int iz = ir - ix*Ny*Nz - iy*Nz;
 
+    // Reverse directions as necessary
+    if(dix == -1)
+        ix = Nx-1 - ix;
+
+    if(diy == -1)
+        iy = Ny-1 - iy;
+
+    if(diz == -1)
+        iz = Nz-1 - iz;
+
+    // Recompute the voxel index after reversing directions
+    ir = ix*Ny*Nz + iy*Nz + iz;
+
     float influxX, influxY, influxZ;
 
     int zid = zoneId[ir];  // Get the zone id of this element
 
     // Handle the x influx
-    if(mu[iang] >= 0)                                       // Approach x = 0 -> xMesh
+    if(dix == 1)                                       // Approach x = 0 -> xMesh
     {
         if(ix == 0)                                               // If this is a boundary cell
             influxX = 0.0f;                                       // then the in-flux is zero
@@ -250,7 +264,7 @@ __global__ void isoSolKernel(
     }
 
     // Handle the y influx
-    if(xi[iang] >= 0)                                       // Approach y = 0 -> yMesh
+    if(diy == 1)                                       // Approach y = 0 -> yMesh
     {
         if(iy == 0)
             influxY = 0.0f;
@@ -259,14 +273,14 @@ __global__ void isoSolKernel(
     }
     else                                                          // Approach y = yMesh-1 -> 0
     {
-        if(iy == (signed) Ny - 1)
+        if(iy == Ny - 1)
             influxY = 0.0f;
         else
             influxY = outboundFluxY[ir + Nz];
     }
 
     // Handle the z influx
-    if(eta[iang] >= 0)
+    if(diz == 1)
     {
         if(iz == 0)
             influxZ = 0.0f;
@@ -275,7 +289,7 @@ __global__ void isoSolKernel(
     }
     else
     {
-        if(iz == (signed) Nz - 1)
+        if(iz == Nz - 1)
             influxZ = 0.0f;
         else
             influxZ = outboundFluxZ[ir + 1];

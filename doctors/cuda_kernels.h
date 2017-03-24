@@ -53,6 +53,7 @@ __global__ void isoSolKernel(
         float *outboundFluxX, float *outboundFluxY, float *outboundFluxZ,
         int ie, int iang,
         int Nx, int Ny, int Nz, int groups, int angleCount, int pn,
+        int dix, int diy, int diz,
         int startIndx, int voxThisLevel, int *gpuIdxToMesh);
 
 __global__ void isoSrcKernel(
