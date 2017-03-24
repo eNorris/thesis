@@ -9,6 +9,26 @@
 #define CUDA_4PI 12.5663706144
 #define CUDA_4PI_INV 0.07957747154
 
+// Utility class used to avoid linker errors with extern
+// unsized shared memory arrays with templated type
+/*
+template<class T>
+struct SharedMemory
+{
+    __device__ inline operator       T *()
+    {
+        extern __shared__ int __smem[];
+        return (T *)__smem;
+    }
+
+    __device__ inline operator const T *() const
+    {
+        extern __shared__ int __smem[];
+        return (T *)__smem;
+    }
+};
+*/
+
 __global__ void isoRayKernel(
         float *uflux,
         float *xNodes, float *yNodes, float *zNodes,
@@ -59,7 +79,11 @@ __global__ void clearSweepKernel(
         float *preFlux, float *tempFlux,
         int Nx, int Ny, int Nz);
 
-__global__ void isoDiffKernel();
+//__global__ void isoDiffKernel();
+
+//template <class T, unsigned int blockSize, bool nIsPow2>
+//__global__ void
+//reduce6(T *g_idata, T *g_odata, unsigned int n);
 
 #endif // CUDA_KERNALS
 

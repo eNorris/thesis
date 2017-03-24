@@ -235,6 +235,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
     //scalarFlux = new std::vector<SOL_T>(xs->groupCount() * mesh->voxelCount());
     scalarFlux->resize(xs->groupCount() * mesh->voxelCount());
+    std::vector<float> prevFlux(mesh->voxelCount(), 0.0f);
 
     std::vector<SOL_T> errMaxList;
     //std::vector<std::vector<SOL_T> > errList;
@@ -417,6 +418,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     //    std::cout << i << " " << subSweepStartIndex[i] << std::endl;
 
     int *gpuThreadIndexToGlobalIndex = alloc_gpuInt(gpuId, threadIndexToGlobalIndex.size(), &threadIndexToGlobalIndex[0]);
+    float *gpuDiffMatrix = alloc_gpuFloat(gpuId, mesh->xElemCt*mesh->yElemCt, NULL);
     //int *gpuSubsweepStartIndex = alloc_gpuInt(gpuId, subSweepStartIndex.size(), &subSweepStartIndex[0]);
 
     std::cout << "Got here" << std::endl;
@@ -529,8 +531,48 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
             } // end of all angles
 
-            isoDiffKernel<<<dimGrid, dimBlock>>>(
-                  );
+            //unsigned int bytes = size * sizeof(T);
+
+            //int numBlocks = 0;
+            //int numThreads = 0;
+            //int maxBlocks = 64;
+            //int maxThreads = 256;
+            //getNumBlocksAndThreads(0, mesh->voxelCount() * sizeof(float), maxBlocks, maxThreads, numBlocks, numThreads);
+
+            /*
+            float *errorData = new float[numBlocks];
+
+            //printf("%d blocks\n\n", numBlocks);
+
+            // allocate device memory and data
+            //T *d_idata = NULL;
+            float *d_odata = NULL;
+
+            //checkCudaErrors(cudaMalloc((void **) &d_idata, bytes));
+            checkCudaErrors(cudaMalloc((void **) &d_odata, numBlocks*sizeof(float)));
+
+            // copy data directly to device memory
+            //checkCudaErrors(cudaMemcpy(d_idata, h_idata, bytes, cudaMemcpyHostToDevice));
+            checkCudaErrors(cudaMemcpy(d_odata, gpuScalarFlux, numBlocks*sizeof(float), cudaMemcpyDeviceToDevice));
+
+            // warm-up
+            reduce<float>(mesh->voxelCount(), numThreads, numBlocks, gpuTempFlux, d_odata);
+
+            updateCpuData(gpuId, errorData, d_odata, numBlocks, 0);
+
+            */
+
+            float maxDiff = -1.0e35f;
+            for(unsigned int i = 0; i < mesh->voxelCount(); i++)
+                maxDiff = max(((*scalarFlux)[ie*mesh->voxelCount() + i]-prevFlux[i])/(*scalarFlux)[ie*mesh->voxelCount()+i], maxDiff);
+
+            for(unsigned int i = 0; i < mesh->voxelCount(); i++)
+                prevFlux[i] = (*scalarFlux)[ie*mesh->voxelCount() + i];
+
+            std::cout << "Max diff = " << maxDiff << std::endl;
+
+            //isoDiffKernel<<<dimGrid, dimBlock>>>(
+            //      );
 
             /*
             maxDiff = -1.0E35f;
@@ -586,17 +628,8 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     //    std::cout << "launch_isoRayKernel failed while copying flux from GPU to CPU with error code "<< cudaerr << std::endl;
 
     // Release the GPU resources
-    //release_gpu(gpuId, gpuUflux);
-    //release_gpu(gpuId, gpuXNodes);
-    //release_gpu(gpuId, gpuYNodes);
-    //release_gpu(gpuId, gpuZNodes);
-    //release_gpu(gpuId, gpuDx);
-    //release_gpu(gpuId, gpuDy);
-    //release_gpu(gpuId, gpuDz);
     release_gpu(gpuId, gpuZoneId);
     release_gpu(gpuId, gpuAtomDensity);
-    //release_gpu(gpuId, gpuTot1d);
-    //release_gpu(gpuId, gpuSrcStrength);
 
     release_gpu(gpuId, gpuAxy);
     release_gpu(gpuId, gpuAxz);
@@ -618,3 +651,185 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
     return EXIT_SUCCESS;
 }
+
+/*
+template <class T>
+void reduce(int size, int threads, int blocks, T *d_idata, T *d_odata)
+{
+    int numBlocks = 0;
+    int numThreads = 0;
+    int maxBlocks = 64;
+    int maxThreads = 256;
+    //getNumBlocksAndThreads(0, size, maxBlocks, maxThreads, numBlocks, numThreads);
+
+    cudaDeviceProp prop;
+    //int device;
+   // checkCudaErrors(cudaGetDevice(&gpuId));
+    checkCudaErrors(cudaGetDeviceProperties(&prop, gpuId));
+
+    numThreads = (n < maxThreads*2) ? nextPow2((n + 1)/ 2) : maxThreads;
+    numBlocks = (n + (numThreads * 2 - 1)) / (numThreads * 2);
+
+    if ((float)numThreads*numBlocks > (float)prop.maxGridSize[0] * prop.maxThreadsPerBlock)
+    {
+        printf("n is too large, please choose a smaller number!\n");
+    }
+
+    if (numBlocks > prop.maxGridSize[0])
+    {
+        printf("Grid size <%d> excceeds the device capability <%d>, set block size as %d (original %d)\n",
+               numBlocks, prop.maxGridSize[0], numThreads*2, numThreads);
+
+        numBlocks /= 2;
+        numThreads *= 2;
+    }
+
+    numBlocks = MIN(maxBlocks, numBlocks);
+
+    // allocate mem for the result on host side
+    T *h_odata = (T *) malloc(numBlocks*sizeof(T));
+
+    printf("%d blocks\n\n", numBlocks);
+
+    // allocate device memory and data
+    T *d_idata = NULL;
+    T *d_odata = NULL;
+
+    checkCudaErrors(cudaMalloc((void **) &d_idata, bytes));
+    checkCudaErrors(cudaMalloc((void **) &d_odata, numBlocks*sizeof(T)));
+
+    // copy data directly to device memory
+    checkCudaErrors(cudaMemcpy(d_idata, h_idata, bytes, cudaMemcpyHostToDevice));
+    checkCudaErrors(cudaMemcpy(d_odata, h_idata, numBlocks*sizeof(T), cudaMemcpyHostToDevice));
+
+    // warm-up
+    //reduce<T>(size, numThreads, numBlocks, whichKernel, d_idata, d_odata);
+
+    dim3 dimBlock(threads, 1, 1);
+    dim3 dimGrid(blocks, 1, 1);
+
+    // when there is only one warp per block, we need to allocate two warps
+    // worth of shared memory so that we don't index shared memory out of bounds
+    int smemSize = (threads <= 32) ? 2 * threads * sizeof(T) : threads * sizeof(T);
+
+    if (isPow2(size))
+    {
+        switch (threads)
+        {
+            case 512:
+                reduce6<T, 512, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
+            case 256:
+                reduce6<T, 256, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
+            case 128:
+                reduce6<T, 128, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
+            case 64:
+                reduce6<T,  64, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
+            case 32:
+                reduce6<T,  32, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
+            case 16:
+                reduce6<T,  16, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
+            case  8:
+                reduce6<T,   8, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
+            case  4:
+                reduce6<T,   4, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
+            case  2:
+                reduce6<T,   2, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
+            case  1:
+                reduce6<T,   1, true><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+        }
+    }
+    else
+    {
+        switch (threads)
+        {
+            case 512:
+                reduce6<T, 512, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
+            case 256:
+                reduce6<T, 256, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
+            case 128:
+                reduce6<T, 128, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
+            case 64:
+                reduce6<T,  64, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
+            case 32:
+                reduce6<T,  32, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
+            case 16:
+                reduce6<T,  16, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
+            case  8:
+                reduce6<T,   8, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
+            case  4:
+                reduce6<T,   4, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
+            case  2:
+                reduce6<T,   2, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+
+            case  1:
+                reduce6<T,   1, false><<< dimGrid, dimBlock, smemSize >>>(d_idata, d_odata, size);
+                break;
+        }
+    }
+}
+*/
+/*
+void getNumBlocksAndThreads(int gpuId, int n, int maxBlocks, int maxThreads, int &blocks, int &threads)
+{
+    //get device capability, to avoid block/grid size excceed the upbound
+    cudaDeviceProp prop;
+    //int device;
+   // checkCudaErrors(cudaGetDevice(&gpuId));
+    checkCudaErrors(cudaGetDeviceProperties(&prop, gpuId));
+
+    threads = (n < maxThreads*2) ? nextPow2((n + 1)/ 2) : maxThreads;
+    blocks = (n + (threads * 2 - 1)) / (threads * 2);
+
+    if ((float)threads*blocks > (float)prop.maxGridSize[0] * prop.maxThreadsPerBlock)
+    {
+        printf("n is too large, please choose a smaller number!\n");
+    }
+
+    if (blocks > prop.maxGridSize[0])
+    {
+        printf("Grid size <%d> excceeds the device capability <%d>, set block size as %d (original %d)\n",
+               blocks, prop.maxGridSize[0], threads*2, threads);
+
+        blocks /= 2;
+        threads *= 2;
+    }
+
+    blocks = MIN(maxBlocks, blocks);
+}
+*/

@@ -37,5 +37,10 @@ void updateCpuData(int gpuId, int *data_cpu, int *data_gpu, size_t elements, int
 int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, std::vector<RAY_T> *uflux);
 int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux, std::vector<SOL_T> *scalarFlux);
 
+//template <class T>
+//void reduce(int size, int threads, int blocks, T *d_idata, T *d_odata);
+
+//void getNumBlocksAndThreads(int gpuId, int n, int maxBlocks, int maxThreads, int &blocks, int &threads);
+
 #endif // CUDA_LINK
 
