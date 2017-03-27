@@ -14,6 +14,7 @@
 #include "legendre.h"
 #include "sourceparams.h"
 #include "solverparams.h"
+#include "outwriter.h"
 
 #include "cuda_link.h"
 
@@ -165,6 +166,13 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
 
     unsigned int totalMissedVoxels = 0;
 
+    unsigned int highestEnergy = 0;
+    while(srcStrength[highestEnergy] <= 0 && highestEnergy < groups)
+        highestEnergy++;
+
+    if(highestEnergy >= groups)
+        return NULL;
+
     for(unsigned int zIndxStart = 0; zIndxStart < mesh->zElemCt; zIndxStart++)
         for(unsigned int yIndxStart = 0; yIndxStart < mesh->yElemCt; yIndxStart++)
             for(unsigned int xIndxStart = 0; xIndxStart < mesh->xElemCt; xIndxStart++)  // For every voxel
@@ -179,7 +187,7 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
                     RAY_T srcToCellDist = sqrt((x-sx)*(x-sx) + (y-sy)*(y-sy) + (z-sz)*(z-sz));
                     unsigned int zid = mesh->zoneId[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
                     RAY_T xsval;
-                    for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
+                    for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)
                     {
                         xsval = xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
                         (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = srcStrength[ie] * exp(-xsval*srcToCellDist) / (4 * m_pi * srcToCellDist * srcToCellDist);
@@ -254,7 +262,7 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
 
                     // Update mpf array
                     unsigned int zid = mesh->zoneId[xIndx*xjmp + yIndx*yjmp + zIndx];
-                    for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
+                    for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)
                     {
                         //                   [cm] * [b] * [atom/b-cm]
                         meanFreePaths[ie] += tmin * xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
@@ -350,7 +358,7 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
                     {
                         RAY_T finalDist = sqrt((x-sx)*(x-sx) + (y-sy)*(y-sy) + (z-sz)*(z-sz));
 
-                        for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
+                        for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)
                         {
                             //       [#]       = [cm] * [b] * [1/cm-b]
                             meanFreePaths[ie] += finalDist * xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
@@ -361,7 +369,7 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
 
                 } // End of while loop
 
-                for(unsigned int ie = 0; ie < xs->groupCount(); ie++)
+                for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)
                 {
                     RAY_T flx = srcStrength[ie] * exp(-meanFreePaths[ie]) / (m_4pi * srcToCellDist * srcToCellDist);
 
@@ -565,7 +573,8 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
                         int ix = ixStart;
                         while(ix < (signed) mesh->xElemCt && ix >= 0)  // for every mesh element in the proper order
                         {
-                            int zid = mesh->zoneId[ix*xjmp + iy*yjmp + iz];  // Get the zone id of this element
+                            unsigned int ir = ix*xjmp + iy*yjmp + iz;
+                            int zid = mesh->zoneId[ir];  // Get the zone id of this element
 
                             // Handle the x influx
                             if(quad->mu[iang] >= 0)                                       // Approach x = 0 -> xMesh
@@ -615,13 +624,13 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
                                     influxZ = outboundFluxZ[ix*xjmp + iy*yjmp + iz+1];
                             }
 
-                            SOL_T inscatter = m_4pi_inv*(*scalarFlux)[ie*mesh->voxelCount() + ix*xjmp+iy*yjmp+iz] * xs->scatxs2d(zid, ie, ie, 0) * mesh->atomDensity[ix*xjmp+iy*yjmp+iz] * mesh->vol[ix*xjmp+iy*yjmp+iz];
+                            SOL_T inscatter = m_4pi_inv*(*scalarFlux)[ie*mesh->voxelCount() + ir] * xs->scatxs2d(zid, ie, ie, 0) * mesh->atomDensity[ir] * mesh->vol[ir];
 
-                            SOL_T numer = totalSource[ix*xjmp+iy*yjmp+iz] +  inscatter +                                                                                            // [#]
+                            SOL_T numer = totalSource[ir] +  inscatter +                                                                                            // [#]
                                     mesh->Ayz[ie*quad->angleCount()*mesh->yElemCt*mesh->zElemCt + iang*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz] * influxX +  // [cm^2 * #/cm^2]  The 2x is already factored in
                                     mesh->Axz[ie*quad->angleCount()*mesh->xElemCt*mesh->zElemCt + iang*mesh->xElemCt*mesh->zElemCt + ix*mesh->zElemCt + iz] * influxY +
                                     mesh->Axy[ie*quad->angleCount()*mesh->xElemCt*mesh->yElemCt + iang*mesh->xElemCt*mesh->yElemCt + ix*mesh->yElemCt + iy] * influxZ;
-                            SOL_T denom = mesh->vol[ix*xjmp+iy*yjmp+iz]*xs->totXs1d(zid, ie)*mesh->atomDensity[ix*xjmp + iy*yjmp + iz] +                               // [cm^3] * [b] * [1/b-cm]
+                            SOL_T denom = mesh->vol[ir]*xs->totXs1d(zid, ie)*mesh->atomDensity[ir] +                               // [cm^3] * [b] * [1/b-cm]
                                     mesh->Ayz[ie*quad->angleCount()*mesh->yElemCt*mesh->zElemCt + iang*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz] +            // [cm^2]
                                     mesh->Axz[ie*quad->angleCount()*mesh->xElemCt*mesh->zElemCt + iang*mesh->xElemCt*mesh->zElemCt + ix*mesh->zElemCt + iz] +
                                     mesh->Axy[ie*quad->angleCount()*mesh->xElemCt*mesh->yElemCt + iang*mesh->xElemCt*mesh->yElemCt + ix*mesh->yElemCt + iy];
@@ -657,19 +666,23 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
                     iz += diz;
                 } // end of for iz
 
-                for(unsigned int i = 0; i < tempFlux.size(); i++)
-                {
-                    (*scalarFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
-                }
+
 
                 emit signalNewSolverIteration(scalarFlux);
 
                 unsigned int xTracked = mesh->xElemCt/2;
                 unsigned int yTracked = mesh->yElemCt/2;
                 unsigned int zTracked = mesh->zElemCt/2;
-                converganceTracker.push_back((*scalarFlux)[ie*mesh->voxelCount() + xTracked*xjmp + yTracked*yjmp + zTracked]);
+                converganceTracker.push_back(tempFlux[xTracked*xjmp + yTracked*yjmp + zTracked]);
 
             } // end of all angles
+
+            for(unsigned int i = 0; i < tempFlux.size(); i++)
+            {
+                (*scalarFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
+            }
+
+            OutWriter::writeArray((QString("scalar_flux_") + QString::number(ie) + "_" + QString::number(iterNum)).toStdString(), tempFlux);
 
             maxDiff = -1.0E35f;
             for(unsigned int i = 0; i < tempFlux.size(); i++)
