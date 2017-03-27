@@ -122,8 +122,8 @@ void OutWriter::writeArray(std::string filename, const std::vector<T>& arry)
     std::ofstream fout;
     fout.open(filename.c_str());
 
-    fout << std::fixed;
-    fout << std::setprecision(6);
+    //fout << std::fixed;
+    //fout << std::setprecision(6);
 
     for(int i = 0; i < arry.size(); i++)
         fout << arry[i] << '\n';
