@@ -3,9 +3,9 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include <iomanip>
+//#include <iomanip>
 
-#include <QDebug>
+//#include <QDebug>
 
 #include "mesh.h"
 #include "quadrature.h"
@@ -39,7 +39,8 @@ void OutWriter::writeZoneId(std::string filename, const Mesh& mesh)
         fout << mesh.zNodes[i] << '\n';
 
     if(mesh.voxelCount() != mesh.zoneId.size())
-        qDebug() << "WARNING: OutWriter::writeZoneId: the mesh size did not match the data size";
+        std::cout << "WARNING: OutWriter::writeZoneId: the mesh size did not match the data size" << std::endl;
+        //qDebug() << "WARNING: OutWriter::writeZoneId: the mesh size did not match the data size";
 
     for(unsigned int i = 0; i < mesh.zoneId.size(); i++)
         fout << mesh.zoneId[i] << '\n';
@@ -53,8 +54,8 @@ void OutWriter::writeFloatArrays(std::string filename, const std::vector<std::ve
     std::ofstream fout;
     fout.open(filename.c_str());
 
-    fout << std::fixed;
-    fout << std::setprecision(6);
+    //fout << std::fixed;
+    //fout << std::setprecision(6);
 
     for(unsigned int indx = 0; indx < arry[0].size(); indx++)
     {

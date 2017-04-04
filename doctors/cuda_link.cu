@@ -6,6 +6,8 @@
 #include "sourceparams.h"
 #include "solverparams.h"
 
+#include "outwriter.h"
+
 void reportGpuData()
 {
     std::cout << "Reporting GPU resources" << std::endl;
@@ -312,8 +314,10 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
         cudaDeviceSynchronize();
         release_gpu(gpuId, gpuUFlux);
 
-        // TODO: Copy and dump
-
+        std::vector<float> cpuExtSrc;
+        cpuExtSrc.resize(xs->groupCount() * mesh->voxelCount());
+        updateCpuData(gpuId, &cpuExtSrc[0], gpuExtSource, xs->groupCount() * mesh->voxelCount());
+        OutWriter::writeArray("gpuExtSrc.dat", cpuExtSrc);
     }
     else
     {
@@ -534,6 +538,8 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
             updateCpuData(gpuId, errorData, d_odata, numBlocks, 0);
 
             */
+
+            OutWriter::writeArray(std::string("gpuScalarFlux_") + std::to_string(iterNum), *scalarFlux);
 
             maxDiff = -1.0e35f;
             for(unsigned int i = 0; i < mesh->voxelCount(); i++)

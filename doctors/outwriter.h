@@ -4,8 +4,8 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include <iomanip>
-#include <QDebug>
+//#include <iomanip>
+//#include <QDebug>
 
 #include <iostream>
 //#include <cstdarg>  // For variadic templates
@@ -68,7 +68,8 @@ void OutWriter::writeScalarFlux(std::string filename, const XSection& xs, const 
         fout << mesh.zNodes[i] << '\n';
 
     if(mesh.voxelCount()*xs.groupCount() != flux.size())
-        qDebug() << "WARNING: OutWriter::writeScalarFlux: the mesh size did not match the data size";
+        std::cout << "WARNING: OutWriter::writeScalarFlux: the mesh size did not match the data size" << std::endl;
+        //qDebug() << "WARNING: OutWriter::writeScalarFlux: the mesh size did not match the data size";
 
     for(unsigned int i = 0; i < flux.size(); i++)
         fout << flux[i] << '\n';
@@ -84,7 +85,8 @@ void OutWriter::writeAngularFlux(std::string filename, const XSection &xs, const
     fout.open(filename.c_str());
 
     if(xs.groupCount() * quad.angleCount() * mesh.voxelCount() != flux.size())
-        qCritical() << "WARNING: OutWriter::writeScalarFlux: the mesh size did not match the data size";
+        std::cout << "WARNING: OutWriter::writeScalarFlux: the mesh size did not match the data size" << std::endl;
+        //qCritical() << "WARNING: OutWriter::writeScalarFlux: the mesh size did not match the data size";
 
     fout << "5\n";
     fout << xs.groupCount() << '\n';
@@ -144,7 +146,8 @@ void OutWriter::writeArray2(std::string filename, const std::vector<T1>& arry1, 
 
     if(arry1.size() != arry2.size())
     {
-        qDebug() << __FILE__ << ": " << __LINE__ << ": arrays sizes do not match";
+        std::cout << "OutWriter::writeArray2(): Array sizes do not match!" << std::endl;
+        //qDebug() << __FILE__ << ": " << __LINE__ << ": arrays sizes do not match";
     }
 
     int maxtimes = MIN(arry1.size(), arry2.size());
@@ -167,7 +170,8 @@ void OutWriter::writeArray3(std::string filename, const std::vector<T1>& arry1, 
 
     if(arry1.size() != arry2.size() || arry1.size() != arry3.size())
     {
-        qDebug() << __FILE__ << ": " << __LINE__ << ": arrays sizes do not match";
+        std::cout << "OutWriter::writeArray3(): Array sizes do not match!" << std::endl;
+        //qDebug() << __FILE__ << ": " << __LINE__ << ": arrays sizes do not match";
     }
 
     for(int i = 0; i < arry1.size(); i++)
