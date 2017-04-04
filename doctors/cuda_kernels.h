@@ -64,7 +64,8 @@ __global__ void isoSrcKernel(
         int voxels, int groups, int pn, int highestEnergyGroup, int sinkGroup,
         int Nx, int Ny, int Nz);
 
-__global__ void zeroKernel(int Nx, int Ny, int Nz, float *ptr);
+__global__ void zeroKernelMesh(int Nx, int Ny, int Nz, float *ptr);
+__global__ void zeroKernelMeshEnergy(int groups, int Nx, int Ny, int Nz, float *ptr);
 
 __global__ void downscatterKernel(
         float *totalSource,

@@ -480,9 +480,10 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
         //unsigned int xx= xs->groupCount();
         for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)  // Sink energy
             for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
-                for(unsigned int iep = highestEnergy; iep <= ie; iep++) // Source energy
+                //for(unsigned int iep = highestEnergy; iep <= ie; iep++) // Source energy
                     //                               [#]   =                        [#/cm^2]      * [cm^3]        *  [b]                               * [1/b-cm]
-                    extSource[ie*mesh->voxelCount() + ri] += (*uFlux)[iep*mesh->voxelCount() + ri] * mesh->vol[ri] * xs->scatxs2d(mesh->zoneId[ri], iep, ie, 0) * mesh->atomDensity[ri];
+                    //extSource[ie*mesh->voxelCount() + ri] += (*uFlux)[iep*mesh->voxelCount() + ri] * mesh->vol[ri] * xs->scatxs2d(mesh->zoneId[ri], iep, ie, 0) * mesh->atomDensity[ri];
+                extSource[ie*mesh->voxelCount() + ri] += (*uFlux)[ie*mesh->voxelCount() + ri] * mesh->vol[ri] * xs->scatxs2d(mesh->zoneId[ri], ie, ie, 0) * mesh->atomDensity[ri];
 
         OutWriter::writeArray("externalSrc.dat", extSource);
     }

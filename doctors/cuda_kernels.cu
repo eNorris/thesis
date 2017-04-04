@@ -330,12 +330,28 @@ __global__ void isoSrcKernel(
 {
     int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx.x;
     for(unsigned int iep = highestEnergyGroup; iep <= sinkGroup; iep++)  // Sink energy
+    {
+        if(sinkGroup == 17)
+            printf("Called %d -> %d @ %d (%d, %d, %d): uflux=%f, v=%f, s=%f, p=%f\n",
+                   iep, sinkGroup, ir, blockIdx.x, blockIdx.y, threadIdx.x,
+                   uFlux[iep*voxels + ir], vol[ir], scatxs2d[zoneId[ir]*groups*groups*pn + iep*groups*pn + sinkGroup*pn], atomDensity[ir]);
         extSource[sinkGroup*voxels + ir] += uFlux[iep*voxels + ir] * vol[ir] * scatxs2d[zoneId[ir]*groups*groups*pn + iep*groups*pn + sinkGroup*pn] * atomDensity[ir];
+    }
 }
-__global__ void zeroKernel(int Nx, int Ny, int Nz, float *ptr)
+__global__ void zeroKernelMesh(int Nx, int Ny, int Nz, float *ptr)
 {
     int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx.x;
     ptr[ir] = 0.0f;
+}
+
+__global__ void zeroKernelMeshEnergy(int groups, int Nx, int Ny, int Nz, float *ptr)
+{
+    int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx.x;
+    for(unsigned int ie = 0; ie < groups; ie++)
+    {
+        //printf("Indx: %d = %d, %d, %d, %d\n", groups*Nx*Ny*Nz + ir, i);
+        ptr[ie*Nx*Ny*Nz + ir] = 0.0f;
+    }
 }
 
 __global__ void downscatterKernel(

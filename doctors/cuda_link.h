@@ -31,8 +31,13 @@ int *alloc_gpuInt(const int gpuId, const int elements, const int *data);
 float *alloc_gpuFloat(const int gpuId, const int elements, const float *data);
 void release_gpu(int gpuId, float *gpus);
 void release_gpu(int gpuId, int *gpus);
+
 void updateCpuData(int gpuId, float *data_cpu, float *data_gpu, size_t elements, int cpuOffset=0);
 void updateCpuData(int gpuId, int *data_cpu, int *data_gpu, size_t elements, int cpuOffset=0);
+
+//template<typename T>
+//void updateCpuDataBlocking(int gpuId, T *data_cpu, T *data_gpu, size_t elements, int cpuOffset=0);
+//void updateCpuDataBlocking(int gpuId, int *data_cpu, int *data_gpu, size_t elements, int cpuOffset=0);
 
 int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, std::vector<RAY_T> *uflux);
 int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux, std::vector<SOL_T> *scalarFlux);
@@ -41,6 +46,18 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 //void reduce(int size, int threads, int blocks, T *d_idata, T *d_odata);
 
 //void getNumBlocksAndThreads(int gpuId, int n, int maxBlocks, int maxThreads, int &blocks, int &threads);
+
+// HPP implementation
+template<typename T>
+void updateCpuDataBlocking(int gpuId, T *cpuData, T *gpuData, size_t elements, int cpuOffset=0)
+{
+    cudaError_t cudaerr;
+    if((cudaerr = cudaSetDevice(gpuId)) != cudaSuccess)
+        std::cout << "updateCpuDataBlocking (T) failed to set the device with error code: " << cudaerr << ": " << cudaGetErrorString(cudaerr) << std::endl;
+
+    if((cudaerr = cudaMemcpy(cpuData+cpuOffset, gpuData, elements*sizeof(T), cudaMemcpyDeviceToHost)) != cudaSuccess)
+        std::cout << "updateCpuDataBlocking (T) MemcpyAsync failed with error code: " << cudaerr << ": " << cudaGetErrorString(cudaerr) << std::endl;
+}
 
 #endif // CUDA_LINK
 
