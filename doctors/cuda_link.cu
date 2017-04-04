@@ -311,6 +311,9 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
         cudaDeviceSynchronize();
         release_gpu(gpuId, gpuUFlux);
+
+        // TODO: Copy and dump
+
     }
     else
     {
