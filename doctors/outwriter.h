@@ -141,8 +141,8 @@ void OutWriter::writeArray2(std::string filename, const std::vector<T1>& arry1, 
     std::ofstream fout;
     fout.open(filename.c_str());
 
-    fout << std::fixed;
-    fout << std::setprecision(6);
+    //fout << std::fixed;
+    //fout << std::setprecision(6);
 
     if(arry1.size() != arry2.size())
     {
@@ -165,8 +165,8 @@ void OutWriter::writeArray3(std::string filename, const std::vector<T1>& arry1, 
     std::ofstream fout;
     fout.open(filename.c_str());
 
-    fout << std::fixed;
-    fout << std::setprecision(6);
+    //fout << std::fixed;
+    //fout << std::setprecision(6);
 
     if(arry1.size() != arry2.size() || arry1.size() != arry3.size())
     {

@@ -28,8 +28,8 @@ void OutWriter::writeZoneId(std::string filename, const Mesh& mesh)
     fout << mesh.yElemCt << '\n';
     fout << mesh.zElemCt << '\n';
 
-    fout << std::fixed;
-    fout << std::setprecision(6);
+    //fout << std::fixed;
+    //fout << std::setprecision(6);
 
     for(unsigned int i = 0; i < mesh.xElemCt; i++)
         fout << mesh.xNodes[i] << '\n';
