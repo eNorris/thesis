@@ -171,7 +171,7 @@ CUDA_ARCH     = sm_35                # Titan Z
 #CUDA_ARCH = sm_52     # GTX 960
 
 # Here are some NVCC flags I've always used by default.
-NVCCFLAGS     = --compiler-options -fno-strict-aliasing -use_fast_math --ptxas-options=-v -lineinfo -std=c++0x
+NVCCFLAGS     = --compiler-options -fno-strict-aliasing -use_fast_math --ptxas-options=-v -lineinfo # -Xcompiler "-std=c++0x"
 #NVCCFLAGS     = --compiler-options -fno-strict-aliasing -use_fast_math --ptxas-options=-v -D_DEBUG --cudart=shared  -Xcompiler "/EHsc /W3 /nologo /FS /Zi /MDd"
 
 # Prepend with -I
