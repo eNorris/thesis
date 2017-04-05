@@ -220,15 +220,16 @@ __global__ void isoSolKernel(
 
     int ir = gpuIdxToMesh[startIndx + iGpu];
 
-    //if(i >= voxThisSubSweep)
-    //    return;
-
-    //int level = static_cast<int>((1 + sqrtf(1 + 8*i))/2.0);
-    //int prior = level * (level + 1) / 2;
-
     int ix = ir / (Ny*Nz);
     int iy = (ir-ix*Ny*Nz) / Nz;
     int iz = ir - ix*Ny*Nz - iy*Nz;
+
+    printf("iGpu=%d, voxThisSubSweep=%d, startIndx=%d, ir=%d, ix=%d, iy=%d, iz=%d, iS=%d\n", iGpu, voxThisSubSweep, startIndx, ir, ix, iy, iz, ix+iy+iz);
+
+    if(ir == 33288)
+    {
+        printf("ix=%d, iy=%d, iz=%d", ix, iy, iz);
+    }
 
     // Reverse directions as necessary
     if(dix == -1)
@@ -295,7 +296,6 @@ __global__ void isoSolKernel(
             influxZ = outboundFluxZ[ir + 1];
     }
 
-    //SOL_T inscatter = CUDA_4PI_INV*scalarFlux[ie*Nx*Ny*Nz + ir] * scatxs2d(zid, ie, ie, 0) * atomDensity[ir] * vol[ir];
     SOL_T inscatter = CUDA_4PI_INV*scalarFlux[ie*Nx*Ny*Nz + ir] * scatxs2d[zid*groups*groups*pn + ie*groups * pn +  ie*groups] * atomDensity[ir] * vol[ir];
 
     SOL_T numer = totalSource[ir] +  inscatter +                                                                                            // [#]
@@ -309,6 +309,11 @@ __global__ void isoSolKernel(
 
     //   [#/cm^2] = [#]  / [cm^2]
     SOL_T angFlux = numer/denom;
+
+    if(ix == 32 && iy == 32 && iz == 8)
+    {
+        printf("psi=%f, totSrc=%f, inScat=%f, numer=%f, denom=%f", angFlux, totalSource[ir], inscatter, numer, denom);
+    }
 
     //angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz] = angFlux;
 
@@ -329,14 +334,15 @@ __global__ void isoSrcKernel(
         int Nx, int Ny, int Nz)
 {
     int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx.x;
-    for(unsigned int iep = highestEnergyGroup; iep <= sinkGroup; iep++)  // Sink energy
-    {
-        if(sinkGroup == 17)
-            printf("Called %d -> %d @ %d (%d, %d, %d): uflux=%f, v=%f, s=%f, p=%f\n",
-                   iep, sinkGroup, ir, blockIdx.x, blockIdx.y, threadIdx.x,
-                   uFlux[iep*voxels + ir], vol[ir], scatxs2d[zoneId[ir]*groups*groups*pn + iep*groups*pn + sinkGroup*pn], atomDensity[ir]);
-        extSource[sinkGroup*voxels + ir] += uFlux[iep*voxels + ir] * vol[ir] * scatxs2d[zoneId[ir]*groups*groups*pn + iep*groups*pn + sinkGroup*pn] * atomDensity[ir];
-    }
+    //for(unsigned int iep = highestEnergyGroup; iep <= sinkGroup; iep++)  // Sink energy
+    //{
+    //if(sinkGroup == 17)
+    //    printf("Called %d -> %d @ %d (%d, %d, %d): uflux=%f, v=%f, s=%f, p=%f\n",
+    //           iep, sinkGroup, ir, blockIdx.x, blockIdx.y, threadIdx.x,
+    //           uFlux[iep*voxels + ir], vol[ir], scatxs2d[zoneId[ir]*groups*groups*pn + iep*groups*pn + sinkGroup*pn], atomDensity[ir]);
+    //extSource[sinkGroup*voxels + ir] += uFlux[iep*voxels + ir] * vol[ir] * scatxs2d[zoneId[ir]*groups*groups*pn + iep*groups*pn + sinkGroup*pn] * atomDensity[ir];
+    extSource[sinkGroup*voxels + ir] = uFlux[sinkGroup*voxels + ir] * vol[ir] * scatxs2d[zoneId[ir]*groups*groups*pn + sinkGroup*groups*pn + sinkGroup*pn] * atomDensity[ir];
+    //}
 }
 __global__ void zeroKernelMesh(int Nx, int Ny, int Nz, float *ptr)
 {
@@ -366,13 +372,14 @@ __global__ void downscatterKernel(
 {
     int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx.x;
 
+    totalSource[ir] = extSource[ir];
     for(unsigned int iie = highestEnergyGroup; iie < sinkGroup; iie++)
     {
         //int zidIndx = zoneId[ir];
         //         [#]  +=  [#]         *  [#/cm^2]                     *  [b]                                                                 *  [1/b-cm]       *  [cm^3]
         totalSource[ir] += CUDA_4PI_INV * scalarFlux[iie*Nx*Ny*Nz + ir] * scatxs2d[zoneId[ir]*groups*groups*pn + iie*groups*pn + sinkGroup*pn] * atomDensity[ir] * vol[ir];
     }
-    totalSource[ir] += extSource[sinkGroup*Nx*Ny*Nz + ir];
+
 }
 
 __global__ void clearSweepKernel(
