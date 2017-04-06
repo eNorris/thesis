@@ -327,6 +327,82 @@ The data files containing the scatter cross sections are distributed using a Leg
 \mu_s = \Omega_a \cdot \Omega_{a'}
 \end{equation}
 
+\section{Uncollided Flux}
+To avoid ray effect, the flux is split into collided and uncollided components as shown in Eq.~\ref{eq:totflux}. Equation~\ref{eq:boltz} can be rewritten as two equations solving for the uncollided flux, $\psi_u$, and collided flux, $\psi_c$ independently. Equation~\ref{eq:unc} has no scatter term since scattered particles are not considered in the uncollided flux. The source term, $S_u$, in Eq.~\ref{eq:col} is the first collision source.
+
+\begin{equation} \label{eq:totflux}
+\psi = \psi_u + \psi_c
+\end{equation}
+
+\begin{equation} \label{eq:unc}
+\left[ \hat{\Omega} \cdot \nabla + \Sigma_t(\boldsymbol{r}, E) \right]
+\psi_u(\boldsymbol{r}, E, \hat{\Omega}) =  S(\boldsymbol{r}, E, \hat{\Omega})
+\end{equation}
+
+\begin{equation} \label{eq:col}
+\begin{split}
+	&\left[ \hat{\Omega} \cdot \nabla + \Sigma_t(\boldsymbol{r}, E) \right]
+	\psi_c(\boldsymbol{r}, E, \hat{\Omega}) = \\
+	&\int_{4 \pi} \int_0^\infty \Sigma_s(\boldsymbol{r}, E' \rightarrow E, \hat{\Omega}' \rightarrow \hat{\Omega}) \psi_c(\boldsymbol{r}, E', \hat{\Omega}') dE' d\hat{\Omega}' + S_{u}(\boldsymbol{r}, E, \hat{\Omega})
+\end{split}
+\end{equation}
+
+The uncollided flux in Eq.~\ref{eq:unc} can be analytically solved. The solution is given in Eq.~\ref{eq:uncsol} for a known isotropic point source located at position $\boldsymbol{s}$. The $\delta$ symbol in Eq.~\ref{eq:uncsol} is the Kronecker delta given by Eq.~\ref{eq:kronecker}. 
+
+\begin{equation} \label{eq:uncsol}
+\psi_u(\boldsymbol{r}, E, \hat{\Omega}) = 
+S(\boldsymbol{s}, E)
+\frac{e^{-\sum_i \Sigma_{t,i} x_i}}{4\pi |\boldsymbol{r}-\boldsymbol{s}|^2}
+\delta\left( \hat{\Omega}, \frac{\boldsymbol{r}-\boldsymbol{s}}{|\boldsymbol{r}-\boldsymbol{s}|^2}\right)
+\end{equation}
+
+\begin{equation} \label{eq:kronecker}
+\delta(x, y) = 
+\begin{cases}
+1, \quad \mathrm{if} \ x=y \\
+0, \quad \mathrm{otherwise}
+\end{cases}
+\end{equation}
+
+Equation~\ref{eq:uncsol} can be expanded to accomodate any number of spatially distributed sources of arbitrary directionality given in Eq.~\ref{eq:uncsol2} by integrating over the entire spatial domain, $V$.
+
+\begin{equation} \label{eq:uncsol2}
+\psi_u(\boldsymbol{r}, E, \hat{\Omega}) = \iiint_{V}
+S(\boldsymbol{s}, E, \hat{\Omega})
+\frac{e^{-\sum_i \Sigma_{t,i} x_i}}{|\boldsymbol{r}-\boldsymbol{s}|^2}
+\delta\left( \hat{\Omega}, \frac{\boldsymbol{r}-\boldsymbol{s}}{|\boldsymbol{r}-\boldsymbol{s}|^2}\right)
+d \boldsymbol{s}
+\end{equation}
+
+The uncollided source term, $S_u$ in Eq.~\ref{eq:col} is computed from the uncollided flux using Eq.~\ref{eq:uncsrc}.
+
+\begin{equation} \label{eq:uncsrc}
+S_u(\boldsymbol{r}, E, \hat{\Omega}) = \int_{4\pi} \int_{0}^{\infty} 
+\Sigma_s(\boldsymbol{r}, E' \rightarrow E, \hat{\Omega}' \rightarrow \hat{\Omega}) \psi_u(\boldsymbol{r}, E', \hat{\Omega}') 
+dE' d\hat{\Omega}'
+\end{equation}
+
+Substituting Eq.~\ref{eq:uncsrc} into $S_u$ in Eq.~{eq:col} gives Eq.~\ref{eq:col2} which simplifies to Eq.~\ref{eq:col3} by using Eq.~\ref{eq:totflux} to replace the collided and uncollided components with the total angular flux.
+
+\begin{equation} \label{eq:col2}
+\begin{split}
+	&\left[ \hat{\Omega} \cdot \nabla + \Sigma_t(\boldsymbol{r}, E) \right]
+	\psi_c(\boldsymbol{r}, E, \hat{\Omega}) = \\
+	&\int_{4 \pi} \int_0^\infty \Sigma_s(\boldsymbol{r}, E' \rightarrow E, \hat{\Omega}' \rightarrow \hat{\Omega}) \psi_c(\boldsymbol{r}, E', \hat{\Omega}') dE' d\hat{\Omega}' + \\
+	&\int_{4\pi} \int_{0}^{\infty} 
+\Sigma_s(\boldsymbol{r}, E' \rightarrow E, \hat{\Omega}' \rightarrow \hat{\Omega}) \psi_u(\boldsymbol{r}, E', \hat{\Omega}') 
+dE' d\hat{\Omega}'
+\end{split}
+\end{equation}
+
+\begin{equation} \label{eq:col3}
+\begin{split}
+	&\left[ \hat{\Omega} \cdot \nabla + \Sigma_t(\boldsymbol{r}, E) \right]
+	\psi_c(\boldsymbol{r}, E, \hat{\Omega}) = \\
+	&\int_{4 \pi} \int_0^\infty \Sigma_s(\boldsymbol{r}, E' \rightarrow E, \hat{\Omega}' \rightarrow \hat{\Omega}) \psi(\boldsymbol{r}, E', \hat{\Omega}') dE' d\hat{\Omega}'
+\end{split}
+\end{equation}
+
 \endinput
 %%
 %% End of file `chapmin.tex'.
