@@ -127,7 +127,7 @@ int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     int gpuId = 0;
 
     // Allocate memory space for the solution vector
-    std::cout << "Allocating uflux" << std::endl;
+    //std::cout << "Allocating uflux" << std::endl;
     float *gpuUflux = alloc_gpuFloat(gpuId, mesh->voxelCount() * xs->groupCount(), NULL);
 
     // Copy the xyzNode values
@@ -150,7 +150,7 @@ int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     float *gpuTot1d = alloc_gpuFloat(gpuId, xs->m_tot1d.size(), &xs->m_tot1d[0]);
 
     // Copy the source strength
-    std::cout << "Allocating source strength" << std::endl;
+    //std::cout << "Allocating source strength" << std::endl;
     float *gpuSrcStrength = alloc_gpuFloat(gpuId, srcPar->spectraIntensity.size(), &srcPar->spectraIntensity[0]);
 
     //int ixSrc, iySrc, izSrc;
@@ -171,7 +171,7 @@ int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     dim3 dimGrid(mesh->xElemCt, mesh->yElemCt);
     dim3 dimBlock(mesh->zElemCt);
 
-    std::cout << "Grid: " << dimGrid.x << "x" << dimGrid.y << ",   Block: " << dimBlock.x << "x" << dimBlock.y << std::endl;
+    //std::cout << "Grid: " << dimGrid.x << "x" << dimGrid.y << ",   Block: " << dimBlock.x << "x" << dimBlock.y << std::endl;
 
     isoRayKernel<<<dimGrid, dimBlock>>>(
                 gpuUflux,
@@ -220,7 +220,7 @@ int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
 int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uFlux, std::vector<SOL_T> *scalarFlux)
 {
-    std::cout << "Launching solver kernel" << std::endl;
+    //std::cout << "Launching solver kernel" << std::endl;
     if(uFlux == NULL)
     {
         std::cout << "STOP!" << std::endl;
@@ -285,7 +285,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
     // Allocate GPU resources for the external source computation
     float *gpuUFlux = alloc_gpuFloat(gpuId, xs->groupCount()*mesh->voxelCount(), &(*uFlux)[0]);
-    float *gpuExtSource = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
+    float *gpuColFlux = alloc_gpuFloat(gpuId, scalarFlux->size(), NULL);
 
     float *gpuVol = alloc_gpuFloat(gpuId, mesh->vol.size(), &mesh->vol[0]);
     float *gpuAtomDensity = alloc_gpuFloat(gpuId, mesh->atomDensity.size(), &mesh->atomDensity[0]);
@@ -294,10 +294,12 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     float *gpuScatXs2d = alloc_gpuFloat(gpuId, xs->m_scat2d.size(), &xs->m_scat2d[0]);
 
     // Allocate additional GPU resources for the solver
-    float *gpuScalarFlux = alloc_gpuFloat(gpuId, scalarFlux->size(), NULL);
+
     float *gpuTempFlux = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
-    float *gpuPreFlux = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
+    //float *gpuPreFlux = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
+    float *gpu1stSource = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
     float *gpuTotalSource = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
+
     float *gpuOutboundFluxX = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
     float *gpuOutboundFluxY = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
     float *gpuOutboundFluxZ = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
@@ -313,7 +315,14 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
     float *gpuTotXs1d = alloc_gpuFloat(gpuId, xs->m_tot1d.size(), &xs->m_tot1d[0]);
 
+    // Zero the scalar flux
+    int erblocks = 64;
+    int ergrids = scalarFlux->size() / erblocks;
+    if(scalarFlux->size() % erblocks != 0)
+        ergrids += 1;  // Account for lengths not divisible by 64
 
+    //dim3 dimGrid(mesh->xElemCt, mesh->yElemCt);
+    zeroKernel<<<dim3(ergrids), dim3(erblocks)>>>(scalarFlux->size(), gpuColFlux);
 
     //std::cout << "Grid: " << dimGrid.x << "x" << dimGrid.y << ",   Block: " << dimBlock.x << "x" << dimBlock.y << std::endl;
 
@@ -330,7 +339,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
     for(unsigned int iSubSweep = 0; iSubSweep < totalSubsweeps; iSubSweep++)
     {
-        std::cout << "subsweep " << iSubSweep << std::endl;
+        //std::cout << "subsweep " << iSubSweep << std::endl;
 
         int iSubSweepPrev = iSubSweep - 1;
         int C = (iSubSweepPrev+1) * (iSubSweepPrev+2) / 2;
@@ -364,10 +373,10 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
                 int ir = ix*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz;
 
-                if(ix == 32 && iy == 32 && iz==8)
-                {
-                    std::cout << "ir = " << ir << std::endl;
-                }
+                //if(ix == 32 && iy == 32 && iz==8)
+                //{
+                //    std::cout << "ir = " << ir << std::endl;
+                //}
 
                 threadIndexToGlobalIndex[subSweepStartIndex[iSubSweep] + voxelsSoFar] = ir;
                 voxelsSoFar++;
@@ -380,42 +389,52 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     dim3 dimGrid(mesh->xElemCt, mesh->yElemCt);
     dim3 dimBlock(mesh->zElemCt);
 
+    //dim3 blockLinear(64);
+    //dim3 gridLinear
+
     for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)  // for every energy group
     {
-        std::cout << "ie=" << ie << std::endl;
+        //std::cout << "ie=" << ie << std::endl;
         int iterNum = 1;
         SOL_T maxDiff = 1.0;
+
+        // Needs to be done before the first clearSweepKernel<<<>>> call
+        int rblocks = 64;
+        int rgrids = mesh->voxelCount() / rblocks;
+        if(mesh->voxelCount() % rblocks != 0)
+            rgrids += 1;  // Account for lengths not divisible by 64
+        zeroKernel<<<dim3(rgrids), dim3(rblocks)>>>(mesh->voxelCount(), gpuTempFlux);
 
         // No longer needed since the src kernel is no longer an integrator
         //zeroKernelMesh<<<dimGrid, dimBlock>>>(mesh->xElemCt, mesh->yElemCt, mesh->zElemCt, gpuExtSource);
 
         // Compute the external source
-        std::cout << "About to launch isoSrcKernels" << std::endl;
-        for(unsigned int iSink = highestEnergy; iSink < xs->groupCount(); iSink++)
-        {
+        //std::cout << "About to launch isoSrcKernels" << std::endl;
+        //for(unsigned int iSink = highestEnergy; iSink < xs->groupCount(); iSink++)
+        //{
             //std::cout << "Launching iSink = " << iSink << std::endl;
-            isoSrcKernel<<<dimGrid, dimBlock>>>(
-                                              gpuUFlux,
-                                              gpuExtSource,
-                                              gpuVol, gpuAtomDensity, gpuZoneId,
-                                              gpuScatXs2d,
-                                              mesh->voxelCount(), xs->groupCount(), solPar->pn, highestEnergy, iSink,
-                                              mesh->xElemCt, mesh->yElemCt, mesh->zElemCt);
-        }
+        isoSrcKernel<<<dimGrid, dimBlock>>>(
+                                          gpuUFlux,
+                                          gpu1stSource,
+                                          gpuVol, gpuAtomDensity, gpuZoneId,
+                                          gpuScatXs2d,
+                                          mesh->voxelCount(), xs->groupCount(), solPar->pn, highestEnergy, ie,
+                                          mesh->xElemCt, mesh->yElemCt, mesh->zElemCt);
+        //}
 
-        std::cout << "Finished src kernels" << std::endl;
+        //std::cout << "Finished src kernels" << std::endl;
 
         cudaDeviceSynchronize();
 
 
-        std::cout << "About to write the source results" << std::endl;
-        std::vector<float> cpuExtSrc;
-        cpuExtSrc.resize(mesh->voxelCount());
-        updateCpuDataBlocking(gpuId, &cpuExtSrc[0], gpuExtSource, mesh->voxelCount());
-        char ieString[256];
-        sprintf(ieString, "%d", ie);
-        OutWriter::writeArray(std::string("gpuExtSrc") + ieString + ".dat", cpuExtSrc);
-        std::cout << "Wrote the source results" << std::endl;
+        //std::cout << "About to write the source results" << std::endl;
+        //std::vector<float> cpuExtSrc;
+        //cpuExtSrc.resize(mesh->voxelCount());
+        //updateCpuDataBlocking(gpuId, &cpuExtSrc[0], gpu1stSource, mesh->voxelCount());
+        //char ieString[256];
+        //sprintf(ieString, "%d", ie);
+        //OutWriter::writeArray(std::string("gpuExtSrc") + ieString + ".dat", cpuExtSrc);
+        //std::cout << "Wrote the source results" << std::endl;
         //}
         //else
         //{
@@ -428,23 +447,26 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
         //zeroKernelMesh<<<dimGrid, dimBlock>>>(mesh->xElemCt, mesh->yElemCt, mesh->zElemCt, gpuTotalSource);
 
         // Calculate the down-scattering source + external source
-        std::cout << "Launching scatter kernel" << std::endl;
+        //std::cout << "Launching scatter kernel" << std::endl;
         downscatterKernel<<<dimGrid, dimBlock>>>(
                 gpuTotalSource,
                 highestEnergy, ie,
                 mesh->xElemCt, mesh->yElemCt, mesh->zElemCt, xs->groupCount(), solPar->pn,
                 gpuZoneId,
-                gpuScalarFlux,
+                gpuColFlux,
                 gpuScatXs2d,
                 gpuAtomDensity, gpuVol,
-                gpuExtSource);
+                gpu1stSource);
 
         while(iterNum <= maxIterations && maxDiff > epsilon)  // while not converged
         {
-            std::cout << "iteration: " << iterNum << std::endl;
+            //std::cout << "iteration: " << iterNum << std::endl;
+            //clearSweepKernel<<<dimGrid, dimBlock>>>(
+            //        gpuPreFlux, gpuTempFlux,
+            //        mesh->xElemCt, mesh->yElemCt, mesh->zElemCt);
             clearSweepKernel<<<dimGrid, dimBlock>>>(
-                    gpuPreFlux, gpuTempFlux,
-                    mesh->xElemCt, mesh->yElemCt, mesh->zElemCt);
+                    gpuColFlux, gpuTempFlux,
+                    mesh->xElemCt, mesh->yElemCt, mesh->zElemCt, ie);
 
             for(unsigned int iang = 0; iang < quad->angleCount(); iang++)  // for every angle
             {
@@ -485,7 +507,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
                     //std::cout << "Launching the subsweep Kernel" << std::endl;
 
                     isoSolKernel<<<dimGridS, dimBlockS>>>(
-                          gpuScalarFlux, gpuTempFlux,
+                          gpuColFlux, gpuTempFlux,
                           gpuTotalSource,
                           gpuTotXs1d, gpuScatXs2d,
                           gpuAxy, gpuAxz, gpuAyz,
@@ -496,7 +518,20 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
                           mesh->xElemCt, mesh->yElemCt, mesh->zElemCt, xs->groupCount(), quad->angleCount(), solPar->pn,
                           dix, diy, diz,
                           subSweepStartIndex[subSweepId], subSweepVoxelCount[subSweepId], gpuThreadIndexToGlobalIndex);
+
+                    cudaDeviceSynchronize();
+
+                    //std::cout << "Launched subSweepId=" << subSweepId <<  "(" << dimGridS.x << ", " << dimGridS.y << " : " << dimBlockS.x << ", " << dimBlockS.y << " )" << std::endl;
+                    //std::cin.ignore(1024, '\n');
+                    //std::cout << "Ran angle " << iang << std::endl;
+                    //std::cin.get();
+
                 }
+
+                //std::cout << "Launched subSweepId=" << subSweepId <<  "(" << dimGridS.x << ", " << dimGridS.y << " : " << dimBlockS.x << ", " << dimBlockS.y << " )" << std::endl;
+                //std::cin.ignore(1024, '\n');
+                //std::cout << "Ran angle " << iang << std::endl;
+                //std::cin.get();
 
                 updateCpuDataBlocking(gpuId, &(*scalarFlux)[0], gpuTempFlux, mesh->voxelCount(), ie*mesh->voxelCount());
             } // end of all angles

@@ -410,7 +410,7 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
 
 
     //std::vector<SOL_T> angularFlux(xs->groupCount() * quad->angleCount() * mesh->voxelCount());
-    std::vector<SOL_T> *scalarFlux = new std::vector<SOL_T>(xs->groupCount() * mesh->voxelCount(), 0.0f);
+    std::vector<SOL_T> *cFlux = new std::vector<SOL_T>(xs->groupCount() * mesh->voxelCount(), 0.0f);
     std::vector<SOL_T> tempFlux(mesh->voxelCount(), 0.0f);
     std::vector<SOL_T> preFlux(mesh->voxelCount(), -100.0f);
     std::vector<SOL_T> totalSource(mesh->voxelCount(), -100.0f);
@@ -480,10 +480,10 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
         //unsigned int xx= xs->groupCount();
         for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)  // Sink energy
             for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
-                //for(unsigned int iep = highestEnergy; iep <= ie; iep++) // Source energy
+                for(unsigned int iep = highestEnergy; iep <= ie; iep++) // Source energy
                     //                               [#]   =                        [#/cm^2]      * [cm^3]        *  [b]                               * [1/b-cm]
-                    //extSource[ie*mesh->voxelCount() + ri] += (*uFlux)[iep*mesh->voxelCount() + ri] * mesh->vol[ri] * xs->scatxs2d(mesh->zoneId[ri], iep, ie, 0) * mesh->atomDensity[ri];
-                extSource[ie*mesh->voxelCount() + ri] += (*uFlux)[ie*mesh->voxelCount() + ri] * mesh->vol[ri] * xs->scatxs2d(mesh->zoneId[ri], ie, ie, 0) * mesh->atomDensity[ri];
+                    extSource[ie*mesh->voxelCount() + ri] += (*uFlux)[iep*mesh->voxelCount() + ri] * mesh->vol[ri] * xs->scatxs2d(mesh->zoneId[ri], iep, ie, 0) * mesh->atomDensity[ri];
+                //extSource[ie*mesh->voxelCount() + ri] += (*uFlux)[ie*mesh->voxelCount() + ri] * mesh->vol[ri] * xs->scatxs2d(mesh->zoneId[ri], ie, ie, 0) * mesh->atomDensity[ri];
 
         OutWriter::writeArray("externalSrc.dat", extSource);
     }
@@ -509,16 +509,16 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
         for(unsigned int i = 0; i < totalSource.size(); i++)
             totalSource[i] = 0;
 
-        // Calculate the down-scattering source
+        // Calculate the down-scattering source from the collided flux
         for(unsigned int iie = highestEnergy; iie < ie; iie++)
             for(unsigned int ir = 0; ir < mesh->voxelCount(); ir++)
             {
                 int zidIndx = mesh->zoneId[ir];
                 //         [#]    +=  [#]          *      [#/cm^2]                               * [b]                          * [1/b-cm]                * [cm^3]
-                totalSource[ir] += m_4pi_inv*(*scalarFlux)[iie*mesh->voxelCount() + ir] * xs->scatxs2d(zidIndx, iie, ie, 0) * mesh->atomDensity[ir] * mesh->vol[ir]; //xsref(ie-1, zidIndx, 0, iie));
+                totalSource[ir] += m_4pi_inv*(*cFlux)[iie*mesh->voxelCount() + ir] * xs->scatxs2d(zidIndx, iie, ie, 0) * mesh->atomDensity[ir] * mesh->vol[ir]; //xsref(ie-1, zidIndx, 0, iie));
             }
 
-        // Add the external source
+        // Add the external (uncollided) source
         for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
         {
             //  [#]         +=  [#]
@@ -625,7 +625,7 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
                                     influxZ = outboundFluxZ[ix*xjmp + iy*yjmp + iz+1];
                             }
 
-                            SOL_T inscatter = m_4pi_inv*(*scalarFlux)[ie*mesh->voxelCount() + ir] * xs->scatxs2d(zid, ie, ie, 0) * mesh->atomDensity[ir] * mesh->vol[ir];
+                            SOL_T inscatter = m_4pi_inv*(*cFlux)[ie*mesh->voxelCount() + ir] * xs->scatxs2d(zid, ie, ie, 0) * mesh->atomDensity[ir] * mesh->vol[ir];
 
                             SOL_T numer = totalSource[ir] +  inscatter +                                                                                            // [#]
                                     mesh->Ayz[ie*quad->angleCount()*mesh->yElemCt*mesh->zElemCt + iang*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz] * influxX +  // [cm^2 * #/cm^2]  The 2x is already factored in
@@ -667,9 +667,7 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
                     iz += diz;
                 } // end of for iz
 
-
-
-                emit signalNewSolverIteration(scalarFlux);
+                emit signalNewSolverIteration(cFlux);
 
                 unsigned int xTracked = mesh->xElemCt/2;
                 unsigned int yTracked = mesh->yElemCt/2;
@@ -680,7 +678,7 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
 
             for(unsigned int i = 0; i < tempFlux.size(); i++)
             {
-                (*scalarFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
+                (*cFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
             }
 
             OutWriter::writeArray((QString("scalar_flux_") + QString::number(ie) + "_" + QString::number(iterNum)).toStdString(), tempFlux);
@@ -702,7 +700,7 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
 
             for(unsigned int i = 0; i < tempFlux.size(); i++)
             {
-                (*scalarFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
+                (*cFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
             }
 
             iterNum++;
@@ -726,8 +724,8 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
         std::cout << std::endl;
     }
 
-    emit signalNewSolverIteration(scalarFlux);
-    emit signalSolverFinished(scalarFlux);
+    emit signalNewSolverIteration(cFlux);
+    emit signalSolverFinished(cFlux);
 }
 
 
