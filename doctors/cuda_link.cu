@@ -194,11 +194,6 @@ int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     updateCpuDataBlocking(gpuId, &(*uflux)[0], gpuUflux, elements);
     OutWriter::writeArray("uflux.dat", *uflux);
 
-
-    //int cudaerr;
-    //if((cudaerr = cudaMemcpy(gpuUflux, &(*uflux)[0], elements*sizeof(float), cudaMemcpyDeviceToHost)) != cudaSuccess)
-    //    std::cout << "launch_isoRayKernel failed while copying flux from GPU to CPU with error code "<< cudaerr << std::endl;
-
     release_gpu(gpuId, gpuUflux);
     release_gpu(gpuId, gpuXNodes);
     release_gpu(gpuId, gpuYNodes);
@@ -218,16 +213,16 @@ int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     return EXIT_SUCCESS;
 }
 
-int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uFlux, std::vector<SOL_T> *scalarFlux)
+int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *cpuUFlux, std::vector<SOL_T> *cpuCFlux)
 {
     //std::cout << "Launching solver kernel" << std::endl;
-    if(uFlux == NULL)
+    if(cpuUFlux == NULL)
     {
         std::cout << "STOP!" << std::endl;
         return -1;
     }
 
-    if(scalarFlux == NULL)
+    if(cpuCFlux == NULL)
     {
         std::cout << "STOP!" << std::endl;
         return -2;
@@ -240,13 +235,13 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     const int maxIterations = 25;
     const SOL_T epsilon = 0.01f;
 
-    scalarFlux->resize(xs->groupCount() * mesh->voxelCount());
-    std::vector<float> prevFlux(mesh->voxelCount(), 0.0f);
+    cpuCFlux->resize(xs->groupCount() * mesh->voxelCount());
+    std::vector<float> cpuCFluxTmp(mesh->voxelCount(), 0.0f);
 
     std::vector<SOL_T> errMaxList;
     errMaxList.resize(xs->groupCount());
 
-    if(uFlux == NULL && srcPar == NULL)
+    if(cpuUFlux == NULL && srcPar == NULL)
     {
         std::cout << "uFlux and srcPar cannot both be NULL" << std::endl;
         return 55;
@@ -264,7 +259,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
         unsigned int vc = mesh->voxelCount();
         for(unsigned int ir = 0; ir < vc; ir++)
         {
-            dmax = (dmax > (*uFlux)[highestEnergy*vc + ir]) ? dmax : (*uFlux)[highestEnergy*vc + ir];
+            dmax = (dmax > (*cpuUFlux)[highestEnergy*vc + ir]) ? dmax : (*cpuUFlux)[highestEnergy*vc + ir];
         }
         if(dmax <= 0.0)
         {
@@ -284,8 +279,8 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     }
 
     // Allocate GPU resources for the external source computation
-    float *gpuUFlux = alloc_gpuFloat(gpuId, xs->groupCount()*mesh->voxelCount(), &(*uFlux)[0]);
-    float *gpuColFlux = alloc_gpuFloat(gpuId, scalarFlux->size(), NULL);
+    float *gpuUFlux = alloc_gpuFloat(gpuId, cpuUFlux->size(), &(*cpuUFlux)[0]);
+    float *gpuColFlux = alloc_gpuFloat(gpuId, cpuCFlux->size(), NULL);
 
     float *gpuVol = alloc_gpuFloat(gpuId, mesh->vol.size(), &mesh->vol[0]);
     float *gpuAtomDensity = alloc_gpuFloat(gpuId, mesh->atomDensity.size(), &mesh->atomDensity[0]);
@@ -294,7 +289,6 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     float *gpuScatXs2d = alloc_gpuFloat(gpuId, xs->m_scat2d.size(), &xs->m_scat2d[0]);
 
     // Allocate additional GPU resources for the solver
-
     float *gpuTempFlux = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
     //float *gpuPreFlux = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
     float *gpu1stSource = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
@@ -317,14 +311,11 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
     // Zero the scalar flux
     int erblocks = 64;
-    int ergrids = scalarFlux->size() / erblocks;
-    if(scalarFlux->size() % erblocks != 0)
+    int ergrids = cpuCFlux->size() / erblocks;
+    if(cpuCFlux->size() % erblocks != 0)
         ergrids += 1;  // Account for lengths not divisible by 64
 
-    //dim3 dimGrid(mesh->xElemCt, mesh->yElemCt);
-    zeroKernel<<<dim3(ergrids), dim3(erblocks)>>>(scalarFlux->size(), gpuColFlux);
-
-    //std::cout << "Grid: " << dimGrid.x << "x" << dimGrid.y << ",   Block: " << dimBlock.x << "x" << dimBlock.y << std::endl;
+    zeroKernel<<<dim3(ergrids), dim3(erblocks)>>>(cpuCFlux->size(), gpuColFlux);
 
     // Generate the sweep index block
     int totalSubsweeps = mesh->xElemCt + mesh->yElemCt + mesh->zElemCt - 2;
@@ -339,8 +330,6 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
     for(unsigned int iSubSweep = 0; iSubSweep < totalSubsweeps; iSubSweep++)
     {
-        //std::cout << "subsweep " << iSubSweep << std::endl;
-
         int iSubSweepPrev = iSubSweep - 1;
         int C = (iSubSweepPrev+1) * (iSubSweepPrev+2) / 2;
 
@@ -373,24 +362,15 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
                 int ir = ix*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz;
 
-                //if(ix == 32 && iy == 32 && iz==8)
-                //{
-                //    std::cout << "ir = " << ir << std::endl;
-                //}
-
                 threadIndexToGlobalIndex[subSweepStartIndex[iSubSweep] + voxelsSoFar] = ir;
                 voxelsSoFar++;
             }
     }
 
     int *gpuThreadIndexToGlobalIndex = alloc_gpuInt(gpuId, threadIndexToGlobalIndex.size(), &threadIndexToGlobalIndex[0]);
-    //float *gpuDiffMatrix = alloc_gpuFloat(gpuId, mesh->xElemCt*mesh->yElemCt, NULL);
 
     dim3 dimGrid(mesh->xElemCt, mesh->yElemCt);
     dim3 dimBlock(mesh->zElemCt);
-
-    //dim3 blockLinear(64);
-    //dim3 gridLinear
 
     for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)  // for every energy group
     {
@@ -404,25 +384,15 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
         if(mesh->voxelCount() % rblocks != 0)
             rgrids += 1;  // Account for lengths not divisible by 64
         zeroKernel<<<dim3(rgrids), dim3(rblocks)>>>(mesh->voxelCount(), gpuTempFlux);
+        //zeroKernel<<<dim3(rgrids), dim3(rblocks)>>>(mesh->voxelCount(), gpu1stSource);
 
-        // No longer needed since the src kernel is no longer an integrator
-        //zeroKernelMesh<<<dimGrid, dimBlock>>>(mesh->xElemCt, mesh->yElemCt, mesh->zElemCt, gpuExtSource);
-
-        // Compute the external source
-        //std::cout << "About to launch isoSrcKernels" << std::endl;
-        //for(unsigned int iSink = highestEnergy; iSink < xs->groupCount(); iSink++)
-        //{
-            //std::cout << "Launching iSink = " << iSink << std::endl;
         isoSrcKernel<<<dimGrid, dimBlock>>>(
                                           gpuUFlux,
                                           gpu1stSource,
                                           gpuVol, gpuAtomDensity, gpuZoneId,
                                           gpuScatXs2d,
-                                          mesh->voxelCount(), xs->groupCount(), solPar->pn, highestEnergy, ie,
+                                          mesh->voxelCount(), xs->groupCount(), solPar->pn+1, highestEnergy, ie,
                                           mesh->xElemCt, mesh->yElemCt, mesh->zElemCt);
-        //}
-
-        //std::cout << "Finished src kernels" << std::endl;
 
         cudaDeviceSynchronize();
 
@@ -434,66 +404,50 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
         //char ieString[256];
         //sprintf(ieString, "%d", ie);
         //OutWriter::writeArray(std::string("gpuExtSrc") + ieString + ".dat", cpuExtSrc);
-        //std::cout << "Wrote the source results" << std::endl;
-        //}
-        //else
-        //{
-        //    return 2809;
-        //}
 
-        // Zero the source array
-        // No longer needed since the total is initialized with the external
-        //std::cout << "Launching zero kernel" << std::endl;
-        //zeroKernelMesh<<<dimGrid, dimBlock>>>(mesh->xElemCt, mesh->yElemCt, mesh->zElemCt, gpuTotalSource);
-
-        // Calculate the down-scattering source + external source
-        //std::cout << "Launching scatter kernel" << std::endl;
         downscatterKernel<<<dimGrid, dimBlock>>>(
                 gpuTotalSource,
                 highestEnergy, ie,
-                mesh->xElemCt, mesh->yElemCt, mesh->zElemCt, xs->groupCount(), solPar->pn,
+                mesh->xElemCt, mesh->yElemCt, mesh->zElemCt, xs->groupCount(), solPar->pn+1,
                 gpuZoneId,
                 gpuColFlux,
                 gpuScatXs2d,
                 gpuAtomDensity, gpuVol,
                 gpu1stSource);
 
+        for(unsigned int i = 0; i < cpuCFluxTmp.size(); i++)
+            cpuCFluxTmp[i] = 0.0f;
+
         while(iterNum <= maxIterations && maxDiff > epsilon)  // while not converged
         {
-            //std::cout << "iteration: " << iterNum << std::endl;
-            //clearSweepKernel<<<dimGrid, dimBlock>>>(
-            //        gpuPreFlux, gpuTempFlux,
-            //        mesh->xElemCt, mesh->yElemCt, mesh->zElemCt);
             clearSweepKernel<<<dimGrid, dimBlock>>>(
                     gpuColFlux, gpuTempFlux,
                     mesh->xElemCt, mesh->yElemCt, mesh->zElemCt, ie);
 
+            for(unsigned int i = 0; i < cpuCFluxTmp.size(); i++)
+            {
+                //cpuCFlux[ie*mesh->voxelCount() + i] = cpuCFluxTmp[i];
+                cpuCFluxTmp[i] = 0.0f;
+            }
+
             for(unsigned int iang = 0; iang < quad->angleCount(); iang++)  // for every angle
             {
-
-                //std::cout << "iang=" << iang << std::endl;
                 // Find the correct direction to sweep
-                //int izStart = 0;                  // Sweep start index
                 int diz = 1;                      // Sweep direction
                 if(quad->eta[iang] < 0)           // Condition to sweep backward
                 {
-                    //izStart = mesh->zElemCt - 1;  // Start at the far end
                     diz = -1;                     // Sweep toward zero
                 }
 
-                //int iyStart = 0;
                 int diy = 1;
                 if(quad->zi[iang] < 0)
                 {
-                    //iyStart = mesh->yElemCt - 1;
                     diy = -1;
                 }
 
-                //int ixStart = 0;
                 int dix = 1;
                 if(quad->mu[iang] < 0)
                 {
-                    //ixStart = mesh->xElemCt - 1;
                     dix = -1;
                 }
 
@@ -504,8 +458,6 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
                     dim3 dimGridS(subSweepVoxelCount[subSweepId] / 64 + raise);
                     dim3 dimBlockS(64);
 
-                    //std::cout << "Launching the subsweep Kernel" << std::endl;
-
                     isoSolKernel<<<dimGridS, dimBlockS>>>(
                           gpuColFlux, gpuTempFlux,
                           gpuTotalSource,
@@ -515,7 +467,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
                           gpuMu, gpuEta, gpuXi, gpuWt,
                           gpuOutboundFluxX, gpuOutboundFluxY, gpuOutboundFluxZ,
                           ie, iang,
-                          mesh->xElemCt, mesh->yElemCt, mesh->zElemCt, xs->groupCount(), quad->angleCount(), solPar->pn,
+                          mesh->xElemCt, mesh->yElemCt, mesh->zElemCt, xs->groupCount(), quad->angleCount(), solPar->pn+1, // Send pn+1 to send number of pn groups
                           dix, diy, diz,
                           subSweepStartIndex[subSweepId], subSweepVoxelCount[subSweepId], gpuThreadIndexToGlobalIndex);
 
@@ -528,27 +480,27 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
                 }
 
-                //std::cout << "Launched subSweepId=" << subSweepId <<  "(" << dimGridS.x << ", " << dimGridS.y << " : " << dimBlockS.x << ", " << dimBlockS.y << " )" << std::endl;
-                //std::cin.ignore(1024, '\n');
-                //std::cout << "Ran angle " << iang << std::endl;
-                //std::cin.get();
-
-                updateCpuDataBlocking(gpuId, &(*scalarFlux)[0], gpuTempFlux, mesh->voxelCount(), ie*mesh->voxelCount());
+                updateCpuDataBlocking(gpuId, &cpuCFluxTmp[0], gpuTempFlux, mesh->voxelCount());
             } // end of all angles
 
             char iterString[3];  // 2 digits + NULL
             char ieString[3];  // 2 digits + NULL
             sprintf(iterString, "%d", iterNum);
             sprintf(ieString, "%d", ie);
-            OutWriter::writeArray(std::string("gpuScalarFlux_") + std::string(ieString) + "_" + std::string(iterString), *scalarFlux);
+            OutWriter::writeArray(std::string("gpuScalarFlux_") + std::string(ieString) + "_" + std::string(iterString) + ".dat", cpuCFluxTmp);
             //OutWriter::writeArray(std::string("gpuScalarFlux_") + std::to_string(iterNum), *scalarFlux);
 
             maxDiff = -1.0e35f;
             for(unsigned int i = 0; i < mesh->voxelCount(); i++)
-                maxDiff = max(((*scalarFlux)[ie*mesh->voxelCount() + i]-prevFlux[i])/(*scalarFlux)[ie*mesh->voxelCount()+i], maxDiff);
+                maxDiff = max((cpuCFluxTmp[i]-(*cpuCFlux)[ie*mesh->voxelCount() + i])/cpuCFluxTmp[i], maxDiff);
 
-            for(unsigned int i = 0; i < mesh->voxelCount(); i++)
-                prevFlux[i] = (*scalarFlux)[ie*mesh->voxelCount() + i];
+            for(unsigned int i = 0; i < cpuCFluxTmp.size(); i++)
+            {
+                (*cpuCFlux)[ie*mesh->voxelCount() + i] = cpuCFluxTmp[i];
+            }
+
+            //for(unsigned int i = 0; i < mesh->voxelCount(); i++)
+            //    cpuCFluxTmp[i] = (*cpuCFlux)[ie*mesh->voxelCount() + i];
 
             std::cout << "Max diff = " << maxDiff << std::endl;
 
@@ -574,8 +526,6 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
     release_gpu(gpuId, gpuTotXs1d);
     release_gpu(gpuId, gpuScatXs2d);
-
-
 
     std::cout << "Most recent CUDA Error: " << cudaGetErrorString(cudaGetLastError()) << std::endl;
 

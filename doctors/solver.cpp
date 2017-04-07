@@ -412,7 +412,7 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
     //std::vector<SOL_T> angularFlux(xs->groupCount() * quad->angleCount() * mesh->voxelCount());
     std::vector<SOL_T> *cFlux = new std::vector<SOL_T>(xs->groupCount() * mesh->voxelCount(), 0.0f);
     std::vector<SOL_T> tempFlux(mesh->voxelCount(), 0.0f);
-    std::vector<SOL_T> preFlux(mesh->voxelCount(), -100.0f);
+    //std::vector<SOL_T> preFlux(mesh->voxelCount(), -100.0f);
     std::vector<SOL_T> totalSource(mesh->voxelCount(), -100.0f);
     std::vector<SOL_T> outboundFluxX(mesh->voxelCount(), -100.0f);
     std::vector<SOL_T> outboundFluxY(mesh->voxelCount(), -100.0f);
@@ -509,6 +509,9 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
         for(unsigned int i = 0; i < totalSource.size(); i++)
             totalSource[i] = 0;
 
+        for(unsigned int i = 0; i < tempFlux.size(); i++)
+            tempFlux[i] = 0.0f;
+
         // Calculate the down-scattering source from the collided flux
         for(unsigned int iie = highestEnergy; iie < ie; iie++)
             for(unsigned int ir = 0; ir < mesh->voxelCount(); ir++)
@@ -529,7 +532,13 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
         {
             //qDebug() << "Iteration #" << iterNum;
 
-            preFlux = tempFlux;  // Store flux for previous iteration
+            for(unsigned int i = 0; i < tempFlux.size(); i++)
+            {
+                //(*cFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
+                tempFlux[i] = 0.0f;
+            }
+
+            //preFlux = tempFlux;  // Store flux for previous iteration
 
 
             // Clear for a new sweep
@@ -676,32 +685,38 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
 
             } // end of all angles
 
-            for(unsigned int i = 0; i < tempFlux.size(); i++)
-            {
-                (*cFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
-            }
+            //for(unsigned int i = 0; i < tempFlux.size(); i++)
+            //{
+            //    (*cFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
+            //}
 
-            OutWriter::writeArray((QString("scalar_flux_") + QString::number(ie) + "_" + QString::number(iterNum)).toStdString(), tempFlux);
+            OutWriter::writeArray((QString("cpuScalarFlux_") + QString::number(ie) + "_" + QString::number(iterNum) + ".dat").toStdString(), tempFlux);
 
             maxDiff = -1.0E35f;
             for(unsigned int i = 0; i < tempFlux.size(); i++)
             {
                 //float z = qAbs((tempFlux[i] - preFlux[i])/tempFlux[i]);
-                maxDiff = qMax(maxDiff, qAbs((tempFlux[i] - preFlux[i])/tempFlux[i]));
+                maxDiff = qMax(maxDiff, qAbs((tempFlux[i] - (*cFlux)[ie*mesh->voxelCount() + i])/tempFlux[i]));
 
                 if(std::isnan(maxDiff))
                     qDebug() << "Found a diff nan!";
             }
             qDebug() << "Max diff = " << maxDiff;
 
+            for(unsigned int i = 0; i < tempFlux.size(); i++)
+            {
+                (*cFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
+                //tempFlux[i] = 0.0f;
+            }
+
             errList[ie].push_back(maxDiff);
             errMaxList[ie] = maxDiff;
             converganceIters[ie] = iterNum;
 
-            for(unsigned int i = 0; i < tempFlux.size(); i++)
-            {
-                (*cFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
-            }
+            //for(unsigned int i = 0; i < tempFlux.size(); i++)
+            //{
+            //    (*cFlux)[ie*mesh->voxelCount() + i] = tempFlux[i];
+            //}
 
             iterNum++;
         } // end not converged

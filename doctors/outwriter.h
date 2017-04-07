@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <algorithm>
 //#include <iomanip>
 //#include <QDebug>
 
@@ -11,6 +12,8 @@
 //#include <cstdarg>  // For variadic templates
 
 #include "globals.h"
+
+//#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 class Mesh;
 class Quadrature;
@@ -30,7 +33,7 @@ public:
     static void writeZoneId(std::string filename, const Mesh& mesh);
 
     template<typename T>
-    static void writeArray(std::string filename, const std::vector<T>& arry);
+    static void writeArray(std::string filename, const std::vector<T>& arry, int offset=0, int elements=-1);
 
     template<typename T1, typename T2>
     static void writeArray2(std::string filename, const std::vector<T1>& arry1, const std::vector<T2>& arry2);
@@ -118,16 +121,16 @@ void OutWriter::writeAngularFlux(std::string filename, const XSection &xs, const
 }
 
 template<typename T>
-void OutWriter::writeArray(std::string filename, const std::vector<T>& arry)
+void OutWriter::writeArray(std::string filename, const std::vector<T>& arry, int offset, int elements)
 {
     std::cout << "Writing 1D data to " << filename << std::endl;
     std::ofstream fout;
     fout.open(filename.c_str());
 
-    //fout << std::fixed;
-    //fout << std::setprecision(6);
-
-    for(int i = 0; i < arry.size(); i++)
+    int stop = arry.size();
+    if(elements >= 0)
+        stop = std::min(stop, offset+elements);
+    for(int i = offset; i < stop; i++)
         fout << arry[i] << '\n';
 
     fout.flush();

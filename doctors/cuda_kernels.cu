@@ -302,7 +302,7 @@ __global__ void isoSolKernel(
             influxZ = outboundFluxZ[ir + 1];
     }
 
-    SOL_T inscatter = CUDA_4PI_INV*colFlux[ie*Nx*Ny*Nz + ir] * scatxs2d[zid*groups*groups*pn + ie*groups * pn +  ie*groups] * atomDensity[ir] * vol[ir];
+    SOL_T inscatter = CUDA_4PI_INV*colFlux[ie*Nx*Ny*Nz + ir] * scatxs2d[zid*groups*groups*pn + ie*groups*pn +  ie*pn] * atomDensity[ir] * vol[ir];
 
     SOL_T numer = totalSource[ir] +  inscatter +                                                                                            // [#]
             Ayz[ie*angleCount*Ny*Nz + iang*Ny*Nz + iy*Nz + iz] * influxX +  // [cm^2 * #/cm^2]  The 2x is already factored in
@@ -318,10 +318,10 @@ __global__ void isoSolKernel(
 
     //if(ix == 32 && iy == 32 && iz == 8)
     //{
-    //printf("ix=%d, iy=%d, iz=%d, psi=%e, totSrc=%e, inScat=%e, numer=%e, denom=%e, inx=%e, iny=%e, inz=%e, Axy=%f, Ayz=%f, Axz=%f\n",
+    //printf("ix=%d, iy=%d, iz=%d, psi=%e, totSrc=%e, inScat=%e, cFlux=%e, numer=%e, inx=%e, iny=%e, inz=%e, sig=%e, zid=%d, ie=%d, groups=%d, pn=%d, indx=%d\n",
     //       ix, iy, iz,
-    //       angFlux, totalSource[ir], inscatter, numer, denom, influxX, influxY, influxZ,
-    //       Axy[ie*angleCount*Nx*Ny + iang*Nx*Ny + ix*Ny + iy], Ayz[ie*angleCount*Ny*Nz + iang*Ny*Nz + iy*Nz + iz], Axz[ie*angleCount*Nx*Nz + iang*Nx*Nz + ix*Nz + iz]);
+    //       angFlux, totalSource[ir], inscatter, colFlux[ie*Nx*Ny*Nz + ir], numer, influxX, influxY, influxZ,
+    //       scatxs2d[zid*groups*groups*pn + ie*groups*pn +  ie*groups], zid, ie, groups, pn, zid*groups*groups*pn + ie*groups*pn +  ie*pn);
     //}
 
     //angularFlux[ie*ejmp + iang*ajmp + ix*xjmp + iy*yjmp + iz] = angFlux;
@@ -332,6 +332,11 @@ __global__ void isoSolKernel(
 
     // Sum all the angular fluxes
     tempFlux[ir] += wt[iang]*angFlux;
+
+    //if(ir == 32*64*16 + 32*16 + 8)
+    //{
+    //    printf("after tempSummer(ia=%d) angFlux=%e, wt=%e, tempFlux=%e\n", iang, angFlux, wt[iang], tempFlux[ir]);
+    //}
 }
 
 __global__ void isoSrcKernel(
@@ -343,6 +348,10 @@ __global__ void isoSrcKernel(
         int Nx, int Ny, int Nz)
 {
     int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx.x;
+
+    // Zero from previous iterations
+    extSource[ir] = 0.0f;
+
     for(unsigned int iep = highestEnergyGroup; iep <= sinkGroup; iep++)  // for every higher energy
     {
     //if(sinkGroup == 17)
@@ -351,7 +360,7 @@ __global__ void isoSrcKernel(
     //           uFlux[iep*voxels + ir], vol[ir], scatxs2d[zoneId[ir]*groups*groups*pn + iep*groups*pn + sinkGroup*pn], atomDensity[ir]);
     //extSource[sinkGroup*voxels + ir] += uFlux[iep*voxels + ir] * vol[ir] * scatxs2d[zoneId[ir]*groups*groups*pn + iep*groups*pn + sinkGroup*pn] * atomDensity[ir];
     //extSource[sinkGroup*voxels + ir] = uFlux[sinkGroup*voxels + ir] * vol[ir] * scatxs2d[zoneId[ir]*groups*groups*pn + sinkGroup*groups*pn + sinkGroup*pn] * atomDensity[ir];
-        extSource[ir] = uFlux[iep*Nx*Ny*Nz + ir] * vol[ir] * scatxs2d[zoneId[ir]*groups*groups*pn + iep*groups*pn + sinkGroup*pn] * atomDensity[ir];
+        extSource[ir] += uFlux[iep*Nx*Ny*Nz + ir] * vol[ir] * scatxs2d[zoneId[ir]*groups*groups*pn + iep*groups*pn + sinkGroup*pn] * atomDensity[ir];
     }
 
     //if(blockIdx.x == 32)
@@ -416,8 +425,18 @@ __global__ void clearSweepKernel(
 {
     int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx.x;
 
+    //if(ir == 32*64*16 + 32*16 + 8)
+    //{
+    //    printf("@clearSweek, cFlux=%e, tempFlux=%e BEFORE clear\n", cFlux[ie*Nx*Ny*Nz + ir], tempFlux[ir]);
+    //}
+
     cFlux[ie*Nx*Ny*Nz + ir] = tempFlux[ir];
     tempFlux[ir] = 0.0f;
+
+    //if(ir == 32*64*16 + 32*16 + 8)
+    //{
+    //    printf("@clearSweek, cFlux=%e, tempFlux=%e AFTER clear\n", cFlux[ie*Nx*Ny*Nz + ir], tempFlux[ir]);
+    //}
 }
 
 /*
