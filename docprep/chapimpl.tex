@@ -77,26 +77,115 @@ CUDA code is compoiled with the Nvidia complier nvcc. Qt uses the gcc compiler a
 
 The sweep through the mesh is different.
 
-\begin{tabular}{ l | c | c | c}	
-  i  & ix & iy & iz \\ \hline
-  0  & 4 & 0 & 0\\
-  1  & 3 & 1 & 0\\
-  2  & 3 & 0 & 1\\
-  3  & 2 & 2 & 0\\
-  4  & 2 & 1 & 1\\
-  5  & 2 & 0 & 2\\
-  6  & 1 & 3 & 0\\
-  7  & 1 & 2 & 1\\
-  8  & 1 & 1 & 2\\
-  9  & 1 & 0 & 3\\
-  10 & 0 & 4 & 0\\
-  11 & 0 & 3 & 1\\
-  12 & 0 & 2 & 2\\
-  13 & 0 & 1 & 3\\
-  14 & 0 & 0 & 4\\
+\begin{tabular}{ l | c | c | c | c}	
+  i  & ix & iy & iz & ix+iy+iz \\ \hline
+  0  & 4 & 0 & 0 & 4\\
+  1  & 3 & 1 & 0 & 4\\
+  2  & 3 & 0 & 1 & 4\\
+  3  & 2 & 2 & 0 & 4\\
+  4  & 2 & 1 & 1 & 4\\
+  5  & 2 & 0 & 2 & 4\\
+  6  & 1 & 3 & 0 & 4\\
+  7  & 1 & 2 & 1 & 4\\
+  8  & 1 & 1 & 2 & 4\\
+  9  & 1 & 0 & 3 & 4\\
+  10 & 0 & 4 & 0 & 4\\
+  11 & 0 & 3 & 1 & 4\\
+  12 & 0 & 2 & 2 & 4\\
+  13 & 0 & 1 & 3 & 4\\
+  14 & 0 & 0 & 4 & 4\\
 \end{tabular}
 
-We first split the mesh into levels, $L$. The number of elements before the 4$^{th}$ level is 1 + 2 + 3 = 6. This is simply the sum of all integers less than the level number given by Eq.~\ref{eq:levelsum}. This is conincidentally the index of the first element of that level. However, there is a special case of $N_0 = 1$.
+We first split the sweep process into $N_L$ subsweeps. For a $N_x \times N_x \times N_x$ mesh, the subsweep process is straightforward. Some of the initial subsweeps are shown for a $8 \times 8 \times 8$ mesh in Fig.~\ref{fig:subsweep_cube}. This is valid for any direction, $\hat{\Omega}$, for which all three of its direction cosines ($\mu$, $\xi$, and $\eta$) are positive.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/subsweep_cube1}
+        \caption{Subsweep 0 ($S=0$)}
+        \label{fig:subsweep_cube1}
+    \end{subfigure}
+    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
+      %(or a blank line to force the subfigure onto a new line)
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/subsweep_cube2}
+        \caption{Subsweep 1 ($S=1$)}
+        \label{fig:subsweep_cube2}
+    \end{subfigure}
+    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
+    %(or a blank line to force the subfigure onto a new line)
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/subsweep_cube3}
+        \caption{Subsweep 6 ($S=6$)}
+        \label{fig:subsweep_cube3}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/subsweep_cube4}
+        \caption{Subsweep 6 ($S=6$) with labels}
+        \label{fig:subsweep_cube4}
+    \end{subfigure}
+    \caption{The progression of subsweeps throughout a sweep. Each subsweep must complete before those after it. Each voxel within a subsweep can be solved in parallel with all others in its subsweep.}\label{fig:subsweep_cube}
+\end{figure}
+
+The number of parallel tasks, $P$, that can be done on the $S$ subsweep of a $N_x \times N_y \times N_z$ mesh is given by Eq.~\ref{eq:taskspersub}.
+
+\begin{equation}\label{eq:taskspersub}
+P = C_S - L_x - L_y - L_z + G_{xy} + G_{yz} + G_{xz}
+\end{equation}
+
+\begin{equation}
+C_S = \frac{(S+1)(S+2)}{2}
+\end{equation}
+
+\begin{equation}
+L_x = \frac{dx(dx+1)}{2}
+\end{equation}
+
+\begin{equation}
+L_y = \frac{dy(dy+1)}{2}
+\end{equation}
+
+\begin{equation}
+L_z = \frac{dz(dz+1)}{2}
+\end{equation}
+
+\begin{equation}
+G_{xy} = \frac{d_{xy}(d_{xy}+1)}{2}
+\end{equation}
+
+\begin{equation}
+G_{yz} = \frac{d_{yz}(d_{yz}+1)}{2}
+\end{equation}
+
+\begin{equation}
+G_{xz} = \frac{d_{xz}(d_{xz}+1)}{2}
+\end{equation}
+
+\begin{equation}
+d_x = \max(S+1-N_x, 0)
+\end{equation}
+
+\begin{equation}
+d_y = \max(S+1-N_y, 0)
+\end{equation}
+
+\begin{equation}
+d_z = \max(S+1-N_z, 0)
+\end{equation}
+
+\begin{equation}
+d_{xy} = \max(S+1-N_x - Ny, 0)
+\end{equation}
+
+\begin{equation}
+d_{yz} = \max(S+1-N_y - Nz, 0)
+\end{equation}
+
+\begin{equation}
+d_{xz} = \max(S+1-N_x - Nz, 0)
+\end{equation}
+
+The number of elements before the 4$^{th}$ level is 1 + 2 + 3 = 6. This is simply the sum of all integers less than the level number given by Eq.~\ref{eq:levelsum}. This is conincidentally the index of the first element of that level. However, there is a special case of $N_0 = 1$.
 
 \begin{equation} \label{eq:levelsum}
 N_L = \sum_{i=1}^{L} = \frac{L(L+1)}{2}
@@ -135,6 +224,9 @@ iz = L + i - N_L
 Some examples are given in the following section
 \subsection{Example 1}
 In the $N=4$ subsweep, 
+
+\subsection{Sweep Indexing}
+In a $N_x \times N_y \times N_z$ mesh, the number of voxels computed in the $i$ subsweep is computed by Eq.~\ref{eq:}
 
 
 
