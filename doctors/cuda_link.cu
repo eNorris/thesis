@@ -32,7 +32,34 @@ void reportGpuData()
         std::cout << "Max grid size: " << props.maxGridSize[0] << " x " << props.maxGridSize[1] << " x " << props.maxGridSize[2] << std::endl;
         std::cout << "Memory Clock Rate (KHz): " << props.memoryClockRate << std::endl;
         std::cout << "Memory Bus Width (bits): " << props.memoryBusWidth << std::endl;
-        std::cout << "Peak Memory Bandwidth (GB/s): " << (2.0*props.memoryClockRate*(props.memoryBusWidth/8)/1.0e6) << '\n' << std::endl;
+        std::cout << "Peak Memory Bandwidth (GB/s): " << (2.0*props.memoryClockRate*(props.memoryBusWidth/8)/1.0e6) << std::endl;
+
+        int cores = 0;
+        int mp = props.multiProcessorCount;
+        switch (props.major){
+        case 2: // Fermi
+            if (props.minor == 1) cores = mp * 48;
+            else cores = mp * 32;
+            break;
+        case 3: // Kepler
+            cores = mp * 192;
+            break;
+        case 5: // Maxwell
+            cores = mp * 128;
+            break;
+        case 6: // Pascal
+            if (props.minor == 1) cores = mp * 128;
+            else if (props.minor == 0) cores = mp * 64;
+            else printf("Unknown device type\n");
+            break;
+        default:
+            printf("Unknown device type\n");
+            break;
+        }
+
+        std::cout << "SMs: " << mp << std::endl;
+        std::cout << "CUDA Cores: " << cores << '\n' << std::endl;
+
     }
 }
 
@@ -230,16 +257,28 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
     int gpuId = 0;
 
+    std::vector<SOL_T> errMaxList;
+    std::vector<std::vector<SOL_T> > errList;
+    std::vector<std::vector<SOL_T> > errIntList;
+    std::vector<int> converganceIters;
+    std::vector<SOL_T> converganceTracker;
+
+    errMaxList.resize(xs->groupCount());
+    errList.resize(xs->groupCount());
+    errIntList.resize(xs->groupCount());
+    converganceIters.resize(xs->groupCount());
+    converganceTracker.resize(xs->groupCount());
+
     std::clock_t startTime = std::clock();
 
     const int maxIterations = 25;
-    const SOL_T epsilon = 0.01f;
+    const SOL_T epsilon = 0.001f;
 
     cpuCFlux->resize(xs->groupCount() * mesh->voxelCount());
     std::vector<float> cpuCFluxTmp(mesh->voxelCount(), 0.0f);
 
-    std::vector<SOL_T> errMaxList;
-    errMaxList.resize(xs->groupCount());
+    //std::vector<SOL_T> errMaxList;
+    //errMaxList.resize(xs->groupCount());
 
     if(cpuUFlux == NULL && srcPar == NULL)
     {
@@ -377,6 +416,8 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
         //std::cout << "ie=" << ie << std::endl;
         int iterNum = 1;
         SOL_T maxDiff = 1.0;
+        SOL_T totDiff = 1.0E30;    // Should be very large
+        SOL_T totDiffPre = 1.0E35; // Should be larger than totDiff
 
         // Needs to be done before the first clearSweepKernel<<<>>> call
         int rblocks = 64;
@@ -418,7 +459,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
         for(unsigned int i = 0; i < cpuCFluxTmp.size(); i++)
             cpuCFluxTmp[i] = 0.0f;
 
-        while(iterNum <= maxIterations && maxDiff > epsilon)  // while not converged
+        while(iterNum <= maxIterations && maxDiff > epsilon && totDiff/totDiffPre < 1.0)  // while not converged
         {
             clearSweepKernel<<<dimGrid, dimBlock>>>(
                     gpuColFlux, gpuTempFlux,
@@ -491,13 +532,24 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
             //OutWriter::writeArray(std::string("gpuScalarFlux_") + std::to_string(iterNum), *scalarFlux);
 
             maxDiff = -1.0e35f;
+            totDiffPre = totDiff;
+            totDiff = 0.0f;
+            float totDiff = 0.0f;
             for(unsigned int i = 0; i < mesh->voxelCount(); i++)
-                maxDiff = max((cpuCFluxTmp[i]-(*cpuCFlux)[ie*mesh->voxelCount() + i])/cpuCFluxTmp[i], maxDiff);
+            {
+                maxDiff = max( abs((cpuCFluxTmp[i]-(*cpuCFlux)[ie*mesh->voxelCount() + i])/cpuCFluxTmp[i]), maxDiff);
+                totDiff += abs(cpuCFluxTmp[i]-(*cpuCFlux)[ie*mesh->voxelCount() + i]);
+            }
 
             for(unsigned int i = 0; i < cpuCFluxTmp.size(); i++)
             {
                 (*cpuCFlux)[ie*mesh->voxelCount() + i] = cpuCFluxTmp[i];
             }
+
+            errList[ie].push_back(maxDiff);
+            errIntList[ie].push_back(totDiff);
+            errMaxList[ie] = maxDiff;
+            converganceIters[ie] = iterNum;
 
             //for(unsigned int i = 0; i < mesh->voxelCount(); i++)
             //    cpuCFluxTmp[i] = (*cpuCFlux)[ie*mesh->voxelCount() + i];
@@ -526,6 +578,18 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
     release_gpu(gpuId, gpuTotXs1d);
     release_gpu(gpuId, gpuScatXs2d);
+
+    for(unsigned int i = 0; i < errList.size(); i++)
+    {
+        std::cout << "%Group: " << i << "   maxDiff: " << errMaxList[i] << "   Iterations: " << converganceIters[i] << '\n';
+        std::cout << "gpu" << i << " = [";
+        for(unsigned int j = 0; j < errList[i].size(); j++)
+            std::cout << errList[i][j] << ",\t";
+        std::cout << "];\ngpu" << i << "i = [";
+        for(unsigned int j = 0; j < errIntList[i].size(); j++)
+            std::cout << errIntList[i][j] << ",\t";
+        std::cout << "];" << std::endl;
+    }
 
     std::cout << "Most recent CUDA Error: " << cudaGetErrorString(cudaGetLastError()) << std::endl;
 
