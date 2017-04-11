@@ -81,26 +81,28 @@ int *alloc_gpuInt(const int gpuId, const int elements, const int *data)
 
     return gpu_data;
 }
-
-float *alloc_gpuFloat(const int gpuId, const int elements, const float *cpuData)
+/*
+RAY_T *alloc_gpuFloat(const int gpuId, const int elements, const RAY_T *cpuData)
 {
     cudaError_t cudaerr;
     if((cudaerr = cudaSetDevice(gpuId)) != cudaSuccess)
         std::cout << "alloc_gpuFloat failed to set the device with error code: " << cudaerr << ": " << cudaGetErrorString(cudaerr) << std::endl;
 
-    float *gpuData;
-    if((cudaerr = cudaMalloc(&gpuData, elements*sizeof(float))) != cudaSuccess)
+    RAY_T *gpuData;
+    if((cudaerr = cudaMalloc(&gpuData, elements*sizeof(RAY_T))) != cudaSuccess)
         std::cout << "alloc_gpuFloat threw an error while allocating CUDA memory with error code: " << cudaerr << ": " << cudaGetErrorString(cudaerr) << std::endl;
 
     if(cpuData != NULL)
     {
-        if((cudaerr = cudaMemcpyAsync(gpuData, cpuData, elements*sizeof(float), cudaMemcpyHostToDevice)) != cudaSuccess)
+        if((cudaerr = cudaMemcpyAsync(gpuData, cpuData, elements*sizeof(RAY_T), cudaMemcpyHostToDevice)) != cudaSuccess)
             std::cout << "alloc_gpuFloat failed while copying data with error code: " << cudaerr << ": " << cudaGetErrorString(cudaerr) << std::endl;
     }
 
     return gpuData;
 }
+*/
 
+/*
 void release_gpu(int gpuId, float *gpu_data)
 {
     cudaError_t cudaerr;
@@ -120,7 +122,9 @@ void release_gpu(int gpuId, int *gpu_data)
     if((cudaerr = cudaFree(gpu_data)) != cudaSuccess)
         std::cout << "relase_gpu (int) threw an error while deallocating int CUDA memory with error code: " << cudaerr << ": " << cudaGetErrorString(cudaerr) << std::endl;
 }
+*/
 
+/*
 void updateCpuData(int gpuId, float *cpuData, float *gpuData, size_t elements, int cpuOffset)
 {
     cudaError_t cudaerr;
@@ -140,6 +144,7 @@ void updateCpuData(int gpuId, int *cpuData, int *gpuData, size_t elements, int c
     if((cudaerr = cudaMemcpyAsync(cpuData+cpuOffset, gpuData, elements*sizeof(int), cudaMemcpyDeviceToHost)) != cudaSuccess)
         std::cout << "updateCpuData (int) MemcpyAsync failed with error code: " << cudaerr << ": " << cudaGetErrorString(cudaerr) << std::endl;
 }
+*/
 
 int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SolverParams *solPar, const SourceParams *srcPar, std::vector<RAY_T> *uflux)
 {
@@ -155,30 +160,30 @@ int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
     // Allocate memory space for the solution vector
     //std::cout << "Allocating uflux" << std::endl;
-    float *gpuUflux = alloc_gpuFloat(gpuId, mesh->voxelCount() * xs->groupCount(), NULL);
+    RAY_T *gpuUflux = alloc_gpuFloat<RAY_T>(gpuId, mesh->voxelCount() * xs->groupCount(), NULL);
 
     // Copy the xyzNode values
-    float *gpuXNodes = alloc_gpuFloat(gpuId, mesh->xNodes.size(), &mesh->xNodes[0]);
-    float *gpuYNodes = alloc_gpuFloat(gpuId, mesh->xNodes.size(), &mesh->yNodes[0]);
-    float *gpuZNodes = alloc_gpuFloat(gpuId, mesh->xNodes.size(), &mesh->zNodes[0]);
+    float *gpuXNodes = alloc_gpuFloat<float>(gpuId, mesh->xNodes.size(), &mesh->xNodes[0]);
+    float *gpuYNodes = alloc_gpuFloat<float>(gpuId, mesh->xNodes.size(), &mesh->yNodes[0]);
+    float *gpuZNodes = alloc_gpuFloat<float>(gpuId, mesh->xNodes.size(), &mesh->zNodes[0]);
 
     // Copy the dxyz values
-    float *gpuDx = alloc_gpuFloat(gpuId, mesh->dx.size(), &mesh->dx[0]);
-    float *gpuDy = alloc_gpuFloat(gpuId, mesh->dy.size(), &mesh->dy[0]);
-    float *gpuDz = alloc_gpuFloat(gpuId, mesh->dz.size(), &mesh->dz[0]);
+    float *gpuDx = alloc_gpuFloat<float>(gpuId, mesh->dx.size(), &mesh->dx[0]);
+    float *gpuDy = alloc_gpuFloat<float>(gpuId, mesh->dy.size(), &mesh->dy[0]);
+    float *gpuDz = alloc_gpuFloat<float>(gpuId, mesh->dz.size(), &mesh->dz[0]);
 
     // Copy the zone id number
     int *gpuZoneId = alloc_gpuInt(gpuId, mesh->zoneId.size(), &mesh->zoneId[0]);
 
     // Copy the atom density
-    float *gpuAtomDensity = alloc_gpuFloat(gpuId, mesh->atomDensity.size(), &mesh->atomDensity[0]);
+    float *gpuAtomDensity = alloc_gpuFloat<float>(gpuId, mesh->atomDensity.size(), &mesh->atomDensity[0]);
 
     // Copy the xs data
-    float *gpuTot1d = alloc_gpuFloat(gpuId, xs->m_tot1d.size(), &xs->m_tot1d[0]);
+    float *gpuTot1d = alloc_gpuFloat<float>(gpuId, xs->m_tot1d.size(), &xs->m_tot1d[0]);
 
     // Copy the source strength
     //std::cout << "Allocating source strength" << std::endl;
-    float *gpuSrcStrength = alloc_gpuFloat(gpuId, srcPar->spectraIntensity.size(), &srcPar->spectraIntensity[0]);
+    float *gpuSrcStrength = alloc_gpuFloat<float>(gpuId, srcPar->spectraIntensity.size(), &srcPar->spectraIntensity[0]);
 
     //int ixSrc, iySrc, izSrc;
 
@@ -219,7 +224,7 @@ int launch_isoRayKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     //cudaDeviceSynchronize();
 
     updateCpuDataBlocking(gpuId, &(*uflux)[0], gpuUflux, elements);
-    OutWriter::writeArray("uflux.dat", *uflux);
+    //OutWriter::writeArray("uflux.dat", *uflux);
 
     release_gpu(gpuId, gpuUflux);
     release_gpu(gpuId, gpuXNodes);
@@ -272,10 +277,10 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     std::clock_t startTime = std::clock();
 
     const int maxIterations = 25;
-    const SOL_T epsilon = 0.001f;
+    const SOL_T epsilon = static_cast<SOL_T>(0.001);
 
     cpuCFlux->resize(xs->groupCount() * mesh->voxelCount());
-    std::vector<float> cpuCFluxTmp(mesh->voxelCount(), 0.0f);
+    std::vector<SOL_T> cpuCFluxTmp(mesh->voxelCount(), static_cast<SOL_T>(0.0));
 
     //std::vector<SOL_T> errMaxList;
     //errMaxList.resize(xs->groupCount());
@@ -318,35 +323,34 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     }
 
     // Allocate GPU resources for the external source computation
-    float *gpuUFlux = alloc_gpuFloat(gpuId, cpuUFlux->size(), &(*cpuUFlux)[0]);
-    float *gpuColFlux = alloc_gpuFloat(gpuId, cpuCFlux->size(), NULL);
+    RAY_T *gpuUFlux = alloc_gpuFloat<RAY_T>(gpuId, cpuUFlux->size(), &(*cpuUFlux)[0]);
+    SOL_T *gpuColFlux = alloc_gpuFloat<SOL_T>(gpuId, cpuCFlux->size(), NULL);
 
-    float *gpuVol = alloc_gpuFloat(gpuId, mesh->vol.size(), &mesh->vol[0]);
-    float *gpuAtomDensity = alloc_gpuFloat(gpuId, mesh->atomDensity.size(), &mesh->atomDensity[0]);
+    float *gpuVol = alloc_gpuFloat<float>(gpuId, mesh->vol.size(), &mesh->vol[0]);
+    float *gpuAtomDensity = alloc_gpuFloat<float>(gpuId, mesh->atomDensity.size(), &mesh->atomDensity[0]);
     int   *gpuZoneId = alloc_gpuInt(gpuId, mesh->zoneId.size(), &mesh->zoneId[0]);
 
-    float *gpuScatXs2d = alloc_gpuFloat(gpuId, xs->m_scat2d.size(), &xs->m_scat2d[0]);
+    float *gpuScatXs2d = alloc_gpuFloat<float>(gpuId, xs->m_scat2d.size(), &xs->m_scat2d[0]);
 
     // Allocate additional GPU resources for the solver
-    float *gpuTempFlux = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
-    //float *gpuPreFlux = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
-    float *gpu1stSource = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
-    float *gpuTotalSource = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
+    SOL_T *gpuTempFlux = alloc_gpuFloat<SOL_T>(gpuId, mesh->voxelCount(), NULL);
+    SOL_T *gpu1stSource = alloc_gpuFloat<SOL_T>(gpuId, mesh->voxelCount(), NULL);
+    SOL_T *gpuTotalSource = alloc_gpuFloat<SOL_T>(gpuId, mesh->voxelCount(), NULL);
 
-    float *gpuOutboundFluxX = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
-    float *gpuOutboundFluxY = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
-    float *gpuOutboundFluxZ = alloc_gpuFloat(gpuId, mesh->voxelCount(), NULL);
+    SOL_T *gpuOutboundFluxX = alloc_gpuFloat<SOL_T>(gpuId, mesh->voxelCount(), NULL);
+    SOL_T *gpuOutboundFluxY = alloc_gpuFloat<SOL_T>(gpuId, mesh->voxelCount(), NULL);
+    SOL_T *gpuOutboundFluxZ = alloc_gpuFloat<SOL_T>(gpuId, mesh->voxelCount(), NULL);
 
-    float *gpuAxy = alloc_gpuFloat(gpuId, mesh->Axy.size(), &mesh->Axy[0]);
-    float *gpuAxz = alloc_gpuFloat(gpuId, mesh->Axz.size(), &mesh->Axz[0]);
-    float *gpuAyz = alloc_gpuFloat(gpuId, mesh->Ayz.size(), &mesh->Ayz[0]);
+    float *gpuAxy = alloc_gpuFloat<float>(gpuId, mesh->Axy.size(), &mesh->Axy[0]);
+    float *gpuAxz = alloc_gpuFloat<float>(gpuId, mesh->Axz.size(), &mesh->Axz[0]);
+    float *gpuAyz = alloc_gpuFloat<float>(gpuId, mesh->Ayz.size(), &mesh->Ayz[0]);
 
-    float *gpuMu = alloc_gpuFloat(gpuId, quad->mu.size(), &quad->mu[0]);
-    float *gpuEta = alloc_gpuFloat(gpuId, quad->eta.size(), &quad->eta[0]);
-    float *gpuXi = alloc_gpuFloat(gpuId, quad->zi.size(), &quad->zi[0]);
-    float *gpuWt = alloc_gpuFloat(gpuId, quad->wt.size(), &quad->wt[0]);
+    float *gpuMu = alloc_gpuFloat<float>(gpuId, quad->mu.size(), &quad->mu[0]);
+    float *gpuEta = alloc_gpuFloat<float>(gpuId, quad->eta.size(), &quad->eta[0]);
+    float *gpuXi = alloc_gpuFloat<float>(gpuId, quad->zi.size(), &quad->zi[0]);
+    float *gpuWt = alloc_gpuFloat<float>(gpuId, quad->wt.size(), &quad->wt[0]);
 
-    float *gpuTotXs1d = alloc_gpuFloat(gpuId, xs->m_tot1d.size(), &xs->m_tot1d[0]);
+    float *gpuTotXs1d = alloc_gpuFloat<float>(gpuId, xs->m_tot1d.size(), &xs->m_tot1d[0]);
 
     // Zero the scalar flux
     int erblocks = 64;
@@ -413,11 +417,11 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
     for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)  // for every energy group
     {
-        //std::cout << "ie=" << ie << std::endl;
+        std::cout << "ie=" << ie << std::endl;
         int iterNum = 1;
         SOL_T maxDiff = 1.0;
-        SOL_T totDiff = 1.0E30;    // Should be very large
-        SOL_T totDiffPre = 1.0E35; // Should be larger than totDiff
+        SOL_T totDiff = 1.0E10;    // Should be very large
+        SOL_T totDiffPre = 1.0E11; // Should be larger than totDiff
 
         // Needs to be done before the first clearSweepKernel<<<>>> call
         int rblocks = 64;
@@ -435,7 +439,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
                                           mesh->voxelCount(), xs->groupCount(), solPar->pn+1, highestEnergy, ie,
                                           mesh->xElemCt, mesh->yElemCt, mesh->zElemCt);
 
-        cudaDeviceSynchronize();
+        //cudaDeviceSynchronize();
 
 
         //std::cout << "About to write the source results" << std::endl;
@@ -459,8 +463,11 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
         for(unsigned int i = 0; i < cpuCFluxTmp.size(); i++)
             cpuCFluxTmp[i] = 0.0f;
 
+        //printf("Begin Total crit=%e\n", totDiff/totDiffPre);
+
         while(iterNum <= maxIterations && maxDiff > epsilon && totDiff/totDiffPre < 1.0)  // while not converged
         {
+            //std::cout << "it: " << iterNum << std::endl;
             clearSweepKernel<<<dimGrid, dimBlock>>>(
                     gpuColFlux, gpuTempFlux,
                     mesh->xElemCt, mesh->yElemCt, mesh->zElemCt, ie);
@@ -512,7 +519,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
                           dix, diy, diz,
                           subSweepStartIndex[subSweepId], subSweepVoxelCount[subSweepId], gpuThreadIndexToGlobalIndex);
 
-                    cudaDeviceSynchronize();
+                    //cudaDeviceSynchronize();
 
                     //std::cout << "Launched subSweepId=" << subSweepId <<  "(" << dimGridS.x << ", " << dimGridS.y << " : " << dimBlockS.x << ", " << dimBlockS.y << " )" << std::endl;
                     //std::cin.ignore(1024, '\n');
@@ -521,20 +528,21 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
                 }
 
-                updateCpuDataBlocking(gpuId, &cpuCFluxTmp[0], gpuTempFlux, mesh->voxelCount());
+                //updateCpuDataBlocking(gpuId, &cpuCFluxTmp[0], gpuTempFlux, mesh->voxelCount());
             } // end of all angles
+
+            updateCpuDataBlocking(gpuId, &cpuCFluxTmp[0], gpuTempFlux, mesh->voxelCount());
 
             char iterString[3];  // 2 digits + NULL
             char ieString[3];  // 2 digits + NULL
             sprintf(iterString, "%d", iterNum);
             sprintf(ieString, "%d", ie);
             OutWriter::writeArray(std::string("gpuScalarFlux_") + std::string(ieString) + "_" + std::string(iterString) + ".dat", cpuCFluxTmp);
-            //OutWriter::writeArray(std::string("gpuScalarFlux_") + std::to_string(iterNum), *scalarFlux);
 
             maxDiff = -1.0e35f;
             totDiffPre = totDiff;
             totDiff = 0.0f;
-            float totDiff = 0.0f;
+            //float totDiff = 0.0f;
             for(unsigned int i = 0; i < mesh->voxelCount(); i++)
             {
                 maxDiff = max( abs((cpuCFluxTmp[i]-(*cpuCFlux)[ie*mesh->voxelCount() + i])/cpuCFluxTmp[i]), maxDiff);
@@ -546,6 +554,8 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
                 (*cpuCFlux)[ie*mesh->voxelCount() + i] = cpuCFluxTmp[i];
             }
 
+            //printf("Diff=%e, tot=%e, pre=%e, condition=%e\n", maxDiff, totDiff, totDiffPre, totDiff/totDiffPre);
+
             errList[ie].push_back(maxDiff);
             errIntList[ie].push_back(totDiff);
             errMaxList[ie] = maxDiff;
@@ -554,10 +564,13 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
             //for(unsigned int i = 0; i < mesh->voxelCount(); i++)
             //    cpuCFluxTmp[i] = (*cpuCFlux)[ie*mesh->voxelCount() + i];
 
-            std::cout << "Max diff = " << maxDiff << std::endl;
+            //std::cout << "Max diff = " << maxDiff << std::endl;
 
             iterNum++;
         } // end not converged
+
+        //printf("End Total crit=%e\n", totDiff/totDiffPre);
+
     }  // end each energy group
 
     std::cout << "Time to complete: " << (std::clock() - startTime)/(double)(CLOCKS_PER_SEC/1000) << " ms" << std::endl;

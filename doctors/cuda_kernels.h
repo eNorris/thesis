@@ -30,7 +30,7 @@ struct SharedMemory
 */
 
 __global__ void isoRayKernel(
-        float *uflux,
+        RAY_T *uflux,
         float *xNodes, float *yNodes, float *zNodes,
         float *dx, float *dy, float *dz,
         int *zoneId,
@@ -44,42 +44,42 @@ __global__ void isoRayKernel(
         );
 
 __global__ void isoSolKernel(
-        float *scalarFlux, float *tempFlux,
-        float *totalSource,
+        SOL_T *scalarFlux, SOL_T *tempFlux,
+        SOL_T *totalSource,
         float *totXs1d, float *scatxs2d,
         float *Axy, float *Axz, float *Ayz,
         int *zoneId, float *atomDensity, float *vol,
         float *mu, float *eta, float *xi, float *wt,
-        float *outboundFluxX, float *outboundFluxY, float *outboundFluxZ,
+        SOL_T *outboundFluxX, SOL_T *outboundFluxY, SOL_T *outboundFluxZ,
         int ie, int iang,
         int Nx, int Ny, int Nz, int groups, int angleCount, int pn,
         int dix, int diy, int diz,
         int startIndx, int voxThisLevel, int *gpuIdxToMesh);
 
 __global__ void isoSrcKernel(
-        float *uFlux,
-        float *extSource,
+        RAY_T *uFlux,
+        SOL_T *extSource,
         float *vol, float *atomDensity, int *zoneId,
         float *scatxs2d,
         int voxels, int groups, int pn, int highestEnergyGroup, int sinkGroup,
         int Nx, int Ny, int Nz);
 
-__global__ void zeroKernel(int elements, float *ptr);
-__global__ void zeroKernelMesh(int Nx, int Ny, int Nz, float *ptr);
-__global__ void zeroKernelMeshEnergy(int groups, int Nx, int Ny, int Nz, float *ptr);
+__global__ void zeroKernel(int elements, SOL_T *ptr);
+__global__ void zeroKernelMesh(int Nx, int Ny, int Nz, SOL_T *ptr);
+__global__ void zeroKernelMeshEnergy(int groups, int Nx, int Ny, int Nz, SOL_T *ptr);
 
 __global__ void downscatterKernel(
-        float *totalSource,
+        SOL_T *totalSource,
         int highestEnergyGroup, int sinkGroup,
         int Nx, int Ny, int Nz, int groups, int pn,
         int *zoneId,
-        float *scalarFlux,
+        SOL_T *scalarFlux,
         float *scatxs2d,
         float *atomDensity, float *vol,
-        float *extSource);
+        SOL_T *extSource);
 
 __global__ void clearSweepKernel(
-        float *cFlux, float *tempFlux,
+        SOL_T *cFlux, SOL_T *tempFlux,
         int Nx, int Ny, int Nz, int ie);
 
 //__global__ void isoDiffKernel();

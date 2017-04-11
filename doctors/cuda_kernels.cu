@@ -1,7 +1,7 @@
 #include "cuda_kernels.h"
 
 __global__ void isoRayKernel(
-        float *uflux,
+        RAY_T *uflux,
         float *xNodes, float *yNodes, float *zNodes,
         float *dx, float *dy, float *dz,
         int *zoneId,
@@ -27,12 +27,12 @@ __global__ void isoRayKernel(
 
     int ir0 = xIndxStart*Ny*Nz + yIndxStart*Nz + zIndxStart;
 
-    float *meanFreePaths = new float[groups];
+    RAY_T *meanFreePaths = new RAY_T[groups];
 
     // This runs for a single voxel
-    RAY_T x = xNodes[xIndxStart] + dx[xIndxStart]/2;
-    RAY_T y = yNodes[yIndxStart] + dy[yIndxStart]/2;
-    RAY_T z = zNodes[zIndxStart] + dz[zIndxStart]/2;
+    float x = xNodes[xIndxStart] + dx[xIndxStart]/2;
+    float y = yNodes[yIndxStart] + dy[yIndxStart]/2;
+    float z = zNodes[zIndxStart] + dz[zIndxStart]/2;
 
     if(xIndxStart == srcIndxX && yIndxStart == srcIndxY && zIndxStart == srcIndxZ)  // End condition
     {
@@ -195,13 +195,13 @@ __global__ void isoRayKernel(
 }
 
 __global__ void isoSolKernel(
-        float *colFlux, float *tempFlux,
-        float *totalSource,
+        SOL_T *colFlux, SOL_T *tempFlux,
+        SOL_T *totalSource,
         float *totXs1d, float *scatxs2d,
         float *Axy, float *Axz, float *Ayz,
         int *zoneId, float *atomDensity, float *vol,
         float *mu, float *eta, float *xi, float *wt,
-        float *outboundFluxX, float *outboundFluxY, float *outboundFluxZ,
+        SOL_T *outboundFluxX, SOL_T *outboundFluxY, SOL_T *outboundFluxZ,
         int ie, int iang,
         int Nx, int Ny, int Nz, int groups, int angleCount, int pn,
         int dix, int diy, int diz,
@@ -230,7 +230,7 @@ __global__ void isoSolKernel(
     // Recompute the voxel index after reversing directions
     ir = ix*Ny*Nz + iy*Nz + iz;
 
-    float influxX, influxY, influxZ;
+    SOL_T influxX, influxY, influxZ;
 
     int zid = zoneId[ir];  // Get the zone id of this element
 
@@ -305,8 +305,8 @@ __global__ void isoSolKernel(
 }
 
 __global__ void isoSrcKernel(
-        float *uFlux,
-        float *extSource,
+        RAY_T *uFlux,
+        SOL_T *extSource,
         float *vol, float *atomDensity, int *zoneId,
         float *scatxs2d,
         int voxels, int groups, int pn, int highestEnergyGroup, int sinkGroup,
@@ -321,20 +321,20 @@ __global__ void isoSrcKernel(
         extSource[ir] += uFlux[iep*Nx*Ny*Nz + ir] * vol[ir] * scatxs2d[zoneId[ir]*groups*groups*pn + iep*groups*pn + sinkGroup*pn] * atomDensity[ir];
 }
 
-__global__ void zeroKernel(int elements, float *ptr)
+__global__ void zeroKernel(int elements, SOL_T *ptr)
 {
     int ir = blockIdx.x*64 + threadIdx.x;
     if(ir < elements)
         ptr[ir] = 0.0f;
 }
 
-__global__ void zeroKernelMesh(int Nx, int Ny, int Nz, float *ptr)
+__global__ void zeroKernelMesh(int Nx, int Ny, int Nz, SOL_T *ptr)
 {
     int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx.x;
     ptr[ir] = 0.0f;
 }
 
-__global__ void zeroKernelMeshEnergy(int groups, int Nx, int Ny, int Nz, float *ptr)
+__global__ void zeroKernelMeshEnergy(int groups, int Nx, int Ny, int Nz, SOL_T *ptr)
 {
     int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx.x;
     for(unsigned int ie = 0; ie < groups; ie++)
@@ -342,14 +342,14 @@ __global__ void zeroKernelMeshEnergy(int groups, int Nx, int Ny, int Nz, float *
 }
 
 __global__ void downscatterKernel(
-        float *totalSource,
+        SOL_T *totalSource,
         int highestEnergyGroup, int sinkGroup,
         int Nx, int Ny, int Nz, int groups, int pn,
         int *zoneId,
-        float *scalarFlux,
+        SOL_T *scalarFlux,
         float *scatxs2d,
         float *atomDensity, float *vol,
-        float *extSource)
+        SOL_T *extSource)
 {
     int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx.x;
 
@@ -362,7 +362,7 @@ __global__ void downscatterKernel(
 }
 
 __global__ void clearSweepKernel(
-        float *cFlux, float *tempFlux,
+        SOL_T *cFlux, SOL_T *tempFlux,
         int Nx, int Ny, int Nz, int ie)
 {
     int ir = blockIdx.x*Ny*Nz + blockIdx.y*Nz + threadIdx.x;
