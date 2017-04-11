@@ -19,6 +19,7 @@ public:
     void loadSn(const int sn);
     void loadSpecial(const int sp);
     unsigned int angleCount() const;
+    void sortIntoOctants();
 
 private:
     unsigned int m_angles;

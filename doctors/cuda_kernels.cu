@@ -230,9 +230,21 @@ __global__ void isoSolKernel(
     // Recompute the voxel index after reversing directions
     ir = ix*Ny*Nz + iy*Nz + iz;
 
+    //if(dix == 1 && diy == 1 && diz == 1 && (ix+iy+iz ==64))
+    //{
+    //    printf("start=%d, ix=%d, iy=%d, iz=%d\n", startIndx, ix, iy, iz);
+    //}
+
+    //int anglesPerOctant = angleCount/8;
+
     SOL_T influxX, influxY, influxZ;
 
     int zid = zoneId[ir];  // Get the zone id of this element
+
+    //for(unsigned int ia = 0; ia < anglesPerOctant; ia++) // For every angle in this octant
+    //{
+        // The index value of the angle
+        //unsigned int iang = anglesPerOctant*io + ia;
 
     // Handle the x influx
     if(dix == 1)                                       // Approach x = 0 -> xMesh
@@ -240,6 +252,7 @@ __global__ void isoSolKernel(
         if(ix == 0)                                               // If this is a boundary cell
             influxX = 0.0f;                                       // then the in-flux is zero
         else                                                      // otherwise
+            //influxX = outboundFluxX[iy*Nz*anglesPerOctant + iz*anglesPerOctant + ia];
             influxX = outboundFluxX[ir - Ny*Nz];  // the in-flux is the out-flux from the previous cell
     }
     else                                                          // Approach x = xMesh-1 -> 0
@@ -247,6 +260,7 @@ __global__ void isoSolKernel(
         if(ix == Nx - 1)
             influxX = 0.0f;
         else
+            //influxX = outboundFluxX[iy*Nz*anglesPerOctant + iz*anglesPerOctant + ia];
             influxX = outboundFluxX[ir + Ny*Nz];
     }
 
@@ -256,6 +270,7 @@ __global__ void isoSolKernel(
         if(iy == 0)
             influxY = 0.0f;
         else
+            //influxX = outboundFluxY[(iy-1)*Nz*anglesPerOctant + iz*anglesPerOctant + ia];
             influxY = outboundFluxY[ir - Nz];
     }
     else                                                          // Approach y = yMesh-1 -> 0
@@ -263,6 +278,7 @@ __global__ void isoSolKernel(
         if(iy == Ny - 1)
             influxY = 0.0f;
         else
+            //influxX = outboundFluxY[(iy+1)*Nz*anglesPerOctant + iz*anglesPerOctant + ia];
             influxY = outboundFluxY[ir + Nz];
     }
 
@@ -272,6 +288,7 @@ __global__ void isoSolKernel(
         if(iz == 0)
             influxZ = 0.0f;
         else
+            //influxX = outboundFluxZ[iy*Nz*anglesPerOctant + (iz-1)*anglesPerOctant + ia];
             influxZ = outboundFluxZ[ir - 1];
     }
     else
@@ -279,6 +296,7 @@ __global__ void isoSolKernel(
         if(iz == Nz - 1)
             influxZ = 0.0f;
         else
+            //influxX = outboundFluxZ[iy*Nz*anglesPerOctant + (iz+1)*anglesPerOctant + ia];
             influxZ = outboundFluxZ[ir + 1];
     }
 
@@ -300,8 +318,13 @@ __global__ void isoSolKernel(
     outboundFluxY[ir] = 2*angFlux - influxY;
     outboundFluxZ[ir] = 2*angFlux - influxZ;
 
+    //outboundFluxX[iy*Nz*anglesPerOctant + iz*anglesPerOctant + ia] = 2*angFlux - influxX;
+    //outboundFluxY[iy*Nz*anglesPerOctant + iz*anglesPerOctant + ia] = 2*angFlux - influxY;
+    //outboundFluxZ[iy*Nz*anglesPerOctant + iz*anglesPerOctant + ia] = 2*angFlux - influxZ;
+
     // Sum all the angular fluxes
     tempFlux[ir] += wt[iang]*angFlux;
+    //}
 }
 
 __global__ void isoSrcKernel(

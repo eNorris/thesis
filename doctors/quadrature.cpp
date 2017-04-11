@@ -194,9 +194,53 @@ void Quadrature::loadSn(const int sn)
     {
         qDebug() << "ERROR: Unknown quadrature!! Sn=" << sn;
     }
+
+    sortIntoOctants();
 }
 
 unsigned int Quadrature::angleCount() const
 {
     return m_angles;
+}
+
+void Quadrature::sortIntoOctants()
+{
+    std::vector<float> tmu = mu;
+    std::vector<float> txi = zi;
+    std::vector<float> teta = eta;
+    std::vector<float> twt = wt;
+    std::vector<int> transposeRecord;
+    transposeRecord.resize(angleCount(), -1);
+
+    std::vector<int> octPtrs;
+    octPtrs.resize(8, 0);
+
+    for(unsigned int ia = 0; ia < angleCount(); ia++)
+    {
+        /*
+        int octant = 0;
+        if(mu[ia] < 0)
+            octant += 4;
+        if(zi[ia] < 0)
+            octant += 2;
+        if(eta[ia] < 0)
+            octant += 1;
+        */
+
+        int octant = (mu[ia] > 0 ? 0 : 4) + (zi[ia] > 0 ? 0 : 2) + (eta[ia] > 0 ? 0 : 1);
+
+        int iaNew = octant*angleCount()/8 + octPtrs[octant];
+
+        tmu[iaNew] = mu[ia];
+        txi[iaNew] = zi[ia];
+        teta[iaNew] = eta[ia];
+        twt[iaNew] = wt[ia];
+        transposeRecord[iaNew] = ia;
+        octPtrs[octant]++;
+    }
+
+    mu = tmu;
+    zi = txi;
+    eta = teta;
+    wt = twt;
 }

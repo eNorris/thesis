@@ -337,6 +337,10 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     SOL_T *gpu1stSource = alloc_gpuFloat<SOL_T>(gpuId, mesh->voxelCount(), NULL);
     SOL_T *gpuTotalSource = alloc_gpuFloat<SOL_T>(gpuId, mesh->voxelCount(), NULL);
 
+    //unsigned int anglesPerOctant = quad->angleCount()/8;
+    //SOL_T *gpuOutboundFluxX = alloc_gpuFloat<SOL_T>(gpuId, mesh->yElemCt * mesh->zElemCt * anglesPerOctant, NULL);
+    //SOL_T *gpuOutboundFluxY = alloc_gpuFloat<SOL_T>(gpuId, mesh->yElemCt * mesh->zElemCt * anglesPerOctant, NULL);
+    //SOL_T *gpuOutboundFluxZ = alloc_gpuFloat<SOL_T>(gpuId, mesh->yElemCt * mesh->zElemCt * anglesPerOctant, NULL);
     SOL_T *gpuOutboundFluxX = alloc_gpuFloat<SOL_T>(gpuId, mesh->voxelCount(), NULL);
     SOL_T *gpuOutboundFluxY = alloc_gpuFloat<SOL_T>(gpuId, mesh->voxelCount(), NULL);
     SOL_T *gpuOutboundFluxZ = alloc_gpuFloat<SOL_T>(gpuId, mesh->voxelCount(), NULL);
@@ -479,6 +483,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
             }
 
             for(unsigned int iang = 0; iang < quad->angleCount(); iang++)  // for every angle
+            //for(unsigned int io = 0; io < 8; io++)  // for every octant
             {
                 // Find the correct direction to sweep
                 int diz = 1;                      // Sweep direction
@@ -499,8 +504,16 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
                     dix = -1;
                 }
 
+                //int dix = io / 4 == 0 ? 1 : -1;  // + x x, positive are first
+                //int diy = (io/2) % 2 == 0 ? 1 : -1;  // x + x, alternate every other octant
+                //int diz = io % 2 == 0 ? 1 : -1;  // x x + alternate every octant
+
+                //std::cout << "io = " << io << ", dix = " << dix << ", diy = " << diy << ", diz = " << diz << std::endl;
+
                 for(unsigned int subSweepId = 0; subSweepId < totalSubsweeps; subSweepId++)
                 {
+
+                    //std::cout << "Subsweep " << subSweepId << std::endl;
 
                     int raise = subSweepVoxelCount[subSweepId] % 64 == 0 ? 0 : 1;
                     dim3 dimGridS(subSweepVoxelCount[subSweepId] / 64 + raise);
@@ -525,19 +538,18 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
                     //std::cin.ignore(1024, '\n');
                     //std::cout << "Ran angle " << iang << std::endl;
                     //std::cin.get();
-
                 }
 
-                //updateCpuDataBlocking(gpuId, &cpuCFluxTmp[0], gpuTempFlux, mesh->voxelCount());
+                updateCpuDataBlocking(gpuId, &cpuCFluxTmp[0], gpuTempFlux, mesh->voxelCount());
             } // end of all angles
 
-            updateCpuDataBlocking(gpuId, &cpuCFluxTmp[0], gpuTempFlux, mesh->voxelCount());
+            //updateCpuDataBlocking(gpuId, &cpuCFluxTmp[0], gpuTempFlux, mesh->voxelCount());
 
-            char iterString[3];  // 2 digits + NULL
-            char ieString[3];  // 2 digits + NULL
-            sprintf(iterString, "%d", iterNum);
-            sprintf(ieString, "%d", ie);
-            OutWriter::writeArray(std::string("gpuScalarFlux_") + std::string(ieString) + "_" + std::string(iterString) + ".dat", cpuCFluxTmp);
+            //char iterString[3];  // 2 digits + NULL
+            //char ieString[3];  // 2 digits + NULL
+            //sprintf(iterString, "%d", iterNum);
+            //sprintf(ieString, "%d", ie);
+            //OutWriter::writeArray(std::string("gpuScalarFlux_") + std::string(ieString) + "_" + std::string(iterString) + ".dat", cpuCFluxTmp);
 
             maxDiff = -1.0e35f;
             totDiffPre = totDiff;
