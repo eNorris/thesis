@@ -10,6 +10,8 @@
 //#include <string>
 #include <stdio.h>
 
+#include <cuda_profiler_api.h>
+
 void reportGpuData()
 {
     std::cout << "Reporting GPU resources" << std::endl;
@@ -540,7 +542,7 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
                     //std::cin.get();
                 }
 
-                updateCpuDataBlocking(gpuId, &cpuCFluxTmp[0], gpuTempFlux, mesh->voxelCount());
+                updateCpuData(gpuId, &cpuCFluxTmp[0], gpuTempFlux, mesh->voxelCount());
             } // end of all angles
 
             //updateCpuDataBlocking(gpuId, &cpuCFluxTmp[0], gpuTempFlux, mesh->voxelCount());
@@ -550,6 +552,9 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
             //sprintf(iterString, "%d", iterNum);
             //sprintf(ieString, "%d", ie);
             //OutWriter::writeArray(std::string("gpuScalarFlux_") + std::string(ieString) + "_" + std::string(iterString) + ".dat", cpuCFluxTmp);
+
+            // Make sure all kernels and data transfers finish before advancing
+            cudaDeviceSynchronize();
 
             maxDiff = -1.0e35f;
             totDiffPre = totDiff;
@@ -580,6 +585,20 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
 
             iterNum++;
         } // end not converged
+
+        if(!(iterNum <= maxIterations))
+        {
+            std::cout << "Max iterations hit" << std::endl;
+        }
+        else if(!(maxDiff > epsilon))
+        {
+            std::cout << "Converged on relative error" << std::endl;
+        }
+        else
+        {
+            std::cout << "Converged on precsion bound" << std::endl;
+        }
+        //iterNum <= maxIterations && maxDiff > epsilon && totDiff/totDiffPre < 1.0
 
         //printf("End Total crit=%e\n", totDiff/totDiffPre);
 
@@ -617,6 +636,9 @@ int launch_isoSolKernel(const Quadrature *quad, const Mesh *mesh, const XSection
     }
 
     std::cout << "Most recent CUDA Error: " << cudaGetErrorString(cudaGetLastError()) << std::endl;
+
+    cudaDeviceReset();
+    cudaProfilerStop();
 
     return EXIT_SUCCESS;
 }
