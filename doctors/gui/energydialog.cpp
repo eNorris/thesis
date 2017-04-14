@@ -309,7 +309,13 @@ void EnergyDialog::setMaxEnergy(float eV)
     ui->energyMaxLabel->setText(str);
 }
 
+void EnergyDialog::on_energyOkPushButton_clicked()
+{
 
+    hide();
+
+    emit notifyOkClicked();
+}
 
 
 

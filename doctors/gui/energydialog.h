@@ -66,11 +66,16 @@ protected:
 private:
     Ui::EnergyDialog *ui;
 
+signals:
+    void notifyOkClicked();
+
 public slots:
     void setEnergy(AmpxParser *p);
     void on_energyLogXCheckBox_toggled(bool s);
     void setMinEnergy(float e);
     void setMaxEnergy(float e);
+
+    void on_energyOkPushButton_clicked();
 };
 
 #endif // ENERGYDIALOG_H
