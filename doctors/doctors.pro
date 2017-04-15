@@ -62,7 +62,8 @@ SOURCES += main.cpp\
     cuda_link.cu \
     cuda_kernels.cu \
     sourceparams.cpp \
-    solverparams.cpp
+    solverparams.cpp \
+    picturelabel.cpp
 
 SOURCES -= cuda_kernels.cu \
            cuda_link.cu
@@ -95,7 +96,8 @@ HEADERS  += mainwindow.h \
     cuda_link.h \
     cuda_kernels.h \
     sourceparams.h \
-    solverparams.h
+    solverparams.h \
+    picturelabel.h
 
 
 HEADERS -= cuda_link.h \

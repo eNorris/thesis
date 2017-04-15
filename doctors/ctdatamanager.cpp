@@ -14,7 +14,7 @@ CtDataManager::CtDataManager() : m_valid(false), m_messageBox(){}
 
 CtDataManager::~CtDataManager(){}
 
-Mesh *CtDataManager::parse16(int xbins, int ybins, int zbins, std::string filename)
+void CtDataManager::parse16(int xbins, int ybins, int zbins, QString filename)
 {
     Mesh *m = new Mesh;
     long tbins = xbins * ybins * zbins;
@@ -25,33 +25,39 @@ Mesh *CtDataManager::parse16(int xbins, int ybins, int zbins, std::string filena
     std::vector<U16_T> zoneIds;
     zoneIds.resize(tbins);
 
-    std::ifstream szChkFin(filename.c_str(), std::ios::binary|std::ios::in|std::ios::ate);
+    std::ifstream szChkFin(filename.toStdString().c_str(), std::ios::binary|std::ios::in|std::ios::ate);
     unsigned int szFin = szChkFin.tellg();
     if(szFin != 2*tbins)
     {
         QString errmsg = QString("The specified mesh size (");
                 errmsg += QString::number(xbins) + ", " + QString::number(ybins) + ", " + QString::number(zbins) + ") ";
                 errmsg += "requires " + QString::number(2*tbins) + " bytes of data to be populated. ";
-                errmsg += "The binary file specified (" + QString::fromStdString(filename) +  ") only reported " + QString::number(szFin) + " bytes of data.";
+                errmsg += "The binary file specified (" + filename +  ") only reported " + QString::number(szFin) + " bytes of data.";
                 errmsg += "You may either abort further parsing of the data file or ignore this warning (which may result in corrupted geometry data).";
         int resp = QMessageBox::warning(NULL, "Data Size Mismatch", errmsg, QMessageBox::Abort | QMessageBox::Ignore);
         if(resp == QMessageBox::Abort)
-            return NULL;
+            return;
     }
     szChkFin.close();
 
-    std::ifstream fin(filename.c_str(), std::ios::binary);
+    std::ifstream fin(filename.toStdString().c_str(), std::ios::binary);
 
     if(fin.good())
     {
         for(int i = 0; i < tbins; i++)
         {
+            //qDebug() << "tbins=" << tbins;
+            if(i % 10000 == 0)
+            {
+                //qDebug() << "EMIT";
+                emit signalMeshUpdate(i);
+            }
             fin.read((char*)&zoneIds[i], 2);
         }
     }
     else
     {
-        return NULL;
+        return;
     }
 
     int gindx = 0;
@@ -64,7 +70,8 @@ Mesh *CtDataManager::parse16(int xbins, int ybins, int zbins, std::string filena
                 m->ct[gindx] = zoneIds[k*YX + j*X + i];
                 gindx++;
             }
-    return ctNumberToHumanPhantom(m);
+    //return ctNumberToHumanPhantom(m);
+    emit finishedMeshParsing(ctNumberToHumanPhantom(m));
 }
 
 Mesh *CtDataManager::ctNumberToQuickCheck(Mesh *mesh)

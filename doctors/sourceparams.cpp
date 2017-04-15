@@ -50,5 +50,5 @@ bool SourceParams::update(std::vector<float> e, double x, double y, double z)
     sourceX = x;
     sourceY = y;
     sourceZ = z;
-    return true;
+    return normalize();
 }

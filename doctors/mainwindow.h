@@ -23,6 +23,7 @@ class Mesh;
 class XSection;
 class SourceParams;
 class SolverParams;
+class CtDataManager;
 //class Config;
 
 namespace Ui {
@@ -57,7 +58,7 @@ private:
     XSectionDialog *xsDialog;
     EnergyDialog *energyDialog;
 
-    bool m_geomLoaded, m_xsLoaded, m_quadLoaded, m_paramsLoaded;
+    bool m_geomLoaded, m_xsLoaded, m_quadLoaded, m_solverLoaded, m_srcLoaded;
 
     static QPalette *m_goodPalette, *m_badPalette;
 
@@ -68,6 +69,9 @@ private:
 
     AmpxParser *m_parser;
     QThread m_xsWorkerThread;
+
+    CtDataManager *m_ctman;
+    QThread m_meshWorkerThread;
 
     Solver *m_solver;
     QThread m_solverWorkerThread;
@@ -95,13 +99,19 @@ protected slots:
     void on_xsExplorePushButton_clicked();
     void on_actionMCNP6_Generation_triggered();
     void on_solverGpuCheckBox_toggled(bool);
+    void on_sourceTypeComboBox_activated(int);
 
     void updateLaunchButton();
     void xsParseErrorHandler(QString);
     void xsParseUpdateHandler(int x);
     void xsParseFinished(AmpxParser *parser);
 
+    void meshParseUpdateHandler(int x);
+    void meshParseFinished(Mesh *mesh);
+
     bool buildMaterials(AmpxParser *parser);
+
+    void energyGroupsUpdated();
 
     void onRaytracerFinished(std::vector<RAY_T>* uncollided);
     void onSolverFinished(std::vector<SOL_T>* solution);
@@ -118,6 +128,8 @@ signals:
 
     void signalDebugHalt(std::vector<float>);
     void signalBeginXsParse(QString);
+
+    void signalBeginMeshParse(int,int,int,QString);
 
 };
 

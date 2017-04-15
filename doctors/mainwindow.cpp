@@ -42,8 +42,8 @@ MainWindow::MainWindow(QWidget *parent):
     m_mesh(NULL),
     m_xs(NULL),
     m_quad(NULL),
-    m_solvParams(NULL),
     m_srcParams(NULL),
+    m_solvParams(NULL),
     outputDialog(NULL),
     geomDialog(NULL),
     quadDialog(NULL),
@@ -52,10 +52,13 @@ MainWindow::MainWindow(QWidget *parent):
     m_geomLoaded(false),
     m_xsLoaded(false),
     m_quadLoaded(false),
-    m_paramsLoaded(false),
+    m_solverLoaded(false),
+    m_srcLoaded(false),
     m_configSelectDialog(NULL),
     m_parser(NULL),
     m_xsWorkerThread(NULL),
+    m_ctman(NULL),
+    m_meshWorkerThread(NULL),
     m_solver(NULL),
     m_solverWorkerThread(NULL),
     m_solution(NULL),
@@ -85,6 +88,7 @@ MainWindow::MainWindow(QWidget *parent):
     m_solver = new Solver;
     m_xs = new XSection;
     m_solvParams = new SolverParams;
+    m_ctman = new CtDataManager;
 
     // Connect explore buttons
     connect(ui->actionSolution_Explorer, SIGNAL(triggered()), outputDialog, SLOT(show()));
@@ -101,6 +105,15 @@ MainWindow::MainWindow(QWidget *parent):
     connect(m_parser, SIGNAL(finishedParsing(AmpxParser*)), this, SLOT(xsParseFinished(AmpxParser*)));
     m_xsWorkerThread.start();
 
+    // Set up mesh reader threads
+    m_ctman->moveToThread(&m_meshWorkerThread);
+    connect(&m_meshWorkerThread, SIGNAL(finished()), m_ctman, SLOT(deleteLater()));
+    connect(this, SIGNAL(signalBeginMeshParse(int,int,int,QString)), m_ctman, SLOT(parse16(int,int,int,QString)));
+    connect(m_ctman, SIGNAL(signalMeshUpdate(int)), this, SLOT(meshParseUpdateHandler(int)));
+    //connect(m_ctman, SIGNAL(signal(int)), ui->geomProgressBar, SLOT(setMaximum(int)));
+    connect(m_ctman, SIGNAL(finishedMeshParsing(Mesh*)), this, SLOT(meshParseFinished(Mesh*)));
+    m_meshWorkerThread.start();
+
     // Set up the solver thread
     m_solver->moveToThread(&m_solverWorkerThread);
     connect(&m_xsWorkerThread, SIGNAL(finished()), m_solver, SLOT(deleteLater()));
@@ -113,6 +126,8 @@ MainWindow::MainWindow(QWidget *parent):
 
     connect(this, SIGNAL(signalLaunchRaytracerHarmonic(const Quadrature*,const Mesh*,const XSection*, const SolverParams*,const SourceParams*)), m_solver, SLOT(raytraceHarmonic(const Quadrature*,const Mesh*,const XSection*,const SolverParams*,const SourceParams*)));
     connect(this, SIGNAL(signalLaunchSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const SolverParams*, const SourceParams*,const std::vector<RAY_T>*)), m_solver, SLOT(gsSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const SolverParams*,const SourceParams*,const std::vector<RAY_T>*)));
+
+    connect(energyDialog, SIGNAL(notifyOkClicked()), this, SLOT(energyGroupsUpdated()));
 
     connect(m_solver, SIGNAL(signalRaytracerFinished(std::vector<RAY_T>*)), this, SLOT(onRaytracerFinished(std::vector<RAY_T>*)));
     connect(m_solver, SIGNAL(signalSolverFinished(std::vector<SOL_T>*)), this, SLOT(onSolverFinished(std::vector<SOL_T>*)));
@@ -131,10 +146,21 @@ MainWindow::MainWindow(QWidget *parent):
 
     ui->geometryOpenPushButton->setToolTip("Opens a dialog box to import a CT data file");
 
-    ui->geometryGroupBox->setStyleSheet("QGroupBox { color: red; } ");
-    ui->xsGroupBox->setStyleSheet("QGroupBox { color: red; } ");
-    ui->paramsGroupBox->setStyleSheet("QGroupBox { color: red; } ");
-    ui->quadGroupBox->setStyleSheet("QGroupBox { color: red; } ");
+    ui->sourceImageLabel->setPixmapFile("/media/Storage/thesis/doctors/images/source1.png");
+    //QPixmap srcImg("/media/Storage/thesis/doctors/images/source1.png");
+    //ui->sourceImageLabel->setScaledContents(true);
+    //ui->sourceImageLabel->setPixmap(srcImg.scaledToWidth(ui->sourceImageLabel->width(), Qt::SmoothTransformation));
+
+    //ui->geometryGroupBox->setStyleSheet("QGroupBox { color: red; } ");
+    //ui->xsGroupBox->setStyleSheet("QGroupBox { color: red; } ");
+    //ui->paramsGroupBox->setStyleSheet("QGroupBox { color: red; } ");
+    //ui->quadGroupBox->setStyleSheet("QGroupBox { color: red; } ");
+
+    ui->tabWidget->tabBar()->setTabTextColor(0, Qt::red);
+    ui->tabWidget->tabBar()->setTabTextColor(1, Qt::red);
+    ui->tabWidget->tabBar()->setTabTextColor(2, Qt::red);
+    ui->tabWidget->tabBar()->setTabTextColor(3, Qt::red);
+    ui->tabWidget->tabBar()->setTabTextColor(4, Qt::red);
 
     quadDialog->updateQuad(m_quad);
 }
@@ -203,12 +229,12 @@ void MainWindow::on_launchSolverPushButton_clicked()
         return;
     }
 
-    if(!m_srcParams->update(energyDialog->getUserIntensity(), ui->sourceXDoubleSpinBox->value(), ui->sourceYDoubleSpinBox->value(), ui->sourceZDoubleSpinBox->value()))
-    {
-        QString errmsg = QString("Could not update the energy intensity data. The energy structure may have changed.");
-        QMessageBox::warning(this, "Invalid Vector Size", errmsg, QMessageBox::Close);
-        return;
-    }
+    //if(!m_srcParams->update(energyDialog->getUserIntensity(), ui->sourceXDoubleSpinBox->value(), ui->sourceYDoubleSpinBox->value(), ui->sourceZDoubleSpinBox->value()))
+    //{
+    //    QString errmsg = QString("Could not update the energy intensity data. The energy structure may have changed.");
+    //    QMessageBox::warning(this, "Invalid Vector Size", errmsg, QMessageBox::Close);
+    //    return;
+    //}
 
     if(!m_srcParams->normalize())
     {
@@ -255,12 +281,14 @@ void MainWindow::on_geometryOpenPushButton_clicked()
 
     ui->geometryFileLineEdit->setText(filename);
 
-    CtDataManager ctman;
+    //CtDataManager ctman;
     if(ui->signedCheckBox->isChecked())
     {
         if(ui->bitSpinBox->value() == 16)
         {
-            m_mesh = ctman.parse16(ui->xBinSpinBox->value(), ui->yBinSpinBox->value(), ui->zBinSpinBox->value(), filename.toStdString());
+            ui->geomProgressBar->setMaximum(ui->xBinSpinBox->value() * ui->yBinSpinBox->value() * ui->zBinSpinBox->value());
+            //m_mesh = m_ctman->parse16(ui->xBinSpinBox->value(), ui->yBinSpinBox->value(), ui->zBinSpinBox->value(), filename.toStdString());
+            emit signalBeginMeshParse(ui->xBinSpinBox->value(), ui->yBinSpinBox->value(), ui->zBinSpinBox->value(), filename);
         }
         else
         {
@@ -274,6 +302,7 @@ void MainWindow::on_geometryOpenPushButton_clicked()
         QMessageBox::warning(NULL, "Not Supported", errmsg, QMessageBox::Close);
     }
 
+    /*
     if(m_mesh == NULL)
     {
         m_geomLoaded = false;
@@ -281,19 +310,20 @@ void MainWindow::on_geometryOpenPushButton_clicked()
         return;
     }
 
-    OutWriter::writeArray("/media/Storage/thesis/mcnp.gitignore/ctdensity.dat", m_mesh->density);
+    //OutWriter::writeArray("/media/Storage/thesis/mcnp.gitignore/ctdensity.dat", m_mesh->density);
 
-    qDebug() << "Here the zslice = " << m_mesh->zElemCt;
+    //qDebug() << "Here the zslice = " << m_mesh->zElemCt;
     geomDialog->updateMesh(m_mesh);
     outputDialog->updateMesh(m_mesh);
     m_geomLoaded = true;
 
     updateLaunchButton();
+    */
 }
 
 void MainWindow::updateLaunchButton()
 {
-    if(m_geomLoaded && m_quadLoaded && m_xsLoaded && m_paramsLoaded)
+    if(m_geomLoaded && m_quadLoaded && m_xsLoaded && m_solverLoaded && m_srcLoaded)
     {
         ui->launchSolverPushButton->setEnabled(true);
     }
@@ -304,47 +334,64 @@ void MainWindow::updateLaunchButton()
 
     if(m_geomLoaded)
     {
-        ui->geometryGroupBox->setStyleSheet("QGroupBox { color: black; } ");
+        //ui->geometryGroupBox->setStyleSheet("QGroupBox { color: black; } ");
+        ui->tabWidget->tabBar()->setTabTextColor(0, Qt::black);
         ui->geometryExplorePushButton->setEnabled(true);
     }
     else
     {
-        ui->geometryGroupBox->setStyleSheet("QGroupBox { color: red; } ");
+        //ui->geometryGroupBox->setStyleSheet("QGroupBox { color: red; } ");
+        ui->tabWidget->tabBar()->setTabTextColor(0, Qt::red);
         ui->geometryExplorePushButton->setEnabled(false);
-    }
-
-    if(m_quadLoaded)
-    {
-        ui->quadGroupBox->setStyleSheet("QGroupBox { color: black; } ");
-        ui->quadExplorePushButton->setEnabled(true);
-    }
-    else
-    {
-        ui->quadGroupBox->setStyleSheet("QGroupBox { color: red; } ");
-        ui->quadExplorePushButton->setEnabled(false);
     }
 
     if(m_xsLoaded)
     {
-        ui->xsGroupBox->setStyleSheet("QGroupBox { color: black; } ");
+        //ui->xsGroupBox->setStyleSheet("QGroupBox { color: black; } ");
+        ui->tabWidget->tabBar()->setTabTextColor(1, Qt::black);
         ui->xsExplorePushButton->setEnabled(true);
     }
     else
     {
-        ui->xsGroupBox->setStyleSheet("QGroupBox { color: red; } ");
+        //ui->xsGroupBox->setStyleSheet("QGroupBox { color: red; } ");
+        ui->tabWidget->tabBar()->setTabTextColor(1, Qt::red);
         ui->xsExplorePushButton->setEnabled(false);
     }
 
-    if(m_paramsLoaded)
+    if(m_quadLoaded)
     {
-        ui->paramsGroupBox->setStyleSheet("QGroupBox { color: black; } ");
+        //ui->quadGroupBox->setStyleSheet("QGroupBox { color: black; } ");
+        ui->tabWidget->tabBar()->setTabTextColor(2, Qt::black);
+        ui->quadExplorePushButton->setEnabled(true);
     }
     else
     {
-        ui->paramsGroupBox->setStyleSheet("QGroupBox { color: red; } ");
+        //ui->quadGroupBox->setStyleSheet("QGroupBox { color: red; } ");
+        ui->quadExplorePushButton->setEnabled(false);
+        ui->tabWidget->tabBar()->setTabTextColor(2, Qt::red);
     }
 
-    ui->geometryGroupBox->update();
+    if(m_solverLoaded)
+    {
+        //ui->paramsGroupBox->setStyleSheet("QGroupBox { color: black; } ");
+        ui->tabWidget->tabBar()->setTabTextColor(3, Qt::black);
+    }
+    else
+    {
+        //ui->paramsGroupBox->setStyleSheet("QGroupBox { color: red; } ");
+        ui->tabWidget->tabBar()->setTabTextColor(3, Qt::red);
+    }
+
+    if(m_srcLoaded)
+    {
+        ui->tabWidget->tabBar()->setTabTextColor(4, Qt::black);
+    }
+    else
+    {
+        ui->tabWidget->tabBar()->setTabTextColor(4, Qt::red);
+    }
+
+    //ui->geometryGroupBox->update();
 
 }
 
@@ -441,7 +488,7 @@ void MainWindow::on_paramsTypeComboBox_activated(int indx)
     ui->paramsPnComboBox->setEnabled(indx > 1);
     m_solType = indx - 1; // Resetting to the default (indx = 0) rolls over to UINT_MAX
 
-    m_paramsLoaded = (indx == 1 || (indx > 1 && ui->paramsPnComboBox->currentIndex() > 1));
+    m_solverLoaded = (indx == 1 || (indx > 1 && ui->paramsPnComboBox->currentIndex() > 1));
 
     updateLaunchButton();
 }
@@ -450,7 +497,7 @@ void MainWindow::on_paramsPnComboBox_activated(int indx)
 {
     m_pn = indx - 1;  // Resetting to the default rolls over to UINT_MAX
 
-    m_paramsLoaded = (ui->paramsTypeComboBox->currentIndex() == 1 || (ui->paramsTypeComboBox->currentIndex() > 1 && indx >= 1));
+    m_solverLoaded = (ui->paramsTypeComboBox->currentIndex() == 1 || (ui->paramsTypeComboBox->currentIndex() > 1 && indx >= 1));
 
     updateLaunchButton();
 }
@@ -538,7 +585,7 @@ void MainWindow::xsParseFinished(AmpxParser *parser)
 
 bool MainWindow::buildMaterials(AmpxParser *parser)
 {
-    qDebug() << "Generating materials";
+    //qDebug() << "Generating materials";
 
     // One extra material for the empty material at the end (1u is unsigned 1.0)
     m_xs->allocateMemory(static_cast<const unsigned int>(MaterialUtils::hounsfieldRangePhantom19.size()) + 1, parser->getGammaEnergyGroups(), m_pn);
@@ -555,6 +602,57 @@ bool MainWindow::buildMaterials(AmpxParser *parser)
         allPassed &= m_xs->addMaterial(std::vector<int>{}, std::vector<float>{}, parser);
 
     return allPassed;
+}
+
+void MainWindow::meshParseUpdateHandler(int x)
+{
+    qDebug() << "Here";
+    ui->geomProgressBar->setValue(x);
+}
+
+void MainWindow::meshParseFinished(Mesh *mesh)
+{
+    m_mesh = mesh;
+
+    if(m_mesh == NULL)
+    {
+        m_geomLoaded = false;
+        updateLaunchButton();
+        return;
+    }
+
+    //OutWriter::writeArray("/media/Storage/thesis/mcnp.gitignore/ctdensity.dat", m_mesh->density);
+
+    //qDebug() << "Here the zslice = " << m_mesh->zElemCt;
+    geomDialog->updateMesh(m_mesh);
+    outputDialog->updateMesh(m_mesh);
+    m_geomLoaded = true;
+
+    updateLaunchButton();
+
+    ui->geomProgressBar->setValue(0);
+}
+
+void MainWindow::energyGroupsUpdated()
+{
+    if(m_srcParams != NULL)
+    {
+        if(!m_srcParams->update(energyDialog->getUserIntensity(), ui->sourceXDoubleSpinBox->value(), ui->sourceYDoubleSpinBox->value(), ui->sourceZDoubleSpinBox->value()))
+        {
+            //qDebug() << "Whoops";
+            return;
+        }
+        else
+        {
+            m_srcLoaded = true;
+            updateLaunchButton();
+        }
+    }
+    else
+    {
+        return;
+        //qDebug() << "still null";
+    }
 }
 
 void MainWindow::onRaytracerFinished(std::vector<RAY_T>* uncollided)
@@ -616,4 +714,45 @@ void MainWindow::onSolverFinished(std::vector<SOL_T> *solution)
 void MainWindow::on_solverGpuCheckBox_toggled(bool gpuOn)
 {
     m_solvParams->gpu_accel = gpuOn;
+}
+
+void MainWindow::on_sourceTypeComboBox_activated(int v)
+{
+
+    QPixmap srcImg;
+    switch(v)
+    {
+    case 0:
+        ui->sourceImageLabel->setPixmapFile("/media/Storage/thesis/doctors/images/source1.png");
+        //srcImg.load("/media/Storage/thesis/doctors/images/source1.png");
+        //ui->sourceImageLabel->setScaledContents(true);
+        //ui->sourceImageLabel->setPixmap(srcImg.scaledToWidth(ui->sourceImageLabel->width(), Qt::SmoothTransformation));
+        break;
+    case 1:
+        ui->sourceImageLabel->setPixmapFile("/media/Storage/thesis/doctors/images/source2.png");
+        //srcImg.load("/media/Storage/thesis/doctors/images/source2.png");
+        //ui->sourceImageLabel->setScaledContents(true);
+        //ui->sourceImageLabel->setPixmap(srcImg.scaledToWidth(ui->sourceImageLabel->width(), Qt::SmoothTransformation));
+        break;
+    case 2:
+        ui->sourceImageLabel->setPixmapFile("/media/Storage/thesis/doctors/images/source3.png");
+        //srcImg.load("/media/Storage/thesis/doctors/images/source3.png");
+        //ui->sourceImageLabel->setScaledContents(true);
+        //ui->sourceImageLabel->setPixmap(srcImg.scaledToWidth(ui->sourceImageLabel->width(), Qt::SmoothTransformation));
+        break;
+    case 3:
+        ui->sourceImageLabel->setPixmapFile("/media/Storage/thesis/doctors/images/source4.png");
+        //srcImg.load("/media/Storage/thesis/doctors/images/source4.png");
+        //ui->sourceImageLabel->setScaledContents(true);
+        //ui->sourceImageLabel->setPixmap(srcImg.scaledToWidth(ui->sourceImageLabel->width(), Qt::SmoothTransformation));
+        break;
+    case 4:
+        ui->sourceImageLabel->setPixmapFile("/media/Storage/thesis/doctors/images/source5.png");
+        //srcImg.load("/media/Storage/thesis/doctors/images/source5.png");
+        //ui->sourceImageLabel->setScaledContents(true);
+        //ui->sourceImageLabel->setPixmap(srcImg.scaledToWidth(ui->sourceImageLabel->width(), Qt::SmoothTransformation));
+        break;
+    default:
+        qDebug() << "No picture associated with source type " << v;
+    }
 }
