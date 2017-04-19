@@ -14,7 +14,7 @@
    height="1052.3622047"
    id="svg2"
    version="1.1"
-   inkscape:version="0.91 r13725"
+   inkscape:version="0.48.4 r9939"
    sodipodi:docname="beamshapes.svg">
   <defs
      id="defs4">
@@ -354,48 +354,6 @@
        fx="284.54761"
        fy="-38.381824"
        r="66.670067" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3768"
-       id="linearGradient5532"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(-880.16147,-627.94112)"
-       x1="552.39313"
-       y1="271.51163"
-       x2="685.73688"
-       y2="271.51163" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3818"
-       id="radialGradient5534"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.6106848,-0.16870189,0.06427033,0.61361858,-767.49903,-318.58927)"
-       cx="284.54761"
-       cy="-38.381824"
-       fx="284.54761"
-       fy="-38.381824"
-       r="66.670067" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3768"
-       id="linearGradient5579"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(-880.16147,-806.94112)"
-       x1="552.39313"
-       y1="271.51163"
-       x2="685.73688"
-       y2="271.51163" />
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3818"
-       id="radialGradient5581"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(1.6106848,-0.16870189,0.06427033,0.61361858,-767.49903,-497.58927)"
-       cx="284.54761"
-       cy="-38.381824"
-       fx="284.54761"
-       fy="-38.381824"
-       r="66.670067" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -404,16 +362,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="-241.58714"
-     inkscape:cy="1503.3096"
+     inkscape:zoom="0.35355339"
+     inkscape:cx="548.8635"
+     inkscape:cy="851.56975"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1017"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
+     inkscape:window-width="1855"
+     inkscape:window-height="1056"
+     inkscape:window-x="65"
+     inkscape:window-y="24"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -423,7 +381,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -1683,7 +1641,10 @@
        width="608"
        height="200"
        x="-772"
-       y="28.362188" />
+       y="28.362188"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(1.5588235,0,0,1.5588235,-914.59629,-496.50825)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -1693,7 +1654,10 @@
        sodipodi:cx="145.31044"
        id="path4627"
        style="fill:#ffffff;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
@@ -1703,7 +1667,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="translate(-833.3934,-272.94745)" />
+       transform="translate(-833.3934,-272.94745)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="translate(-833.3934,-272.94745)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -1713,7 +1680,10 @@
        sodipodi:cx="145.31044"
        id="path4631"
        style="fill:url(#radialGradient4665);fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(3.3623244,0,0,0.14702186,-2406.2297,-13.973598)"
        d="M 584.21861,811.51073 A 92.984543,92.984543 0 0 1 580.1449,932.39699"
@@ -1726,7 +1696,10 @@
        sodipodi:type="arc"
        sodipodi:start="5.6087562"
        sodipodi:end="7.0249862"
-       sodipodi:open="true" />
+       sodipodi:open="true"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:none;stroke:#000000;stroke-width:0.96537966;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.96537964, 0.96537964;stroke-dashoffset:0"
@@ -1739,7 +1712,10 @@
        transform="matrix(3.3623244,0,0,0.14702186,-2406.1501,12.624862)"
        sodipodi:start="5.6185521"
        sodipodi:end="6.2857337"
-       sodipodi:open="true" />
+       sodipodi:open="true"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:open="true"
        sodipodi:type="arc"
@@ -1752,19 +1728,28 @@
        d="m 604.56469,868.10542 a 92.984543,92.984543 0 0 1 -0.21421,7.94621"
        transform="matrix(2.4904192,0,0,3.3937428,-1961.1404,-2823.2927)"
        sodipodi:start="6.2673793"
-       sodipodi:end="6.3528937" />
+       sodipodi:end="6.3528937"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.67874855;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        d="m -441.88818,105.18349 c 0,0 -244.66862,22.16746 -245.86846,22.16746"
        id="path4639"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.67874855;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.67874855, 0.67874855;stroke-dashoffset:0"
        d="m -688.16122,127.41855 248.51868,4.64569"
        id="path4641"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:none;stroke:#000000;stroke-width:0.99999994;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.99999997, 0.99999997;stroke-dashoffset:0"
@@ -1777,19 +1762,28 @@
        transform="matrix(3.3937428,0,0,0.14839564,-2424.9679,-1.2197084)"
        sodipodi:start="5.6130954"
        sodipodi:end="6.2861721"
-       sodipodi:open="true" />
+       sodipodi:open="true"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.67874855;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        d="m -455.83235,137.13873 -231.92429,-9.78778"
        id="path4645"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.67874855;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.67874855, 0.67874855;stroke-dashoffset:0"
        d="m -440.53815,119.35695 -247.62307,8.0616"
        id="path4647"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:open="true"
        sodipodi:end="0.73914157"
@@ -1802,7 +1796,10 @@
        sodipodi:cx="511.59177"
        id="path4649"
        style="fill:none;stroke:#000000;stroke-opacity:1"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:open="true"
        sodipodi:end="7.029268"
@@ -1815,7 +1812,10 @@
        sodipodi:cx="511.59177"
        id="path4651"
        style="fill:none;stroke:#000000;stroke-width:0.96537966;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(2.6646227,0,0,3.3937428,-2052.1175,-2823.2927)"
        d="m 604.34319,862.99485 a 92.984543,92.984543 0 0 1 0.22481,7.82356"
@@ -1828,7 +1828,10 @@
        sodipodi:type="arc"
        sodipodi:start="6.2123593"
        sodipodi:end="6.2965571"
-       sodipodi:open="true" />
+       sodipodi:open="true"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:none;stroke:#000000;stroke-width:0.28210863;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
@@ -1841,7 +1844,10 @@
        transform="matrix(1.7057138,0,0,3.3937428,-1555.942,-2823.2927)"
        sodipodi:start="6.2724972"
        sodipodi:end="6.3311307"
-       sodipodi:open="true" />
+       sodipodi:open="true"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(3.3937428,0,0,3.3937428,-2424.9149,-2823.2927)"
        d="m 604.48345,865.42041 a 92.984543,92.984543 0 0 1 0.0157,7.94174"
@@ -1854,30 +1860,45 @@
        sodipodi:type="arc"
        sodipodi:start="6.2384892"
        sodipodi:end="6.3239246"
-       sodipodi:open="true" />
+       sodipodi:open="true"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.67874855;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        d="m -524.82922,124.33109 c 45.41877,-6.82366 19.38061,-11.8634 4.63935,-11.93525"
        id="path4659"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
        id="path4661"
        d="m -687.75664,127.35095 232.25548,-4.24773"
-       style="fill:none;stroke:#000000;stroke-width:0.67900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+       style="fill:none;stroke:#000000;stroke-width:0.67900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
        id="path4663"
        d="m -456.25714,149.73492 c -2.82842,0 -231.4995,-22.38397 -231.4995,-22.38397"
-       style="fill:none;stroke:#000000;stroke-width:0.67900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+       style="fill:none;stroke:#000000;stroke-width:0.67900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        id="path4667"
        d="m -362.76837,97.527842 0,59.406248 c 0,3.4653 29.86988,6.28125 66.68749,6.28125 36.81762,0 66.65625,-2.81595 66.65625,-6.28125 l 0,-59.406248 -133.34374,0 z"
        style="fill:url(#linearGradient4671);fill-opacity:1;stroke:none"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(1,0,0,0.31057088,-727.42637,18.862772)"
        d="m 498.00521,253.33151 a 66.670067,20.203051 0 1 1 -133.34013,0 66.670067,20.203051 0 1 1 133.34013,0 z"
@@ -1887,19 +1908,28 @@
        sodipodi:cx="431.33514"
        id="path4669"
        style="fill:url(#radialGradient4673);fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <rect
        y="-230.43889"
        x="-772"
        height="200"
        width="608"
        id="rect4675"
-       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.67900002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.67900002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        inkscape:connector-curvature="0"
        style="fill:url(#linearGradient4721);fill-opacity:1;stroke:none"
        d="m -362.76837,-161.27324 0,59.40625 c 0,3.465299 29.86988,6.281249 66.68749,6.281249 36.81762,0 66.65625,-2.81595 66.65625,-6.281249 l 0,-59.40625 -133.34374,0 z"
-       id="path4715" />
+       id="path4715"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:url(#radialGradient4723);fill-opacity:1;stroke:none"
@@ -1909,67 +1939,106 @@
        sodipodi:rx="66.670067"
        sodipodi:ry="20.203051"
        d="m 498.00521,253.33151 a 66.670067,20.203051 0 1 1 -133.34013,0 66.670067,20.203051 0 1 1 133.34013,0 z"
-       transform="matrix(1,0,0,0.31057088,-727.42637,-239.93831)" />
+       transform="matrix(1,0,0,0.31057088,-727.42637,-239.93831)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        inkscape:connector-curvature="0"
        id="path4725"
        d="m -685.41111,-136.23161 0,-39.59798"
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)" />
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
        d="m -682.44387,-135.43787 19.799,-34.29286"
        id="path4727"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        inkscape:connector-curvature="0"
        id="path4729"
        d="m -680.23125,-133.23261 34.29286,-19.79898"
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)" />
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
        d="m -679.42886,-130.15465 39.59798,2e-5"
        id="path4731"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        inkscape:connector-curvature="0"
        id="path4733"
        d="m -680.25782,-127.1761 34.29286,19.799"
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)" />
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
        d="m -682.45228,-125.00308 19.79898,34.292858"
        id="path4735"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        inkscape:connector-curvature="0"
        id="path4737"
        d="m -685.39943,-124.21241 -2e-5,39.597978"
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)" />
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
        d="m -688.50197,-125.05501 -19.799,34.292858"
        id="path4739"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        inkscape:connector-curvature="0"
        id="path4741"
        d="m -690.63447,-127.1963 -34.29286,19.79898"
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)" />
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
        d="m -691.44375,-130.21905 -39.59798,-2e-5"
        id="path4743"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
        d="m -690.64046,-133.23327 -34.29286,-19.79899"
        id="path4745"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        inkscape:connector-curvature="0"
        id="path4747"
        d="m -688.50067,-135.39708 -19.79899,-34.29287"
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)" />
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ffffff;fill-opacity:1;stroke:none"
@@ -1979,7 +2048,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="matrix(1.5588235,0,0,1.5588235,-911.95033,-753.84064)" />
+       transform="matrix(1.5588235,0,0,1.5588235,-911.95033,-753.84064)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="translate(-830.74744,-530.27985)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -1989,7 +2061,10 @@
        sodipodi:cx="145.31044"
        id="path4751"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:url(#radialGradient4755);fill-opacity:1;stroke:none"
@@ -1999,14 +2074,20 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="translate(-830.74744,-530.27985)" />
+       transform="translate(-830.74744,-530.27985)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <rect
        y="328.17548"
        x="-767.75739"
        height="200"
        width="608"
        id="rect4757"
-       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.67900002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.67900002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ffffff;fill-opacity:1;stroke:none"
@@ -2016,7 +2097,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="matrix(1.5588235,0,0,1.5588235,-910.35365,-247.60667)" />
+       transform="matrix(1.5588235,0,0,1.5588235,-910.35365,-247.60667)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="translate(-829.15076,-24.045864)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -2026,7 +2110,10 @@
        sodipodi:cx="145.31044"
        id="path4761"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:url(#radialGradient4801);fill-opacity:1;stroke:none"
@@ -2036,7 +2123,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="translate(-829.15076,-24.045864)" />
+       transform="translate(-829.15076,-24.045864)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:open="true"
        sodipodi:end="7.0249862"
@@ -2049,7 +2139,10 @@
        sodipodi:rx="92.984543"
        sodipodi:ry="92.984543"
        d="M 584.21861,811.51073 A 92.984543,92.984543 0 0 1 580.1449,932.39699"
-       transform="matrix(3.3623244,0,0,0.14702186,-2401.9871,234.92799)" />
+       transform="matrix(3.3623244,0,0,0.14702186,-2401.9871,234.92799)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:open="true"
        sodipodi:end="6.2857337"
@@ -2062,7 +2155,10 @@
        sodipodi:cx="511.59177"
        id="path4767"
        style="fill:none;stroke:#000000;stroke-width:0.96537966;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.96537964, 0.96537964;stroke-dashoffset:0"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:end="6.3528937"
        sodipodi:start="6.2673793"
@@ -2075,19 +2171,28 @@
        id="path4769"
        style="fill:none;stroke:#000000;stroke-width:0.23347116;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        sodipodi:type="arc"
-       sodipodi:open="true" />
+       sodipodi:open="true"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
        id="path4771"
        d="m -437.64554,354.08507 c 0,0 -244.66862,22.16746 -245.86846,22.16746"
-       style="fill:none;stroke:#000000;stroke-width:0.67874855;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+       style="fill:none;stroke:#000000;stroke-width:0.67874855;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
        id="path4773"
        d="m -683.91858,376.32013 248.51868,4.64569"
-       style="fill:none;stroke:#000000;stroke-width:0.67874855;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.67874855, 0.67874855;stroke-dashoffset:0" />
+       style="fill:none;stroke:#000000;stroke-width:0.67874855;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.67874855, 0.67874855;stroke-dashoffset:0"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:open="true"
        sodipodi:end="6.2861721"
@@ -2100,19 +2205,28 @@
        sodipodi:cx="511.59177"
        id="path4775"
        style="fill:none;stroke:#000000;stroke-width:0.99999994;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.99999997, 0.99999997;stroke-dashoffset:0"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
        id="path4777"
        d="M -451.58971,386.04031 -683.514,376.25253"
-       style="fill:none;stroke:#000000;stroke-width:0.67874855;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+       style="fill:none;stroke:#000000;stroke-width:0.67874855;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
        id="path4779"
        d="m -436.29551,368.25853 -247.62307,8.0616"
-       style="fill:none;stroke:#000000;stroke-width:0.67874855;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.67874855, 0.67874855;stroke-dashoffset:0" />
+       style="fill:none;stroke:#000000;stroke-width:0.67874855;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.67874855, 0.67874855;stroke-dashoffset:0"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:none;stroke:#000000;stroke-opacity:1"
@@ -2125,7 +2239,10 @@
        transform="matrix(3.3937428,0,0,0.14839564,-2420.7253,247.68188)"
        sodipodi:start="0.00043403048"
        sodipodi:end="0.73914157"
-       sodipodi:open="true" />
+       sodipodi:open="true"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:none;stroke:#000000;stroke-width:0.96537966;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
@@ -2138,7 +2255,10 @@
        transform="matrix(3.3623244,0,0,0.14702186,-2401.9075,261.52645)"
        sodipodi:start="6.2823387"
        sodipodi:end="7.029268"
-       sodipodi:open="true" />
+       sodipodi:open="true"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:open="true"
        sodipodi:end="6.2965571"
@@ -2151,7 +2271,10 @@
        sodipodi:rx="92.984543"
        sodipodi:ry="92.984543"
        d="m 604.34319,862.99485 a 92.984543,92.984543 0 0 1 0.22481,7.82356"
-       transform="matrix(2.6646227,0,0,3.3937428,-2047.8749,-2574.3911)" />
+       transform="matrix(2.6646227,0,0,3.3937428,-2047.8749,-2574.3911)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:open="true"
        sodipodi:end="6.3311307"
@@ -2164,7 +2287,10 @@
        sodipodi:cx="511.59177"
        id="path4787"
        style="fill:none;stroke:#000000;stroke-width:0.28210863;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:open="true"
        sodipodi:end="6.3239246"
@@ -2177,30 +2303,45 @@
        sodipodi:rx="92.984543"
        sodipodi:ry="92.984543"
        d="m 604.48345,865.42041 a 92.984543,92.984543 0 0 1 0.0157,7.94174"
-       transform="matrix(3.3937428,0,0,3.3937428,-2420.6723,-2574.3911)" />
+       transform="matrix(3.3937428,0,0,3.3937428,-2420.6723,-2574.3911)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
        id="path4791"
        d="m -520.58658,373.23267 c 45.41877,-6.82366 19.38061,-11.8634 4.63935,-11.93525"
-       style="fill:none;stroke:#000000;stroke-width:0.67874855;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+       style="fill:none;stroke:#000000;stroke-width:0.67874855;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.67900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        d="m -683.514,376.25253 232.25548,-4.24773"
        id="path4793"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.67900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        d="m -452.0145,398.6365 c -2.82842,0 -231.4995,-22.38397 -231.4995,-22.38397"
        id="path4795"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        inkscape:connector-curvature="0"
        style="fill:url(#linearGradient4803);fill-opacity:1;stroke:none"
        d="m -358.52573,346.42943 0,59.40624 c 0,3.4653 29.86988,6.28125 66.68749,6.28125 36.81762,0 66.65625,-2.81595 66.65625,-6.28125 l 0,-59.40624 -133.34374,0 z"
-       id="path4797" />
+       id="path4797"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:url(#radialGradient4805);fill-opacity:1;stroke:none"
@@ -2210,7 +2351,10 @@
        sodipodi:rx="66.670067"
        sodipodi:ry="20.203051"
        d="m 498.00521,253.33151 a 66.670067,20.203051 0 1 1 -133.34013,0 66.670067,20.203051 0 1 1 133.34013,0 z"
-       transform="matrix(1,0,0,0.31057088,-723.18373,267.76436)" />
+       transform="matrix(1,0,0,0.31057088,-723.18373,267.76436)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-width:0.67900002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
@@ -3213,7 +3357,10 @@
        sodipodi:rx="82.731491"
        sodipodi:ry="82.731491"
        d="m 1168.1404,229.99699 a 82.731491,82.731491 0 1 1 -165.463,0 82.731491,82.731491 0 1 1 165.463,0 z"
-       transform="matrix(0.21780803,0,0,0.21780803,-897.88551,415.08773)" />
+       transform="matrix(0.21780803,0,0,0.21780803,-897.88551,415.08773)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0,0.21780803,-0.21780803,0,-576.9445,92.125901)"
        sodipodi:end="6.6539506"
@@ -3225,7 +3372,10 @@
        sodipodi:cx="1449.5688"
        id="path5077"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
@@ -3237,7 +3387,10 @@
        d="m 1611.7053,327.50403 a 173.94827,173.94827 0 0 1 -0.01,126.03267 l -162.1286,-63.02648 z"
        sodipodi:start="5.9125451"
        sodipodi:end="6.6539506"
-       transform="matrix(0,-0.21780803,0.21780803,0,-745.9724,838.35502)" />
+       transform="matrix(0,-0.21780803,0.21780803,0,-745.9724,838.35502)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
@@ -3249,7 +3402,10 @@
        d="m 1611.7053,327.50403 a 173.94827,173.94827 0 0 1 -0.01,126.03267 l -162.1286,-63.02648 z"
        sodipodi:start="5.9125451"
        sodipodi:end="6.6539506"
-       transform="matrix(0.21780803,0,0,0.21780803,-1034.573,380.72649)" />
+       transform="matrix(0.21780803,0,0,0.21780803,-1034.573,380.72649)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(-0.21780803,0,0,-0.21780803,-288.34391,549.75439)"
        sodipodi:end="6.6539506"
@@ -3261,7 +3417,10 @@
        sodipodi:cx="1449.5688"
        id="path5083"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.21780803,0,0,0.21780803,-693.65295,320.11912)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -3271,7 +3430,10 @@
        sodipodi:cx="145.31044"
        id="path5101"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
@@ -3281,7 +3443,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="matrix(0.21780803,0,0,0.21780803,-692.55191,435.83774)" />
+       transform="matrix(0.21780803,0,0,0.21780803,-692.55191,435.83774)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
@@ -3291,7 +3456,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="matrix(0,-0.21780803,0.21780803,0,-806.44741,497.31419)" />
+       transform="matrix(0,-0.21780803,0.21780803,0,-806.44741,497.31419)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0,-0.21780803,0.21780803,0,-690.72879,496.21315)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -3301,7 +3469,10 @@
        sodipodi:cx="145.31044"
        id="path5107"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
@@ -3313,7 +3484,10 @@
        d="m 1611.7053,327.50403 a 173.94827,173.94827 0 0 1 -0.01,126.03267 l -162.1286,-63.02648 z"
        sodipodi:start="5.9125451"
        sodipodi:end="6.6539506"
-       transform="matrix(0.15401353,0.15401353,-0.15401353,0.15401353,-865.43869,141.61527)" />
+       transform="matrix(0.15401353,0.15401353,-0.15401353,0.15401353,-865.43869,141.61527)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(-0.15401353,-0.15401353,0.15401353,-0.15401353,-457.29584,788.79965)"
        sodipodi:end="6.6539506"
@@ -3325,7 +3499,10 @@
        sodipodi:cx="1449.5688"
        id="path5127"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.15401353,-0.15401353,0.15401353,0.15401353,-984.95947,669.2789)"
        sodipodi:end="6.6539506"
@@ -3337,7 +3514,10 @@
        sodipodi:cx="1449.5688"
        id="path5129"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
@@ -3349,7 +3529,10 @@
        d="m 1611.7053,327.50403 a 173.94827,173.94827 0 0 1 -0.01,126.03267 l -162.1286,-63.02648 z"
        sodipodi:start="5.9125451"
        sodipodi:end="6.6539506"
-       transform="matrix(-0.15401353,0.15401353,-0.15401353,-0.15401353,-337.77506,261.13605)" />
+       transform="matrix(-0.15401353,0.15401353,-0.15401353,-0.15401353,-337.77506,261.13605)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
@@ -3359,7 +3542,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="matrix(0.15401353,-0.15401353,0.15401353,0.15401353,-786.74848,385.35615)" />
+       transform="matrix(0.15401353,-0.15401353,0.15401353,0.15401353,-786.74848,385.35615)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.15401353,-0.15401353,0.15401353,0.15401353,-704.1445,466.40302)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -3369,7 +3555,10 @@
        sodipodi:cx="145.31044"
        id="path5135"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(-0.15401353,-0.15401353,0.15401353,-0.15401353,-741.21038,590.40972)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -3379,7 +3568,10 @@
        sodipodi:cx="145.31044"
        id="path5137"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
@@ -3389,7 +3581,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="matrix(-0.15401353,-0.15401353,0.15401353,-0.15401353,-660.1635,507.80574)" />
+       transform="matrix(-0.15401353,-0.15401353,0.15401353,-0.15401353,-660.1635,507.80574)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
@@ -3401,7 +3596,10 @@
        d="m 1611.7053,327.50403 a 173.94827,173.94827 0 0 1 -0.01,126.03267 l -162.1286,-63.02648 z"
        sodipodi:start="5.9125451"
        sodipodi:end="6.6539506"
-       transform="matrix(0.08335152,0.20122838,-0.20122838,0.08335152,-726.11362,88.178051)" />
+       transform="matrix(0.08335152,0.20122838,-0.20122838,0.08335152,-726.11362,88.178051)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(-0.08335152,-0.20122838,0.20122838,-0.08335152,-596.70553,842.28802)"
        sodipodi:end="6.6539506"
@@ -3413,7 +3611,10 @@
        sodipodi:cx="1449.5688"
        id="path5175"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.20122838,-0.08335152,0.08335152,0.20122838,-1038.4645,529.93706)"
        sodipodi:end="6.6539506"
@@ -3425,7 +3626,10 @@
        sodipodi:cx="1449.5688"
        id="path5177"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
@@ -3437,7 +3641,10 @@
        d="m 1611.7053,327.50403 a 173.94827,173.94827 0 0 1 -0.01,126.03267 l -162.1286,-63.02648 z"
        sodipodi:start="5.9125451"
        sodipodi:end="6.6539506"
-       transform="matrix(-0.20122838,0.08335152,-0.08335152,-0.20122838,-284.35461,400.52899)" />
+       transform="matrix(-0.20122838,0.08335152,-0.08335152,-0.20122838,-284.35461,400.52899)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
@@ -3447,7 +3654,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="matrix(0.20122838,-0.08335152,0.08335152,0.20122838,-746.68895,343.47871)" />
+       transform="matrix(0.20122838,-0.08335152,0.08335152,0.20122838,-746.68895,343.47871)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.20122838,-0.08335152,0.08335152,0.20122838,-701.38812,449.96743)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -3457,7 +3667,10 @@
        sodipodi:cx="145.31044"
        id="path5183"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(-0.08335152,-0.20122838,0.20122838,-0.08335152,-783.08782,550.35018)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -3467,7 +3680,10 @@
        sodipodi:cx="145.31044"
        id="path5185"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
@@ -3477,7 +3693,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="matrix(-0.08335152,-0.20122838,0.20122838,-0.08335152,-676.5991,505.04936)" />
+       transform="matrix(-0.08335152,-0.20122838,0.20122838,-0.08335152,-676.5991,505.04936)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.20122838,0.08335152,-0.08335152,0.20122838,-973.7087,244.30222)"
        sodipodi:end="6.6539506"
@@ -3489,7 +3708,10 @@
        sodipodi:cx="1449.5688"
        id="path5189"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
@@ -3501,7 +3723,10 @@
        d="m 1611.7053,327.50403 a 173.94827,173.94827 0 0 1 -0.01,126.03267 l -162.1286,-63.02648 z"
        sodipodi:start="5.9125451"
        sodipodi:end="6.6539506"
-       transform="matrix(-0.20122838,-0.08335152,0.08335152,-0.20122838,-348.96716,686.03313)" />
+       transform="matrix(-0.20122838,-0.08335152,0.08335152,-0.20122838,-348.96716,686.03313)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
@@ -3513,7 +3738,10 @@
        d="m 1611.7053,327.50403 a 173.94827,173.94827 0 0 1 -0.01,126.03267 l -162.1286,-63.02648 z"
        sodipodi:start="5.9125451"
        sodipodi:end="6.6539506"
-       transform="matrix(0.08335152,-0.20122838,0.20122838,0.08335152,-882.20339,777.53847)" />
+       transform="matrix(0.08335152,-0.20122838,0.20122838,0.08335152,-882.20339,777.53847)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(-0.08335152,0.20122838,-0.20122838,-0.08335152,-440.47248,152.79688)"
        sodipodi:end="6.6539506"
@@ -3525,7 +3753,10 @@
        sodipodi:cx="1449.5688"
        id="path5195"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.08335152,-0.20122838,0.20122838,0.08335152,-807.73287,439.37598)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -3535,7 +3766,10 @@
        sodipodi:cx="145.31044"
        id="path5197"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
@@ -3545,7 +3779,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="matrix(0.08335152,-0.20122838,0.20122838,0.08335152,-700.40144,482.64235)" />
+       transform="matrix(0.08335152,-0.20122838,0.20122838,0.08335152,-700.40144,482.64235)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
@@ -3555,7 +3792,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="matrix(-0.20122838,-0.08335152,0.08335152,-0.20122838,-687.19054,611.39408)" />
+       transform="matrix(-0.20122838,-0.08335152,0.08335152,-0.20122838,-687.19054,611.39408)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(-0.20122838,-0.08335152,0.08335152,-0.20122838,-643.92418,504.06269)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -3565,7 +3805,10 @@
        sodipodi:cx="145.31044"
        id="path5203"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.98885589,0,0,0.98885589,720.16718,8.442804)"
        d="m 1620.6887,-800.25757 a 268.70056,268.70056 0 1 1 -537.4011,0 268.70056,268.70056 0 1 1 537.4011,0 z"
@@ -3585,7 +3828,10 @@
        sodipodi:rx="268.70056"
        sodipodi:ry="268.70056"
        d="m 1620.6887,-800.25757 a 268.70056,268.70056 0 1 1 -537.4011,0 268.70056,268.70056 0 1 1 537.4011,0 z"
-       transform="matrix(0.21538075,0,0,0.21538075,-952.66692,637.54301)" />
+       transform="matrix(0.21538075,0,0,0.21538075,-952.66692,637.54301)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source3.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.98885589,0,0,0.98885589,2105.6457,-75.335996)"
        d="m 1620.6887,-800.25757 a 268.70056,268.70056 0 1 1 -537.4011,0 268.70056,268.70056 0 1 1 537.4011,0 z"
@@ -4184,7 +4430,10 @@
        width="608"
        height="200"
        x="-767.75739"
-       y="642.17548" />
+       y="642.17548"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source4.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(1.5588235,0,0,1.5588235,-925.35365,121.39333)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -4194,7 +4443,10 @@
        sodipodi:cx="145.31044"
        id="path5519"
        style="fill:#ffffff;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source4.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
@@ -4204,7 +4456,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="translate(-844.15076,344.95413)" />
+       transform="translate(-844.15076,344.95413)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source4.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="translate(-844.15076,344.95413)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -4214,12 +4469,18 @@
        sodipodi:cx="145.31044"
        id="path5523"
        style="fill:url(#radialGradient5629);fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source4.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        id="path5557"
        d="m -373.52573,715.42943 0,59.40624 c 0,3.4653 29.86988,6.28125 66.68749,6.28125 36.81762,0 66.65625,-2.81595 66.65625,-6.28125 l 0,-59.40624 -133.34374,0 z"
        style="fill:url(#linearGradient5631);fill-opacity:1;stroke:none"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source4.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(1,0,0,0.31057088,-738.18373,636.76436)"
        d="m 498.00521,253.33151 a 66.670067,20.203051 0 1 1 -133.34013,0 66.670067,20.203051 0 1 1 133.34013,0 z"
@@ -4229,7 +4490,10 @@
        sodipodi:cx="431.33514"
        id="path5559"
        style="fill:url(#radialGradient5633);fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source4.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        inkscape:transform-center-y="6.4562445e-05"
        inkscape:transform-center-x="38.342381"
@@ -4247,7 +4511,10 @@
        inkscape:rounded="0"
        inkscape:randomized="0"
        d="m 1221.5074,-178.34771 -80.2371,0 -80.2372,0 40.1186,-69.48741 40.1186,-69.48741 40.1185,69.48741 z"
-       transform="matrix(0,-0.35237256,1.6553637,0,-173.40961,1147.2992)" />
+       transform="matrix(0,-0.35237256,1.6553637,0,-173.40961,1147.2992)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source4.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.29852152,0,0,0.49200956,-839.32875,595.10865)"
        d="m 1272.0851,304.95032 a 27.577164,57.982758 0 1 1 -55.1543,0 27.577164,57.982758 0 1 1 55.1543,0 z"
@@ -4257,19 +4524,28 @@
        sodipodi:cx="1244.5079"
        id="path5511"
        style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.77172041;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source4.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
        id="path5513"
        d="m -698.15485,745.1827 c 4.875,0 230.95354,0 230.95354,0"
-       style="fill:none;stroke:#000000;stroke-width:0.67900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.67900002, 0.67900002;stroke-dashoffset:0" />
+       style="fill:none;stroke:#000000;stroke-width:0.67900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.67900002, 0.67900002;stroke-dashoffset:0"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source4.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:nodetypes="cc"
        style="fill:none;stroke:#000000;stroke-width:0.67900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow1Lend)"
        d="m -467.16851,745.1827 c 4.875,0 43.2001,0 43.2001,0"
        id="path5515"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source4.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:none;stroke:#000000;stroke-width:0.67900002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
@@ -4282,14 +4558,20 @@
        sodipodi:start="6.1650259"
        sodipodi:end="6.2881246"
        sodipodi:open="true"
-       transform="translate(-15,55)" />
+       transform="translate(-15,55)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source4.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <rect
        y="958.17548"
        x="-773.75739"
        height="200"
        width="608"
        id="rect5637"
-       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.67900002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.67900002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ffffff;fill-opacity:1;stroke:none"
@@ -4299,7 +4581,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="matrix(1.5588235,0,0,1.5588235,-931.35365,381.39333)" />
+       transform="matrix(1.5588235,0,0,1.5588235,-931.35365,381.39333)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="translate(-850.15076,604.95413)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -4309,7 +4594,10 @@
        sodipodi:cx="145.31044"
        id="path5641"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:url(#radialGradient5659);fill-opacity:1;stroke:none"
@@ -4319,12 +4607,18 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="translate(-850.15076,604.95413)" />
+       transform="translate(-850.15076,604.95413)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        inkscape:connector-curvature="0"
        style="fill:url(#linearGradient5661);fill-opacity:1;stroke:none"
        d="m -379.52573,975.4294 0,59.4063 c 0,3.4653 29.86988,6.2812 66.68749,6.2812 36.81762,0 66.65625,-2.8159 66.65625,-6.2812 l 0,-59.4063 -133.34374,0 z"
-       id="path5645" />
+       id="path5645"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:url(#radialGradient5663);fill-opacity:1;stroke:none"
@@ -4334,7 +4628,10 @@
        sodipodi:rx="66.670067"
        sodipodi:ry="20.203051"
        d="m 498.00521,253.33151 a 66.670067,20.203051 0 1 1 -133.34013,0 66.670067,20.203051 0 1 1 133.34013,0 z"
-       transform="matrix(1,0,0,0.31057088,-744.18373,896.76436)" />
+       transform="matrix(1,0,0,0.31057088,-744.18373,896.76436)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0,-0.35237256,1.6553637,0,-179.40961,1407.2992)"
        d="m 1221.5074,-178.34771 -80.2371,0 -80.2372,0 40.1186,-69.48741 40.1186,-69.48741 40.1185,69.48741 z"
@@ -4352,7 +4649,10 @@
        style="fill:none;stroke:#000000;stroke-width:1.13950551;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        sodipodi:type="star"
        inkscape:transform-center-x="38.342381"
-       inkscape:transform-center-y="6.4562445e-05" />
+       inkscape:transform-center-y="6.4562445e-05"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.77172041;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
@@ -4362,19 +4662,28 @@
        sodipodi:rx="27.577164"
        sodipodi:ry="57.982758"
        d="m 1272.0851,304.95032 a 27.577164,57.982758 0 1 1 -55.1543,0 27.577164,57.982758 0 1 1 55.1543,0 z"
-       transform="matrix(0.29852152,0,0,0.49200956,-845.32875,855.10865)" />
+       transform="matrix(0.29852152,0,0,0.49200956,-845.32875,855.10865)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.67900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:0.67900002, 0.67900002;stroke-dashoffset:0"
        d="m -704.15485,1005.1827 c 4.875,0 230.95354,0 230.95354,0"
        id="path5653"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        inkscape:connector-curvature="0"
        id="path5655"
        d="m -473.16851,1005.1827 c 4.875,0 43.2001,0 43.2001,0"
        style="fill:none;stroke:#000000;stroke-width:0.67900002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow1Lend)"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="translate(-21,315)"
        sodipodi:open="true"
@@ -4387,7 +4696,10 @@
        sodipodi:cx="-683.06512"
        id="path5657"
        style="fill:none;stroke:#000000;stroke-width:0.67900002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.21780803,0,0,0.21780803,-903.88551,1042.0877)"
        d="m 1168.1404,229.99699 a 82.731491,82.731491 0 1 1 -165.463,0 82.731491,82.731491 0 1 1 165.463,0 z"
@@ -4397,7 +4709,10 @@
        sodipodi:cx="1085.4089"
        id="path5665"
        style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-width:0.67900002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
@@ -4409,7 +4724,10 @@
        d="m 1611.7053,327.50403 a 173.94827,173.94827 0 0 1 -0.01,126.03267 l -162.1286,-63.02648 z"
        sodipodi:start="5.9125451"
        sodipodi:end="6.6539506"
-       transform="matrix(0,0.21780803,-0.21780803,0,-582.9445,719.1259)" />
+       transform="matrix(0,0.21780803,-0.21780803,0,-582.9445,719.1259)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0,-0.21780803,0.21780803,0,-751.9724,1465.355)"
        sodipodi:end="6.6539506"
@@ -4421,7 +4739,10 @@
        sodipodi:cx="1449.5688"
        id="path5669"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.21780803,0,0,0.21780803,-1040.573,1007.7265)"
        sodipodi:end="6.6539506"
@@ -4433,7 +4754,10 @@
        sodipodi:cx="1449.5688"
        id="path5671"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
@@ -4445,7 +4769,10 @@
        d="m 1611.7053,327.50403 a 173.94827,173.94827 0 0 1 -0.01,126.03267 l -162.1286,-63.02648 z"
        sodipodi:start="5.9125451"
        sodipodi:end="6.6539506"
-       transform="matrix(-0.21780803,0,0,-0.21780803,-294.34391,1176.7544)" />
+       transform="matrix(-0.21780803,0,0,-0.21780803,-294.34391,1176.7544)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
@@ -4455,7 +4782,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="matrix(0.21780803,0,0,0.21780803,-699.65295,947.11912)" />
+       transform="matrix(0.21780803,0,0,0.21780803,-699.65295,947.11912)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.21780803,0,0,0.21780803,-698.55191,1062.8377)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -4465,7 +4795,10 @@
        sodipodi:cx="145.31044"
        id="path5677"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0,-0.21780803,0.21780803,0,-812.44741,1124.3142)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -4475,7 +4808,10 @@
        sodipodi:cx="145.31044"
        id="path5679"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
@@ -4485,7 +4821,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="matrix(0,-0.21780803,0.21780803,0,-696.72879,1123.2131)" />
+       transform="matrix(0,-0.21780803,0.21780803,0,-696.72879,1123.2131)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.15401353,0.15401353,-0.15401353,0.15401353,-871.43869,768.61527)"
        sodipodi:end="6.6539506"
@@ -4497,7 +4836,10 @@
        sodipodi:cx="1449.5688"
        id="path5683"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
@@ -4509,7 +4851,10 @@
        d="m 1611.7053,327.50403 a 173.94827,173.94827 0 0 1 -0.01,126.03267 l -162.1286,-63.02648 z"
        sodipodi:start="5.9125451"
        sodipodi:end="6.6539506"
-       transform="matrix(-0.15401353,-0.15401353,0.15401353,-0.15401353,-463.29584,1415.7996)" />
+       transform="matrix(-0.15401353,-0.15401353,0.15401353,-0.15401353,-463.29584,1415.7996)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
@@ -4521,7 +4866,10 @@
        d="m 1611.7053,327.50403 a 173.94827,173.94827 0 0 1 -0.01,126.03267 l -162.1286,-63.02648 z"
        sodipodi:start="5.9125451"
        sodipodi:end="6.6539506"
-       transform="matrix(0.15401353,-0.15401353,0.15401353,0.15401353,-990.95947,1296.2789)" />
+       transform="matrix(0.15401353,-0.15401353,0.15401353,0.15401353,-990.95947,1296.2789)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(-0.15401353,0.15401353,-0.15401353,-0.15401353,-343.77506,888.13605)"
        sodipodi:end="6.6539506"
@@ -4533,7 +4881,10 @@
        sodipodi:cx="1449.5688"
        id="path5689"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.15401353,-0.15401353,0.15401353,0.15401353,-792.74848,1012.3561)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -4543,7 +4894,10 @@
        sodipodi:cx="145.31044"
        id="path5691"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
@@ -4553,7 +4907,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="matrix(0.15401353,-0.15401353,0.15401353,0.15401353,-710.1445,1093.403)" />
+       transform="matrix(0.15401353,-0.15401353,0.15401353,0.15401353,-710.1445,1093.403)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
@@ -4563,7 +4920,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="matrix(-0.15401353,-0.15401353,0.15401353,-0.15401353,-747.21038,1217.4097)" />
+       transform="matrix(-0.15401353,-0.15401353,0.15401353,-0.15401353,-747.21038,1217.4097)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(-0.15401353,-0.15401353,0.15401353,-0.15401353,-666.1635,1134.8057)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -4573,7 +4933,10 @@
        sodipodi:cx="145.31044"
        id="path5697"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.08335152,0.20122838,-0.20122838,0.08335152,-732.11362,715.17805)"
        sodipodi:end="6.6539506"
@@ -4585,7 +4948,10 @@
        sodipodi:cx="1449.5688"
        id="path5699"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
@@ -4597,7 +4963,10 @@
        d="m 1611.7053,327.50403 a 173.94827,173.94827 0 0 1 -0.01,126.03267 l -162.1286,-63.02648 z"
        sodipodi:start="5.9125451"
        sodipodi:end="6.6539506"
-       transform="matrix(-0.08335152,-0.20122838,0.20122838,-0.08335152,-602.70553,1469.288)" />
+       transform="matrix(-0.08335152,-0.20122838,0.20122838,-0.08335152,-602.70553,1469.288)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
@@ -4609,7 +4978,10 @@
        d="m 1611.7053,327.50403 a 173.94827,173.94827 0 0 1 -0.01,126.03267 l -162.1286,-63.02648 z"
        sodipodi:start="5.9125451"
        sodipodi:end="6.6539506"
-       transform="matrix(0.20122838,-0.08335152,0.08335152,0.20122838,-1044.4645,1156.9371)" />
+       transform="matrix(0.20122838,-0.08335152,0.08335152,0.20122838,-1044.4645,1156.9371)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(-0.20122838,0.08335152,-0.08335152,-0.20122838,-290.35461,1027.529)"
        sodipodi:end="6.6539506"
@@ -4621,7 +4993,10 @@
        sodipodi:cx="1449.5688"
        id="path5705"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.20122838,-0.08335152,0.08335152,0.20122838,-752.68895,970.47871)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -4631,7 +5006,10 @@
        sodipodi:cx="145.31044"
        id="path5707"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
@@ -4641,7 +5019,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="matrix(0.20122838,-0.08335152,0.08335152,0.20122838,-707.38812,1076.9674)" />
+       transform="matrix(0.20122838,-0.08335152,0.08335152,0.20122838,-707.38812,1076.9674)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
@@ -4651,7 +5032,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="matrix(-0.08335152,-0.20122838,0.20122838,-0.08335152,-789.08782,1177.3502)" />
+       transform="matrix(-0.08335152,-0.20122838,0.20122838,-0.08335152,-789.08782,1177.3502)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(-0.08335152,-0.20122838,0.20122838,-0.08335152,-682.5991,1132.0494)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -4661,7 +5045,10 @@
        sodipodi:cx="145.31044"
        id="path5713"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
@@ -4673,7 +5060,10 @@
        d="m 1611.7053,327.50403 a 173.94827,173.94827 0 0 1 -0.01,126.03267 l -162.1286,-63.02648 z"
        sodipodi:start="5.9125451"
        sodipodi:end="6.6539506"
-       transform="matrix(0.20122838,0.08335152,-0.08335152,0.20122838,-979.7087,871.30222)" />
+       transform="matrix(0.20122838,0.08335152,-0.08335152,0.20122838,-979.7087,871.30222)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(-0.20122838,-0.08335152,0.08335152,-0.20122838,-354.96716,1313.0331)"
        sodipodi:end="6.6539506"
@@ -4685,7 +5075,10 @@
        sodipodi:cx="1449.5688"
        id="path5717"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.08335152,-0.20122838,0.20122838,0.08335152,-888.20339,1404.5385)"
        sodipodi:end="6.6539506"
@@ -4697,7 +5090,10 @@
        sodipodi:cx="1449.5688"
        id="path5719"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#0000ff;fill-opacity:0.32876713;stroke:none"
@@ -4709,7 +5105,10 @@
        d="m 1611.7053,327.50403 a 173.94827,173.94827 0 0 1 -0.01,126.03267 l -162.1286,-63.02648 z"
        sodipodi:start="5.9125451"
        sodipodi:end="6.6539506"
-       transform="matrix(-0.08335152,0.20122838,-0.20122838,-0.08335152,-446.47248,779.79688)" />
+       transform="matrix(-0.08335152,0.20122838,-0.20122838,-0.08335152,-446.47248,779.79688)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
@@ -4719,7 +5118,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="matrix(0.08335152,-0.20122838,0.20122838,0.08335152,-813.73287,1066.376)" />
+       transform="matrix(0.08335152,-0.20122838,0.20122838,0.08335152,-813.73287,1066.376)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.08335152,-0.20122838,0.20122838,0.08335152,-706.40144,1109.6423)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -4729,7 +5131,10 @@
        sodipodi:cx="145.31044"
        id="path5725"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(-0.20122838,-0.08335152,0.08335152,-0.20122838,-693.19054,1238.3941)"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
@@ -4739,7 +5144,10 @@
        sodipodi:cx="145.31044"
        id="path5727"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
-       sodipodi:type="arc" />
+       sodipodi:type="arc"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        sodipodi:type="arc"
        style="fill:#ff64c8;fill-opacity:1;stroke:none"
@@ -4749,7 +5157,10 @@
        sodipodi:rx="6.0104074"
        sodipodi:ry="6.0104074"
        d="m 151.32085,400.05618 a 6.0104074,6.0104074 0 1 1 -12.02082,0 6.0104074,6.0104074 0 1 1 12.02082,0 z"
-       transform="matrix(-0.20122838,-0.08335152,0.08335152,-0.20122838,-649.92418,1131.0627)" />
+       transform="matrix(-0.20122838,-0.08335152,0.08335152,-0.20122838,-649.92418,1131.0627)"
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
     <path
        transform="matrix(0.21538075,0,0,0.21538075,-958.66692,1264.543)"
        d="m 1620.6887,-800.25757 a 268.70056,268.70056 0 1 1 -537.4011,0 268.70056,268.70056 0 1 1 537.4011,0 z"
@@ -4759,104 +5170,317 @@
        sodipodi:cx="1351.9882"
        id="path5731"
        style="fill:none;stroke:#ff0000;stroke-width:0.63204354;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       sodipodi:type="arc" />
-    <path
-       id="path5528"
-       d="m -327.76837,-389.27324 0,59.40625 c 0,3.4653 29.86988,6.28125 66.68749,6.28125 36.81762,0 66.65625,-2.81595 66.65625,-6.28125 l 0,-59.40625 -133.34374,0 z"
-       style="fill:url(#linearGradient5532);fill-opacity:1;stroke:none"
-       inkscape:connector-curvature="0" />
-    <ellipse
-       id="path5530"
-       style="fill:url(#radialGradient5534);fill-opacity:1;stroke:none"
-       cx="-261.09125"
-       cy="-389.26093"
-       rx="66.670067"
-       ry="6.2744794" />
-    <path
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="ellipse5536"
        sodipodi:type="arc"
-       sodipodi:cx="-261.09125"
-       sodipodi:cy="-358.85529"
-       sodipodi:rx="210.47363"
-       sodipodi:ry="19.808176"
-       sodipodi:start="5.0342904"
-       sodipodi:end="4.389788"
-       d="m -194.50352,-377.64603 a 210.47363,19.808176 0 0 1 141.171508,21.96172 210.47363,19.808176 0 0 1 -207.685618,16.6372 210.47363,19.808176 0 0 1 -207.80923,-16.62352 210.47363,19.808176 0 0 1 141.00822,-21.97101"
-       sodipodi:open="true" />
+       inkscape:export-filename="/media/Storage/thesis/doctors/images/source5.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.67900002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5768"
+       width="274.35742"
+       height="274.35742"
+       x="202.23254"
+       y="1151.3572" />
     <path
-       style="fill:#00ff3c;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-       d="m -327.32031,-355.77344 -69.49219,12.0918 142.24609,-6.50977 a 66.670067,6.2744794 0 0 1 -6.52539,0.0371 66.670067,6.2744794 0 0 1 -66.22851,-5.61914 z"
-       id="path5561"
-       inkscape:connector-curvature="0" />
-    <path
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:1, 1;stroke-dashoffset:0;stroke-opacity:1"
-       id="ellipse5555"
-       sodipodi:type="arc"
-       sodipodi:cx="-261.09125"
-       sodipodi:cy="-356.4295"
-       sodipodi:rx="66.670067"
-       sodipodi:ry="6.2744794"
-       sodipodi:start="0"
-       sodipodi:end="3.1416897"
-       sodipodi:open="true"
-       d="m -194.42118,-356.4295 a 66.670067,6.2744794 0 0 1 -33.3369,5.43396 66.670067,6.2744794 0 0 1 -66.67194,-3.1e-4 66.670067,6.2744794 0 0 1 -33.33129,-5.43426" />
-    <circle
-       style="opacity:1;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       id="path5540"
-       cx="-397.01059"
-       cy="-343.86755"
-       r="3.1819806" />
-    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 337.5,1182.8622 c 99,4.5 134,17.5 104,37.5 -30,20 -33.98978,-15.2185 -64.5,19.5 -14.5,16.5 8.74057,16.5016 -16,46 -13,15.5 -8,37.5 29.5,44 37.5,6.5 67.5,49 26,50.5 -41.5,1.5 -201,3.5 -170.5,-29 30.5,-32.5 40,-26.5 41.5,-61 1.5,-34.5 -5,-23.5 -24,-50.5 -19,-27 -30,-68 -3.5,-65 26.5,3 61.5,9.5 77.5,8 z"
+       id="path5770"
        inkscape:connector-curvature="0"
-       style="fill:url(#linearGradient5579);fill-opacity:1;stroke:none"
-       d="m -327.76837,-568.27324 0,59.40625 c 0,3.4653 29.86988,6.28125 66.68749,6.28125 36.81762,0 66.65625,-2.81595 66.65625,-6.28125 l 0,-59.40625 -133.34374,0 z"
-       id="path5567" />
-    <ellipse
-       ry="6.2744794"
-       rx="66.670067"
-       cy="-568.26093"
-       cx="-261.09125"
-       style="fill:url(#radialGradient5581);fill-opacity:1;stroke:none"
-       id="ellipse5569" />
+       sodipodi:nodetypes="csssssssssc" />
+    <rect
+       y="1414.0127"
+       x="548.29156"
+       height="13.447451"
+       width="137.03969"
+       id="rect5794"
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.96225315;stroke-opacity:1" />
+    <rect
+       y="1153.4785"
+       x="548.00775"
+       height="274.35742"
+       width="274.35742"
+       id="rect5772"
+       style="fill:none;stroke:#000000;stroke-width:0.67900002;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+    <rect
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.96312457;stroke-opacity:1"
+       id="rect5776"
+       width="137.03882"
+       height="13.471905"
+       x="548.29199"
+       y="1153.7725" />
     <path
-       sodipodi:open="true"
-       d="m -194.50352,-556.64603 a 210.47363,19.808176 0 0 1 141.171508,21.96172 210.47363,19.808176 0 0 1 -207.685618,16.6372 210.47363,19.808176 0 0 1 -207.80923,-16.62352 210.47363,19.808176 0 0 1 141.00822,-21.97101"
-       sodipodi:end="4.389788"
-       sodipodi:start="5.0342904"
-       sodipodi:ry="19.808176"
-       sodipodi:rx="210.47363"
-       sodipodi:cy="-537.85529"
-       sodipodi:cx="-261.09125"
-       sodipodi:type="arc"
-       id="path5571"
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-    <path
-       d="m -194.42118,-535.4295 a 66.670067,6.2744794 0 0 1 -33.3369,5.43396 66.670067,6.2744794 0 0 1 -66.67194,-3.1e-4 66.670067,6.2744794 0 0 1 -33.33129,-5.43426"
-       sodipodi:open="true"
-       sodipodi:end="3.1416897"
-       sodipodi:start="0"
-       sodipodi:ry="6.2744794"
-       sodipodi:rx="66.670067"
-       sodipodi:cy="-535.4295"
-       sodipodi:cx="-261.09125"
-       sodipodi:type="arc"
-       id="path5575"
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:1, 1;stroke-dashoffset:0;stroke-opacity:1" />
-    <path
+       sodipodi:nodetypes="csssssssssc"
        inkscape:connector-curvature="0"
-       id="path5587"
-       d="m -327.32031,-534.76918 -69.49219,12.0918 142.24609,-6.50977 a 66.670067,6.2744794 0 0 1 -6.52539,0.0371 66.670067,6.2744794 0 0 1 -66.22851,-5.61914 z"
-       style="fill:#00ff00;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" />
-    <path
-       style="fill:#00be3c;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-       d="M -327.58203 -551.2832 L -396.8125 -522.68164 L -256.92773 -545.42383 A 66.670067 6.2744794 0 0 1 -294.42969 -546.24609 A 66.670067 6.2744794 0 0 1 -327.58203 -551.2832 z "
-       id="path5573" />
-    <circle
-       r="3.1819806"
-       cy="-522.86755"
-       cx="-397.01059"
-       id="circle5577"
-       style="opacity:1;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+       id="path5774"
+       d="m 683.27521,1184.9835 c 99,4.5 134,17.5 104,37.5 -30,20 -33.98978,-15.2185 -64.5,19.5 -14.5,16.5 8.74057,16.5016 -16,46 -13,15.5 -8,37.5 29.5,44 37.5,6.5 67.5,49 26,50.5 -41.5,1.5 -201,3.5 -170.5,-29 30.5,-32.5 40,-26.5 41.5,-61 1.5,-34.5 -5,-23.5 -24,-50.5 -19,-27 -30,-68 -3.5,-65 26.5,3 61.5,9.5 77.5,8 z"
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <rect
+       y="1167.2643"
+       x="548.08826"
+       height="13.879307"
+       width="44.284897"
+       id="rect5778"
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.55572236;stroke-opacity:1"
+       ry="0" />
+    <rect
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.7583133;stroke-opacity:1"
+       id="rect5780"
+       width="83.68029"
+       height="13.676716"
+       x="548.18958"
+       y="1276.9299" />
+    <rect
+       y="1304.3083"
+       x="548.17694"
+       height="13.702001"
+       width="78.048714"
+       id="rect5782"
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.73302883;stroke-opacity:1" />
+    <rect
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.67591625;stroke-opacity:1"
+       id="rect5784"
+       width="66.085014"
+       height="13.759112"
+       x="548.14838"
+       y="1317.9755" />
+    <rect
+       y="1331.6296"
+       x="548.10706"
+       height="13.841742"
+       width="50.611294"
+       id="rect5786"
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.59328759;stroke-opacity:1" />
+    <rect
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.5245415;stroke-opacity:1"
+       id="rect5788"
+       width="39.366333"
+       height="13.910487"
+       x="548.07269"
+       y="1345.2909" />
+    <rect
+       y="1358.9865"
+       x="548.07269"
+       height="13.910487"
+       width="39.366333"
+       id="rect5790"
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.5245415;stroke-opacity:1" />
+    <rect
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.60328436;stroke-opacity:1"
+       id="rect5792"
+       width="52.369064"
+       height="13.831744"
+       x="548.11206"
+       y="1372.7212" />
+    <rect
+       y="1386.5962"
+       x="548.29156"
+       height="13.447451"
+       width="137.03969"
+       id="rect5796"
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.96225315;stroke-opacity:1" />
+    <rect
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.96225315;stroke-opacity:1"
+       id="rect5798"
+       width="137.03969"
+       height="13.447451"
+       x="548.29156"
+       y="1400.3044" />
+    <rect
+       y="1263.2225"
+       x="548.17773"
+       height="13.700393"
+       width="78.400665"
+       id="rect5800"
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.7346366;stroke-opacity:1" />
+    <rect
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.62658823;stroke-opacity:1"
+       id="rect5802"
+       width="56.588402"
+       height="13.808441"
+       x="548.12372"
+       y="1235.7775" />
+    <rect
+       y="1194.6466"
+       x="548.07947"
+       height="13.896892"
+       width="41.474056"
+       id="rect5804"
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.5381375;stroke-opacity:1" />
+    <rect
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.75520259;stroke-opacity:1"
+       id="rect5806"
+       width="82.976288"
+       height="13.679827"
+       x="548.18805"
+       y="1290.6239" />
+    <rect
+       y="1180.95"
+       x="548.07837"
+       height="13.899133"
+       width="41.122742"
+       id="rect5808"
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.53589666;stroke-opacity:1" />
+    <rect
+       y="1249.4985"
+       x="548.14923"
+       height="13.75736"
+       width="66.436813"
+       id="rect5810"
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.67766976;stroke-opacity:1" />
+    <rect
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.5851599;stroke-opacity:1"
+       id="rect5812"
+       width="49.205208"
+       height="13.849869"
+       x="548.10303"
+       y="1222.0612" />
+    <rect
+       y="1208.3499"
+       x="548.08722"
+       height="13.881473"
+       width="43.93351"
+       id="rect5814"
+       style="fill:#0000ff;fill-opacity:1;stroke:#000000;stroke-width:0.55355644;stroke-opacity:1" />
+    <rect
+       y="1153.7909"
+       x="685.224"
+       height="13.435029"
+       width="136.82515"
+       id="rect5816"
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-opacity:1" />
+    <rect
+       ry="0"
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-opacity:1"
+       id="rect5818"
+       width="136.82515"
+       height="13.435029"
+       x="685.224"
+       y="1167.4865" />
+    <rect
+       y="1276.9935"
+       x="715.74908"
+       height="13.549618"
+       width="106.35737"
+       id="rect5820"
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-width:0.88541126;stroke-opacity:1" />
+    <rect
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-width:0.92082757;stroke-opacity:1"
+       id="rect5822"
+       width="115.33756"
+       height="13.514201"
+       x="706.75116"
+       y="1304.4023" />
+    <rect
+       y="1318.0371"
+       x="736.03528"
+       height="13.635793"
+       width="86.114227"
+       id="rect5824"
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-width:0.7992366;stroke-opacity:1" />
+    <rect
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-width:0.6432938;stroke-opacity:1"
+       id="rect5826"
+       width="55.157471"
+       height="13.791736"
+       x="767.07001"
+       y="1331.6547" />
+    <rect
+       y="1345.3112"
+       x="779.93567"
+       height="13.86988"
+       width="42.330917"
+       id="rect5828"
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-width:0.56514895;stroke-opacity:1" />
+    <rect
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-width:0.54524738;stroke-opacity:1"
+       id="rect5830"
+       width="39.345612"
+       height="13.889782"
+       x="782.93091"
+       y="1358.9967" />
+    <rect
+       y="1372.6946"
+       x="782.2262"
+       height="13.885031"
+       width="40.04797"
+       id="rect5832"
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-width:0.54999834;stroke-opacity:1" />
+    <rect
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-opacity:1"
+       id="rect5834"
+       width="136.82515"
+       height="13.435029"
+       x="685.224"
+       y="1414.0062" />
+    <rect
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-opacity:1"
+       id="rect5836"
+       width="136.82515"
+       height="13.435029"
+       x="685.224"
+       y="1386.6151" />
+    <rect
+       y="1400.3107"
+       x="685.224"
+       height="13.435029"
+       width="136.82515"
+       id="rect5838"
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-opacity:1" />
+    <rect
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-width:0.86892074;stroke-opacity:1"
+       id="rect5840"
+       width="102.308"
+       height="13.566109"
+       x="719.8067"
+       y="1263.2897" />
+    <rect
+       y="1235.8773"
+       x="729.86176"
+       height="13.608528"
+       width="92.274147"
+       id="rect5842"
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-width:0.82650089;stroke-opacity:1" />
+    <rect
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-width:0.42683256;stroke-opacity:1"
+       id="rect5844"
+       width="23.907679"
+       height="14.008197"
+       x="798.42804"
+       y="1194.5909" />
+    <rect
+       y="1290.7087"
+       x="705.69257"
+       height="13.510133"
+       width="116.39416"
+       id="rect5846"
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-width:0.92489648;stroke-opacity:1" />
+    <rect
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-width:0.60288191;stroke-opacity:1"
+       id="rect5848"
+       width="48.303589"
+       height="13.832148"
+       x="773.94409"
+       y="1180.9834" />
+    <rect
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-width:0.86819595;stroke-opacity:1"
+       id="rect5850"
+       width="102.13194"
+       height="13.566833"
+       x="719.98309"
+       y="1249.5938" />
+    <rect
+       y="1222.0239"
+       x="787.8634"
+       height="13.92434"
+       width="34.430424"
+       id="rect5852"
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-width:0.51068866;stroke-opacity:1" />
+    <rect
+       style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-width:0.42990273;stroke-opacity:1"
+       id="rect5854"
+       width="24.258162"
+       height="14.005126"
+       x="798.07605"
+       y="1208.2881" />
   </g>
 </svg>
