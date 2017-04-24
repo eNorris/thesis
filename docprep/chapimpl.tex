@@ -127,7 +127,108 @@ We first split the sweep process into $N_L$ subsweeps. For a $N_x \times N_x \ti
     \caption{The progression of subsweeps throughout a sweep. Each subsweep must complete before those after it. Each voxel within a subsweep can be solved in parallel with all others in its subsweep.}\label{fig:subsweep_cube}
 \end{figure}
 
-The number of parallel tasks, $P$, that can be done on the $S$ subsweep of a $N_x \times N_y \times N_z$ mesh is given by Eq.~\ref{eq:taskspersub}.
+In general, blah blah.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figs/subsweep_general1}
+        \caption{$S=0$}
+        \label{fig:subsweep_general1}
+    \end{subfigure}
+    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
+      %(or a blank line to force the subfigure onto a new line)
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figs/subsweep_general2}
+        \caption{$S=1$}
+        \label{fig:subsweep_general2}
+    \end{subfigure}
+    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
+    %(or a blank line to force the subfigure onto a new line)
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figs/subsweep_general3}
+        \caption{$S=2$}
+        \label{fig:subsweep_general3}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figs/subsweep_general4}
+        \caption{$S=3$}
+        \label{fig:subsweep_general4}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figs/subsweep_general5}
+        \caption{$S=4$}
+        \label{fig:subsweep_general5}
+    \end{subfigure}
+    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
+      %(or a blank line to force the subfigure onto a new line)
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figs/subsweep_general6}
+        \caption{$S=5$}
+        \label{fig:subsweep_general6}
+    \end{subfigure}
+    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
+    %(or a blank line to force the subfigure onto a new line)
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figs/subsweep_general7}
+        \caption{$S=6$}
+        \label{fig:subsweep_general7}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figs/subsweep_general8}
+        \caption{$S=7$}
+        \label{fig:subsweep_general8}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figs/subsweep_general9}
+        \caption{$S=8$}
+        \label{fig:subsweep_general9}
+    \end{subfigure}
+    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
+      %(or a blank line to force the subfigure onto a new line)
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figs/subsweep_general10}
+        \caption{$S=9$}
+        \label{fig:subsweep_general10}
+    \end{subfigure}
+    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
+    %(or a blank line to force the subfigure onto a new line)
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figs/subsweep_general11}
+        \caption{$S=10$}
+        \label{fig:subsweep_general11}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figs/subsweep_general12}
+        \caption{$S=11$}
+        \label{fig:subsweep_general12}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figs/subsweep_general13}
+        \caption{$S=12$}
+        \label{fig:subsweep_general12}
+    \end{subfigure}
+    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
+      %(or a blank line to force the subfigure onto a new line)
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figs/subsweep_general14}
+        \caption{$S=13$}
+        \label{fig:subsweep_general13}
+    \end{subfigure}
+    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
+    %(or a blank line to force the subfigure onto a new line)
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figs/subsweep_general15}
+        \caption{$S=14$}
+        \label{fig:subsweep_general14}
+    \end{subfigure}
+    \caption{The generalized subsweep.}\label{fig:subsweep_general}
+\end{figure}
+
+The number of parallel tasks, $P$, that can be done on subsweep $S$ of an $N_x \times N_y \times N_z$ mesh is given by Eq.~\ref{eq:taskspersub}.
 
 \begin{equation}\label{eq:taskspersub}
 P = C_S - L_x - L_y - L_z + G_{xy} + G_{yz} + G_{xz}
@@ -138,15 +239,15 @@ C_S = \frac{(S+1)(S+2)}{2}
 \end{equation}
 
 \begin{equation}
-L_x = \frac{dx(dx+1)}{2}
+L_x = \frac{d_x(d_x+1)}{2}
 \end{equation}
 
 \begin{equation}
-L_y = \frac{dy(dy+1)}{2}
+L_y = \frac{d_y(d_y+1)}{2}
 \end{equation}
 
 \begin{equation}
-L_z = \frac{dz(dz+1)}{2}
+L_z = \frac{d_z(d_z+1)}{2}
 \end{equation}
 
 \begin{equation}
@@ -221,17 +322,9 @@ iy = L + N_L - i
 iz = L + i - N_L
 \end{equation}
 
-Some examples are given in the following section
-\subsection{Example 1}
-In the $N=4$ subsweep, 
-
-\subsection{Sweep Indexing}
-In a $N_x \times N_y \times N_z$ mesh, the number of voxels computed in the $i$ subsweep is computed by Eq.~\ref{eq:}
-
-
 
 \section{Hardware}
-For this work, a computer with an Intel i7-5960X 8 core (16 hyperthreads) processor with a base clock speed of 3.X GHz and two Nvidia Titan Z graphics cards were used. The KBA algorithm was used to map th eproblem domain onto the GPU. A second version was created taht utilized both graphics cards. Currently, if the problem requires more memory than is available on the GPU, the problem can still be solved, but much more time will be required to to copy overhead between the CPU and GPU. If the problem requires more memory than either the GPU or CPU can provide, an error is thrown and the simulation is not run.
+For this work, a computer with an Intel i7-5960X 8 core (16 hyperthreads) processor with a base clock speed of 3.X GHz and an Nvidia Titan Z graphics card was used. The KBA algorithm was used to map th eproblem domain onto the GPU. A second version was created taht utilized both graphics cards. Currently, if the problem requires more memory than is available on the GPU, the problem can still be solved, but much more time will be required to to copy overhead between the CPU and GPU. If the problem requires more memory than either the GPU or CPU can provide, an error is thrown and the simulation is not run.
 
 
 \section{Section with \texttt{nomencl} Entries}
