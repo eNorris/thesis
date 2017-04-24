@@ -53,6 +53,10 @@ public:
     /** atom density in [atom/b-cm] */
     std::vector<float> atomDensity;
 
+    float getMaxX() const {return m_maxX;}
+    float getMaxY() const {return m_maxY;}
+    float getMaxZ() const {return m_maxZ;}
+
     void load(const Config *config, const Quadrature *quad);
 
     unsigned int voxelCount() const;
@@ -75,6 +79,10 @@ public:
 private:
     bool insideBox(int x, int y, int z, int xmin, int xmax, int ymin, int ymax, int zmin, int zmax);
     bool insideTightBox(int x, int y, int z, int xmin, int xmax, int ymin, int ymax, int zmin, int zmax);
+
+    float m_maxX;
+    float m_maxY;
+    float m_maxZ;
 };
 
 #endif // MESH_H

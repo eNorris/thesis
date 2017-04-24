@@ -2,7 +2,7 @@
 
 #include "xs_reader/ampxparser.h"
 
-SourceParams::SourceParams(AmpxParser *parser)
+SourceParams::SourceParams(AmpxParser *parser) : sourceType(-1)
 {
     //spectraEnergyLimits.resize(parser->getGammaEnergyGroups()+1);
     spectraIntensity.resize(parser->getGammaEnergyGroups(), 0);
@@ -40,7 +40,7 @@ bool SourceParams::normalize()
     return true;
 }
 
-bool SourceParams::update(std::vector<float> e, double x, double y, double z)
+bool SourceParams::update(std::vector<float> e, double x, double y, double z, double phi, double theta, int n, bool degrees, double d, double w, double h, int type)
 {
     if(spectraIntensity.size() != e.size())
     {
@@ -50,5 +50,13 @@ bool SourceParams::update(std::vector<float> e, double x, double y, double z)
     sourceX = x;
     sourceY = y;
     sourceZ = z;
+    sourcePhi = phi;
+    sourceTheta = theta;
+    sourceN = n;
+    this->degrees = degrees;
+    sourceD = d;
+    sourceW = w;
+    sourceH = h;
+    sourceType = type;
     return normalize();
 }

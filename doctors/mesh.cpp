@@ -72,6 +72,10 @@ void Mesh::uniform(const int xelems, const int yelems, const int zelems, const f
 
     vol.resize(xElemCt * yElemCt * zElemCt);
 
+    m_maxX = xLen;
+    m_maxY = yLen;
+    m_maxZ = zLen;
+
     // The coordinates between mesh elements
     for(unsigned int i = 0; i < xElemCt+1; i++)  // iterate the xMesh+1 to get the last bin
         xNodes[i] = i * (xLen / xElemCt);

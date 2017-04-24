@@ -162,6 +162,14 @@ MainWindow::MainWindow(QWidget *parent):
     ui->tabWidget->tabBar()->setTabTextColor(3, Qt::red);
     ui->tabWidget->tabBar()->setTabTextColor(4, Qt::red);
 
+    // Add unicode Greek text
+    const QChar phySymbol(0x03C6);
+    const QChar thetaSymbol(0x03B8);
+    ui->sourcePhiLabel->setText(phySymbol);
+    ui->sourceThetaLabel->setText(thetaSymbol);
+    ui->sourcePhiLabel->setFont(QFont("Times New Roman"));
+    ui->sourceThetaLabel->setFont(QFont("Times New Roman"));
+
     quadDialog->updateQuad(m_quad);
 }
 
@@ -542,7 +550,10 @@ void MainWindow::on_actionMCNP6_Generation_triggered()
         return;
     }
 
-    if(!m_srcParams->update(energyDialog->getUserIntensity(), ui->sourceXDoubleSpinBox->value(), ui->sourceYDoubleSpinBox->value(), ui->sourceZDoubleSpinBox->value()))
+    if(!m_srcParams->update(energyDialog->getUserIntensity(), ui->sourceXDoubleSpinBox->value(), ui->sourceYDoubleSpinBox->value(), ui->sourceZDoubleSpinBox->value(),
+                            ui->sourcePhiSpinBox->value(), ui->sourceThetaSpinBox->value(), ui->sourceNSpinBox->value(), ui->sourceDegreesCheckBox->isChecked(),
+                            ui->sourceDistanceSpinBox->value(), ui->sourceWidthSpinBox->value(), ui->sourceHeightSpinBox->value(),
+                            ui->sourceTypeComboBox->currentIndex()))
     {
         QString errmsg = QString("Could not update the energy intensity data. The energy structure may have changed.");
         QMessageBox::warning(this, "Invalid Vector Size", errmsg, QMessageBox::Close);
@@ -637,7 +648,10 @@ void MainWindow::energyGroupsUpdated()
 {
     if(m_srcParams != NULL)
     {
-        if(!m_srcParams->update(energyDialog->getUserIntensity(), ui->sourceXDoubleSpinBox->value(), ui->sourceYDoubleSpinBox->value(), ui->sourceZDoubleSpinBox->value()))
+        if(!m_srcParams->update(energyDialog->getUserIntensity(), ui->sourceXDoubleSpinBox->value(), ui->sourceYDoubleSpinBox->value(), ui->sourceZDoubleSpinBox->value(),
+                                ui->sourcePhiSpinBox->value(), ui->sourceThetaSpinBox->value(), ui->sourceNSpinBox->value(), ui->sourceDegreesCheckBox->isChecked(),
+                                ui->sourceDistanceSpinBox->value(), ui->sourceWidthSpinBox->value(), ui->sourceHeightSpinBox->value(),
+                                ui->sourceTypeComboBox->currentIndex()))
         {
             //qDebug() << "Whoops";
             return;
@@ -723,34 +737,34 @@ void MainWindow::on_sourceTypeComboBox_activated(int v)
     switch(v)
     {
     case 0:
-        ui->sourceImageLabel->setPixmapFile("/media/Storage/thesis/doctors/images/source1.png");
-        //srcImg.load("/media/Storage/thesis/doctors/images/source1.png");
-        //ui->sourceImageLabel->setScaledContents(true);
-        //ui->sourceImageLabel->setPixmap(srcImg.scaledToWidth(ui->sourceImageLabel->width(), Qt::SmoothTransformation));
+        ui->sourceImageLabel->setPixmapFile("/media/Storage/thesis/doctors/images/source1.png");  // Point source
+        ui->sourcePhiSpinBox->setEnabled(false);
+        ui->sourceThetaSpinBox->setEnabled(false);
+        ui->sourceNSpinBox->setEnabled(false);
         break;
     case 1:
-        ui->sourceImageLabel->setPixmapFile("/media/Storage/thesis/doctors/images/source2.png");
-        //srcImg.load("/media/Storage/thesis/doctors/images/source2.png");
-        //ui->sourceImageLabel->setScaledContents(true);
-        //ui->sourceImageLabel->setPixmap(srcImg.scaledToWidth(ui->sourceImageLabel->width(), Qt::SmoothTransformation));
+        ui->sourceImageLabel->setPixmapFile("/media/Storage/thesis/doctors/images/source2.png");  // Fan
+        ui->sourcePhiSpinBox->setEnabled(true);
+        ui->sourceThetaSpinBox->setEnabled(true);
+        ui->sourceNSpinBox->setEnabled(false);
         break;
     case 2:
-        ui->sourceImageLabel->setPixmapFile("/media/Storage/thesis/doctors/images/source3.png");
-        //srcImg.load("/media/Storage/thesis/doctors/images/source3.png");
-        //ui->sourceImageLabel->setScaledContents(true);
-        //ui->sourceImageLabel->setPixmap(srcImg.scaledToWidth(ui->sourceImageLabel->width(), Qt::SmoothTransformation));
+        ui->sourceImageLabel->setPixmapFile("/media/Storage/thesis/doctors/images/source3.png");  // Multifan
+        ui->sourcePhiSpinBox->setEnabled(true);
+        ui->sourceThetaSpinBox->setEnabled(true);
+        ui->sourceNSpinBox->setEnabled(true);
         break;
     case 3:
-        ui->sourceImageLabel->setPixmapFile("/media/Storage/thesis/doctors/images/source4.png");
-        //srcImg.load("/media/Storage/thesis/doctors/images/source4.png");
-        //ui->sourceImageLabel->setScaledContents(true);
-        //ui->sourceImageLabel->setPixmap(srcImg.scaledToWidth(ui->sourceImageLabel->width(), Qt::SmoothTransformation));
+        ui->sourceImageLabel->setPixmapFile("/media/Storage/thesis/doctors/images/source4.png"); // Cone
+        ui->sourcePhiSpinBox->setEnabled(false);
+        ui->sourceThetaSpinBox->setEnabled(true);
+        ui->sourceNSpinBox->setEnabled(false);
         break;
     case 4:
-        ui->sourceImageLabel->setPixmapFile("/media/Storage/thesis/doctors/images/source5.png");
-        //srcImg.load("/media/Storage/thesis/doctors/images/source5.png");
-        //ui->sourceImageLabel->setScaledContents(true);
-        //ui->sourceImageLabel->setPixmap(srcImg.scaledToWidth(ui->sourceImageLabel->width(), Qt::SmoothTransformation));
+        ui->sourceImageLabel->setPixmapFile("/media/Storage/thesis/doctors/images/source5.png"); // Multicone
+        ui->sourcePhiSpinBox->setEnabled(false);
+        ui->sourceThetaSpinBox->setEnabled(true);
+        ui->sourceNSpinBox->setEnabled(true);
         break;
     default:
         qDebug() << "No picture associated with source type " << v;
