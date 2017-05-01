@@ -566,11 +566,19 @@ x' = (x-x_f) \cos \theta - (y-y_f) \sin \theta + x_f
 x' = (y - y_f) \cos \theta + (x - x_f) \sin \theta + y_f
 \end{equation}
 
-\subsection{Cone Source}
-Pointy!
+\subsection{Cone Source and Multi-cone Source}
+Cone sources are identical to fan beam sources except for the rejection criteria used to determine whether or not a voxel is inside the beam. The rejection crieria is a function of only a single parameter, $\theta$, the maximum permissible angle between the center of the beam and a ray toward the point of interest.
 
-\subsection{Multi-cone Source}
-All of the pointy!
+The actual angle is $\zeta$ which is computed similarly to Eq.~\ref{eq:phicos} without the projection onto the $xy$ plane in Eq.~\ref{eq:zetacos} can be simplified to a simple summation since both $\vec{S}$ and $\vec{C}$ are unit vectors.
+
+\begin{equation}\label{eq:zetacos}
+\cos(\zeta) = \frac{<S_x, S_y, S_z>}{\sqrt{S_x^2 + S_y^2 + S_z^2}} \cdot \frac{<C_x, C_y, C_z>}{\sqrt{C_x^2 + C_y^2 + C_z^2}} = S_x C_x + S_y C_y + S_z C_z
+\end{equation}
+
+\begin{equation}\label{eq:zetacon}
+|\zeta| < \theta
+\end{equation}
+
 
 \subsection{Multileaf Collimator}
 How fancy.
