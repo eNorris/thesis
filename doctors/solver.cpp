@@ -108,7 +108,7 @@ void Solver::gsSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XS
  * ========================================= CPU Code ========================================= *
  ************************************************************************************************/
 
-std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh *mesh, const XSection *xs, const SourceParams *srcPar)
+std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *, const Mesh *mesh, const XSection *xs, const SourceParams *srcPar)
 {
     unsigned int groups = xs->groupCount();
 
@@ -119,9 +119,11 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
     std::vector<RAY_T> sx;
     std::vector<RAY_T> sy;
     std::vector<RAY_T> sz;
+    int sourceCt = 1;
 
     RAY_T xt;
     RAY_T yt;
+    RAY_T dt;
 
     RAY_T focusX = mesh->getMaxX()/2;
     RAY_T focusY = mesh->getMaxY()/2;
@@ -147,9 +149,9 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
         sy.push_back(static_cast<RAY_T>(srcPar->sourceY));
         sz.push_back(static_cast<RAY_T>(srcPar->sourceZ));
 
-        RAY_T dt = 2*m_pi / srcPar->sourceN;
+        dt = 2*m_pi / srcPar->sourceN;
 
-        for(unsigned int i = 0; i < srcPar->sourceN-1; i++)
+        for(int i = 0; i < srcPar->sourceN-1; i++)
         {
             xt = sx[sx.size()-1];
             yt = sy[sy.size()-1];
@@ -157,6 +159,8 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
             sy.push_back((yt-focusY)*cos(dt) + (xt-focusX)*sin(dt) + focusY);
             sz.push_back(srcPar->sourceZ);
         }
+
+        sourceCt = srcPar->sourceN;
         break;
 
     case 3:  // Cone
@@ -173,7 +177,7 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
 
     default:
         qDebug() << "Error: Source type " << srcPar->sourceType << " not understood";
-        return;
+        return NULL;
     }
 
     //const RAY_T sx = static_cast<RAY_T>(srcPar->sourceX);
@@ -217,33 +221,44 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
 
     // These are fatal errors for now
     // TODO: Update the solver to handle these
-    if(sx < mesh->xNodes[0] || sy < mesh->yNodes[0] || sz < mesh->zNodes[0])
-    {
-        qCritical() << "Source is ouside the mesh region on the negative side";
-    }
+    //if(sx < mesh->xNodes[0] || sy < mesh->yNodes[0] || sz < mesh->zNodes[0])
+    //{
+    //    qCritical() << "Source is ouside the mesh region on the negative side";
+    //}
 
-    if(sx > mesh->xNodes[mesh->xNodeCt-1] || sy > mesh->yNodes[mesh->yNodeCt-1] || sz > mesh->zNodes[mesh->zNodeCt-1])
-    {
-        qCritical() << "Source is ouside the mesh region on the positive side";
-    }
+    //if(sx > mesh->xNodes[mesh->xNodeCt-1] || sy > mesh->yNodes[mesh->yNodeCt-1] || sz > mesh->zNodes[mesh->zNodeCt-1])
+    //{
+    //    qCritical() << "Source is ouside the mesh region on the positive side";
+    //}
 
-    for(unsigned int is = 0; is < srcPar->sourceN; is++)
+    for(int is = 0; is < sourceCt; is++)
     {
         // Find the indices of the source index
         unsigned int srcIndxX = 0;
         unsigned int srcIndxY = 0;
         unsigned int srcIndxZ = 0;
 
-        while(mesh->xNodes[srcIndxX+1] < sx[is])
-            srcIndxX++;
+        // If the source is outside the mesh then it can't have meaningful indices
+        if(sx[is] < mesh->xNodes[0] || sx[is] > mesh->xNodes[mesh->xNodes.size()-1] ||
+           sy[is] < mesh->yNodes[0] || sy[is] > mesh->yNodes[mesh->yNodes.size()-1] ||
+           sz[is] < mesh->zNodes[0] || sz[is] > mesh->zNodes[mesh->zNodes.size()-1])
+        {
+            srcIndxX = srcIndxY = srcIndxZ = -1; // Will roll over to UINT_MAX
+        }
+        else
+        {
+            // Find the x, y, and z index of the cell containing the source
+            while(mesh->xNodes[srcIndxX+1] < sx[is])
+                srcIndxX++;
 
-        while(mesh->yNodes[srcIndxY+1] < sy[is])
-            srcIndxY++;
+            while(mesh->yNodes[srcIndxY+1] < sy[is])
+                srcIndxY++;
 
-        while(mesh->zNodes[srcIndxZ+1] < sz[is])
-            srcIndxZ++;
+            while(mesh->zNodes[srcIndxZ+1] < sz[is])
+                srcIndxZ++;
+        }
 
-        unsigned int totalMissedVoxels = 0;
+        //unsigned int totalMissedVoxels = 0;
 
         unsigned int highestEnergy = 0;
         while(srcStrength[highestEnergy] <= 0 && highestEnergy < groups)
@@ -279,7 +294,7 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
                         for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)
                         {
                             xsval = xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart];
-                            (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = srcStrength[ie] * exp(-xsval*srcToCellDist) / (4 * m_pi * srcToCellDist * srcToCellDist);
+                            (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] += srcStrength[ie] * exp(-xsval*srcToCellDist) / (4 * m_pi * srcToCellDist * srcToCellDist * sourceCt);
                         }
                         continue;
                     }
@@ -333,6 +348,19 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
                         break;
 
                     case 2: // Multifan
+                        zetaTheta = acos(beamVectorZ) - acos(zcos);
+                        if(std::abs(zetaTheta) > theta/2)
+                        {
+                            //qDebug() << x << "," << y << "," << z << ":" << " acos(beam z)=" << acos(beamCenterZ) << "  zcos=" << acos(zcos) <<  "   |zetaTheta|=" << std::abs(zetaTheta) << "    theta/2=" << (theta/2);
+                            continue;
+                        }
+
+                        // Test phi rejection
+                        zetaPhi = acos(beamVectorX*xcos + beamVectorY*ycos)/(sqrt(beamVectorX*beamVectorX + beamVectorY*beamVectorY) * sqrt(xcos*xcos + ycos*ycos));
+                        if(std::abs(zetaPhi) > phi/2.0)
+                            continue;
+
+                        acceptance = 1.0;
                         break;
 
                     case 3: // Cone beam
@@ -344,10 +372,10 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
                         std::cout << "This should never happen. basicRaytraceCPU got an illegal source type: " << srcPar->sourceType << std::endl;
                     }
 
-                    if(srcPar->sourceType > 0) // If not isotropic
-                    {
+                    //if(srcPar->sourceType > 0) // If not isotropic
+                    //{
 
-                    }
+                    //}
 
                     int xBoundIndx = (xcos >= 0 ? xIndx+1 : xIndx);
                     int yBoundIndx = (ycos >= 0 ? yIndx+1 : yIndx);
@@ -416,23 +444,31 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
                             {
                                 xIndx++;
                                 xBoundIndx++;
+                                if(xBoundIndx == mesh->xNodeCt-1) // If the mesh boundary is reached, jump to the source
+                                    exhaustedRay = true;
+                                /*
                                 if(xIndx > srcIndxX)
                                 {
                                     totalMissedVoxels++;
                                     qCritical() << "Missed the target x+ bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
                                     exhaustedRay = true;
                                 }
+                                */
                             }
                             else
                             {
                                 xIndx--;
                                 xBoundIndx--;
+                                if(xBoundIndx == 0)
+                                    exhaustedRay = true;
+                                /*
                                 if(xIndx < srcIndxX)
                                 {
                                     totalMissedVoxels++;
                                     qCritical() << "Missed the target x- bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
                                     exhaustedRay = true;
                                 }
+                                */
                             }
                         }
                         else if(dirHitFirst == DIRECTION_Y) // y direction
@@ -444,23 +480,31 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
                             {
                                 yIndx++;
                                 yBoundIndx++;
+                                if(yBoundIndx = mesh->yNodeCt-1)
+                                    exhaustedRay = true;
+                                /*
                                 if(yIndx > srcIndxY)
                                 {
                                     totalMissedVoxels++;
                                     qCritical() << "Missed the target y+ bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
                                     exhaustedRay = true;
                                 }
+                                */
                             }
                             else
                             {
                                 yIndx--;
                                 yBoundIndx--;
+                                if(yBoundIndx == 0)
+                                    exhaustedRay = true;
+                                /*
                                 if(yIndx < srcIndxY)
                                 {
                                     totalMissedVoxels++;
                                     qCritical() << "Missed the target y- bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
                                     exhaustedRay = true;
                                 }
+                                */
                             }
                         }
                         else if(dirHitFirst == DIRECTION_Z) // z direction
@@ -472,28 +516,40 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
                             {
                                 zIndx++;
                                 zBoundIndx++;
+                                if(zBoundIndx == mesh->zNodeCt-1)
+                                    exhaustedRay = true;
+                                /*
                                 if(zIndx > srcIndxZ)
                                 {
                                     totalMissedVoxels++;
                                     qCritical() << "Missed the target z+ bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
                                     exhaustedRay = true;
                                 }
+                                */
                             }
                             else
                             {
                                 zIndx--;
                                 zBoundIndx--;
+                                if(zBoundIndx == 0)
+                                    exhaustedRay = true;
+                                /*
                                 if(zIndx < srcIndxZ)
                                 {
                                     totalMissedVoxels++;
                                     qCritical() << "Missed the target z- bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
                                     exhaustedRay = true;
                                 }
+                                */
                             }
                         }
 
-                        if((xIndx == srcIndxX && yIndx == srcIndxY && zIndx == srcIndxZ) || exhaustedRay)
+                        //if((xIndx == srcIndxX && yIndx == srcIndxY && zIndx == srcIndxZ) || exhaustedRay)
+                        if(xIndx == srcIndxX && yIndx == srcIndxY && zIndx == srcIndxZ)
                         {
+                            // If I'm still in the mesh, compute the last voxel contribution
+                            //if(!exhaustedRay)
+                            //{
                             RAY_T finalDist = sqrt((x-sx[is])*(x-sx[is]) + (y-sy[is])*(y-sy[is]) + (z-sz[is])*(z-sz[is]));
 
                             for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)
@@ -501,15 +557,16 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
                                 //       [#]       = [cm] * [b] * [1/cm-b]
                                 meanFreePaths[ie] += finalDist * xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
                             }
+                            //}
 
                             exhaustedRay = true;
                         }
 
-                    } // End of while loop
+                    } // End of while !exhausted loop
 
                     for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)
                     {
-                        RAY_T flx = acceptance * srcStrength[ie] * exp(-meanFreePaths[ie]) / (m_4pi * srcToCellDist * srcToCellDist);
+                        RAY_T flx = acceptance * srcStrength[ie] * exp(-meanFreePaths[ie]) / (m_4pi * srcToCellDist * srcToCellDist * sourceCt);
 
                         if(flx < 0)
                             qDebug() << "solver.cpp: (291): Negative?";
@@ -517,7 +574,7 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *quad, const Mesh 
                         if(flx > 1E6)
                             qDebug() << "solver.cpp: (294): Too big!";
 
-                        (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] = static_cast<SOL_T>(flx);  //srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
+                        (*uflux)[ie*ejmp + xIndxStart*xjmp + yIndxStart*yjmp + zIndxStart] += static_cast<SOL_T>(flx);  //srcStrength * exp(-meanFreePaths[ie]) / (4 * M_PI * srcToCellDist * srcToCellDist);
                     }
 
                 } // End of each voxel
@@ -1181,7 +1238,7 @@ void Solver::gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const
                             if(iterNum == 1 && ri == mesh->voxelCount()/2 && ia==0)
                             {
                                 qDebug() << "Zoom";
-                                SOL_T v = totalSource[ia*mesh->voxelCount() + ri];
+                                //SOL_T v = totalSource[ia*mesh->voxelCount() + ri];
                             }
 
                             SOL_T numer = totalSource[ia*mesh->voxelCount() + ri] + inscatter +                                                                                             // [#]
@@ -1407,7 +1464,7 @@ void Solver::gsSolverHarmonicCPU(const Quadrature *quad, const Mesh *mesh, const
 
     //std::vector<SOL_T> angularFlux(xs->groupCount() * quad->angleCount() * mesh->voxelCount());
     std::vector<SOL_T> *scalarFlux = new std::vector<SOL_T>(xs->groupCount() * mesh->voxelCount(), 0.0f);
-    std::vector<SOL_T> *moments = new std::vector<SOL_T>(xs->groupCount() * mesh->voxelCount() * momentCount, 0.0f);
+    //std::vector<SOL_T> *moments = new std::vector<SOL_T>(xs->groupCount() * mesh->voxelCount() * momentCount, 0.0f);
     std::vector<SOL_T> tempFlux(mesh->voxelCount());
     std::vector<SOL_T> preFlux(mesh->voxelCount(), -100.0f);
     std::vector<SOL_T> totalSource(mesh->voxelCount(), -100.0f);

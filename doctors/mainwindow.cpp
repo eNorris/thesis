@@ -230,19 +230,32 @@ void MainWindow::on_launchSolverPushButton_clicked()
             return;
     }
 
+    unsigned int srcType = ui->sourceTypeComboBox->currentIndex();
+    if((srcType == 2 || srcType == 4) && ui->sourceNSpinBox->value() < 2)
+    {
+        QString errmsg = QString("You don't have at least 2 fan beams on a multi-fan source. ");
+        errmsg += "You may either abort the run or ignore this warning (which may produce incorrect results).";
+        int resp = QMessageBox::warning(this, "Internal Error", errmsg, QMessageBox::Abort | QMessageBox::Ignore);
+        if(resp == QMessageBox::Abort)
+            return;
+    }
+
     if(m_srcParams == NULL)
     {
-        QString errmsg = QString("The energy spectra must be loaded before a MCNP6 file can be generated.");
+        QString errmsg = QString("The energy spectra must be loaded before the solver can be run");
         QMessageBox::warning(this, "Insufficient Data", errmsg, QMessageBox::Close);
         return;
     }
 
-    //if(!m_srcParams->update(energyDialog->getUserIntensity(), ui->sourceXDoubleSpinBox->value(), ui->sourceYDoubleSpinBox->value(), ui->sourceZDoubleSpinBox->value()))
-    //{
-    //    QString errmsg = QString("Could not update the energy intensity data. The energy structure may have changed.");
-    //    QMessageBox::warning(this, "Invalid Vector Size", errmsg, QMessageBox::Close);
-    //    return;
-    //}
+    if(!m_srcParams->update(energyDialog->getUserIntensity(), ui->sourceXDoubleSpinBox->value(), ui->sourceYDoubleSpinBox->value(), ui->sourceZDoubleSpinBox->value(),
+                            ui->sourcePhiSpinBox->value(), ui->sourceThetaSpinBox->value(), ui->sourceNSpinBox->value(), ui->sourceDegreesCheckBox->isChecked(),
+                            ui->sourceDistanceSpinBox->value(), ui->sourceWidthSpinBox->value(), ui->sourceHeightSpinBox->value(),
+                            ui->sourceTypeComboBox->currentIndex()))
+    {
+        QString errmsg = QString("Could not update the energy intensity data. The energy structure may have changed.");
+        QMessageBox::warning(this, "Invalid Vector Size", errmsg, QMessageBox::Close);
+        return;
+    }
 
     if(!m_srcParams->normalize())
     {
