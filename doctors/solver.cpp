@@ -180,10 +180,6 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *, const Mesh *mes
         return NULL;
     }
 
-    //const RAY_T sx = static_cast<RAY_T>(srcPar->sourceX);
-    //const RAY_T sy = static_cast<RAY_T>(srcPar->sourceY);
-    //const RAY_T sz = static_cast<RAY_T>(srcPar->sourceZ);
-
     RAY_T phi;
     RAY_T theta;
 
@@ -218,18 +214,6 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *, const Mesh *mes
     std::vector<RAY_T> srcStrength(groups, 0.0);
     for(unsigned int i = 0; i < groups; i++)
         srcStrength[i] = srcPar->spectraIntensity[i];
-
-    // These are fatal errors for now
-    // TODO: Update the solver to handle these
-    //if(sx < mesh->xNodes[0] || sy < mesh->yNodes[0] || sz < mesh->zNodes[0])
-    //{
-    //    qCritical() << "Source is ouside the mesh region on the negative side";
-    //}
-
-    //if(sx > mesh->xNodes[mesh->xNodeCt-1] || sy > mesh->yNodes[mesh->yNodeCt-1] || sz > mesh->zNodes[mesh->zNodeCt-1])
-    //{
-    //    qCritical() << "Source is ouside the mesh region on the positive side";
-    //}
 
     for(int is = 0; is < sourceCt; is++)
     {
@@ -319,11 +303,6 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *, const Mesh *mes
                     RAY_T zetaTheta;
                     RAY_T zetaPhi;
 
-                    //RAY_T tt;
-                    //RAY_T rr;
-                    //RAY_T ss;
-                    //RAY_T uu;
-                    //bool cond;
                     switch(srcPar->sourceType)
                     {
                     case 0: // Isotropic (do nothing)
@@ -331,6 +310,7 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *, const Mesh *mes
 
                     case 1: // Fan beam
                         // Test theta rejection
+                        /*
                         zetaTheta = acos(beamVectorZ) - acos(zcos);
                         if(std::abs(zetaTheta) > theta/2)
                         {
@@ -346,6 +326,7 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *, const Mesh *mes
                         acceptance = 1.0;
 
                         break;
+                        */
 
                     case 2: // Multifan
                         zetaTheta = acos(beamVectorZ) - acos(zcos);
@@ -364,22 +345,21 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *, const Mesh *mes
                         break;
 
                     case 3: // Cone beam
-                        break;
-
                     case 4: // Multicone
+                        zetaTheta = acos(beamVectorX*xcos + beamVectorY*ycos + beamVectorZ*zcos);
+                        if(std::abs(zetaTheta) > theta)
+                        {
+                            continue;
+                        }
                         break;
                     default:
                         std::cout << "This should never happen. basicRaytraceCPU got an illegal source type: " << srcPar->sourceType << std::endl;
                     }
 
-                    //if(srcPar->sourceType > 0) // If not isotropic
-                    //{
-
-                    //}
-
-                    int xBoundIndx = (xcos >= 0 ? xIndx+1 : xIndx);
-                    int yBoundIndx = (ycos >= 0 ? yIndx+1 : yIndx);
-                    int zBoundIndx = (zcos >= 0 ? zIndx+1 : zIndx);
+                    // Index of the boundary the particle is headed toward
+                    unsigned int xBoundIndx = (xcos >= 0 ? xIndx+1 : xIndx);
+                    unsigned int yBoundIndx = (ycos >= 0 ? yIndx+1 : yIndx);
+                    unsigned int zBoundIndx = (zcos >= 0 ? zIndx+1 : zIndx);
 
                     // Clear the MPF array to zeros
                     for(unsigned int i = 0; i < xs->groupCount(); i++)
@@ -389,7 +369,8 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *, const Mesh *mes
                     while(!exhaustedRay)
                     {
 
-                        // This ensures that roundoff error doesn't cause the ray to miss the source cell
+                        // recomputing the direction cosines ensures that roundoff error doesn't
+                        //   cause the ray to miss the source cell
                         srcToCellX = sx[is] - x;
                         srcToCellY = sy[is] - y;
                         srcToCellZ = sz[is] - z;
@@ -442,33 +423,17 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *, const Mesh *mes
                             z += tmin*zcos;
                             if(xcos >= 0)
                             {
-                                xIndx++;
-                                xBoundIndx++;
                                 if(xBoundIndx == mesh->xNodeCt-1) // If the mesh boundary is reached, jump to the source
                                     exhaustedRay = true;
-                                /*
-                                if(xIndx > srcIndxX)
-                                {
-                                    totalMissedVoxels++;
-                                    qCritical() << "Missed the target x+ bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
-                                    exhaustedRay = true;
-                                }
-                                */
+                                xIndx++;
+                                xBoundIndx++;
                             }
                             else
                             {
-                                xIndx--;
-                                xBoundIndx--;
                                 if(xBoundIndx == 0)
                                     exhaustedRay = true;
-                                /*
-                                if(xIndx < srcIndxX)
-                                {
-                                    totalMissedVoxels++;
-                                    qCritical() << "Missed the target x- bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
-                                    exhaustedRay = true;
-                                }
-                                */
+                                xIndx--;
+                                xBoundIndx--;
                             }
                         }
                         else if(dirHitFirst == DIRECTION_Y) // y direction
@@ -478,33 +443,17 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *, const Mesh *mes
                             z += tmin*zcos;
                             if(ycos >= 0)
                             {
-                                yIndx++;
-                                yBoundIndx++;
                                 if(yBoundIndx = mesh->yNodeCt-1)
                                     exhaustedRay = true;
-                                /*
-                                if(yIndx > srcIndxY)
-                                {
-                                    totalMissedVoxels++;
-                                    qCritical() << "Missed the target y+ bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
-                                    exhaustedRay = true;
-                                }
-                                */
+                                yIndx++;
+                                yBoundIndx++;
                             }
                             else
                             {
-                                yIndx--;
-                                yBoundIndx--;
                                 if(yBoundIndx == 0)
                                     exhaustedRay = true;
-                                /*
-                                if(yIndx < srcIndxY)
-                                {
-                                    totalMissedVoxels++;
-                                    qCritical() << "Missed the target y- bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
-                                    exhaustedRay = true;
-                                }
-                                */
+                                yIndx--;
+                                yBoundIndx--;
                             }
                         }
                         else if(dirHitFirst == DIRECTION_Z) // z direction
@@ -514,33 +463,17 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *, const Mesh *mes
                             z = mesh->zNodes[zBoundIndx];
                             if(zcos >= 0)
                             {
-                                zIndx++;
-                                zBoundIndx++;
                                 if(zBoundIndx == mesh->zNodeCt-1)
                                     exhaustedRay = true;
-                                /*
-                                if(zIndx > srcIndxZ)
-                                {
-                                    totalMissedVoxels++;
-                                    qCritical() << "Missed the target z+ bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
-                                    exhaustedRay = true;
-                                }
-                                */
+                                zIndx++;
+                                zBoundIndx++;
                             }
                             else
                             {
-                                zIndx--;
-                                zBoundIndx--;
                                 if(zBoundIndx == 0)
                                     exhaustedRay = true;
-                                /*
-                                if(zIndx < srcIndxZ)
-                                {
-                                    totalMissedVoxels++;
-                                    qCritical() << "Missed the target z- bound: Started at " << xIndxStart << " " + yIndxStart << " " << zIndxStart << " Aiming for " << srcIndxX << " " << srcIndxY << " " << srcIndxZ << " and hit " << xIndx << " " << yIndx << " " << zIndx << "Missed voxel # " << totalMissedVoxels;
-                                    exhaustedRay = true;
-                                }
-                                */
+                                zIndx--;
+                                zBoundIndx--;
                             }
                         }
 

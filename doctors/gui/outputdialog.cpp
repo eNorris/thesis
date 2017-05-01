@@ -361,7 +361,7 @@ void OutputDialog::setSliceLevel(int level)
                 {
                     if(flux <= 1E-35)
                     {
-                        rects[i*m_mesh->yElemCt + j]->setBrush(errBrush);
+                        rects[i*m_mesh->zElemCt + j]->setBrush(errBrush);
                         continue;
                     }
                     else
