@@ -136,7 +136,7 @@ DESTDIR = $$PWD #$$system("echo %cd%")
 OBJECTS_DIR = $$DESTDIR/Obj
 
 # Path to cuda toolkit install
-CUDA_DIR      = /usr/local/cuda-7.0
+CUDA_DIR      = /usr/local/cuda-8.0
 #CUDA_DIR      = D:/CUDA/win/v8.0/sdk
 #CUDA_SDK =
 
@@ -164,12 +164,12 @@ INCLUDEPATH  += $$CUDA_DIR/include
 INCLUDEPATH  += $$DESTDIR/cuda_common/inc
 QMAKE_LIBDIR += $$CUDA_DIR/lib64     # For a 64 bits Linux
 #QMAKE_LIBDIR += $$CUDA_DIR/lib/x64      # For 64 bit Windows
-LIBS += -lcudart -lcuda
+LIBS += -L"/usr/local/cuda-8.0/lib64" -lcudart -lcuda
 
 #VS2015_CUDA = --use-local-env --cl-version 2015 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin" -G --keep-dir Debug -maxrregcount=0 --machine 32 --compile -cudart static -g -DWIN32 -D_DEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /FS /Zi /RTC1 /MDd "
 
 # GPU architecture
-CUDA_ARCH     = sm_35                # Titan Z
+CUDA_ARCH = sm_35     # Titan Z
 #CUDA_ARCH = sm_52     # GTX 960
 
 # Here are some NVCC flags I've always used by default.
