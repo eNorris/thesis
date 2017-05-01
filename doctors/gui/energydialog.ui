@@ -130,6 +130,20 @@
       </widget>
      </item>
      <item>
+      <widget class="QComboBox" name="energyPresetComboBox">
+       <item>
+        <property name="text">
+         <string>Presets</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>CT (19)</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="energySavePushButton">
        <property name="text">
         <string>Save</string>

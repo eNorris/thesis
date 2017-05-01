@@ -317,7 +317,31 @@ void EnergyDialog::on_energyOkPushButton_clicked()
     emit notifyOkClicked();
 }
 
+void EnergyDialog::on_energyPresetComboBox_activated(int indx)
+{
+    QRectF old;
+    switch(indx)
+    {
+    case 0:
+        return;
+    case 1:
+        for(unsigned int i = 0; i < m_rects.size(); i++)
+        {
+            old = m_rects[i]->rect();
+            m_rects[i]->setRect(old.x(), old.y(), old.width(), 0);
+        }
 
+        //m_rects[1]->prepareGeometryChange();
+        old = m_rects[m_rects.size()-2]->rect();
+        m_rects[m_rects.size()-2]->setRect(old.x(), old.y(), old.width(), 1);
+        break;
+    default:
+        qDebug() << "Preset #" << indx << " is not recognized";
+    }
+
+    update();
+    //repaint();
+}
 
 
 

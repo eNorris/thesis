@@ -27,9 +27,6 @@ protected:
     bool m_drag;
     int m_button;
     EnergyDialog *m_parent;
-    //std::vector<float> *m_energyPointer;
-    //std::vector<QGraphicsRectItem*> *m_rectPointer;
-    //std::vector<QGraphicsLineItem*> *m_linePointer;
 
 public slots:
     void mousePressEvent(QMouseEvent *event);
@@ -37,7 +34,6 @@ public slots:
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void resizeEvent(QResizeEvent *event);
-    //void link(std::vector<float> *e, std::vector<QGraphicsRectItem*> *r, std::vector<QGraphicsLineItem*> *l);
 };
 
 class EnergyDialog : public QDialog
@@ -76,6 +72,7 @@ public slots:
     void setMaxEnergy(float e);
 
     void on_energyOkPushButton_clicked();
+    void on_energyPresetComboBox_activated(int);
 };
 
 #endif // ENERGYDIALOG_H
