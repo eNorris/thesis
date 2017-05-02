@@ -73,6 +73,7 @@ public slots:
 
     void on_energyOkPushButton_clicked();
     void on_energyPresetComboBox_activated(int);
+    void on_energyOpenPushButton_clicked();
 };
 
 #endif // ENERGYDIALOG_H

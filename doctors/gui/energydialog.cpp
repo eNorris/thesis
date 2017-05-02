@@ -4,6 +4,8 @@
 #include <QDebug>
 #include <QMouseEvent>
 #include <QGraphicsRectItem>
+#include <QFileDialog>
+#include <QMessageBox>
 
 #include "xs_reader/ampxparser.h"
 #include "gui/colormappable.h"
@@ -340,7 +342,49 @@ void EnergyDialog::on_energyPresetComboBox_activated(int indx)
     }
 
     update();
-    //repaint();
+}
+
+void EnergyDialog::on_energyOpenPushButton_clicked()
+{
+    QString filename = QFileDialog::getOpenFileName(this, "Open Spectrum Formatted Data File", "/media/data/thesis/doctors/data/", "SPEC (*.spec);;All Files (*)");
+
+    if(filename.isEmpty())
+    {
+        qDebug() << "Error, failed to load spectrum data file";
+        return;
+    }
+
+    std::vector<float> values;
+    std::ifstream fin(filename.toStdString().c_str());
+
+    if(fin.good())
+    {
+        float f;
+        while(fin >> f)
+        {
+            values.push_back(f);
+        }
+    }
+
+    // Check to make sure the correct number of groups were loaded
+    if(values.size() != m_energyBins.size()-1)
+    {
+        QString errmsg = QString("The XS Data file has ") + QString::number(m_energyBins.size()) + " energy groups, but " + filename + " contained " + QString::number(values.size()) + " data points";
+        QMessageBox::warning(this, "Data Size Mismatch", errmsg, QMessageBox::Close);
+        return;
+    }
+
+    float sum = 0.0f;
+    for(unsigned int iv = 0; iv < values.size(); iv++)
+        sum += values[iv];
+
+    for(unsigned int iv = 0; iv < values.size(); iv++)
+    {
+        QRectF old = m_rects[iv]->rect();
+        m_rects[iv]->setRect(old.x(), old.y(), old.width(), values[iv]/sum);
+    }
+
+    return;
 }
 
 
