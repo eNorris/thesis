@@ -366,6 +366,9 @@ Equation~\ref{eq:boltz_i4} can be directly solved for the volume averaged flux. 
 }
 \end{equation}
 
+\subsection{Convergence Criterial}
+It converges.
+
 \subsection{Anisotropy Treatment}
 
 Scatter is assumed to be a function of only the scatter angle between the initial and scattered directions, $\theta_s$. Often, the cosine of the scatter angle, $\mu_s$ is used.
@@ -579,9 +582,51 @@ The actual angle is $\zeta$ which is computed similarly to Eq.~\ref{eq:phicos} w
 |\zeta| < \theta
 \end{equation}
 
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/beamconexy}
+        \caption{Cone xy}
+        \label{fig:beamconexy}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/beamfanxy}
+        \caption{Fan xy}
+        \label{fig:beamfanxy}
+    \end{subfigure}
+
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/beamconeyz}
+        \caption{Cone yz}
+        \label{fig:subsweep_general3}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/beamfanyz}
+        \caption{Fan yz}
+        \label{fig:subsweep_general4}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/beamconexz}
+        \caption{Cone xz}
+        \label{fig:subsweep_general5}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/beamfanxz}
+        \caption{Fan xz}
+        \label{fig:subsweep_general6}
+    \end{subfigure}
+    \caption{The beam shapes.}\label{fig:beamfancone}
+\end{figure}
+
 
 \subsection{Multileaf Collimator}
 How fancy.
+
+Talk about the MCNP generation in the comparison to results part.
 
 \endinput
 %%
