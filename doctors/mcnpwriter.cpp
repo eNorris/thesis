@@ -6,6 +6,7 @@
 #include <QDebug>
 
 #include "mesh.h"
+#include "xsection.h"
 #include "materialutils.h"
 #include "sourceparams.h"
 
@@ -100,7 +101,6 @@ std::string McnpWriter::generateCellString(Mesh *m, bool fineDensity)
             for(unsigned int zi = 0; zi < m->zElemCt; zi++)
             {
                 unsigned int mindx = xi * m->yElemCt * m->zElemCt + yi * m->zElemCt + zi;
-                //std::string cellString = "";
 
                 if(mindx == 208311)
                     qDebug() << "stop";
@@ -109,7 +109,6 @@ std::string McnpWriter::generateCellString(Mesh *m, bool fineDensity)
                 {
                     std::cerr << "ERROR: mindx=" << mindx << " > zoneId.size=" << m->zoneId.size() << std::endl;
                     m_failFlag = true;
-                    //cellString = "?????";
                     allCellString += "?????\n";
                     continue;
                 }
@@ -122,9 +121,6 @@ std::string McnpWriter::generateCellString(Mesh *m, bool fineDensity)
                     allCellString += "?????\n";
                     continue;
                 }
-
-                //if(mindx == 208311)
-                //    qDebug() << "halt";
 
                 std::string matstr = "";
 
@@ -162,7 +158,6 @@ std::string McnpWriter::generateCellString(Mesh *m, bool fineDensity)
 
                 if(cellString.length() > 81)  // The newline char doesn't count in the 80 limit
                 {
-                    //std::cerr << "ERROR: Cell <" << xi << ", " << yi << ", " << zi << "> = " << mindx << " exceeded 80 characters" << std::endl;
                     m_failFlag = true;
                 }
 
@@ -193,22 +188,15 @@ std::string McnpWriter::generateDataCards(SourceParams *p)
     while(p->spectraIntensity[iEmax] <= 0 && iEmax < p->spectraIntensity.size())
         iEmax++;
 
-    //"SI1 H   0.01   0.045   0.1   0.2\n" +
-    //"SP1 D 0      1       0     0\n";
-
     std::string si = "SI1 H   &\n     ";
-    //for(int i = 0; i < p->spectraEnergyLimits.size(); i++)
-    //    si += std::to_string(p->spectraEnergyLimits[i]) + "  ";
     for(unsigned int i = p->spectraEnergyLimits.size()-1; i >= iEmax+1; i--)
           si += std::to_string(p->spectraEnergyLimits[i]/1e6) + " &\n     ";
-    si += std::to_string(p->spectraEnergyLimits[iEmax]/1e6) + " &\n";
-    //si += '\n';
+    si += std::to_string(p->spectraEnergyLimits[iEmax]/1e6) + " \n";
 
     std::string sp = "SP1 D &\n     0     \n     ";
     for(unsigned int i = p->spectraIntensity.size()-1; i >= iEmax+1; i--)
         sp += std::to_string(p->spectraIntensity[i]) + " &\n     ";
-    //sp += '\n';
-    sp += std::to_string(p->spectraIntensity[iEmax]) + " &\n";
+    sp += std::to_string(p->spectraIntensity[iEmax]) + " \n";
 
     dataString += si + sp;  //limit80Char(si) + limit80Char(sp);
 
@@ -236,20 +224,47 @@ std::string McnpWriter::generatePhantom19MaterialString()
     return allMatString;
 }
 
-std::string McnpWriter::generateMeshTally(Mesh *m)
+std::string McnpWriter::generateMeshTally(Mesh *m, SourceParams *p)
 {
+    unsigned int highestEnergy = 0;
+    bool keepGoing = true;
+
+    // Find the index of the highest non-zero group
+    while(keepGoing)
+    {
+        if(p->spectraIntensity[highestEnergy] <= 0)
+            highestEnergy++;
+        else
+            keepGoing = false;
+    }
+
+    std::string emeshunc = "EMESH ";
+    std::string eintsunc = "EINTS ";
+    std::string emeshcol = "EMESH ";
+    std::string eintscol = "EINTS ";
+
+    // Start at size() instead of the usual size()-1 because the limits vector is one element longer
+    //   than the intensity vector.
+    for(unsigned int ie = p->spectraIntensity.size(); ie >= highestEnergy; ie--)
+    {
+        emeshunc += std::to_string(p->spectraEnergyLimits[ie]/1e6) + " ";
+        eintsunc += "1 ";
+        emeshcol += std::to_string(p->spectraEnergyLimits[ie]/1e6) + " ";
+        eintscol += "1 ";
+    }
+
     std::string tallyString = std::string("FC4 Uncollided flux\n") +
             "FMESH4:p GEOM=REC ORIGIN=0 0 0 INC 0 \n     " +
             "IMESH " + std::to_string(m->xNodes[m->xNodeCt-1]) + " IINTS " + std::to_string(m->xElemCt) + "\n     " +
             "JMESH " + std::to_string(m->yNodes[m->yNodeCt-1]) + " JINTS " + std::to_string(m->yElemCt) + "\n     " +
             "KMESH " + std::to_string(m->zNodes[m->zNodeCt-1]) + " KINTS " + std::to_string(m->zElemCt) + "\n     " +
-            "EMESH .01 .045 .1 .2 EINTS 1 1 1 1\n" +
+            emeshunc + "\n     " + eintsunc + "\n" +
             "FC14 Collided flux\n" +
             "FMESH14:p GEOM=REC ORIGIN=0 0 0 INC 1 INFINITE \n     " +
             "IMESH " + std::to_string(m->xNodes[m->xNodeCt-1]) + " IINTS " + std::to_string(m->xElemCt) + "\n     " +
             "JMESH " + std::to_string(m->yNodes[m->yNodeCt-1]) + " JINTS " + std::to_string(m->yElemCt) + "\n     " +
             "KMESH " + std::to_string(m->zNodes[m->zNodeCt-1]) + " KINTS " + std::to_string(m->zElemCt) + "\n     " +
-            "EMESH .01 .045 .1 .2 EINTS 1 1 1 1\n" +
+            emeshcol + "\n     " + eintscol + "\n" +
             "UNC:p 0 65536r\n";
 
     return tallyString;
@@ -314,7 +329,7 @@ void McnpWriter::writeMcnp(std::string filename, Mesh *m, SourceParams *p, bool 
     fout << "\n";
     fout << generateDataCards(p);
     fout << generatePhantom19MaterialString();
-    fout << generateMeshTally(m);
+    fout << generateMeshTally(m, p);
 
     fout.close();
 }

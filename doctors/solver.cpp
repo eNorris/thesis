@@ -309,35 +309,16 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *, const Mesh *mes
                         break;
 
                     case 1: // Fan beam
-                        // Test theta rejection
-                        /*
-                        zetaTheta = acos(beamVectorZ) - acos(zcos);
-                        if(std::abs(zetaTheta) > theta/2)
-                        {
-                            //qDebug() << x << "," << y << "," << z << ":" << " acos(beam z)=" << acos(beamCenterZ) << "  zcos=" << acos(zcos) <<  "   |zetaTheta|=" << std::abs(zetaTheta) << "    theta/2=" << (theta/2);
-                            continue;
-                        }
-
-                        // Test phi rejection
-                        zetaPhi = acos(beamVectorX*xcos + beamVectorY*ycos)/(sqrt(beamVectorX*beamVectorX + beamVectorY*beamVectorY) * sqrt(xcos*xcos + ycos*ycos));
-                        if(std::abs(zetaPhi) > phi/2.0)
-                            continue;
-
-                        acceptance = 1.0;
-
-                        break;
-                        */
-
                     case 2: // Multifan
                         zetaTheta = acos(beamVectorZ) - acos(zcos);
-                        if(std::abs(zetaTheta) > theta/2)
+                        if(std::abs(zetaTheta) > theta/2.0)
                         {
                             //qDebug() << x << "," << y << "," << z << ":" << " acos(beam z)=" << acos(beamCenterZ) << "  zcos=" << acos(zcos) <<  "   |zetaTheta|=" << std::abs(zetaTheta) << "    theta/2=" << (theta/2);
                             continue;
                         }
 
                         // Test phi rejection
-                        zetaPhi = acos(beamVectorX*xcos + beamVectorY*ycos)/(sqrt(beamVectorX*beamVectorX + beamVectorY*beamVectorY) * sqrt(xcos*xcos + ycos*ycos));
+                        zetaPhi = acos((beamVectorX*xcos + beamVectorY*ycos)/(sqrt(beamVectorX*beamVectorX + beamVectorY*beamVectorY) * sqrt(xcos*xcos + ycos*ycos)));
                         if(std::abs(zetaPhi) > phi/2.0)
                             continue;
 
@@ -351,10 +332,12 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *, const Mesh *mes
                         {
                             continue;
                         }
+
+                        acceptance = 1.0;
                         break;
                     default:
                         std::cout << "This should never happen. basicRaytraceCPU got an illegal source type: " << srcPar->sourceType << std::endl;
-                    }
+                    } // End of switch
 
                     // Index of the boundary the particle is headed toward
                     unsigned int xBoundIndx = (xcos >= 0 ? xIndx+1 : xIndx);
