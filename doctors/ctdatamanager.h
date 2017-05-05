@@ -7,13 +7,17 @@
 #include "mesh.h"
 #include "quadrature.h"
 
+class CtMapDialog;
+
 class CtDataManager : public QObject
 {
     Q_OBJECT
 
 protected:
     bool m_valid;
+    Mesh *m_mesh;
     QMessageBox m_messageBox;
+    CtMapDialog *m_mapDialog;
 
 public:
     CtDataManager();
@@ -21,6 +25,7 @@ public:
 
     //Mesh *parse16(int xbins, int ybins, int zbins, std::string filename);
     Mesh *ctNumberToHumanPhantom(Mesh *mesh);
+    Mesh *ctNumberToWater(Mesh *mesh);
     Mesh *ctNumberToQuickCheck(Mesh *mesh);
 
 signals:
@@ -32,6 +37,10 @@ signals:
 
 public slots:
     void parse16(int xbins, int ybins, int zbins, QString filename);
+
+protected slots:
+    void onWater();
+    void onPhantom19();
 };
 
 #endif // CTDATAREADER_H

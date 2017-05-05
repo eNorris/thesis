@@ -63,7 +63,8 @@ SOURCES += main.cpp\
     cuda_kernels.cu \
     sourceparams.cpp \
     solverparams.cpp \
-    picturelabel.cpp
+    picturelabel.cpp \
+    ctmapdialog.cpp
 
 SOURCES -= cuda_kernels.cu \
            cuda_link.cu
@@ -97,7 +98,8 @@ HEADERS  += mainwindow.h \
     cuda_kernels.h \
     sourceparams.h \
     solverparams.h \
-    picturelabel.h
+    picturelabel.h \
+    ctmapdialog.h
 
 
 HEADERS -= cuda_link.h \
@@ -109,7 +111,8 @@ FORMS    += mainwindow.ui \
     gui/quaddialog.ui \
     gui/xsectiondialog.ui \
     solverparamsdialog.ui \
-    gui/energydialog.ui
+    gui/energydialog.ui \
+    ctmapdialog.ui
 
 # Cuda sources
 CUDA_SOURCES += cuda_kernels.cu \
