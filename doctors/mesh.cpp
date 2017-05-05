@@ -6,12 +6,13 @@
 
 #include <QDebug>
 
-Mesh::Mesh()
+Mesh::Mesh() : material(0)
 {
 
 }
 
-Mesh::Mesh(const Config *config, const Quadrature *quad)
+/*
+Mesh::Mesh(const Config *config, const Quadrature *quad) : material(0)
 {
     load(config, quad);
 }
@@ -20,6 +21,7 @@ void Mesh::load(const Config *config, const Quadrature *quad)
 {
     remesh(89, 99, -1, config, quad);
 }
+*/
 
 bool Mesh::insideBox(int x, int y, int z, int xmin, int xmax, int ymin, int ymax, int zmin, int zmax)
 {

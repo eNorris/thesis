@@ -17,7 +17,9 @@ class Mesh
 
 public:
     Mesh();
-    Mesh(const Config *config, const Quadrature *quad);
+    //Mesh(const Config *config, const Quadrature *quad);
+
+    int material;
 
     unsigned int xElemCt;
     unsigned int yElemCt;
@@ -57,7 +59,7 @@ public:
     float getMaxY() const {return m_maxY;}
     float getMaxZ() const {return m_maxZ;}
 
-    void load(const Config *config, const Quadrature *quad);
+    //void load(const Config *config, const Quadrature *quad);
 
     unsigned int voxelCount() const;
     int xjmp() const;
