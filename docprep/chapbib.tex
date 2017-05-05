@@ -24,13 +24,12 @@
 
  %% ... sample chapter ...
 
-This section is the literature review. I do these things.
-
-\section{Introduction}
-Many different things are required.
+This chapter summarizes the literature reviewed in preparation of this work. The literature review is split into multiple sections, each highlighting relevant works pertaining to a particular component or section of this work. The first sections cover introductory work and steps necessary for preprocessing data. Section~\ref{sec:discordlit} covers historical and recent work in discrete ordinate methodology, the methodology used by DOCTORS. The remaining sections cover GPU hardware and other implementation facets.
 
 \section{CT Dose Estimation}
-How is this done now?
+The dose a patient receives form both diagnostic CT procedures and radiation therapy is of great concern to the medical community [CITE]. 
+
+Monte Carlo codes have been used in the past to compute flux-to-dose conversion factors for a reference person [CITE ICRP].
 
 \section{CT Phantom Generation}
 The CT phantom is populated with CT numbers, also known as Hounsfield numbers. These values are related to the attenuation coefficient of the material represented by the voxel.
@@ -44,9 +43,9 @@ Another Schneider did some stuff too \citep{ref:schneiderw}. And Vanderstraeten 
 
 The new guy provides 19 materials. The density is measured.
 
-Two phantom datasets are used in this work.
+Two phantom datasets are used in this work [CITE].
 
-\section{Discrete Ordinates}
+\section{Discrete Ordinates}\label{sec:discordlit}
 Discrete ordinates are old. The book is \citet{ref:lewise}.
 
 The Exnihilo thing by \citet{ref:evanst}. And DeHart wrote in \citep{ref:dehartm}

@@ -366,8 +366,30 @@ Equation~\ref{eq:boltz_i4} can be directly solved for the volume averaged flux. 
 }
 \end{equation}
 
-\subsection{Convergence Criterial}
-It converges.
+\subsection{Convergence Criteria}
+The typical converence criteria used to determine whether or to terminate further iteration is the maximum relative error from the $i-1^{th}$ iteration to the $i^{th}$ iteration given in Eq.~\ref{eq:conv}. Once the relative error in the parameter of interest, $\phi$ is below some threshold, $\epsilon$, the iteration stops and the solution is considered converged.
+
+\begin{equation}\label{eq:conv}
+\frac{\phi_i - \phi_{i-1}}{\phi_i} < \epsilon
+\end{equation}
+
+In some problems, the convergence criteria given in Eq.~\ref{eq:conv} is not reached for many iterations. In these cases, terminating the solution early rather than waiting for full convergence is appropriate. This is enforced by a second criterial. Whenever the number of iterations, $i$, exceeds the total permissible number of iterations, $I$, the iteration is terminated.
+
+\begin{equation}\label{eq:conv2}
+i > I
+\end{equation}
+
+Under further investigation, the cause of the convergence failure that results in Eq.~\ref{eq:conv2} being exercised often stems from floating point error. The flux magnitude fluctuates wildly in regions of very flow flux, such as the gantry. In these regions, the relative uncertainty will remain much higher than in regions with smoother flux distributions. FIGURE XYZ SHOWS.
+
+In order to measure the uncertainty due to floating-point error, another convergence criteria was added. Rather than looking at the relative change from iteration to iteration, the total absolute change is measured, computed by Eq.~\ref{eq:conv3}. The termination criteria is given by Eq.~\ref{eq:conv4}. Computation of a value for $\epsilon$ requires two previous iteration, thus this condition cannot be met until the third iteration and thereafter.
+
+\begin{equation}\label{eq:conv3}
+\epsilon = \sum_{\vec{r}} |\phi_i - \phi_{i-1}|
+\end{equation}
+
+\begin{equation}\label{eq:conv4}
+\epsilon_i > \epsilon_{i-1}
+\end{equation}
 
 \subsection{Anisotropy Treatment}
 

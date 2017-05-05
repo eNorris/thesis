@@ -32,15 +32,26 @@ I concluded many things.
 
 \section{Future Work}
 
-The time
+A number of simple modifications to DOCTORS could be made that would greatly increase the code's usability and robustness. One of these modifications, generation of more refined group structures, is not a change to DOCTORS \textit{per se} but rather a change in the input cross section data. The other changes are additions to DOCTORS that would add new capabilities to the software.
+
+In addition to specific modifications, some additional, broader future goals can also be identified.
 
 \subsection{Group Structure}
 
-More refined group structure made for medical purpose.
+The cross section data currently used by DOCTORS are taken from SCALE6.2. While these cross sections have been found to be sufficient to produce flux distributions in medical CT imaging, a more refined group structure designed for medical applications would be worth investigation.
+
+This work can be done using either NJOY [CITE] or the newly released AMPX [CITE] code. Either code has the capability to collapse an ENDF formatted data file into a group structure of the user's choosing in the format DOCTORS reads.
+
+
+
+NJOY or AMPX.
 
 \subsection{Temporal Extension}
 
 Use 4D CT to do temporal stuff as well as spatial stuff.
+
+\subsection{Multileaf Collimation}
+Collimators!
 
 \endinput
 %%

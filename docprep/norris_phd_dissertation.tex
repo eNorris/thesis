@@ -9,6 +9,7 @@
 \usepackage{minted}
 \usepackage[noprefix]{nomencl}
 \usepackage{subcaption}
+\usepackage{xr}
 \makenomenclature
 \renewcommand{\nomgroup}[1]{
    \ifthenelse{\equal{#1}{A}}{\medskip \item \textbf{Roman}}{}%
@@ -88,6 +89,9 @@ And these funding agencies.
 
 \ThesisBodyChapter{Implementation}\input{chapimpl}
  % ... conclusions chapter ...
+
+\ThesisBodyChapter{Results}\input{chapresults} 
+ 
 \ThesisBodyChapter{Conclusions}\input{chapconc}
 
 \end{ThesisBody}
