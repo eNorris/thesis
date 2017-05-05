@@ -17,9 +17,12 @@ public:
     std::string generateSurfaceString(Mesh *m);
     std::string generateCellString(Mesh *m, bool fineDensity);
     std::string generateDataCards(SourceParams *p);
-    std::string generatePhantom19MaterialString();
+    std::string generateMaterialString(Mesh *m);
     std::string generateMeshTally(Mesh *m, SourceParams *xs);
     //std::string limit80Char(std::string s);
+
+    std::string generatePhantom19MaterialString();
+    std::string generateWaterMaterialString();
 
     void writeMcnp(std::string filename, Mesh *m, SourceParams *p, bool fineDensity);
 

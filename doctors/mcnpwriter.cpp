@@ -63,6 +63,8 @@ std::string McnpWriter::generateSurfaceString(Mesh *m)
         surfString += (zsurf(i) + " pz " + std::to_string(m->zNodes[i]) + '\n');
     }
 
+    surfString += "9     so 10000\n";
+
     return surfString;
 }
 
@@ -102,8 +104,8 @@ std::string McnpWriter::generateCellString(Mesh *m, bool fineDensity)
             {
                 unsigned int mindx = xi * m->yElemCt * m->zElemCt + yi * m->zElemCt + zi;
 
-                if(mindx == 208311)
-                    qDebug() << "stop";
+                //if(mindx == 208311)
+                //    qDebug() << "stop";
 
                 if(mindx >= m->zoneId.size())
                 {
@@ -154,7 +156,9 @@ std::string McnpWriter::generateCellString(Mesh *m, bool fineDensity)
                         xsurf(xi) + " -" + xsurf(xi+1) + " " +
                         ysurf(yi) + " -" + ysurf(yi+1) + " " +
                         zsurf(zi) + " -" + zsurf(zi+1) + " " +
-                        " imp:p=" + std::to_string(importance) + "  $ " + std::to_string(xi) + ", " + std::to_string(yi) + ", " + std::to_string(zi) + " \n";
+                        //" imp:p=" + std::to_string(importance) +
+                        " imp:p=1" +
+                        "  $ " + std::to_string(xi) + ", " + std::to_string(yi) + ", " + std::to_string(zi) + " \n";
 
                 if(cellString.length() > 81)  // The newline char doesn't count in the 80 limit
                 {
@@ -166,11 +170,13 @@ std::string McnpWriter::generateCellString(Mesh *m, bool fineDensity)
         }
     }
 
-    allCellString += std::string("99999999 0 ") +
-            " -" + xsurf(0) + ":" + xsurf(m->xNodeCt-1) +
+    allCellString += std::string("99999998 0 ") +
+            "(-" + xsurf(0) + ":" + xsurf(m->xNodeCt-1) +
             ":-" + ysurf(0) + ":" + ysurf(m->yNodeCt-1) +
             ":-" + zsurf(0) + ":" + zsurf(m->zNodeCt-1) +
-            " imp:p=0  $ Outside\n";
+            ") -9 imp:p=1  $ Void surrounding \n";
+
+    allCellString += std::string("99999999 0  9 imp:p=0  $ Outside\n");
 
     return allCellString;
 }
@@ -182,7 +188,80 @@ std::string McnpWriter::generateDataCards(SourceParams *p)
     dataString += "nps 1E7\n";
     dataString += "mode p\n";
 
-    dataString += "sdef par=p pos=" + std::to_string(p->sourceX) + " " + std::to_string(p->sourceY) + " " + std::to_string(p->sourceZ) + " erg=d1\n";
+    float vx, vy, vz, vmag, dx, dy;
+    float fx = 25.0,
+          fy = 25.0,
+          fz = 6.5;
+    const float PI = 3.14159265359;
+    float ttheta;
+    float theta = p->sourceTheta;
+    if(p->degrees)
+        theta *= (PI/180);
+
+    switch(p->sourceType)
+    {
+    case 0:  // Point source
+        dataString += "sdef par=p pos=" + std::to_string(p->sourceX) + " " + std::to_string(p->sourceY) + " " + std::to_string(p->sourceZ) + " erg=d1\n";
+        break;
+
+    case 1: // Fan beam
+    case 2: // Multifan
+        break;
+
+    case 3: // Cone beam
+        vx = fx - p->sourceX;
+        vy = fy - p->sourceY;
+        vz = fz - p->sourceZ;
+        vmag = sqrt(vx*vx + vy*vy + vz*vz);
+        vx /= vmag;
+        vy /= vmag;
+        vz /= vmag;
+        dataString += "sdef par=p \n     pos=" + std::to_string(p->sourceX) + " " + std::to_string(p->sourceY) + " " + std::to_string(p->sourceZ) +
+                "\n     erg=d1\n     vec="+ std::to_string(vx) + " " + std::to_string(vy) + " " + std::to_string(vz) +
+                "\n     dir=d2" +
+                "\nsi2 -1 " + std::to_string(cos(theta)) + " 1" +
+                "\nsp2 0 " + std::to_string(.5 + cos(theta)/2) + " " + std::to_string(.5 - cos(theta)/2) +
+                "\nsb2 0 0 1\n";
+        break;
+    case 4: // Multicone
+        vx = fx - p->sourceX;
+        vy = fy - p->sourceY;
+        vz = fz - p->sourceZ;
+        vmag = sqrt(vx*vx + vy*vy + vz*vz);
+        vx /= vmag;
+        vy /= vmag;
+        vz /= vmag;
+        dataString += "sdef par=p \n     pos=" +
+                std::to_string(p->sourceX) + " " + std::to_string(p->sourceY) + " " + std::to_string(p->sourceZ) +
+                "\n     vec="+ std::to_string(vx) + " " + std::to_string(vy) + " " + std::to_string(vz) +
+                "\n     erg=d1 dir=d2 TR=d4" +
+                "\nsi2 -1 " + std::to_string(cos(theta)) + " 1" +
+                "\nsp2 0 " + std::to_string(.5 + cos(theta)/2) + " " + std::to_string(.5 - cos(theta)/2) +
+                "\nsb2 0 0 1\nsi4 L ";
+        for(int i = 1; i <= p->sourceN; i++)
+            dataString += std::to_string(i) + " ";
+        dataString += "\nsp4 D ";
+        for(int i = 1; i <= p->sourceN; i++)
+            dataString += "1 ";
+        dataString += "\nsb4 D ";
+        for(int i = 1; i <= p->sourceN; i++)
+            dataString += "1 ";
+        dataString += "\nTR1 0 0 0\n";
+
+        for(int i = 1; i < p->sourceN; i++)
+        {
+            ttheta = 2*PI * i/p->sourceN;
+            dx = (p->sourceX-fx)*cos(ttheta) - (p->sourceY-fy)*sin(ttheta) + fx - p->sourceX*cos(ttheta) + p->sourceY*sin(ttheta);  //fx - fx*cos(ttheta) - fy*sin(ttheta);
+            dy = (p->sourceX-fx)*sin(ttheta) + (p->sourceY-fy)*cos(ttheta) + fy - p->sourceX*sin(ttheta) - p->sourceY*cos(ttheta);
+            dataString += "TR" + std::to_string(i+1) + " " + std::to_string(dx) + " " + std::to_string(dy) + " 0 " +
+                    std::to_string(cos(ttheta)) + " " + std::to_string(cos(PI/2-ttheta)) + " 0   " +
+                    std::to_string(cos(PI/2+ttheta)) + " " + std::to_string(cos(ttheta)) + " 0   0 0 1\n";
+        }
+
+        break;
+    default:
+        dataString += "sdef\n";
+    }
 
     unsigned iEmax = 0;
     while(p->spectraIntensity[iEmax] <= 0 && iEmax < p->spectraIntensity.size())
@@ -203,9 +282,29 @@ std::string McnpWriter::generateDataCards(SourceParams *p)
     return dataString;
 }
 
-std::string McnpWriter::generatePhantom19MaterialString()
+std::string McnpWriter::generateMaterialString(Mesh *m)
 {
     std::string allMatString = "c ---------- Materials ----------\n";
+
+    if(m->material == MaterialUtils::HOUNSFIELD19)
+    {
+        allMatString += generatePhantom19MaterialString();
+    }
+    else if(m->material == MaterialUtils::WATER)
+    {
+        allMatString += generateWaterMaterialString();
+    }
+    else
+    {
+        qDebug() << "Mesh material id unknown: " << m->material;
+    }
+
+    return allMatString;
+}
+
+std::string McnpWriter::generatePhantom19MaterialString()
+{
+    std::string allMatString = "";
 
     for(unsigned int mid = 0; mid < MaterialUtils::hounsfieldRangePhantom19.size(); mid++)
     {
@@ -216,6 +315,27 @@ std::string McnpWriter::generatePhantom19MaterialString()
         {
             if(MaterialUtils::hounsfieldRangePhantom19Weights[mid][zindx] > 0)
                 matString += "     " + std::to_string(MaterialUtils::hounsfieldRangePhantom19Elements[zindx]) + "000 " + std::to_string(atomFractions[zindx]) + "\n";
+        }
+
+        allMatString += matString;
+    }
+
+    return allMatString;
+}
+
+std::string McnpWriter::generateWaterMaterialString()
+{
+    std::string allMatString = "";
+
+    for(unsigned int mid = 0; mid < MaterialUtils::water.size(); mid++)
+    {
+        std::vector<float> atomFractions = MaterialUtils::weightFracToAtomFrac(MaterialUtils::waterElements, MaterialUtils::waterWeights[mid]);
+        std::string matString = "m" + std::to_string(mid+1) + " \n";
+
+        for(unsigned int zindx = 0; zindx < MaterialUtils::waterElements.size(); zindx++)
+        {
+            if(MaterialUtils::waterWeights[mid][zindx] > 0)
+                matString += "     " + std::to_string(MaterialUtils::waterElements[zindx]) + "000 " + std::to_string(atomFractions[zindx]) + "\n";
         }
 
         allMatString += matString;
@@ -265,7 +385,7 @@ std::string McnpWriter::generateMeshTally(Mesh *m, SourceParams *p)
             "JMESH " + std::to_string(m->yNodes[m->yNodeCt-1]) + " JINTS " + std::to_string(m->yElemCt) + "\n     " +
             "KMESH " + std::to_string(m->zNodes[m->zNodeCt-1]) + " KINTS " + std::to_string(m->zElemCt) + "\n     " +
             emeshcol + "\n     " + eintscol + "\n" +
-            "UNC:p 0 65536r\n";
+            "UNC:p 0 " + std::to_string(m->voxelCount()+1) + "r\n";
 
     return tallyString;
 }
@@ -328,7 +448,7 @@ void McnpWriter::writeMcnp(std::string filename, Mesh *m, SourceParams *p, bool 
     fout << generateSurfaceString(m);
     fout << "\n";
     fout << generateDataCards(p);
-    fout << generatePhantom19MaterialString();
+    fout << generateMaterialString(m);
     fout << generateMeshTally(m, p);
 
     fout.close();
