@@ -133,18 +133,15 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *, const Mesh *mes
     switch(srcPar->sourceType)
     {
     case 0:  // Isotropic
-        sx.push_back(static_cast<RAY_T>(srcPar->sourceX));
-        sy.push_back(static_cast<RAY_T>(srcPar->sourceY));
-        sz.push_back(static_cast<RAY_T>(srcPar->sourceZ));
-        break;
-
     case 1:  // Fan
+    case 3:  // Cone
         sx.push_back(static_cast<RAY_T>(srcPar->sourceX));
         sy.push_back(static_cast<RAY_T>(srcPar->sourceY));
         sz.push_back(static_cast<RAY_T>(srcPar->sourceZ));
         break;
 
     case 2:  // Multifan
+    case 4:  // Multicone
         sx.push_back(static_cast<RAY_T>(srcPar->sourceX));
         sy.push_back(static_cast<RAY_T>(srcPar->sourceY));
         sz.push_back(static_cast<RAY_T>(srcPar->sourceZ));
@@ -161,18 +158,6 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *, const Mesh *mes
         }
 
         sourceCt = srcPar->sourceN;
-        break;
-
-    case 3:  // Cone
-        sx.push_back(static_cast<RAY_T>(srcPar->sourceX));
-        sy.push_back(static_cast<RAY_T>(srcPar->sourceY));
-        sz.push_back(static_cast<RAY_T>(srcPar->sourceZ));
-        break;
-
-    case 4:  // Multicone
-        sx.push_back(static_cast<RAY_T>(srcPar->sourceX));
-        sy.push_back(static_cast<RAY_T>(srcPar->sourceY));
-        sz.push_back(static_cast<RAY_T>(srcPar->sourceZ));
         break;
 
     default:

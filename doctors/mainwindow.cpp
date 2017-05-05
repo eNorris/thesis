@@ -322,24 +322,6 @@ void MainWindow::on_geometryOpenPushButton_clicked()
         QString errmsg = "Only (16 bit) unsigned binaries are currently supported";
         QMessageBox::warning(NULL, "Not Supported", errmsg, QMessageBox::Close);
     }
-
-    /*
-    if(m_mesh == NULL)
-    {
-        m_geomLoaded = false;
-        updateLaunchButton();
-        return;
-    }
-
-    //OutWriter::writeArray("/media/Storage/thesis/mcnp.gitignore/ctdensity.dat", m_mesh->density);
-
-    //qDebug() << "Here the zslice = " << m_mesh->zElemCt;
-    geomDialog->updateMesh(m_mesh);
-    outputDialog->updateMesh(m_mesh);
-    m_geomLoaded = true;
-
-    updateLaunchButton();
-    */
 }
 
 void MainWindow::updateLaunchButton()
