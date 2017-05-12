@@ -141,6 +141,11 @@
          <string>CT (19)</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>Uniform</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item>

@@ -9,7 +9,7 @@
 #include "xs_reader/ampxparser.h"
 #include "materialutils.h"
 
-XSection::XSection() : m_groups(0), m_matsLoaded(0)
+XSection::XSection() : m_elements(NULL), m_weights(NULL), m_groups(0), m_matsLoaded(0)
 {
 
 }
@@ -98,6 +98,13 @@ bool XSection::allocateMemory(const unsigned int materialCount, const unsigned i
     }
 
     return true;
+}
+
+bool XSection::allocateMemory(const unsigned int groupCount, const unsigned int pn)
+{
+    if(m_elements == NULL || m_weights == NULL)
+        return false;
+    return allocateMemory(m_elements->size()+1, groupCount, pn);
 }
 
 bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &w, const AmpxParser *p)
@@ -300,3 +307,39 @@ bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &
     return true;
 }
 
+bool XSection::addAll(AmpxParser *parser){
+
+    if(m_elements == NULL || m_weights == NULL)
+        return false;
+
+    bool allPassed = true;
+
+    // Add the materials to the xs library
+    for(unsigned int i = 0; i < m_elements->size(); i++)
+        if(allPassed)
+            allPassed &= addMaterial(*m_elements, (*m_weights)[i], parser);
+
+    // The last material is empty and should never be used
+    if(allPassed)
+        allPassed &= addMaterial(std::vector<int>{}, std::vector<float>{}, parser);
+
+    return allPassed;
+}
+
+bool XSection::setElements(const std::vector<int> &elem, const std::vector<std::vector<float> > &wt)
+{
+    for(unsigned int i = 0; i < elem.size(); i++)
+    {
+        if(elem.size() != wt[i].size())
+        {
+            QString errmsg = QString("setElements faild due to a size mismatch");
+            QMessageBox::warning(NULL, "Internal Error", errmsg, QMessageBox::Close);
+            return false;
+        }
+    }
+
+    m_elements = &elem;
+    m_weights = &wt;
+
+    return true;
+}

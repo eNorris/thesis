@@ -593,9 +593,29 @@ bool MainWindow::buildMaterials(AmpxParser *parser)
 {
     //qDebug() << "Generating materials";
 
-    // One extra material for the empty material at the end (1u is unsigned 1.0)
-    m_xs->allocateMemory(static_cast<const unsigned int>(MaterialUtils::hounsfieldRangePhantom19.size()) + 1, parser->getGammaEnergyGroups(), m_pn);
+    switch(m_mesh->material)
+    {
+    case MaterialUtils::HOUNSFIELD19:
+        m_xs->setElements(MaterialUtils::hounsfieldRangePhantom19Elements, MaterialUtils::hounsfieldRangePhantom19Weights);
+        break;
+    case MaterialUtils::WATER:
+        m_xs->setElements(MaterialUtils::waterElements, MaterialUtils::waterWeights);
+        break;
+    default:
+        QString errmsg = QString("Material map ") + QString::number(m_mesh->material) + " was not found in the MaterialUtil database";
+        QMessageBox::warning(NULL, "Internal Error", errmsg, QMessageBox::Close);
+        return false;
+    }
 
+    if(!m_xs->allocateMemory(parser->getGammaEnergyGroups(), m_pn))
+        return false;
+
+    return m_xs->addAll(parser);
+
+    // One extra material for the empty material at the end
+    //m_xs->allocateMemory(static_cast<const unsigned int>(MaterialUtils::hounsfieldRangePhantom19.size()) + 1, parser->getGammaEnergyGroups(), m_pn);
+
+    /*
     bool allPassed = true;
 
     // Add the materials to the xs library
@@ -606,8 +626,9 @@ bool MainWindow::buildMaterials(AmpxParser *parser)
     // The last material is empty and should never be used
     if(allPassed)
         allPassed &= m_xs->addMaterial(std::vector<int>{}, std::vector<float>{}, parser);
+        */
 
-    return allPassed;
+    //return allPassed;
 }
 
 void MainWindow::meshParseUpdateHandler(int x)
@@ -624,6 +645,10 @@ void MainWindow::meshParseFinished(Mesh *mesh)
     {
         m_geomLoaded = false;
         updateLaunchButton();
+
+        QString errmsg = QString("Could not load geometry. See debug log.");
+        QMessageBox::warning(this, "Invalid Geometry", errmsg, QMessageBox::Close);
+
         return;
     }
 

@@ -18,6 +18,9 @@ public:
     std::vector<float> m_tot1d;
     std::vector<float> m_scat1d;
 
+    const std::vector<int> *m_elements;
+    const std::vector<std::vector<float> > *m_weights;
+
     XSection();
     ~XSection();
 
@@ -28,7 +31,11 @@ public:
     float scatxs2d(const int matid, const int gSource, const int gSink, const int n) const;
 
     bool allocateMemory(const unsigned int materialCount, const unsigned int groupCount, const unsigned int PnCount);
+    bool allocateMemory(const unsigned int groupCount, const unsigned int PnCount);
     bool addMaterial(const std::vector<int> &z, const std::vector<float> &w, const AmpxParser *p);
+    bool addAll(AmpxParser *parser);
+
+    bool setElements(const std::vector<int> &elem, const std::vector<std::vector<float> > &wt);
 
 private:
     int m_groups;

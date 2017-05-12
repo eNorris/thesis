@@ -337,6 +337,12 @@ void EnergyDialog::on_energyPresetComboBox_activated(int indx)
         old = m_rects[m_rects.size()-2]->rect();
         m_rects[m_rects.size()-2]->setRect(old.x(), old.y(), old.width(), 1);
         break;
+    case 2:
+        for(unsigned int i = 0; i < m_rects.size(); i++)
+        {
+            old = m_rects[i]->rect();
+            m_rects[i]->setRect(old.x(), old.y(), old.width(), 1);
+        }
     default:
         qDebug() << "Preset #" << indx << " is not recognized";
     }

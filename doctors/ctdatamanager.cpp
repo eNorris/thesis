@@ -193,35 +193,52 @@ Mesh *CtDataManager::ctNumberToWater(Mesh *mesh)
     std::vector<float> atomPerG;
     std::vector<std::vector<float> > waterFractions;
 
+    // Check the size of the material vector
+    if(MaterialUtils::water.size() != MaterialUtils::waterWeights.size())
+    {
+        qDebug() << "Water vectors mismatched: water: " << MaterialUtils::water.size() << ",  weight: " << MaterialUtils::waterWeights.size();
+        return NULL;
+    }
+
+    for(unsigned int i = 0; i < MaterialUtils::waterWeights.size(); i++)
+    {
+        if(MaterialUtils::waterWeights[i].size() != MaterialUtils::waterElements.size())
+        {
+            qDebug() << "Water weight vector mismatched: weight[i]: " << MaterialUtils::waterWeights[i].size()
+                     << ",  elements: " << MaterialUtils::waterElements.size() << " @ index " << i;
+            return NULL;
+        }
+    }
+
     // Convert the weight fractions to atom fractions for each material
-    for(unsigned int i = 0; i < MaterialUtils::water.size(); i++)
+    for(unsigned int i = 0; i < MaterialUtils::waterElements.size(); i++)
         waterFractions.push_back(MaterialUtils::weightFracToAtomFrac(MaterialUtils::waterElements, MaterialUtils::waterWeights[i]));
 
     // Convert atom fraction to atom density for each material
     for(unsigned int i = 0; i < MaterialUtils::water.size(); i++)
         atomPerG.push_back(MaterialUtils::atomsPerGram(MaterialUtils::waterElements, waterFractions[i]));
 
-    int offset = 1000;
+    const int offset = 1024;
     for(unsigned int i = 0; i < mesh->voxelCount(); i++)
     {
+        if(mesh->ct[i] > 65500) // Artifact
+            mesh->ct[i] = 0;
+
         // Raw data minus offset
         int ctv = mesh->ct[i] - offset;  // Underlying data is 0-2500 instead of -1000-1500
 
         // Determine the density (atom density is after the zoneId calculation)
-        if(ctv <= 55)
+        if(ctv <= -66)
         {
-            if(ctv <= -1000)
-            {
-                mesh->density[i] = 0.001225f;
-            }
-            else
-            {
-                mesh->density[i] = 0.0010186f * ctv + 1.013812f;
-            }
+            mesh->density[i] = 0.001225f;
+        }
+        else if(ctv <= 60)
+        {
+            mesh->density[i] = 1.0f;
         }
         else
         {
-            mesh->density[i] = 0.000578402f * ctv + 1.103187f;
+            mesh->density[i] = 1.1f;
         }
 
         // Determine the material
@@ -240,17 +257,13 @@ Mesh *CtDataManager::ctNumberToWater(Mesh *mesh)
             qDebug() << "EXPLODE!";
         }
 
-        if(mesh->zoneId[i] == 0)
-        {
-            mesh->density[i] = 0.001225f;  // force air density because it is very sensitive to miscalibrations
-        }
-
+        //float appg = atomPerG[mesh->zoneId[i]];
         mesh->atomDensity[i] = mesh->density[i] * atomPerG[mesh->zoneId[i]] * 1.0E-24f;  // g/cc * @/g * cm^2/b = @/cm-b
 
-        if(mesh->atomDensity[i] <= 1.0E-10f)
-        {
-            qDebug() << "Got zero density";
-        }
+        //if(mesh->atomDensity[i] <= 1.0E-10f)
+        //{
+        //    qDebug() << "Got zero density";
+        //}
     }
 
     return mesh;

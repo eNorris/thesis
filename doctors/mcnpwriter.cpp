@@ -141,15 +141,15 @@ std::string McnpWriter::generateCellString(Mesh *m, bool fineDensity)
                     matstr = std::to_string(m->zoneId[mindx]+1) + " " + std::to_string(atmden);
                 }
 
-                int importance = 1;
+                //int importance = 1;
                 float dx = m->xNodes[xi] + m->xNodes[xi+1];
                 float dy = m->yNodes[yi] + m->yNodes[yi+1];
                 float dz = m->zNodes[zi] + m->zNodes[zi+1];
                 float dist = sqrt(dx*dx + dy*dy + dz*dz);
-                float r2 = dist*dist;
-                if(r2 < 1.0)
-                    r2 = 1.0;
-                importance = r2;
+                //float r2 = dist*dist;
+                //if(r2 < 1.0)
+                //    r2 = 1.0;
+                //importance = r2;
 
                 // Increment zoneId by 1 because 0 is not legal for MCNP
                 std::string cellString = padFourDigitsSpace(mindx+1) + " " + matstr + " " +
@@ -346,7 +346,7 @@ std::string McnpWriter::generateWaterMaterialString()
 
 std::string McnpWriter::generateMeshTally(Mesh *m, SourceParams *p)
 {
-    unsigned int highestEnergy = 0;
+    int highestEnergy = 0;
     bool keepGoing = true;
 
     // Find the index of the highest non-zero group
@@ -365,7 +365,7 @@ std::string McnpWriter::generateMeshTally(Mesh *m, SourceParams *p)
 
     // Start at size() instead of the usual size()-1 because the limits vector is one element longer
     //   than the intensity vector.
-    for(unsigned int ie = p->spectraIntensity.size(); ie >= highestEnergy; ie--)
+    for(int ie = (signed) p->spectraIntensity.size(); ie >= highestEnergy; ie--)
     {
         emeshunc += std::to_string(p->spectraEnergyLimits[ie]/1e6) + " ";
         eintsunc += "1 ";

@@ -551,9 +551,10 @@ const std::vector<std::vector<float> > MaterialUtils::hounsfieldRangePhantom19We
 };
 
 const std::vector<int> MaterialUtils::water{
-    -950,     // 1 - air
-    300,        // 2 - water
-    1000000,  // 3
+    -66,     // 1 - air
+    60,      // 2 - water
+    150,     // 3 - Container
+    1000000, // 4 - VOID
 };
 
 const std::vector<int> MaterialUtils::waterElements{
@@ -566,6 +567,7 @@ const std::vector<int> MaterialUtils::waterElements{
 const std::vector<std::vector<float> > MaterialUtils::waterWeights{
     std::vector<float> {0.000f, 0.755f, 0.232f, 0.013f}, // Air
     std::vector<float> {0.112f, 0.888f, 0.000f, 0.000f}, // Water
+    std::vector<float> {0.112f, 0.888f, 0.000f, 0.000f}, // Container
     std::vector<float> {1.000f, 0.000f, 0.000f, 0.000f}  // Empty 20
 };
 
@@ -606,7 +608,7 @@ float MaterialUtils::atomsPerGram(std::vector<int> elementZ, std::vector<float> 
 {
     if(elementZ.size() != atomFractions.size())
     {
-        qDebug() << "MaterialUtils::atomsPerGram(): 589: vector sizes don't match!";
+        qDebug() << "vector sizes don't match!";
     }
 
     float s = 0.0f;
@@ -614,20 +616,18 @@ float MaterialUtils::atomsPerGram(std::vector<int> elementZ, std::vector<float> 
         s += atomFractions[i];
     if(fabs(s - 1.0) > 1E-6)
     {
-        qDebug() << "MaterialUtils::atomsPerGram(): 598: atom fractions didn't add to 1.0, they added to " << s;
+        qDebug() << "atom fractions didn't add to 1.0, they added to " << s;
     }
 
     float gpm = 0.0f;
 
-    for(unsigned int i = 0; i < atomFractions.size(); i++)
+    for(unsigned int i = 0; i < elementZ.size(); i++)
     {
         //float tstgpm = MaterialUtils::atomicMass[elementZ[i]-1] * atomFractions[i];
         gpm += MaterialUtils::atomicMass[elementZ[i]-1] * atomFractions[i];  // grams per mol
     }
 
     return MaterialUtils::AVOGADRO / gpm;
-    //float gpa = gpm / MaterialUtils::AVOGADRO;  // grams per atom
-    //return 1.0f/gpa;  // atoms per gram
 }
 
 bool MaterialUtils::validate()
@@ -687,29 +687,6 @@ bool MaterialUtils::validate()
     return true;
 
 }
-
-/*
-void MaterialUtils::hounsfieldRangePhantom19ZaidFract(std::vector<std::vector<int> > &zaids, std::vector<std::vector<float> > &fracts, )
-{
-    if(zaids.size() != 0 || fracts.size() != 0)
-    {
-        std::cerr << "MaterialUtils::hounsfieldRangePhantom19ZaidFract(): 675: the vectors are not initially empty!" << std::endl;
-    }
-
-    for(int mid = 0; mid < hounsfieldRangePhantom19.size(); mid++) // Iterate through all materials
-    {
-        std::vector<int> zaid;
-        std::vector<float> fract;
-
-        std::vector<float> zFract = weightFracToAtomFrac(hounsfieldRangePhantom19Elements, hounsfieldRangePhantom19Weights[mid]);
-
-        for(int zindx = 0; zindx < hounsfieldRangePhantom19Elements.size(); zindx++)
-        {
-
-        }
-    }
-}
-*/
 
 
 
