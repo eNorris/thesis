@@ -1,8 +1,10 @@
 import numpy
 import matplotlib
 import matplotlib.pyplot as pyplot
+import matplotlib.font_manager
 
 __author__ = 'etnc6d'
+
 
 def parse(filename):
     with open(filename, 'rb') as f:
@@ -10,17 +12,18 @@ def parse(filename):
 
         return a
 
+
 def write(filename, mtrx):
     print("Writing a matrix of size: " + str(mtrx.shape))
     with open(filename, 'wb') as f:
         f.write(mtrx.tobytes())
-        #numpy.ndarray.tofile(f, "")
 
-def simplify(mtrx):
-    outmtrx = numpy.zeros((16, 64, 64), dtype=numpy.uint16)
 
-    print(outmtrx.shape)
-    print(mtrx.shape)
+def simplify(matrix):
+    out_matrix = numpy.zeros((16, 64, 64))  # , dtype=numpy.uint16)  # Setting the dtype is required for saving
+
+    # print(out_matrix.shape)
+    # print(matrix.shape)
 
     for ox in range(64):
         for oy in range(64):
@@ -29,26 +32,30 @@ def simplify(mtrx):
                 for ix in range(4):
                     for iy in range(4):
                         for iz in range(4):
-                            v += mtrx[4*oz+iz, 4*oy+iy, 4*ox+ix]
-                outmtrx[oz, oy, ox] = v / (4*4*4)
+                            v += matrix[4*oz+iz, 4*oy+iy, 4*ox+ix]
+                out_matrix[oz, oy, ox] = v / (4*4*4)
 
-    return outmtrx
+    return out_matrix
 
+# Set the font
 font = {'family': 'Times New Roman', 'size': 16}
 matplotlib.rc('font', **font)
 
+# Fixes issue where Times New Roman is bold by default
+del matplotlib.font_manager.weight_dict['roman']
+matplotlib.font_manager._rebuild()
+
 mtrx = parse("/media/Storage/thesis/doctors/data/water35_volume.bin")
-
-
-#mtrx[mtrx > 256] = 256
-
 
 print("Size should be: " + str(256*256*64))
 print(mtrx.shape)
 
-#mtrx[mtrx==65535] = 0
-artifact_count = sum([1 if x>=65500 else 0 for x in mtrx])
-mtrx[:] = [0 if x>=65500 else x for x in mtrx]
+artifact_count = sum([1 if x >= 65500 else 0 for x in mtrx])
+mtrx[:] = [0 if x >= 65500 else x for x in mtrx]
+
+offset = 1024
+mtrx = [x-offset for x in mtrx]
+
 print("Artifacts: " + str(artifact_count))
 '''
 air_count = sum([1 if x < 67 else 0 for x in mtrx])
@@ -70,23 +77,23 @@ print("Artifacts: " + str(arti_count/total))
 totalfound = air_count + arti_count + water_count + cont_count
 print("Total identified: " + str(totalfound/total))
 '''
-hist, bin_edges = numpy.histogram(mtrx, 250)
+
+hist, bin_edges = numpy.histogram(mtrx, 256)
 hx = numpy.repeat(bin_edges, 2)
 hx = hx[1:-1]
 hy = numpy.repeat(hist, 2)
-#hx = [bin_edges[0], numpy.repeat(bin_edges[1:-1], 2), bin_edges[-1]]
-#hy = [h, h for h in hist]
 
 pyplot.figure()
 pyplot.plot(hx, hy)
 pyplot.xlabel('CT Number')
 pyplot.ylabel('Frequency')
+pyplot.hold(True)
+pyplot.plot([0, 0], [0, pyplot.ylim()[1]], 'k--')
 
 pyplot.figure()
-pyplot.semilogy(hx, hy)
+pyplot.semilogy(hx, hy, [0, 0], [1, 1e6], 'k--')
 pyplot.xlabel('CT Number')
 pyplot.ylabel('Frequency')
-#pyplot.title("Histogram")
 
 mtrx = numpy.reshape(mtrx, (64, 256, 256))
 smp = simplify(mtrx)
@@ -145,10 +152,10 @@ pyplot.ylabel('$y$ index')
 pyplot.title("Simplified XY")
 '''
 
-slice = mtrx[32, :, :]
-lineout = slice[:, 120]
+matrix_slice = mtrx[32, :, :]
+line_out = matrix_slice[:, 120]
 pyplot.figure()
-pyplot.plot(lineout)
+pyplot.plot(line_out)
 pyplot.xlim([0, 255])
 pyplot.xlabel('x')
 pyplot.ylabel('Intensity')
