@@ -21,24 +21,25 @@
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
 
+This chapter summarizes the solution methodology employed by DOCTORS. The techniques used to compute the collided and uncollided fluxes are described in seperate sections. After the flux methodology is explained, the methods used for source generation and covered as well as the flux to dose conversion.
 
-\section{Mathmatic Development}
+\section{Collided Solution Methods}
 
-Where does this text go?
+The discrete ordinate solver computes the collided flux distribution inside the CT mesh given an input uncollided flux, physical geometry information, and other associated solver parameters such as quadrature and energy discretization.
 
 \subsection{The Boltzmann Equation}
 
-The time dependent gamma transport equation can be written as
+The time dependent gamma transport equation is
 
 \begin{equation} \label{eq:boltz_t_dep}
 \begin{split}
-	&\left[ \frac{1}{v(E)} \frac{\partial}{\partial t} + \hat{\Omega} \cdot \nabla + \Sigma_t(\boldsymbol{r}, E, t) \right]
+	&\left[ \frac{1}{v(\boldsymbol{r}), t} \frac{\partial}{\partial t} + \hat{\Omega} \cdot \nabla + \Sigma_t(\boldsymbol{r}, E, t) \right]
 	\psi(\boldsymbol{r}, E, \hat{\Omega}, t) = \\
 	&\int_{4 \pi} \int_0^\infty \Sigma_s(\boldsymbol{r}, E' \rightarrow E, \hat{\Omega}' \rightarrow \hat{\Omega}, t) \psi(\boldsymbol{r}, E', \hat{\Omega}', t) dE' d\hat{\Omega}' + S(\boldsymbol{r}, E, \hat{\Omega}, t)
 \end{split}
 \end{equation}
 
-However, we are typically not concerned with the transient case in medical diagnostic imaging. We are more interested in the steady state case. The time independent form of Eq. \ref{eq:boltz_t_dep} is written as
+where $v$ is the velocity of the photon in the medium at $\boldsymbol{r}$, $\Sigma_t$ is the total macroscopic cross section, $\Sigma_s$ is the macroscopic scattering cross section, $S$ is an external photon source, and $\phi$ is the total photon angular flux. However, the transient case is not typically of interest in medical diagnostic imaging, rather the steady state is more important. The time dependence in Eq. \ref{eq:boltz_t_dep} is removed to yield
 
 \begin{equation} \label{eq:boltz}
 \begin{split}
@@ -48,12 +49,10 @@ However, we are typically not concerned with the transient case in medical diagn
 \end{split}
 \end{equation}
 
-The following sections show how Eq.~\ref{eq:boltz} is discretized.
+The following sections show how Eq.~\ref{eq:boltz} is discretized and solved computationally.
 
 \subsection{Angular Discretization}
-The coordinate system used in DOCTORS is shown in Fig.~\ref{fig:coord_sys}. A discrete set of $N_a$ angles ($\Omega_{a} \quad a = 0 \ldots N_a-1$) is selected to represent continuous directional space. Particles are transported only along these discrete directions form one voxel to adjacent voxels.
-
-The rotation symmetrical quadrature is implemented in DOCTORS. There are many different quadrature sets, the rotation symmetrical quadratures were selected because they are easy to implement, rotationally symmetric, and the most commonly used in production discrete ordinate solvers. This enables simple, direct comparison to other solvers. Arbitrary quadratures are permissible in a plain text file supplied by the user enabling other quadratures.
+The coordinate system used in DOCTORS is shown in Fig.~\ref{fig:coord_sys}. A discrete set of $N_a$ angles ($\Omega_{a}, \quad a = 0 \ldots N_a-1$) is selected to represent continuous directional space. Particles are transported only along these discrete directions from one voxel to adjacent voxels.
 
 \begin{figure}[tb]
   \begin{center}
@@ -61,7 +60,31 @@ The rotation symmetrical quadrature is implemented in DOCTORS. There are many di
   \end{center}
   \caption{The coordinate system used in DOCTORS. Given an arbitrary direction, $\Omega$, $\mu$, $\eta$, and $\xi$ are its direction cosines with respect to the $x$, $y$, and $z$ axes respectively. $\varphi$ is the azimuthal angle (with respect to $x$ and the d $\theta$ is the polar angle (with respect to $z$).}
 \label{fig:coord_sys}
-\end{figure}%
+\end{figure}
+
+The rotation symmetrical quadrature is implemented in DOCTORS. There are many different quadrature sets, the rotation symmetrical quadratures were selected because they are easy to implement, rotationally symmetric, and the most commonly used in production discrete ordinate solvers. This enables simple, direct comparison to other solvers. Arbitrary quadratures are permissible in a plain text file supplied by the user enabling other quadratures.
+
+The plain text file should be formatted such that it contains four columns similar to Table~\ref{tab:quad_format} (without any headings). No checks are performed to ensure that octants are covered, this allows simple testing quadratures that utilize only a single direction to be used for testing purposes. Values for $\mu$, $\eta$, and $\xi$ do not necessarily need to add to unity, they will be automatically normalized by DOCTORS. Likewise, the weights will be normalized such that their summation is unity.
+
+\begin{table}[ht]
+\caption{User Defined Quadrature Format}
+\centering 
+\begin{tabular}{c c c c}
+\hline \hline   
+$\mu$    & $\eta$ & $\xi$ & Weight\\ [0.5ex] 
+\hline
+5.12345  & 5.12345 & 5.12345 & 5.12345 \\
+5.12345  & 5.12345 & 5.12345 & 5.12345 \\
+5.12345  & 5.12345 & 5.12345 & 5.12345 \\
+5.12345  & 5.12345 & 5.12345 & 5.12345 \\
+5.12345  & 5.12345 & 5.12345 & 5.12345 \\
+5.12345  & 5.12345 & 5.12345 & 5.12345 \\
+5.12345  & 5.12345 & 5.12345 & 5.12345 \\
+5.12345  & 5.12345 & 5.12345 & 5.12345 \\ [1ex]
+\hline
+\end{tabular}
+\label{table:quad_format}
+\end{table}
 
 A given direction, $\hat{\Omega}$ is determined by its three cosine components. This relation is given in Eq.~\ref{eq:omega_cos} where $\hat{i}$, $\hat{j}$, and $\hat{k}$ are the unit directions in the $x$, $y$, and $z$ directions respectively.
 
@@ -163,6 +186,26 @@ The 2D data is stored in a special format optimized for scatter matrix data.
 \end{figure}
 
 The binary data file is composed of multiple records, each of one of thirteen types. Each record is formatted differently to hold different data.
+
+Once the data is parsed, weighted combinations of elemental data is used to create material cross sections.
+
+WATER EXAMPLE.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/airwaterxs1_19group}
+        \caption{Data}
+        \label{fig:ampx1}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/airwaterxs2_19group}
+        \caption{Same data.}
+        \label{fig:ampx2}
+    \end{subfigure}
+    \caption{Comparison to NIST data.}\label{fig:airwaterxs_19group}
+\end{figure}
 
 \subsection{Spatial Discretization}
 
@@ -413,7 +456,7 @@ The data files containing the scatter cross sections are distributed using a Leg
 \mu_s = \Omega_a \cdot \Omega_{a'}
 \end{equation}
 
-\section{Uncollided Flux}
+\section{Uncollided Solution Methods}
 To avoid ray effect, the flux is split into collided and uncollided components as shown in Eq.~\ref{eq:totflux}. Equation~\ref{eq:boltz} can be rewritten as two equations solving for the uncollided flux, $\psi_u$, and collided flux, $\psi_c$ independently. Equation~\ref{eq:unc} has no scatter term since scattered particles are not considered in the uncollided flux. The source term, $S_u$, in Eq.~\ref{eq:col} is the first collision source.
 
 \begin{equation} \label{eq:totflux}
@@ -649,6 +692,9 @@ The actual angle is $\zeta$ which is computed similarly to Eq.~\ref{eq:phicos} w
 How fancy.
 
 Talk about the MCNP generation in the comparison to results part.
+
+\section{Dose Computation}
+Dose is computed.
 
 \endinput
 %%

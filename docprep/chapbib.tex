@@ -21,18 +21,19 @@
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
 
-
- %% ... sample chapter ...
-
-This chapter summarizes the literature reviewed in preparation of this work. The literature review is split into multiple sections, each highlighting relevant works pertaining to a particular component or section of this work. The first sections cover introductory work and steps necessary for preprocessing data. Section~\ref{sec:discordlit} covers historical and recent work in discrete ordinate methodology, the methodology used by DOCTORS. The remaining sections cover GPU hardware and other implementation facets.
+This chapter summarizes the literature reviewed in preparation of this work. The literature review is split into multiple sections, each highlighting relevant works pertaining to a particular component or section of this work. The first two sections cover introductory work and steps necessary for preprocessing data. Section~\ref{sec:discordlit} covers historical and recent work in discrete ordinate solution methodology, the methodology used by DOCTORS. The remaining sections cover GPU hardware and other implementation facets.
 
 \section{CT Dose Estimation}
 The dose a patient receives form both diagnostic CT procedures and radiation therapy is of great concern to the medical community [CITE]. 
 
+MOTIVATION
+
 Monte Carlo codes have been used in the past to compute flux-to-dose conversion factors for a reference person [CITE ICRP].
 
+COMPUTATION
+
 \section{CT Phantom Generation}
-The CT phantom is populated with CT numbers, also known as Hounsfield numbers. These values are related to the attenuation coefficient of the material represented by the voxel.
+The CT phantom is populated with CT numbers, also known as Hounsfield numbers. These values are related to the attenuation coefficient of the material represented by the voxel. Traditionally, a CT number of zero corresponds to the attenuation of water while -1000 corresponds to dry air CITE though some variations do exist CITE.
 
 Many authors have provided correlations that map the CT number to both a material and a density.
 
@@ -42,11 +43,32 @@ Saw \citep{ref:sawc} did stuff. And \citep{ref:plessisf}. Then \citet{ref:schnei
 Another Schneider did some stuff too \citep{ref:schneiderw}. And Vanderstraeten has a long name \citep{ref:vanderstraetenb}.
 
 The new guy provides 19 materials. The density is measured.
+The DOCTORS code relies on the CT nuber to material mapping of \citet{ref:ottossonr} who developed a 19-group BLAH. Table~\ref{table:ctmap} shows the mapping of CT number to material composition (reproduced from \citep{ref:ottossonr}).
+
+\begin{table}[ht]
+\caption{Water Regions}
+\centering 
+\begin{tabular}{l c r r r r r r r r r r r r}
+\hline \hline   
+Media       & CT Range      & H    & C    & N    & 0    & Na  & Mg & P    & S   & Cl  & Ar  & K   & Ca \\ [0.5ex] 
+\hline
+Air         & -950 to -100  &      &      & 75.7 & 23.3 &     &    &      &     &     & 1.3 &     &       \\
+Lung        & -1000 to -950 & 10.3 & 10.5 & 3.1  & 74.9 & 0.2 &    & 0.2  & 0.3 & 0.3 &     & 0.2 &       \\
+Adipose     & -100 to 15    & 11.2 & 50.8 & 1.2  & 36.4 & 0.1 &    &      & 0.1 & 0.1 &     &     &       \\
+Connective  & 15 to 129     & 10.0 & 16.3 & 4.3  & 68.4 & 0.4 &    &      & 0.4 & 0.3 &     &     &       \\
+Bone        & 129 to 200    & 9.7  & 44.7 & 2.5  & 35.9 &     &    & 2.3  & 0.2 & 0.1 &     & 1.0 & 4.5   \\  [1ex]
+\hline
+\end{tabular}
+\label{table:ctmap}
+\end{table}
 
 Two phantom datasets are used in this work [CITE].
 
 \section{Discrete Ordinates}\label{sec:discordlit}
-Discrete ordinates are old. The book is \citet{ref:lewise}.
+The dsicrete ordinates method dates back to CITE but remains one of the most prominent solution modalities for ration transport in use today.
+
+A comprehensive review of discrete ordinate methods is given by \citet{ref:lewise}. Additional references include 
+
 
 The Exnihilo thing by \citet{ref:evanst}. And DeHart wrote in \citep{ref:dehartm}
 
