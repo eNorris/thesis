@@ -66,24 +66,46 @@ The rotation symmetrical quadrature is implemented in DOCTORS. There are many di
 
 The plain text file should be formatted such that it contains four columns similar to Table~\ref{tab:quad_format} (without any headings). No checks are performed to ensure that octants are covered, this allows simple testing quadratures that utilize only a single direction to be used for testing purposes. Values for $\mu$, $\eta$, and $\xi$ do not necessarily need to add to unity, they will be automatically normalized by DOCTORS. Likewise, the weights will be normalized such that their summation is unity.
 
+However, user defined directions \textit{should not} be parallel to any major axis. Doing so may result in undefined behavior. Also, after normalizaiton, no two rows should have identical values for $\mu$, $\eta$, and $\xi$ such as the last two rows of Table~\ref{tab:quad_interp}. Also, no weights can be negative.
+
 \begin{table}[ht]
-\caption{User Defined Quadrature Format}
+\caption{User Defined Quadrature Input}
 \centering 
 \begin{tabular}{c c c c}
 \hline \hline   
 $\mu$    & $\eta$ & $\xi$ & Weight\\ [0.5ex] 
 \hline
-5.12345  & 5.12345 & 5.12345 & 5.12345 \\
-5.12345  & 5.12345 & 5.12345 & 5.12345 \\
-5.12345  & 5.12345 & 5.12345 & 5.12345 \\
-5.12345  & 5.12345 & 5.12345 & 5.12345 \\
-5.12345  & 5.12345 & 5.12345 & 5.12345 \\
-5.12345  & 5.12345 & 5.12345 & 5.12345 \\
-5.12345  & 5.12345 & 5.12345 & 5.12345 \\
-5.12345  & 5.12345 & 5.12345 & 5.12345 \\ [1ex]
+1        & 0      & 0      & 1 \\
+0.999    & 0.001  & 0.001  & 1 \\
+1.0      & 1.0    & 1.0    & 1.3 \\
+0.02198  & 0.2987 & .34520 & .02226 \\
+.001     & .001   & .999   & 0.999 \\
+-1       & 1      & -1     & .2 \\
+-1.2     & 1.2    & -1.2   & 0.1 \\
+1        & -1     & -1     & .2 \\ [1ex]
 \hline
 \end{tabular}
-\label{table:quad_format}
+\label{tab:quad_format}
+\end{table}
+
+\begin{table}[ht]
+\caption{User Defined Quadrature Interpretation}
+\centering 
+\begin{tabular}{c c c c}
+\hline \hline   
+$\mu$    & $\eta$ & $\xi$ & Weight\\ [0.5ex] 
+\hline
+1.0000   & 0.0000 & 0.0000 & 0.2074 \\
+0.999    & 0.001  & 0.001  & 0.2074 \\
+1.0      & 1.0    & 1.0    & 0.2696 \\
+0.02198  & 0.2987 & .34520 & 0.0207 \\
+.001     & .001   & .999   & 0.0046 \\
+1        & -1     & -1     & 0.2072 \\
+-1.2     & 1.2    & -1.2   & 0.0415 \\
+-1       & 1      & -1     & 0.0415 \\ [1ex]
+\hline
+\end{tabular}
+\label{tab:quad_interp}
 \end{table}
 
 A given direction, $\hat{\Omega}$ is determined by its three cosine components. This relation is given in Eq.~\ref{eq:omega_cos} where $\hat{i}$, $\hat{j}$, and $\hat{k}$ are the unit directions in the $x$, $y$, and $z$ directions respectively.
@@ -194,17 +216,17 @@ WATER EXAMPLE.
 \begin{figure}
     \centering
     \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figs/airwaterxs1_19group}
-        \caption{Data}
-        \label{fig:ampx1}
+        \includegraphics[width=\textwidth]{figs/airwaterxs2_19group}
+        \caption{19 group data}
+        \label{fig:airwaterxs2_19group}
     \end{subfigure}
     ~
     \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figs/airwaterxs2_19group}
-        \caption{Same data.}
-        \label{fig:ampx2}
+        \includegraphics[width=\textwidth]{figs/airwaterxs2_47group}
+        \caption{47 group data.}
+        \label{fig:airwaterxs2_47group}
     \end{subfigure}
-    \caption{Comparison to NIST data.}\label{fig:airwaterxs_19group}
+    \caption{Comparison of the group-averaged DOCTORS cross section data to continuous NIST data.}\label{fig:airwaterxs_group}
 \end{figure}
 
 \subsection{Spatial Discretization}
@@ -687,14 +709,26 @@ The actual angle is $\zeta$ which is computed similarly to Eq.~\ref{eq:phicos} w
     \caption{The beam shapes.}\label{fig:beamfancone}
 \end{figure}
 
-
-\subsection{Multileaf Collimator}
-How fancy.
-
-Talk about the MCNP generation in the comparison to results part.
-
 \section{Dose Computation}
-Dose is computed.
+Dose can be computed in either one of two ways. The first way is to compute the spatial energy dependent fluence distribution and multiply by a fluence-to-dose conversion factor from ICRP 116 [CITE]. The second way to compute dose is to compute the energy deposition in each cell.
+
+\subsection{Fluence-to-dose Conversion}
+
+The publications of the ICRP include fluence-to-dose conversion factors for a reference phantom from various particle types and patient orientations. For CT systems, the rotationally symmetric (ROT) orientation is the most appropriate since the beam rotates about the patient.
+
+This methodology is very simplistic and can be computed quickly with no extra (memory) overhead. When DOCTORS finishes running, the flux is multiplied by the photon 
+
+\begin{figure}[tb]
+  \begin{center}
+   \includegraphics[width=3.75in]{figs/icrp116_rotconv}
+  \end{center}
+  \caption{Fluence-to-dose conversion factors from ICRP 116 for photons.}
+\label{fig:icrp116_rotconv}
+\end{figure}
+
+\subsection{Energy Deposition}
+
+blah
 
 \endinput
 %%
