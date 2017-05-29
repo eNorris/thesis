@@ -22,30 +22,60 @@
 %% in the same archive or directory.)
 
 
-Computed tomography (CT) is becoming increasingly pervasive in medical diagnostics because improved algorithms are giving doctors more access to patient information. Increased information results in faster and more accurate diagnosis. However, the CT operation itself gives a radiation dose to the patient which carries some associated risk. A more detailed measure of that risk would help doctors make informed decisions regarding whether a CT scan is warannted, and if so, which type. This can also help doctors estimate spatial dose distribution to the patient to ensure no specific organ received more dose than permissible.
+Computed tomography (CT) is becoming increasingly pervasive in medical diagnostics as improved algorithms give doctors access to more information. Increased information results in faster and more accurate diagnosis. However, the CT operation itself delivers a radiation dose to the patient increasing risk of long term complications such as cancer [CITE]. Currently, dose estimation relies on \textit{a priori} computation verified with a standardized benchmark. Once the procedure (whether diagnostic or treatment) is completed, the dose distribution is assumed to follow the empirical model.
 
-Currently, dose estimation relies on \textit{a priori} computation verified with a standardized benchmark. No methodology currently exists to verify that the dosimetry evaluation was accurate after the patient has undergone the procedure. This work proposes a methodology by which a patient's CT reconstruction is used to compute the dose received from the radiation beam.
+No methodology currently exists to verify that the dosimetry evaluation was accurate after the patient has undergone the procedure. This work proposes a methodology by which a patient's CT reconstruction is used to compute the dose received from the radiation beam. This can also help doctors estimate spatial dose distribution to the patient to ensure no specific organ received more dose than permissible.
 
-Another, similar, application is dose estimation of patients receiving radiation therapy. Often, before the procedure, a time dependent, 4D CT scan of the patient is taken so that radiologists can account for breathing patterns during administration of the treatment. 
+Another, similar, application is dose estimation of patients receiving radiation therapy. Often, before the procedure, a time dependent, 4D CT scan of the patient is taken so that radiologists can account for breathing patterns during administration of the treatment. With further develpment, this methodology may enable real time dose computation as the treatment is administered. This would be greatly beneficial to both patients and the doctors administering the procedure.
 
-ESTIMATE. PHANTOM. CORRELATE.
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.38\textwidth}
+        \includegraphics[width=\textwidth]{figs/backproject1}
+        \caption{}
+        \label{fig:beamconexy}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.19\textwidth}
+        \includegraphics[width=\textwidth]{figs/backproject2}
+        \caption{}
+        \label{fig:beamfanxy}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.38\textwidth}
+        \includegraphics[width=\textwidth]{figs/backproject3}
+        \caption{}
+        \label{fig:subsweep_general3}
+    \end{subfigure}
+    \caption{(a) The original }\label{fig:backprojection}
+\end{figure}
 
-BASED ON REFERENCE PHANTOM.
+In order for the proposed methodology to be viable, the patient's CT phantom must be available. The phantom is reconstructed from the CT data. Though it is not the focus of this work, a brief summary of reconstruction algorithms is given here.
 
-ADD FIGURE
+Fundamentally, all reconstructions algorithms are based on a thin parallel beam of x-rays that roatate axially about a patient producing a sinogram. The inverse radon transform backprojects each row of the sinogram back to physical space.. Filtering each line in Fourier space and then compositing all layers together recreates th eimage [CTIE]. This methodology has been extended to fan beams [CITE] and cone beams [CITE]. After the filtered backprojection, iterative reconstruction techniques can be applied to greatly improve the reconstruction quality [CITE].
 
-Once the procedure (whether diagnostic or treatment) is completed, the dose distribution is assumed to follow the empirical model.
+Along any particular ray, monoenergetic particles will attenuate through a homogeneus media according to the Beer-Lambert law given in Eq.~\ref{eq:beer_lambert} [CITE] resulting in a small fraction of the source particles reaching the detector. This phenomena leads to an image of the attenutating media but also results in the detector receiving information about the attenuation coefficient, $\mu$, along that ray. With sufficient rays from varying directionality, the entire object can be quantified with respect to its spatially distributed attenuation.
+
+\begin{equation}\label{eq:beer_lambert}
+I(x) = I_0 e^{-\mu x}
+\end{equation}
+
+Once a patient specific aphantom is obtained, the flux throughout the mesh must be computed. Computational techniques to do this cam be split into two broad categories: Monte Carlo and deterministic.
+
+Monte Carlo codes are generally known for their accuracy; they are able to sample the problem and attain arbitrarily high precision given sufficient runtime. They also take advantage of combinatorial geometry allowing a user to produce geometrically complex 3D structures. Deterministic methods are generally much faster than their Monte Carlo counterparts bu tdo not benefit from excess runtime. They also consume vastly more resources, particularly random-access memory (RAM). In regularly structures meshes, deterministic methods can greatly outperform Monte Carlo. A large number of spatial regions slows down th eparticle transport. Monte Carlo will also require a large amoutn of RAM to store the numerous voxels.
+
+The Hounsfield units (also called CT numbers) are traditionally scaled such that -1000 is dry air and water is zero.
+
+Deterministic codes can be accelerated with the use of a grpahics processin gunit (GPU). GPUs differ from the central processin gunit (CPU) in that  each of th emany cores performes identical instruction to all others at the same time bue each with different data. For example, consider a grapyscale 1024$\times$768 image. If some pixelwise operation is applied on a CPU, 786,432 operations must occur. Onboard the GPU with 1024 cores, every pixel in the entire row can be computed simultaneously reducing the number of operations to 768. However, issues such as copying the memory to and from the GPU and cache coherency problems can degrade performance. GPU tehcnology and performance is discussed more throuroughly in Section~\ref{sec:cuda}.
+
+In addition to rapidly computing th epatient dose, another goal of DOCTORS is to present th ecode in a user-friendly fashion. To this end, a grpahical user interface (GUI) was developed. The GUI utilize the Qt5 graphics framework for the window, buttons, and other necessary widgets. The GUI leads the user through th esteps necessary to use th ecode in an intuitive way by using colors to indicated requaired and completed steps. The output is then plotted graphically and the output is also sent to an ASCII text file for more advanced postprocessing. More details about th eGUI are included in Section~\ref{sec:gui}.
 
 There are two primary methodologies available to provide the transport solution: Monte Carlo and deterministic methods. Monte Carlo has proven to be very slow in these areas. Further, the 3D Cartesian mesh generated from CT reconstruction is well suited to deterministic computation. 
 
 This work forcuses on the discrete ordinates method and presents an implementation specially developed for dose estimation from a medical CT scan. 
 
-Computational mesh from a sinogram. Reconstruction.
 The DOCTORS code takes a computational reconstruction mesh of CT numbers, cross section data, and other parameters related to the solution methodology as input. The output is the collided and uncollided flux as well as the dose in each computational cell. These values can be compared to the empirical correlation results as a verification that the patient received an appropriate dose.
 
-SHOULD BE FAST - GPU
-
-USER INTERFACE
 
 \endinput
 %%
