@@ -46,7 +46,102 @@ Figure~\ref{fig:indx_ex} gives an example of the spatial indexing scheme using a
 
 A variable that is dependent on $x$, $y$, $z$, $E$, and $\Omega$ would be written as $\phi(x, y, z, E, \Omega)$ would be discretized to $\phi(i_x, i_y, i_z, G, i_a)$. Rather than storing $\phi$ as a 5-dimensional matrix, $\phi$ is stored as a 1-dimensional vector of the same number of elements.
 
-\section{Qt5 Framework}
+\section{Cross Section Parsing}\label{sec:xsparse}
+AMPX cross sections are stored in a binary format. The binary file is split into a series of records. Each record contains a string of binary bytes between a four byte header and four byte footer. The header and footer are identical and, when interpreted as a signed four byte integer, give the size in words of the record. Each word is a 32-bit section (4~bytes) of binary data. An example record is shown in Fig.~\ref{fig:ampxbytes1}.
+
+The data is stored in Big Endian format which must be converted to Little Endian for most Intel and AMD processors.  The endianess rearrangement is shown in Fig.~\ref{fig:ampxbytes2}. All records are one of 12 unique types. Each type of record is formatted and interpreted differently. For example, Type 1 contains general information about the data file such as the number of nuclides, number of energy groups, and a brief description. Type 2 records contains a list of floating-point numbers representing the energy group boundaries. Figure~\ref{fig:ampxbytes1} shows a Type 1 record. In the case of the header bytes given in Fig.~\ref{fig:ampxbytes1} and~\ref{fig:ampxbytes2}, the bytes correspond to the integer 440 which is the length in bytes of the record (not including the header or footer).
+
+Each word of data is sequentially read, reordered, and converted to an apprpriately typed variable. Table~\ref{tab:reorder} shows the converstion for the record given in Fig.~\ref{fig:ampxbytes1}.
+
+\begin{figure}[tb]
+  \begin{center}
+   \includegraphics[width=3.75in]{figs/ampxbytes1}
+  \end{center}
+  \caption{An example record parsed. The header and footer are identical and are the number of 32-bit words in the record.}
+\label{fig:ampxbytes1}
+\end{figure}
+
+\begin{figure}[tb]
+  \begin{center}
+   \includegraphics[width=2.75in]{figs/ampxbytes2}
+  \end{center}
+  \caption{The byte reordering from Big Endian to Little Endian. Individual bits withing a byte are not rearranged, but the ordering of the four bytes withing a 32-bit word is reversed.}
+\label{fig:ampxbytes2}
+\end{figure}
+
+\begin{table}[ht]
+\caption{Byte Reordering}
+\centering 
+\begin{tabular}{l | c | c | c | l}
+  \hline \hline   
+  Word  & Big Endian & Little Endian & Interpreted & Notes\\ [0.5ex] % inserts table 
+  \hline
+  0   & B8 01 00 00 & 00 00 01 B8 & 440    & Header                    \\
+  1   & 8B 69 00 00 & 00 00 69 8B & 27019  & ID                        \\
+  2   & A4 01 00 00 & 00 00 01 A4 & 420    & Number of nuclides        \\
+  ... &      ---    &      ---    &    --- & ---                       \\
+  11  & 70 75 6F 43 & 43 6F 75 70 & "Coup" & First word of the title   \\
+  12  & 20 64 65 6C & 6C 65 64 20 & "led " & Second word of the title  \\
+  ... &     ---     &    ---      &  ---   & ---                       \\
+  440 & 20 20 20 20 & 20 20 20 20 & "    " & 4 spaces ending the title \\
+  441 & B8 01 00 00 & 00 00 01 B8 & 440    & Footer                    \\ 
+  [1ex]      % [1ex] adds vertical space
+  \hline
+\end{tabular}
+\label{table:reorder}
+\end{table}
+
+The header always reports the number of 8-bit bytes required to store the data. However, some data types, such as texttt{char}, are only one byte so each word represents multiple (4 in the case of \texttt{char}) distinct characters.
+
+DOCTORS reads AMPX fromatted binary data files. Figure~\ref{fig:ampx} shows the data format of the overall file. 
+
+The first entry in each nuclide entry is the directory record. The directory contains general information regarding the nuclide and information necessary to parse the proceeding records. Following the directory, Bondarenko data, resonance parameters, neutron data, and gamma production which are not of interest in photon only problems are read.
+
+The penultimate record contains the average cross section data. This data is averaged over all energies and directions using Eq.~\ref{eq:groupxs}. The only data used in this section in DOCTORS is the total cross section values necessary for implementing the fully discretized form of the LBE given in Eq.~\ref{eq:boltz_i}.
+
+The 2D data is stored in a special format optimized for scatter matrix data.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/ampx1}
+        \caption{The AMPX file format}
+        \label{fig:ampx1}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/ampx2}
+        \caption{The structure of each individual record.}
+        \label{fig:ampx2}
+    \end{subfigure}
+    \caption{The format of the AMPX file. (a) The file contains a header, a list of directory records, energy group information and a list of nuclide entries. (b) Each nuclide entry contains multiple records; the two of concern in this work are the last two containing gamma data.}\label{fig:ampx}
+\end{figure}
+
+SHOW CARBON ELEMENTAL DATA
+
+\section{Generation of Material Cross Section Data}\label{sec:xsgen}
+
+Once the data is parsed, weighted combinations of elemental data is used to create material cross sections. The details of this computation are covered in Section~\ref{sec:
+
+WATER EXAMPLE.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/airwaterxs2_19group}
+        \caption{19 group data}
+        \label{fig:airwaterxs2_19group}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/airwaterxs2_47group}
+        \caption{47 group data.}
+        \label{fig:airwaterxs2_47group}
+    \end{subfigure}
+    \caption{Comparison of the group-averaged DOCTORS cross section data to continuous NIST data.}\label{fig:airwaterxs_group}
+\end{figure}
+
+\section{Qt5 Framework}\label{sec:qt}
 The Qt5 framework was used for implementation of the user interface. Qt5 enables asynchronous calls through its ssignal/slot mechanism. A signal can be emitted which will execute all connected slots. Signals and slots can be connected manually by the user except for ones automatically generated by Qt. Qt prvides a user interface for building user interfaces. Components such a sbuttons, drop boxes, radio buttons, etc. are offered to the user. Qt makes extensive use of polymorphism. All user components inherit from the base \texttt{QWidget} class which inherits from \texttt{QObject}. Any class that utilizes the signal/sloot mechanism must extend the \texttt{QOjbect} class.
 
 Listing~\ref{lst:sync1} gives a pseudocode snippet that has a long function that will block the user interface. A corresponding dequence diagram is given in Fig.~\ref{fig:sync1}. When the user interacts with the GUI, the writer object begins executing the \texttt{doWrite()} function. Until this function completes, the UI thread will be busy an dunable to handle additionaly user interaction or updates. This results in the GUI becoming unresponsive and potentially issuing a warning to the user from the operating system.
@@ -78,7 +173,11 @@ The code in Listing~\ref{lst:sync1} is updated to use the Qt signal/slot mechani
 \label{fig:async1}
 \end{figure}%
 
-\section{CUDA}
+\section{Graphical User Interface}\label{sec:gui}
+
+The GUI is cool. Lots of pictures of it.
+
+\section{CUDA}\label{sec:cuda}
 CUDA code is compoiled with the Nvidia complier nvcc. Qt uses the gcc compiler and its MOC generator for meta code. In order to connect CUDA code to the Qt MOC, the CUDA code is compiled by nvcc to produce a .o file. Qt then compiles all other files into corresponding.o files. The linker than automactically picks up all of the .o files gneerated by nvcc. The final result is an executable that has a Qt generarted user interface that can communicat with an Nvidia graphics card through the CUDA language.
 
 The sweep through the mesh is different.
@@ -344,7 +443,7 @@ iz = L + i - N_L
 \section{MCNP Generation}\label{sec:mcnpgen}
 DOCTORS has the capability to generate MCNP6 input files from the CT mesh data and source specification provided by the user.
 
-\section{Hardware}
+\section{Hardware}\label{sec:hardware}
 For this work, a computer with an Intel i7-5960X 8 core (16 hyperthreads) processor with a base clock speed of 3.X GHz and an Nvidia Titan Z graphics card was used. Currently, if the problem requires more memory than is available on the GPU, the problem can still be solved, but much more time will be required to to copy overhead between the CPU and GPU. If the problem requires more memory than either the GPU or CPU can provide, an error is thrown and the simulation is not run.
 
 CUDA is Nvidia only so AMD is not considered.
