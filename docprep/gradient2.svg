@@ -18,6 +18,19 @@
   <defs
      id="defs8926">
     <marker
+       inkscape:stockid="Arrow1Lstart"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Lstart"
+       style="overflow:visible">
+      <path
+         id="path5853"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt"
+         transform="scale(0.8) translate(12.5,0)" />
+    </marker>
+    <marker
        inkscape:stockid="Arrow1Lend"
        orient="auto"
        refY="0.0"
@@ -38,17 +51,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
-     inkscape:cx="597.85816"
-     inkscape:cy="718.76852"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="456.63778"
+     inkscape:cy="726.46319"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1403"
-     inkscape:window-height="830"
-     inkscape:window-x="188"
-     inkscape:window-y="77"
-     inkscape:window-maximized="0" />
+     inkscape:window-width="1920"
+     inkscape:window-height="1056"
+     inkscape:window-x="1920"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1" />
   <metadata
      id="metadata8929">
     <rdf:RDF>
@@ -125,7 +138,58 @@
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300" />
     <path
-       style="fill:#ffffff;fill-opacity:0.50196078;stroke:none"
+       sodipodi:nodetypes="cc"
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3, 3;stroke-dashoffset:0"
+       d="m 232.08654,482.12752 0,93.17733"
+       id="path10198"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/gradient.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:2,2;stroke-dashoffset:0"
+       d="m 183.84776,393.23765 0,137.38074"
+       id="path4703"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/gradient.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:2,2;stroke-dashoffset:0"
+       d="M 184.35284,530.11332 522.24887,514.96103"
+       id="path4707"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/gradient.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       inkscape:export-ydpi="300"
+       inkscape:export-xdpi="300"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/gradient.png"
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;marker-start:url(#Arrow1Lstart)"
+       d="m 535.83904,530.61839 -352.44948,0"
+       id="path4709"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 396.48487,521.02194 c 1.57836,1.70464 1.89404,7.57614 -0.0631,9.72273"
+       id="path6321"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/gradient.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 401.42857,525.57647 c 21.07143,7.5 7.14286,40.35714 -12.5,49.64286"
+       id="path6323"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/gradient.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:#ffffff;fill-opacity:0.25098041;stroke:none"
        d="m 231.35592,159.66698 -71.659,73.21342 0.10397,322.42885 322.18003,-0.0619 71.07142,-73.39286 1e-5,-322.32143 z"
        id="path10214"
        inkscape:connector-curvature="0"
@@ -217,18 +281,9 @@
     <path
        inkscape:connector-curvature="0"
        id="path10196"
-       d="m 481.90589,555.33557 0,61.39162"
+       d="m 159.76303,555.33557 0,61.39162"
        style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3, 3;stroke-dashoffset:0"
        sodipodi:nodetypes="cc"
-       inkscape:export-filename="/media/Storage/thesis/docprep/figs/gradient.png"
-       inkscape:export-xdpi="300"
-       inkscape:export-ydpi="300" />
-    <path
-       sodipodi:nodetypes="cc"
-       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3, 3;stroke-dashoffset:0"
-       d="m 553.51511,482.12752 0,61.39162"
-       id="path10198"
-       inkscape:connector-curvature="0"
        inkscape:export-filename="/media/Storage/thesis/docprep/figs/gradient.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300" />
@@ -271,8 +326,8 @@
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
-       x="553.60266"
-       y="565.47162"
+       x="232.17409"
+       y="596.18591"
        id="text10210"
        sodipodi:linespacing="125%"
        inkscape:export-filename="/media/Storage/thesis/docprep/figs/gradient.png"
@@ -280,8 +335,8 @@
        inkscape:export-ydpi="300"><tspan
          sodipodi:role="line"
          id="tspan10212"
-         x="553.60266"
-         y="565.47162"
+         x="232.17409"
+         y="596.18591"
          style="font-style:italic;font-family:Times New Roman;-inkscape-font-specification:Times New Roman">x<tspan
    style="font-size:65.00091553%;baseline-shift:sub"
    id="tspan10220">i</tspan></tspan></text>
@@ -289,7 +344,7 @@
        sodipodi:linespacing="125%"
        id="text10222"
        y="639.21277"
-       x="477.84122"
+       x="155.69836"
        style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
        xml:space="preserve"
        inkscape:export-filename="/media/Storage/thesis/docprep/figs/gradient.png"
@@ -297,7 +352,7 @@
        inkscape:export-ydpi="300"><tspan
          style="font-style:italic;font-family:Times New Roman;-inkscape-font-specification:Times New Roman"
          y="639.21277"
-         x="477.84122"
+         x="155.69836"
          id="tspan10224"
          sodipodi:role="line">x<tspan
    id="tspan10226"
@@ -411,5 +466,51 @@
          x="625.71429"
          y="296.64792"
          style="font-style:italic;font-family:Times New Roman;-inkscape-font-specification:Times New Roman">Ω</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:2,2;stroke-dashoffset:0"
+       d="m 521.23871,313.94067 0,201.02036"
+       id="path4705"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/gradient.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       inkscape:export-ydpi="300"
+       inkscape:export-xdpi="300"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/gradient.png"
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="532.89453"
+       y="553.34979"
+       id="text6295"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan6297"
+         x="532.89453"
+         y="553.34979"
+         style="font-style:italic;font-family:Times New Roman;-inkscape-font-specification:Times New Roman">y<tspan
+   style="font-size:65.00091553%;baseline-shift:sub"
+   id="tspan6299" /></tspan></text>
+    <text
+       sodipodi:linespacing="125%"
+       id="text6301"
+       y="610.95386"
+       x="332.90353"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       xml:space="preserve"
+       inkscape:export-filename="/media/Storage/thesis/docprep/figs/gradient.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         style="font-style:italic;font-family:Times New Roman;-inkscape-font-specification:Times New Roman"
+         y="610.95386"
+         x="332.90353"
+         id="tspan6303"
+         sodipodi:role="line"><tspan
+   style="font-style:normal"
+   id="tspan6309">cos<tspan
+   style="font-size:65.00091553%;baseline-shift:super"
+   id="tspan6313">-1</tspan>(</tspan>η<tspan
+   style="font-style:normal"
+   id="tspan6319">)</tspan></tspan></text>
   </g>
 </svg>
