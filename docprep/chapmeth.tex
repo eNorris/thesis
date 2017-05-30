@@ -21,25 +21,30 @@
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
 
-This chapter summarizes the solution methodology employed by DOCTORS. The techniques used to compute the collided and uncollided fluxes are described in seperate sections. After the flux methodology is explained, the methods used for source generation and covered as well as the flux to dose conversion.
+This chapter summarizes the solution methodology employed by DOCTORS. The techniques used to compute the collided and uncollided fluxes are described in seperate sections. After the flux solution methodology is explained, the methods used for source generation and flux to dose conversion are covered.
 
-\section{Collided Solution Methods}
+\section{Discrete Ordinate Methods}
 
-The discrete ordinate solver computes the collided flux distribution inside the CT mesh given an input uncollided flux, physical geometry information, and other associated solver parameters such as quadrature and energy discretization.
+The discrete ordinate solver computes the flux distribution inside the CT mesh given a source, physical geometry information, and other associated solver parameters such as quadrature and energy discretization. Discrete ordinates is a deterministic solution to the linear Boltzmann equation.
 
 \subsection{The Boltzmann Equation}
 
-The time dependent gamma transport equation is
+The linear Boltzmann equation (LBE) is generally true of any particle given that outside forces (electromagnetic or graitational) are either not present or negligible and particle-particle collisions are insignificant. Therefore, the LBE is generally not valid for charged parpticles or systems whose particle density is on the order of the medium they are traveling trhrough. In such systems, particle-particle ineractions may not be negligible.  
+
+In general, the LBE is valid for multiplying media (such as neutrons passing through fuel in a reactor), but the variant considered in this work omits such terms since only photons in medical systems are of concern. The time dependent linear Boltzmann equation for photons is
 
 \begin{equation} \label{eq:boltz_t_dep}
 \begin{split}
-	&\left[ \frac{1}{v(\boldsymbol{r}), t} \frac{\partial}{\partial t} + \hat{\Omega} \cdot \nabla + \Sigma_t(\boldsymbol{r}, E, t) \right]
+	&\left[ \frac{1}{v(\boldsymbol{r},t)} \frac{\partial}{\partial t} + \hat{\Omega} \cdot \nabla + \Sigma_t(\boldsymbol{r}, E, t) \right]
 	\psi(\boldsymbol{r}, E, \hat{\Omega}, t) = \\
 	&\int_{4 \pi} \int_0^\infty \Sigma_s(\boldsymbol{r}, E' \rightarrow E, \hat{\Omega}' \rightarrow \hat{\Omega}, t) \psi(\boldsymbol{r}, E', \hat{\Omega}', t) dE' d\hat{\Omega}' + S(\boldsymbol{r}, E, \hat{\Omega}, t)
 \end{split}
 \end{equation}
 
-where $v$ is the velocity of the photon in the medium at $\boldsymbol{r}$, $\Sigma_t$ is the total macroscopic cross section, $\Sigma_s$ is the macroscopic scattering cross section, $S$ is an external photon source, and $\phi$ is the total photon angular flux. However, the transient case is not typically of interest in medical diagnostic imaging, rather the steady state is more important. The time dependence in Eq. \ref{eq:boltz_t_dep} is removed to yield
+\noindent
+where $v$ is the velocity of the photon in the medium at $\boldsymbol{r}$, $\Sigma_t$ is the total macroscopic cross section, $\Sigma_s$ is the macroscopic scattering cross section, $S$ is an external photon source, and $\psi$ is the total photon angular flux. 
+
+The transient case is not typically of interest in medical diagnostic imaging, rather the steady state is more important. The time dependence in Eq. \ref{eq:boltz_t_dep} is removed to yield
 
 \begin{equation} \label{eq:boltz}
 \begin{split}
@@ -49,10 +54,32 @@ where $v$ is the velocity of the photon in the medium at $\boldsymbol{r}$, $\Sig
 \end{split}
 \end{equation}
 
+The steady state form of the LBE can be readily derived from simple intuition. In the steady state, particle production and removal must be equal. In any volume, three production mechanisms are present. Particles can stream into the volume across a bounding surface, they can inscatter from another energy-direction component of phase space, or they can be produced directly by the external source. Three removal terms are also present, particles can stream out of the volume of interest by crossing a bounding surface, be absorbed and vanish entirely, or outscatter to a energy-direction componennt of phase space other than the one of interest.
+
+The downscatter and absorbtiption removal terms are typically grouped together as
+
+\begin{equation}
+\Sigma_t(\boldsymbol{r}, E) \psi(\boldsymbol{r}, E, \hat{\Omega})
+\end{equation}
+
+\noindent
+and both production and removal streaming operators are combined as well as
+
+\begin{equation}
+\hat{\Omega} \cdot \nabla \psi(\boldsymbol{r}, E, \hat{\Omega})
+\end{equation}
+
+\noindent
+and included as a removal term since they normal is defined pointing outward from the volume. The normal sign convention results in particles streaming out being positive and those streaming in beocming negative. The inscatter to a particular energy and direction is computed by integrating over all other energies and diretions
+
+\begin{equation}
+\int_{4\pi}^{} \int_{0}^{\infty} \Sigma_s(\boldsymbol{r}, E' \rightarrow E, \hat{\Omega}' \rightarrow \hat{\Omega}) \psi(\boldsymbol{r}, E', \hat{\Omega}') dE' d\hat{\Omega}'
+\end{equation}
+
 The following sections show how Eq.~\ref{eq:boltz} is discretized and solved computationally.
 
 \subsection{Angular Discretization}
-The coordinate system used in DOCTORS is shown in Fig.~\ref{fig:coord_sys}. A discrete set of $N_a$ angles ($\Omega_{a}, \quad a = 0 \ldots N_a-1$) is selected to represent continuous directional space. Particles are transported only along these discrete directions from one voxel to adjacent voxels.
+The coordinate system used in DOCTORS is shown in Fig.~\ref{fig:coord_sys}. A discrete set of $N_a$ angles ($\Omega_{a}, \quad a = 0 \ldots N_a-1$) is selected to represent continuous directional space. Particles are transported only along these discrete directions from a voxel to adjacent voxels.
 
 \begin{figure}[tb]
   \begin{center}
@@ -62,11 +89,15 @@ The coordinate system used in DOCTORS is shown in Fig.~\ref{fig:coord_sys}. A di
 \label{fig:coord_sys}
 \end{figure}
 
-The rotation symmetrical quadrature is implemented in DOCTORS. There are many different quadrature sets, the rotation symmetrical quadratures were selected because they are easy to implement, rotationally symmetric, and the most commonly used in production discrete ordinate solvers. This enables simple, direct comparison to other solvers. Arbitrary quadratures are permissible in a plain text file supplied by the user enabling other quadratures.
+The rotation symmetrical quadrature is implemented in DOCTORS. From amongst many different quadrature sets, the rotation symmetrical quadratures were selected because they are easy to implement, rotationally symmetric, and the most commonly used in production discrete ordinate solvers [CITE] which enables simple, direct comparison to other solvers. Arbitrary quadratures are permissible in a plain text file supplied by the user enabling other quadratures.
 
-The plain text file should be formatted such that it contains four columns similar to Table~\ref{tab:quad_format} (without any headings). No checks are performed to ensure that octants are covered, this allows simple testing quadratures that utilize only a single direction to be used for testing purposes. Values for $\mu$, $\eta$, and $\xi$ do not necessarily need to add to unity, they will be automatically normalized by DOCTORS. Likewise, the weights will be normalized such that their summation is unity.
+THEORY
 
-However, user defined directions \textit{should not} be parallel to any major axis. Doing so may result in undefined behavior. Also, after normalizaiton, no two rows should have identical values for $\mu$, $\eta$, and $\xi$ such as the last two rows of Table~\ref{tab:quad_interp}. Also, no weights can be negative.
+To inlcude a user defined quadrature, the plain text file should be formatted such that it contains four columns similar to Table~\ref{tab:quad_format} (without any headings). No checks are performed to ensure that octants are covered, this allows simple testing quadratures that utilize only a single direction to be used for testing purposes. Values for $\mu$, $\eta$, and $\xi$ do not necessarily need to add to unity, they will be automatically normalized by DOCTORS. Likewise, the weights will be normalized such that their summation is unity. However, user defined directions \textit{should not} be parallel to any major axis. Doing so may result in undefined behavior. Also, after normalizaiton, no two rows should have identical values for $\mu$, $\eta$, and $\xi$ such as the last two rows of Table~\ref{tab:quad_interp}. Additionally, no weights may be negative.
+
+Values are read in as a 32 bit IEEE-754 floating point number [CITE] which ensures seven significant digits. Significant digits beyond this will be truncated. Note that Table~\ref{tab:quad_interp} rounds four digits after the decimal.
+
+The data in Table~\ref{tab:quad_format} would be read in and renormalized by DOCTORS. The normalized data would be identical to the data in Table~\ref{tab:quad_interp}.
 
 \begin{table}[ht]
 \caption{User Defined Quadrature Input}
@@ -82,7 +113,7 @@ $\mu$    & $\eta$ & $\xi$ & Weight\\ [0.5ex]
 .001     & .001   & .999   & 0.999 \\
 -1       & 1      & -1     & .2 \\
 -1.2     & 1.2    & -1.2   & 0.1 \\
-1        & -1     & -1     & .2 \\ [1ex]
+-1        & 1     & -1     & .2 \\ [1ex]
 \hline
 \end{tabular}
 \label{tab:quad_format}
@@ -95,32 +126,32 @@ $\mu$    & $\eta$ & $\xi$ & Weight\\ [0.5ex]
 \hline \hline   
 $\mu$    & $\eta$ & $\xi$ & Weight\\ [0.5ex] 
 \hline
-1.0000   & 0.0000 & 0.0000 & 0.2074 \\
-0.999    & 0.001  & 0.001  & 0.2074 \\
-1.0      & 1.0    & 1.0    & 0.2696 \\
-0.02198  & 0.2987 & .34520 & 0.0207 \\
-.001     & .001   & .999   & 0.0046 \\
-1        & -1     & -1     & 0.2072 \\
--1.2     & 1.2    & -1.2   & 0.0415 \\
--1       & 1      & -1     & 0.0415 \\ [1ex]
+ 1.0000  &  0.0000  &  0.0000  & 0.2074 \\
+ 1.0000  &  0.0010  &  0.0010  & 0.2074 \\
+ 0.5774  &  0.5774  &  0.5774  & 0.2696 \\
+ 0.0481  &  0.6536  &  0.7553  & 0.0207 \\
+ 0.5000  & -0.5000  &  0.7071  & 0.0046 \\
+ 0.5774  & -0.5774  & -0.5774  & 0.2072 \\
+-0.5774  &  0.5774  & -0.5774  & 0.0415 \\
+-0.5774  &  0.5774  & -0.5774  & 0.0415 \\ [1ex]
 \hline
 \end{tabular}
 \label{tab:quad_interp}
 \end{table}
 
-A given direction, $\hat{\Omega}$ is determined by its three cosine components. This relation is given in Eq.~\ref{eq:omega_cos} where $\hat{i}$, $\hat{j}$, and $\hat{k}$ are the unit directions in the $x$, $y$, and $z$ directions respectively.
+A given direction, $\hat{\Omega}$, is determined by its three cosine components. This relation is given in Eq.~\ref{eq:omega_cos} where $\hat{i}$, $\hat{j}$, and $\hat{k}$ are the unit directions in the $x$, $y$, and $z$ directions respectively.
 
 \begin{equation} \label{eq:omega_cos}
-	\hat{\Omega} = \mu \hat{i} + \eta \hat{j} + \xi \hat{k}
+\hat{\Omega} = \mu \hat{i} + \eta \hat{j} + \xi \hat{k}
 \end{equation}
 
-Each discrete angle is associated a weight. The weights are designed with the angles such that once a discrete quadrature is selected, integration over continuous space becomes integration in discrete space approximated by Eq.~\ref{eq:disc_int}.
+Each discrete angle is associated a weight. The weights are designed with the angles such that once a discrete quadrature is selected, integration over continuous space becomes integration in discrete space approximated by
 
 \begin{equation} \label{eq:disc_int}
-\int_{4 \pi} f(\hat{\Omega}) d\Omega \approx \sum_{a=0}^{N_a-1} f(\hat{\Omega}_a) \omega_a
+\int_{4 \pi} f(\hat{\Omega}) d\hat{\Omega} \approx \sum_{a=0}^{N_a-1} f(\hat{\Omega}_a) \omega_a
 \end{equation}
 
-Discretizing Eq.~\ref{eq:boltz} in angular space gives Eq.~\ref{eq:boltz_a} where the angle is denoted by subscript $a$.
+Discretizing Eq.~\ref{eq:boltz} in angular space gives
 
 \begin{equation} \label{eq:boltz_a}
 \begin{split}
@@ -130,15 +161,29 @@ Discretizing Eq.~\ref{eq:boltz} in angular space gives Eq.~\ref{eq:boltz_a} wher
 \end{split}
 \end{equation}
 
+\noindent
+where the subscript $a$ denotes the direction.
+
 \subsection{Energy Discretization}
 
-Continuous energy is discretized into $G$ groups indexed from 0 to $G-1$. Upscatter is assumed to be negligible. Therefore, Eq.~\ref{eq:boltz_a} becomes the energy discretized Eq.~\ref{eq:boltz_e} where the group number is indexed by superscript $g$. The group structure is shown in Fig.~\ref{fig:energy_groups}.
+Continuous energy is discretized into $G$ groups indexed from 0 to $G-1$. Upscatter is assumed to be negligible. Therefore, Eq.~\ref{eq:boltz_a} becomes the energy discretized Eq.~\ref{eq:boltz_e} where the group number is indexed by superscript $g$.
 
 \begin{equation} \label{eq:boltz_e}
 \left[ \hat{\Omega}_a \cdot \nabla + \Sigma_t^g(\boldsymbol{r}) \right]
 \psi_{a}^{g}(\boldsymbol{r}) = 
+\sum_{a=0}^{N_a-1} \sum_{g'=0}^{G-1} \Sigma_{s, a, a'}^{g, g'}(\boldsymbol{r}) \psi_{a'}^{g'}(\boldsymbol{r}) \omega_a + S_a^g(\boldsymbol{r})
+\end{equation}
+
+In photon based problems, upscatter is typicall negligible [CITE]. By the time photons become low enough in energy to upscatter significantly, they are no longer of dosimetric concern. Removing upscatter reduces Eq.~\ref{eq:boltz_e} to
+
+\begin{equation} \label{eq:boltz_e2}
+\left[ \hat{\Omega}_a \cdot \nabla + \Sigma_t^g(\boldsymbol{r}) \right]
+\psi_{a}^{g}(\boldsymbol{r}) = 
 \sum_{a=0}^{N_a-1} \sum_{g'=g}^{G-1} \Sigma_{s, a, a'}^{g, g'}(\boldsymbol{r}) \psi_{a'}^{g'}(\boldsymbol{r}) \omega_a + S_a^g(\boldsymbol{r})
 \end{equation}
+
+\noindent
+which is very similar; only the starting point for the scatter summation changes. Computationall, though, this makes a significant different. This means that the highest energy group can be solved independently of all those below it. Once that group is solved, the next group can also be solved and so forth.
 
 \begin{figure}[tb]
   \begin{center}
@@ -148,104 +193,31 @@ Continuous energy is discretized into $G$ groups indexed from 0 to $G-1$. Upscat
 \label{fig:energy_groups}
 \end{figure}
 
-The energy group structure should be selected appropriately for the problem.
+The group structure cannot be arbitrarily selected by DOCOTRS, instead it is determined by the external cross section data file. The energy group structure should be selected appropriately for the problem. The cross sections currently available are those available from the SCALE 6.2 distribution. Those cross sections are designed for light water reactor analysis and are not well suited to medical physics applications. This is currently one of the greatest limitaitons of DOCOTRS. The SCALE cross section data also contains neutron data which is useless for the CT dosimetry DOCTORS performs. More details of the cross section parsing and generation are included in Section~\ref{sec:xsparse} and~\ref{sec:xsgen}.
 
-The cross sections currently availabl eare those available from the SCALE 6.2 distribution. Those cross sections are designed for light water reactor analysis and are not well suited to medical physics applications. This is currently one of the greatest limitaitons of DOCOTRS. The SCALE cross section data also contains neutron data which is useless for the CT dosimetry DOCTORS performs.
-
-Once the energy group structure is selected, cross section data must be available. Group averaged cross section values from energy $E_1$ to $E_2$ are computed using Eq.~\ref{eq:groupxs} where $\sigma(E)$ is the continuous microscopic cross section. A weighting function, $f$, is used to weight some energies. The weighting function can be any of a number commonly used functions. The following section discusses the data format used by the DOCTORS code.
+Once the energy group structure is selected, cross section data must be available. Group averaged cross section values from energy $E_1$ to $E_2$ are computed using Eq.~\ref{eq:groupxs} where $\sigma(E)$ is the continuous microscopic cross section. A weighting function, $f$, is used to weight some energies. The weighting function can be any of a number commonly used functions. 
 
 \begin{equation}\label{eq:groupxs}
-\sigma_G = \frac{\int_{E_1}^{E_2}f(E')\sigma(E') dE'}{\int_{E_1}^{E_2}}
+\sigma_G = \frac{\int_{E_1}^{E_2}f(E')\sigma(E') dE'}{\int_{E_1}^{E_2} dE'}
 \end{equation}
-
-\subsection{Cross Section Parsing}
-AMPX cross sections are read in binary. They are formatted like so. They are read like so. They were obtained from SCALE6.2. These files can be generated by other codes.
-
-The file is split into a series of records. Each record is a string of binary bytes between a four byte header and four byte footer. The header and footer are identical and, when interpreted as a signed four byte integer, give the size in words of the record. A word is a 32-bit chunk (4 bytes) of binary data. The data is stored in Big Endian format which must be converted to Little Endian for most Intel and AMD processors. An example record is shown in Fig.~\ref{fig:ampxbytes1} and the endianess rearrangement is shown in Fig.~\ref{fig:ampxbytes2}. Once the bytes are properly ordered, the entire string can be reinterpreted as a 32-bit integer. In the case of the header bytes given in Fig.~\ref{fig:ampxbytes1} and~\ref{fig:ampxbytes2}, the bytes correspond to the integer 440 which is the length in bytes of the header record.
-
-\begin{figure}[tb]
-  \begin{center}
-   \includegraphics[width=3.75in]{figs/ampxbytes1}
-  \end{center}
-  \caption{The bytes}
-\label{fig:ampxbytes1}
-\end{figure}
-
-\begin{figure}[tb]
-  \begin{center}
-   \includegraphics[width=3.75in]{figs/ampxbytes2}
-  \end{center}
-  \caption{The byte ordering.}
-\label{fig:ampxbytes2}
-\end{figure}
-
-The size always reports the number of 32-bit words required to store the data. However, some data types, such as characters, are only 8 bits so each word represents four distinct characters.
-
-DOCTORS reads AMPX fromatted binary data files. Figure~\ref{fig:ampx} shows the data format of the overall file. The header section contains information about each individual nuclide such as which reaction types are available as well as information the same such as the group structure information.
-
-The first entry in a nuclide is the directory record. The directory contains general information regarding the nuclide and information necessary to parse the proceeding records.
-
-Bondarenko data and resonance parameters.
-
-The next block of data contains the average cross section data. This data is averaged over all energies and directions using Eq.~\ref{eq:groupxs}. The only data used in this section in DOCTORS is the total cross section values necessary for implementing the fully discretized form of the LBE given later.
-
-The 2D data is stored in a special format optimized for scatter matrix data.
-
-\begin{figure}
-    \centering
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figs/ampx1}
-        \caption{The AMPX file format}
-        \label{fig:ampx1}
-    \end{subfigure}
-    ~
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figs/ampx2}
-        \caption{The structure of each individual record.}
-        \label{fig:ampx2}
-    \end{subfigure}
-    \caption{The format of the AMPX file.}\label{fig:ampx}
-\end{figure}
-
-The binary data file is composed of multiple records, each of one of thirteen types. Each record is formatted differently to hold different data.
-
-Once the data is parsed, weighted combinations of elemental data is used to create material cross sections.
-
-WATER EXAMPLE.
-
-\begin{figure}
-    \centering
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figs/airwaterxs2_19group}
-        \caption{19 group data}
-        \label{fig:airwaterxs2_19group}
-    \end{subfigure}
-    ~
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figs/airwaterxs2_47group}
-        \caption{47 group data.}
-        \label{fig:airwaterxs2_47group}
-    \end{subfigure}
-    \caption{Comparison of the group-averaged DOCTORS cross section data to continuous NIST data.}\label{fig:airwaterxs_group}
-\end{figure}
 
 \subsection{Spatial Discretization}
 
-Finally, Eq.~\ref{eq:boltz_e} is discretized in space to give Eq.~\ref{eq:boltz_i} which is fully discretized. The problem domain is split into an evenly spaced Cartesian grid. The grid spacing between each of the spatial dimensions does not necessarily need to be uniform, but it often is in the case of CT voxel phantoms.
+The problem domain is split into an evenly spaced Cartesian grid. The grid spacing between each of the spatial dimensions does not necessarily need to be uniform, but it often is in the case of CT voxel phantoms.
 
-The problem domain must be a regular rectangular parallelpiped of size $D_x$, $D_y$, and $D_z$ in the $x$, $y$, and $z$ directions respectively. The mesh is partitioned into $N_x$, $N_y$, and $N_z$ evenly spaced bins along each direction. The total number of voxels, $N_V$ is easily computed as the multiple of each of the component directions given in Eq.~\ref{eq:n_v}.
+The problem domain must be a regular, rectangular parallelpiped of dimension $D_x \times D_y \times D_z$. The mesh is partitioned into $N_x$, $N_y$, and $N_z$ evenly spaced bins along each major direction. The total number of voxels, $N_V$ is easily computed as the multiple of each of the component directions given in Eq.~\ref{eq:n_v}.
 
 \begin{equation} \label{eq:n_v}
 	N_V = N_x N_y N_z
 \end{equation}
 
-Voxel indices are reordered into a one dimensional vector (flattened) according to the rule given in Eq.~\ref{eq:indx_flat}. Note that indices start at zero.
+Voxels can be indexed in one of two ways, eitehr be their component indices or its global index. Each voxel in the mesh has three components indices, one in each major direction, $ix$, $i_y$, and $i_z$ that rante from 0 to $N_x - 1$, $N_y - 1$, or $N_z-1$. However, this makes indexing cumbersome, so they are combined into a unique glorbal index, $i$ using Eq.~\ref{eq:n_v}. In general, this is known as "flattening" a matrix into a one-dimensional vector.
 
 \begin{equation} \label{eq:indx_flat}
 	i = i_x (N_z + N_y) + i_y N_z + i_z
 \end{equation}
 
-The spatial mesh is shown in Fig.~\ref{fig:spatial_disc}. The size of each voxel in each dimension is computed by dividing the size of the problem domain along in that dimension by the number of mesh elements along the same direction. Eq.~\ref{eq:mesh_x} shows this computation for the $x$ direction. Analagous equations apply in the $y$ and $z$ directions as well.
+The spatial mesh is shown in Fig.~\ref{fig:spatial_disc}. The length of a voxel along a major direction is computed by dividing the size of the problem domain along that dimension by the number of mesh elements. Eq.~\ref{eq:mesh_x} shows this computation for the $x$ direction. Analagous equations apply in the $y$ and $z$ directions as well.
 
 \begin{equation} \label{eq:mesh_x}
 \Delta x = \frac{D_x}{N_x}
@@ -259,7 +231,7 @@ The spatial mesh is shown in Fig.~\ref{fig:spatial_disc}. The size of each voxel
 \label{fig:spatial_disc}
 \end{figure}
 
-The index of interest is denoted as a subscript $i$ which makes the fully discretized form of the steady state Linear Boltzmann Equation given in Eq.~\ref{eq:boltz} into the fully discretized form given in Eq.~\ref{eq:boltz_i}
+The fully discretized form of the steady state LBE given in Eq.~\ref{eq:boltz} is
 
 \begin{equation} \label{eq:boltz_i}
 \left[ \hat{\Omega}_a \cdot \nabla + \Sigma_{t,i}^g \right]
@@ -275,29 +247,32 @@ To solve the fully discretized form of the Linear Boltzmann Equation given in Eq
 \nabla f(x, y, z) = \frac{\partial f(x, y, z)}{\partial x} \hat{i} + \frac{\partial f(x, y, z)}{\partial y} \hat{j} + \frac{\partial f(x, y, z)}{\partial z} \hat{k}
 \end{equation}
 
-To the first order, a partial derivitive can be computed using Eq.~\ref{eq:deriv_1}.
+To a first order approximation, a partial derivitive can be computed using Eq.~\ref{eq:deriv_1}.
 
 \begin{equation} \label{eq:deriv_1}
-\frac{\partial f(x)}{\partial x} \approx \frac{f(x) - f(x + \Delta x)}{\Delta x}
+\frac{\partial f(x)}{\partial x} \approx \frac{f(x+\Delta x/2) - f(x + \Delta x/2)}{\Delta x}
 \end{equation}
 
-Using the definition of $\Omega$ and Eq.~\ref{eq:grad} the $\hat{\Omega} \cdot \nabla \psi$ term can be rewritten using Eq.~\ref{eq:spatial_1}
+Using the definition of $\hat{\Omega}$ and Eq.~\ref{eq:grad} the $\hat{\Omega} \cdot \nabla \psi$ term can be rewritten as
 
 \begin{equation} \label{eq:spatial_1}
 \begin{split}
-\Omega \cdot \nabla \psi & \approx 
-\left\langle \mu, \eta, \xi \right\rangle \cdot
-\left\langle \frac{\psi(x) - \psi(x + \Delta x)}{\Delta x},
-\frac{\psi(y + \Delta y) - \psi(y)}{\Delta y},
-\frac{\psi(z + \Delta z) - \psi(z)}{\Delta z} \right\rangle \\
+\Omega \cdot \nabla \psi 
+& = <\mu, \eta, \xi> \cdot <\frac{\partial \psi}{\partial x}, \frac{\partial \psi}{\partial y}, \frac{\partial \psi}{\partial z}> \\
+& =
+\frac{\partial \psi}{\partial x}\mu + \frac{\partial \psi}{\partial y}\eta + \frac{\partial \psi}{\partial z}\xi \\
 & \approx 
-\frac{\psi(x + \Delta x) - \psi(x)}{\Delta x} \mu + 
-\frac{\psi(y + \Delta y) - \psi(y)}{\Delta y} \eta + 
-\frac{\psi(z + \Delta z) - \psi(z)}{\Delta z} \xi
+\frac{\psi(x + \Delta x/2, y, z) - \psi(x - \Delta x/2, y, z)}{\Delta x} \mu \\
+&+ 
+\frac{\psi(x, y + \Delta y/2, z) - \psi(x, y - \Delta y/2, z)}{\Delta y} \eta \\
+&+ 
+\frac{\psi(x, y, z + \Delta z/2) - \psi(x, y, z - \Delta z/2)}{\Delta z} \xi
 \end{split}
 \end{equation}
 
-Along some direction, $\Omega$, as it enters an arbitrary voxel, it must pass through either of the sides indicated in red and exit via the other as shown in Fig.~\ref{fig:gradient}. Fig.~\ref{fig:gradient} uses the $yz$ faces of the voxel for illustration. If $\eta$ is positive, $\Omega$ will enter through the $x_i$ surface and exit through the $x_{i+1}$ surface. If $\eta$ is negative, this order will be reversed. A limitation to this methodology is that $\mu$, $\eta$, and $\xi$ are assumed to be nonzero. This is ensured as long as none of the directions in the quadrature are parallel to a major axis.
+As a particle enters the voxel shown in Fig.~\ref{fig:gradient} along some direction, $\Omega$, as indicated in Fig.~\ref{fig:gradient}, SOMETHING. 
+
+The surface flux. WRT the direction omega. This allows generalization.
 
 \begin{figure}[tb]
   \begin{center}
@@ -306,25 +281,6 @@ Along some direction, $\Omega$, as it enters an arbitrary voxel, it must pass th
   \caption{The caption.}
 \label{fig:gradient}
 \end{figure}%
-
-Depending on the sign of $\eta$, the first order approximation of the a derivitive along the $y$ direction is given by Eq.~\ref{eq:grad_y}.
-
-\begin{equation} \label{eq:grad_y}
-\begin{split}
-\frac{\partial f}{\partial y} &= \frac{f(x_i) - f(x_{i+1})}{\Delta x}, \quad \eta>0 \\
-\frac{\partial f}{\partial y} &= \frac{f(x_{i+1}) - f(x_{i})}{\Delta x}, \quad \eta <0 \\
-\frac{\partial f}{\partial y} &= 0, \quad \eta=0
-\end{split}
-\end{equation}
-
-Equation~\ref{eq:grad_y} can be generalized to use $f_{in}$ and $f_{out}$ instead of relying on the $x$-coordinate. This is given in Eq.~\ref{eq:grad_y2}
-
-\begin{equation} \label{eq:grad_y2}
-\begin{split}
-\frac{\partial f}{\partial y} &= \frac{f_{in} - f_{out}}{\Delta x}, \quad \eta \neq 0 \\
-\frac{\partial f}{\partial y} &= 0, \quad \eta=0
-\end{split}
-\end{equation}
 
 The generalization of Eq.~\ref{eq:grad_y2} is applied to Eq.~\ref{eq:deriv_1} to yield Eq.~\ref{eq:deriv_2} which is generally valid for all octants.
 
@@ -338,22 +294,25 @@ The generalization of Eq.~\ref{eq:grad_y2} is applied to Eq.~\ref{eq:deriv_1} to
 Using the approximation given in Eq.~\ref{eq:deriv_2}, Eq.~\ref{eq:boltz_i} can be rewritten as Eq.~\ref{eq:boltz_i2}.
 
 \begin{equation} \label{eq:boltz_i2}
-\left[ 
+\begin{split}
+&\left[ 
 \frac{\psi_{i,a,x,in}^g - \psi_{i,a,x,out}^g}{\Delta x} \mu + 
 \frac{\psi_{i,a,y,in}^g - \psi_{i,a,y,out}^g}{\Delta y} \eta + 
 \frac{\psi_{i,a,z,in}^g - \psi_{i,a,z,out}^g}{\Delta z} \xi
 \right]
-+ \Sigma_{t,i}^g \psi_{i,a}^{g} = 
++ \Sigma_{t,i}^g \psi_{i,a}^{g} \\
+& = 
 \sum_{a=0}^{N_a-1} \sum_{g'=g}^{G-1} \Sigma_{s, i, a, a'}^{g, g'} \psi_{i, a'}^{g'} \omega_a + S_{i,a}^g
+\end{split}
 \end{equation}
 
-It is useful to point out that each of $\psi_{i,a,x,in}^g$, $\psi_{i,a,x,out}^g$, $\psi_{i,a,y,in}^g$, $\psi_{i,a,y,out}^g$, $\psi_{i,a,z,in}^g$, and $\psi_{i,a,z,out}^g$ are \textit{surface} flux values while $\psi_{i,a}^{g}$ is a \textit{volume averaged} flux value.
+It is useful to point out that each of $\psi_{i,a,x,in}^g$, $\psi_{i,a,x,out}^g$, $\psi_{i,a,y,in}^g$, $\psi_{i,a,y,out}^g$, $\psi_{i,a,z,in}^g$, and $\psi_{i,a,z,out}^g$ are \textit{surface} averaged flux values while $\psi_{i,a}^{g}$ is a \textit{volume} averaged flux value.
 
-In order for the discretized Linear Boltzmann Equation to be solved using Eq.~\ref{eq:boltz_i2}, the incoming flux must always be known. Either the boundary conditions or previously calculated values are used to determine each incoming flux. Therefore, in order to compute the average flux in a cell, some relationship between the average flux and the outgoing surface fluxes must be known. These values can be related by any one of many different mechanisms, the most common of which is the diamond difference approximation.
+In order for the discretized LBE to be solved using Eq.~\ref{eq:boltz_i2}, the incoming flux must always be known. Either the boundary conditions or previously calculated values determine the incoming flux. Therefore, in order to compute the average flux in a cell, some relationship between the average flux and the outgoing surface fluxes must be known. These values can be related by any one of many different mechanisms, the most common of which is the diamond difference approximation.
 
 \subsection{Diamond Difference Approximation}
 
-In the diamond difference approximation, it is assumed that the incoming and outgoing flux are both known. The average flux is assumed to be the average of the two surface fluxes. This is assumed to be the case in all three spatial dimensions. This leads to Eq.~\ref{eq:dd}.
+The diamond difference approximation, relates the incoming and outgoing surface fluxs to the cell averaged flux. The average flux is assumed to be the average of the two surface fluxes. This is assumed to be the case in all three spatial dimensions. This leads to Eq.~\ref{eq:dd}.
 
 \begin{equation} \label{eq:dd}
 \begin{split}
@@ -373,16 +332,19 @@ Multiplying both sides of Eq.~\ref{eq:dd} and subtracting twice the outgoing sur
 \end{split}
 \end{equation}
 
-The form of the left hand side of Eq.~\ref{eq:dd2} is the same as in Eq.~\ref{eq:boltz_i2}. This allows Eq.~\ref{eq:dd2} to be used to make a substitution in Eq.~\ref{eq:boltz_i2} that removes the dependence on the outgoing flux from discretized equation. After the substitution, Eq.~\ref{eq:boltz_i3} will arise.
+The form of the left hand side of Eq.~\ref{eq:dd2} is the same as in Eq.~\ref{eq:boltz_i2}. This allows Eq.~\ref{eq:dd2} to be used to make a substitution in Eq.~\ref{eq:boltz_i2} that removes the dependence on the outgoing flux from discretized equation. After the substitution:
 
 \begin{equation} \label{eq:boltz_i3}
-\left[ 
+\begin{split}
+&\left[ 
 \frac{2\psi_{i,a}^{g} - \psi_{i,a,x,out}^g}{\Delta x} \mu + 
 \frac{2\psi_{i,a}^{g} - \psi_{i,a,y,out}^g}{\Delta y} \eta + 
 \frac{2\psi_{i,a}^{g} - \psi_{i,a,z,out}^g}{\Delta z} \xi
 \right]
-+ \Sigma_{t,i}^g \psi_{i,a}^{g} = 
++ \Sigma_{t,i}^g \psi_{i,a}^{g} \\
+& = 
 \sum_{a=0}^{N_a-1} \sum_{g'=g}^{G-1} \Sigma_{s, i, a, a'}^{g, g'} \psi_{i, a'}^{g'} \omega_a + S_{i,a}^g
+\end{split}
 \end{equation}
 
 The diamond difference approximation defined in Eq.~\ref{eq:dd} can also be rearranged to solve for each outgoing flux once the volume averaged flux is computed. The outgoing flux is given by Eq.~\ref{eq:dd3}.
@@ -398,7 +360,8 @@ The diamond difference approximation defined in Eq.~\ref{eq:dd} can also be rear
 Rearranging Eq.~\ref{eq:boltz_i3} to factor out the volume averaged flux term yields Eq.~\ref{eq:boltz_i4}.
 
 \begin{equation} \label{eq:boltz_i4}
-\left[ 
+\begin{split}
+&\left[ 
 \frac{2\psi_{i,a}^{g}}{\Delta x} \mu + 
 \frac{2\psi_{i,a}^{g}}{\Delta y} \eta + 
 \frac{2\psi_{i,a}^{g}}{\Delta z} \xi
@@ -408,11 +371,13 @@ Rearranging Eq.~\ref{eq:boltz_i3} to factor out the volume averaged flux term yi
 \frac{2\psi_{i,a,y,out}^g}{\Delta y} \eta + 
 \frac{2\psi_{i,a,z,out}^g}{\Delta z} \xi
 \right]
-+ \Sigma_{t,i}^g \psi_{i,a}^{g} = 
++ \Sigma_{t,i}^g \psi_{i,a}^{g} \\
+& = 
 \sum_{a=0}^{N_a-1} \sum_{g'=g}^{G-1} \Sigma_{s, i, a, a'}^{g, g'} \psi_{i, a'}^{g'} \omega_a + S_{i,a}^g
+\end{split}
 \end{equation}
 
-Equation~\ref{eq:boltz_i4} can be directly solved for the volume averaged flux. The result is given in Eq.~\ref{eq:boltz_i5}.
+Equation~\ref{eq:boltz_i4} can be directly solved for the volume averaged flux. The result is
 
 \begin{equation} \label{eq:boltz_i5}
 \psi_{i,a}^{g} = 
@@ -431,11 +396,13 @@ Equation~\ref{eq:boltz_i4} can be directly solved for the volume averaged flux. 
 }
 \end{equation}
 
+Repeatedly iteration Eq.~\ref{eq:boltz_i5} will eventually yield the solution to the flux distribution regardless of the intial guess. Choosing an accurate guess can greatly accelerate the code and guide convergence on a more accurate solution as discussed in more detail in Section~\ref{sec:uncol}. Either way, some metric must be used to determine when to stop the iteration process.
+
 \subsection{Convergence Criteria}
-The typical converence criteria used to determine whether or to terminate further iteration is the maximum relative error from the $i-1^{th}$ iteration to the $i^{th}$ iteration given in Eq.~\ref{eq:conv}. Once the relative error in the parameter of interest, $\phi$ is below some threshold, $\epsilon$, the iteration stops and the solution is considered converged.
+The typical converence criteria used to determine whether or to terminate further iteration is the maximum relative error from the $i-1^{th}$ iteration to the $i^{th}$ iteration given in Eq.~\ref{eq:conv} over the phase space $\mathbb{R}$. Once the relative error in the parameter of interest, $\phi$ is below some threshold, $\epsilon$, the iteration stops and the solution is considered converged.
 
 \begin{equation}\label{eq:conv}
-\frac{\phi_i - \phi_{i-1}}{\phi_i} < \epsilon
+\max_{\mathbb{R}} \left\{ \frac{\phi_i - \phi_{i-1}}{\phi_i} \right\} < \epsilon
 \end{equation}
 
 In some problems, the convergence criteria given in Eq.~\ref{eq:conv} is not reached for many iterations. In these cases, terminating the solution early rather than waiting for full convergence is appropriate. This is enforced by a second criterial. Whenever the number of iterations, $i$, exceeds the total permissible number of iterations, $I$, the iteration is terminated.
@@ -444,7 +411,9 @@ In some problems, the convergence criteria given in Eq.~\ref{eq:conv} is not rea
 i > I
 \end{equation}
 
-Under further investigation, the cause of the convergence failure that results in Eq.~\ref{eq:conv2} being exercised often stems from floating point error. The flux magnitude fluctuates wildly in regions of very flow flux, such as the gantry. In these regions, the relative uncertainty will remain much higher than in regions with smoother flux distributions. FIGURE XYZ SHOWS.
+Under further investigation, the cause of the convergence failure that results in Eq.~\ref{eq:conv2} being exercised often stems from floating point error. The flux magnitude fluctuates wildly in regions of very flow flux, such as the gantry. In these regions, the relative uncertainty remains much higher than in regions with smoother flux distributions. 
+
+FIGURE XYZ SHOWS.
 
 In order to measure the uncertainty due to floating-point error, another convergence criteria was added. Rather than looking at the relative change from iteration to iteration, the total absolute change is measured, computed by Eq.~\ref{eq:conv3}. The termination criteria is given by Eq.~\ref{eq:conv4}. Computation of a value for $\epsilon$ requires two previous iteration, thus this condition cannot be met until the third iteration and thereafter.
 
@@ -458,7 +427,11 @@ In order to measure the uncertainty due to floating-point error, another converg
 
 \subsection{Anisotropy Treatment}
 
-Scatter is assumed to be a function of only the scatter angle between the initial and scattered directions, $\theta_s$. Often, the cosine of the scatter angle, $\mu_s$ is used.
+Scatter is assumed to be a function of only the scatter angle $\theta_s$ between the initial, $\hat{\Omega}_a$, and scattered, $\hat{\Omega}_{a'}$, directions. The cosine of the scatter angle, $\mu_s$ is related by Eq.~\ref{eq:scat_cos}.
+
+\begin{equation} \label{eq:scat_cos}
+\mu_s = \Omega_a \cdot \Omega_{a'} = \cos(\theta_s) \,, \quad 0 \leq \theta_s \leq \pi
+\end{equation}
 
 \begin{figure}[tb]
   \begin{center}
@@ -468,17 +441,15 @@ Scatter is assumed to be a function of only the scatter angle between the initia
 \label{fig:scat_ang}
 \end{figure}%
 
-The data files containing the scatter cross sections are distributed using a Legendre polynomial expansion. The use of a Legendre expansion removes the dependence on the quadrature from the data. This allows any quadrature to work with any dataset. A $l$-order Legendre polynomial is donoted by $P_l$. The anisotropic scatter cross section can then be rewritten as a Legendre expansion given in Eq.~\ref{eq:leg_1} where the scatter cosine is defined in Eq.~\ref{eq:scat_cos}
+The data files containing the scatter cross sections are distributed using a Legendre polynomial expansion. The use of a Legendre expansion removes the dependence on the quadrature from the data. This allows any quadrature to work with any cross section dataset. A $l$-order Legendre polynomial is denoted by $P_l$. Details of the Legendre polynomials can be found in Appendix~\ref{appdx:leg}. The anisotropic scatter cross section ise rewritten as a Legendre expansion given where the scatter cosine is defined in Eq.~\ref{eq:scat_cos} as
 
 \begin{equation} \label{eq:leg_1}
 \Sigma_{s, i, a, a'}^{g, g'} = \sum_{l=0}^L \frac{2l+1}{4 \pi}\Sigma_{s, i, l}^{g, g'} P_l(\mu_s)
 \end{equation}
 
-\begin{equation} \label{eq:scat_cos}
-\mu_s = \Omega_a \cdot \Omega_{a'}
-\end{equation}
 
-\section{Uncollided Solution Methods}
+
+\section{Uncollided Solution Methods}\label{sec:uncol}
 To avoid ray effect, the flux is split into collided and uncollided components as shown in Eq.~\ref{eq:totflux}. Equation~\ref{eq:boltz} can be rewritten as two equations solving for the uncollided flux, $\psi_u$, and collided flux, $\psi_c$ independently. Equation~\ref{eq:unc} has no scatter term since scattered particles are not considered in the uncollided flux. The source term, $S_u$, in Eq.~\ref{eq:col} is the first collision source.
 
 \begin{equation} \label{eq:totflux}
