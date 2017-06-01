@@ -21,7 +21,7 @@
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
 
-This chapter summarizes the solution methodology employed by DOCTORS. The techniques used to compute the collided and uncollided fluxes are described in seperate sections. After the flux solution methodology is explained, the methods used for source generation and flux to dose conversion are covered.
+This chapter summarizes the solution methodology employed by DOCTORS. The techniques used to compute the collided and uncollided fluxes are described in seperate sections. After the flux solution methodology is explained, the methods used for source generation and flux-to-dose conversion are covered.
 
 \section{Discrete Ordinate Methods}
 
@@ -31,7 +31,7 @@ The discrete ordinate solver computes the flux distribution inside the CT mesh g
 
 The linear Boltzmann equation (LBE) is generally true of any particle given that outside forces (electromagnetic or graitational) are either not present or negligible and particle-particle collisions are insignificant. Therefore, the LBE is generally not valid for charged parpticles or systems whose particle density is on the order of the medium they are traveling trhrough. In such systems, particle-particle ineractions may not be negligible.  
 
-In general, the LBE is valid for multiplying media (such as neutrons passing through fuel in a reactor), but the variant considered in this work omits such terms since only photons in medical systems are of concern. The time dependent linear Boltzmann equation for photons is
+In general, the LBE is valid for multiplying media (such as neutrons passing through fuel in a reactor), but the variant considered in this work omits such terms since only photons in medical systems are of concern. Solutions to the LBE can also be used to solve criticality eigenvalue problems or to produce adjoint parameters for other codes. Such solutions are not considered in this work.
 
 \begin{equation} \label{eq:boltz_t_dep}
 \begin{split}
@@ -450,7 +450,11 @@ The data files containing the scatter cross sections are distributed using a Leg
 
 
 \section{Uncollided Solution Methods}\label{sec:uncol}
-To avoid ray effect, the flux is split into collided and uncollided components as shown in Eq.~\ref{eq:totflux}. Equation~\ref{eq:boltz} can be rewritten as two equations solving for the uncollided flux, $\psi_u$, and collided flux, $\psi_c$ independently. Equation~\ref{eq:unc} has no scatter term since scattered particles are not considered in the uncollided flux. The source term, $S_u$, in Eq.~\ref{eq:col} is the first collision source.
+One of the earliest problems with the discrete orinates method is the ppresence of ray effect. Ray effect arises due to the restriction of particle transport to discrete set of directions. As particles stream out of a point source, into a vacuum, the stream out along the set of direction schosen only. Since no scatter takes place in vacuum conditions, the praticles have no means to escape their initial direction. This gives rise to the phenomena observed in Fig.~FIGURE. This phenomena has been thrououghly studied by many [CITE].
+
+The solution to prevent ray effect is to utilize an analytical uncollided source term. The full flux solution is split into two subproblems. Equation~\ref{eq:boltz} is rewritten as two equations solving for the uncollided flux, $\psi_u$, and collided flux, $\psi_c$ independently. Equation~\ref{eq:unc} has no scatter term since scattered particles are not considered in the uncollided flux. The lack of a scatter term makes the uncollided flux (whose analytical solution is intuitive) computable with a raytracing algorithm.
+
+The source term, $S_u$, in Eq.~\ref{eq:col} is the first collision source. The uncollided flux is driven by an external source. The flux distribution is solved analytically.
 
 \begin{equation} \label{eq:totflux}
 \psi = \psi_u + \psi_c
@@ -469,6 +473,104 @@ To avoid ray effect, the flux is split into collided and uncollided components a
 \end{split}
 \end{equation}
 
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figs/rayeffect_ex1}
+        \caption{}
+        \label{fig:rayeffect_ex1}
+    \end{subfigure}
+    ~ 
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figs/rayeffect_ex2}
+        \caption{}
+        \label{fig:rayeffect_ex2}
+    \end{subfigure}
+    ~ 
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figs/rayeffect_ex3}
+        \caption{}
+        \label{fig:rayeffect_ex3}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.2\textwidth}
+        \includegraphics[width=\textwidth]{figs/rayeffect_ex4}
+        \caption{}
+        \label{fig:rayeffect_ex4}
+    \end{subfigure}
+    \caption{The process}\label{fig:rayeffect_ex}
+\end{figure}
+
+This then results in the value shown in the next figure.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/rayeffect_iso4annot}
+        \caption{}
+        \label{fig:rayeffect_iso4annot}
+    \end{subfigure}
+    ~ 
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/rayeffect_beam4annot}
+        \caption{}
+        \label{fig:rayeffect_beam4annot}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/rayeffect_iso12}
+        \caption{}
+        \label{fig:rayeffect_iso12}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/rayeffect_beam12}
+        \caption{}
+        \label{fig:rayeffect_beam12}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/rayeffect_iso500}
+        \caption{}
+        \label{fig:rayeffect_iso500}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/rayeffect_beam500}
+        \caption{}
+        \label{fig:rayeffect_beam500}
+    \end{subfigure}
+    \caption{The ray effect artifact. The subfigures on the left (a, c, and e) show the correct solution modeled with $1/r^2$. The right subfigures (b, d, and f) show the corresponding solution with ray effect generated by the process described in Fig.~\ref{fig:rayeffect_ex}. The top row of subfigures uses 4 cells, the middle row uses 12, and the bottom row uses 500.}\label{fig:rayeffect_comp}
+\end{figure}
+
+Consider an isotropic point source in a homogeneous media. The (scalar) flux well known to be
+
+\begin{equation}
+\varphi(r, E) = \frac{S_0(E) e^{-\mu(E) r}}{4 \pi r^2}
+\end{equation}
+
+\noindent where $S_0$ is the source strength, $\mu$ is the attenuation coefficient in the material, and $r$ is the distance traveled by the photon [CITE]. Expanding the problem to a full 3D model, the flux at $\boldsymbol{r}$ from a point source at $\boldsymbol{s}$ is
+
+\begin{equation}\label{eq:isouncol}
+\varphi(\boldsymbol{r}, E) = \frac{S_0(E) e^{-\mu(E) |\boldsymbol{r}-\boldsymbol{s}|}}{4 \pi |\boldsymbol{r}-\boldsymbol{s}|^2}.
+\end{equation}
+
+\noindent
+The only tricky step is the introduction of anisotropy. The $4 \pi$ solid angle term is generally expressed by
+
+\begin{equation}
+\int_{4 \pi}^{} \int_{0}^{\infty} S_0(E, \hat{\Omega}) dE d\hat{\Omega}
+\end{equation}
+
+\noindent
+but generally the normalization remains $4 \pi$. The flux is nonzero \textit{only} in the direction of travel, namely in the unit direction $\vec{r} - \vec{s}$. Therefore, a Kroenecker delta function (defined in Eq.~\ref{eq:kronecker}) is used to produce
+
+\begin{equation}
+\psi(\boldsymbol{r}, E, \hat{\Omega}) = \frac{S_0(E, \hat{\Omega}) e^{-\mu(E) |\boldsymbol{r}-\boldsymbol{s}|}}{4 \pi |\boldsymbol{r}-\boldsymbol{s}|^2} \delta \left( \hat{\Omega}, \frac{\boldsymbol{r} - \boldsymbol{s}}{|\boldsymbol{r} - \boldsymbol{s}|^2}\right)
+\end{equation}
+
+
+
 The uncollided flux in Eq.~\ref{eq:unc} can be analytically solved. The solution is given in Eq.~\ref{eq:uncsol} for a known isotropic point source located at position $\boldsymbol{s}$. The $\delta$ symbol in Eq.~\ref{eq:uncsol} is the Kronecker delta given by Eq.~\ref{eq:kronecker}. 
 
 \begin{equation} \label{eq:uncsol}
@@ -479,10 +581,10 @@ S(\boldsymbol{s}, E)
 \end{equation}
 
 \begin{equation} \label{eq:kronecker}
-\delta(\vec{A}, \vec{B}) = 
+\delta(\boldsymbol{A}, \boldsymbol{B}) = 
 \begin{cases}
-1, \quad \mathrm{if} \ \vec{A}=\vec{B} \\
-0, \quad \mathrm{otherwise}
+1 \,, \quad \mathrm{if} \ \boldsymbol{A}=\boldsymbol{B} \\
+0 \,, \quad \mathrm{otherwise}
 \end{cases}
 \end{equation}
 
@@ -509,11 +611,13 @@ Substituting Eq.~\ref{eq:uncsrc} into $S_u$ in Eq.~\ref{eq:col} gives Eq.~\ref{e
 \begin{equation} \label{eq:col2}
 \begin{split}
 	&\left[ \hat{\Omega} \cdot \nabla + \Sigma_t(\boldsymbol{r}, E) \right]
-	\psi_c(\boldsymbol{r}, E, \hat{\Omega}) = \\
-	&\int_{4 \pi} \int_0^\infty \Sigma_s(\boldsymbol{r}, E' \rightarrow E, \hat{\Omega}' \rightarrow \hat{\Omega}) \psi_c(\boldsymbol{r}, E', \hat{\Omega}') dE' d\hat{\Omega}' + \\
+	\psi_c(\boldsymbol{r}, E, \hat{\Omega}) \\
+	&=
+	\int_{4 \pi} \int_0^\infty \Sigma_s(\boldsymbol{r}, E' \rightarrow E, \hat{\Omega}' \rightarrow \hat{\Omega}) \psi_c(\boldsymbol{r}, E', \hat{\Omega}') dE' d\hat{\Omega}' + \\
 	&\int_{4\pi} \int_{0}^{\infty} 
 \Sigma_s(\boldsymbol{r}, E' \rightarrow E, \hat{\Omega}' \rightarrow \hat{\Omega}) \psi_u(\boldsymbol{r}, E', \hat{\Omega}') 
-dE' d\hat{\Omega}'
+dE' d\hat{\Omega}' \\
+& = \int_{4 \pi} \int_{0}^{\infty} \Sigma_s(\boldsymbol{r}, E' \rightarrow E, \hat{\Omega}' \rightarrow \hat{\Omega}) \psi(\boldsymbol{r}, E', \hat{\Omega}') dE' d\hat{\Omega}'
 \end{split}
 \end{equation}
 
@@ -526,15 +630,29 @@ dE' d\hat{\Omega}'
 \end{equation}
 
 \section{Source Generation}
-There are many kinds of external sources implemented in this work.
+All photon tranpot problems considered in the DOCTORS code ar eultimately driven by an external source, namely th emedical equipment producing the photon beam. These sources can com ein a variety of geometric shapes and energy spectra. Currently, CODTORS has  anumber of built in beam typees available for anlaysis including point sources, fan beams, and cone beams. Fan beams and cone beams cna be arranged about a phantom to produce an axial slice. Currently, helical paths are not supported, though they could be added with minimal excess effort.
 
 \subsection{Point Source}
-The simplest source implemented is an isotropic point source. This source is defined only by its position and energy distribution. The center of the cell whose flux is being computed is located at position $<C_x, C_y, C_z>$ and the point source is located at position $<S_x, S_y, S_z>$.
+The simplest source implemented is an isotropic point source. This source is defined only by its position and energy distribution. Given a source a $s$, the uncollided flux at the center of a cell, $<c>$ is computing using Eq.~\ref{eq:isouncol}. The collided flux is then computed using the discrete ordinate solution to the LBE using Eq.~\ref{eq:xxx}.
 
 \subsection{Fan Source}
-In addition to the values defining a point source (position $\vec{S}$ and the energy distribution) a fan source is defined by two additional parameters, $\varphi$ and $\theta$ which describe the azimuthal and polar angles subtented by the fan beam respectively. Figure~\ref{fig:fanbeam} shows $\varphi$ and $\theta$ in reference to the geometry setup. The raytracing algorithm used for the fan beam is identical to the point source raytracer except for one difference: before the raytracing is done, whether the ray falls within the fan beam is determined and any ray falling outside the fan beam is not traced, its uncollided flux is immediately set to zero.
+In addition to the values defining a point source (position $\vec{S}$ and the energy distribution) a fan source is defined by two additional parameters, $\varphi$ and $\theta$ which describe the azimuthal and polar angles subtented by the fan beam respectively. Figure~\ref{fig:fanbeam} shows $\varphi$ and $\theta$ in reference to the geometry setup. The raytracing algorithm used for the fan beam is identical to the point source raytracer except for one difference: before the raytracing is done, whether the ray falls within the fan beam is determined and any ray falling outside the fan beam is not traced, its uncollided flux is immediately set to zero. Some voxels are partially enclosed inside the beam.
 
-Some voxels would be partially enclosed inside the beam. A partial acceptance value is computed for these voxels and multiplied by the final result of the raytrace.
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{.45 \textwidth}
+        \includegraphics[width=\textwidth]{figs/shape_fanbeam}
+        \caption{}
+        \label{fig:shape_fanbeam}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{.45 \textwidth}
+        \includegraphics[width=\textwidth]{figs/shape_conebeam}
+        \caption{}
+        \label{fig:shape_conebeam}
+    \end{subfigure}
+    \caption{(a) The fanbeam is defined by $\theta$ in the polar coordinate and $\varphi$ azimuthally. (b) The cone beam is described only be $\theta$.}\label{fig:shape}
+\end{figure}
 
 \begin{figure}[tb]
   \begin{center}
@@ -544,7 +662,7 @@ Some voxels would be partially enclosed inside the beam. A partial acceptance va
 \label{fig:fan_rejection}
 \end{figure}
 
-First, the ray direction is projected onto the $xy$ plane giving $<S_x, S_y, 0>$ and $C_x, C_y, 0$. Then the vector from the source to the geometry center and the vector from the source to the cell center are dotted to give the cosine of the angle between them as shown in Eq.~\ref{eq:phicos}. Once $\zeta$ is computed, the condition given by Eq.~\ref{eq:phicoscon} is evaluated. If the condition is met, the angle is accepted and raytraced normally, otherwise, it is rejected immediately. Figure~\ref{fig:phi}
+First, the ray direction is projected onto the $xy$ plane giving $<S_x, S_y, 0>$ and $<C_x, C_y, 0>$. Then the cosine of the angle between them computed using Eq.~\ref{eq:phicos}. Once $\zeta$ is computed, the condition given by Eq.~\ref{eq:phicoscon} is evaluated. If the condition is met, the angle is accepted and raytraced normally, otherwise, it is rejected immediately. Figure~\ref{fig:phi}
 
 \begin{figure}[tb]
   \begin{center}
@@ -562,7 +680,7 @@ First, the ray direction is projected onto the $xy$ plane giving $<S_x, S_y, 0>$
 |\zeta_\varphi| < \frac{\varphi}{2}
 \end{equation}
 
-Treatment for the $\theta$ variable is similar to that of $\varphi$ except the polar angle is required instead of the azimuthal angle. This is computed using Eq.~\ref{eq:thetacos} for an arbitrary vector $\vec{\xi}$. This is used to compute the polar angle for both $\vec{S}$ and $\vec{C}$. The difference between the polar angles of the two vectors is computed using Eq.~\ref{eq:thetacos2} and then the condition given in Eq.~\ref{eq:thetacoscon} is evaluated. If the condition is not met, the ray is rejected and no raytrace is performed.
+Treatment for the $\theta$ variable is similar to that of $\varphi$ except the polar angle is required instead of the azimuthal angle. The polar angle of an arbitrary vector $\vec{\xi}$ can be computed using Eq.~\ref{eq:thetacos}. This is used to compute the polar angle for both $\vec{S}$ and $\vec{C}$. The difference between the polar angles of the two vectors is computed using Eq.~\ref{eq:thetacos2} and then the condition given in Eq.~\ref{eq:thetacoscon} is evaluated. If the condition is not met, the ray is rejected and no raytrace is performed.
 
 \begin{equation}\label{eq:thetacos}
 \cos(\theta_\xi) = \frac{\xi_z}{\sqrt{\xi_z^2 + \xi_y^2 + \xi_z^2}}
@@ -573,7 +691,7 @@ Treatment for the $\theta$ variable is similar to that of $\varphi$ except the p
 \end{equation}
 
 \begin{equation}\label{eq:thetacoscon}
-|\zeta_\theta| < \frac{\vartheta}{2}
+|\zeta_\theta| < \frac{\theta}{2}
 \end{equation}
 
 
@@ -657,31 +775,33 @@ The actual angle is $\zeta$ which is computed similarly to Eq.~\ref{eq:phicos} w
     \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{figs/beamconeyz}
         \caption{Cone yz}
-        \label{fig:subsweep_general3}
+        \label{fig:beamconeyz}
     \end{subfigure}
     ~
     \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{figs/beamfanyz}
         \caption{Fan yz}
-        \label{fig:subsweep_general4}
+        \label{fig:beamfanyz}
     \end{subfigure}
     
     \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{figs/beamconexz}
         \caption{Cone xz}
-        \label{fig:subsweep_general5}
+        \label{fig:beamconexz}
     \end{subfigure}
     ~
     \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{figs/beamfanxz}
         \caption{Fan xz}
-        \label{fig:subsweep_general6}
+        \label{fig:beamfanxz}
     \end{subfigure}
     \caption{The beam shapes.}\label{fig:beamfancone}
 \end{figure}
 
 \section{Dose Computation}
 Dose can be computed in either one of two ways. The first way is to compute the spatial energy dependent fluence distribution and multiply by a fluence-to-dose conversion factor from ICRP 116 [CITE]. The second way to compute dose is to compute the energy deposition in each cell.
+
+Transport of secondary particles is neglected and all energy deposition is assumed to be local.
 
 \subsection{Fluence-to-dose Conversion}
 
@@ -699,7 +819,25 @@ This methodology is very simplistic and can be computed quickly with no extra (m
 
 \subsection{Energy Deposition}
 
-blah
+The alternative way to compute the dose is directly from the local energy deposition, $\mathcal{E}$, is by
+
+\begin{equation}
+\mathcal{E}_i = \sum_{g=0}^{G-1} \Sigma_{a,i}^g \varphi_i^g V_i \bar{E}^g F
+\end{equation}
+
+\noindent
+where $\bar{E}$ is the average energy (in MeV) of the $g^{th}$ group and $F$ is a unit conversion factor that converts MeV to Joules. The mass of the voxel, $M$ is then computed
+
+\begin{equation}
+M_i = \rho_i V_i G
+\end{equation}
+
+\noindent
+where $\rho_i$ is the density in g/cm$^3$ and G is a conversion factor to convert grams to kilograms. The dose in grays to the voxel is then
+
+\begin{equation}
+D_i = \frac{\mathcal{E}_i}{M_i} = \frac{\sum_{g=0}^{G-1} \Sigma_{a,i}^g \varphi_i^g \bar{E}^g F}{\rho_i G}
+\end{equation}
 
 \endinput
 %%
