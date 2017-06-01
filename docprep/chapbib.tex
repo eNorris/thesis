@@ -30,6 +30,8 @@ MOTIVATION
 
 Monte Carlo codes have been used in the past to compute flux-to-dose conversion factors for a reference person [CITE ICRP].
 
+Dose estimations have been made using many methodologies including 
+
 COMPUTATION
 
 \section{CT Phantom Generation}
@@ -83,12 +85,22 @@ The dsicrete ordinates method dates back to CITE but remains one of the most pro
 
 A comprehensive review of discrete ordinate methods is given by \citet{ref:lewise}. Additional references include 
 
+Monte Carlo codes such as TOPAS and Geant4 \citep{ref:agostinellis} are the gold standard \citep{ref:jiax}
+
+Codes such as EGS4, its improved versions EGSnrc, and EGS5 \citep{ref:nelsonw}, and PENELOPE \citep{ref:salvatf} are all Monte Carlo and have shown very good results to experimental. But they are developed for high energy physics.
+
 
 The Exnihilo thing by \citet{ref:evanst}. And DeHart wrote in \citep{ref:dehartm}
 
 The Ibrahim did stuff \citep{ref:ibrahima} and Lee did stuff too \citep{ref:leeb}.
 
 With regards to angles, stuff has been done \citep{ref:ahrensc}
+
+There are many acceleration techniques available for discrete ordinates \citep{ref:efremenkod} that can increase speed by 15-30\%.
+
+GPU methods exist for solar stuff at satellites.
+
+The geometry has been extended to Non-Uniform Rational B-Splins (NURBS) for reactor eigenvalue problems.
 
 Attila had a 1st col src added by \citep{ref:wareingt}. Some rays are better than others \citep{ref:mathewsk}.
 
@@ -101,6 +113,10 @@ Denovo.
 Raytracing is important too. Woo came up with on \citep{ref:wooa} which was improved by \citet{ref:liuy} and \citet{ref:hel}.
 
 \section{GPU Acceleration}
+
+Monte Carlo dose computation for protons has been accelerated by GPU technology \citep{ref:jiax} and 
+
+Monte Carlo in voxelized geometries has been done by \citep{ref:hissoinys} for monoenergetic beams.
 GPUs are cool.
 
 CUDA is cool.
