@@ -1,25 +1,9 @@
 %%
-%% This is file `chapmin.tex',
-%% generated with the docstrip utility.
+%% Edward T. Norris
+%% Discrete Ordinates Computed Tomography Organ Dose Simulator (DOCTORS)
+%% 
+%% === Methods ===
 %%
-%% The original source files were:
-%%
-%% ths.dtx  (with options: `chapmin')
-%% 
-%% IMPORTANT NOTICE:
-%% 
-%% For the copyright see the source file.
-%% 
-%% Any modified versions of this file must be renamed
-%% with new filenames distinct from chapmin.tex.
-%% 
-%% For distribution of the original source see the terms
-%% for copying and modification in the file ths.dtx.
-%% 
-%% This generated file may be distributed as long as the
-%% original source files, as listed above, are part of the
-%% same distribution. (The sources need not necessarily be
-%% in the same archive or directory.)
 
 This chapter summarizes the solution methodology employed by DOCTORS. The techniques used to compute the collided and uncollided fluxes are described in separate sections. After the flux solution methodology is explained, the methods used for source generation and flux-to-dose conversion are covered.
 
@@ -76,7 +60,7 @@ The coordinate system used in DOCTORS is shown in Fig.~\ref{fig:coord_sys}. A di
 
 The rotation symmetrical quadrature is implemented in DOCTORS. From amongst many different quadrature sets, the rotation symmetrical quadratures were selected because they are easy to implement, rotationally symmetric, and the most commonly used in production discrete ordinate solvers [CITE] which enables simple, direct comparison to other solvers. Arbitrary quadratures are permissible in a plain text file supplied by the user enabling other quadratures.
 
-THEORY AND MATH?
+THEORY AND MATH OF ANGLE/WEIGHT GENERATION?
 
 To include a user defined quadrature, the plain text file should be formatted such that it contains four columns similar to Table~\ref{tab:quad_format} (without any headings). No checks are performed to ensure that octants are covered, this allows simple testing quadratures that utilize only a single direction to be used. Values for $\mu$, $\eta$, and $\xi$ do not necessarily need to add to unity as they will be automatically normalized by DOCTORS. Likewise, the weights will be normalized such that their summation is unity. However, user defined directions \textit{should not} be parallel to any major axis. Doing so may result in undefined behavior. Also, after normalization, no two rows should have identical values for $\mu$, $\eta$, and $\xi$ such as the last two rows of Table~\ref{tab:quad_interp}, nor may any weights be negative. The data in Table~\ref{tab:quad_format} would be read in and renormalized by DOCTORS. The normalized data would be identical to the data in Table~\ref{tab:quad_interp}.
 
@@ -247,16 +231,16 @@ where
 \begin{equation}
 \psi_{x,out} = 
 \begin{cases}
-\psi(x+\Delta x/2, y, z) - \psi(x-\Delta x/2, y, z) \,, \quad \mu > 0 \\
-\psi(x-\Delta x/2, y, z) - \psi(x+\Delta x/2, y, z) \,, \quad \mu < 0
+\psi(x+\Delta x/2, y, z) \,, \quad \mu > 0 \\
+\psi(x-\Delta x/2, y, z) \,, \quad \mu < 0
 \end{cases}
 \end{equation}
 and
 \begin{equation}
 \psi_{x,in} = 
 \begin{cases}
-\psi(x-\Delta x/2, y, z) - \psi(x+\Delta x/2, y, z) \,, \quad \mu > 0 \\
-\psi(x+\Delta x/2, y, z) - \psi(x-\Delta x/2, y, z) \,, \quad \mu < 0
+\psi(x-\Delta x/2, y, z) \,, \quad \mu > 0 \\
+\psi(x+\Delta x/2, y, z) \,, \quad \mu < 0
 \end{cases}
 \end{equation}
 and $\psi_{y,out}$, $\psi_{y,in}$, $\psi_{z,out}$, and $\psi_{z,in}$ are similarly defined but with respect to $\eta$ and $\xi$ respectively.
@@ -414,7 +398,7 @@ The data files containing the scatter cross sections are distributed using a Leg
 \end{equation}
 
 \section{Uncollided Solution Methods}\label{sec:uncol}
-One of the earliest problems with the discrete ordinate methods is the presence of ray effect. Ray effect arises due to the restriction of particle transport to a set of discrete directions. To illustrate ray effect, consider a point source streaming particles isotropically into vacuum. Since no scatter or absorption takes place in vacuum conditions, the particles can only stream and particles must be conserved. However, if particles are transported along a single discrete direction only as illustrated in Fig.~\ref{fig:rayeffect_ex} ($\hat{\Omega} = <\sqrt{2}/2, \sqrt{2}/2>$ in Fig.~\ref{rayeffect_ex} and~\ref{fig:rayeffect_comp}) the phenomena observed in Fig.~\ref{fig:rayeffect_comp} is observed. As the discretization becomes more refined, the isotropic source becomes more heavily biased in the $\hat{\Omega}$ direction. This phenomena is called ray effect and has been thoroughly studied by many [CITE].
+One of the earliest problems with the discrete ordinate methods is the presence of ray effect. Ray effect arises due to the restriction of particle transport to a set of discrete directions. To illustrate ray effect, consider a point source streaming particles isotropically into vacuum. Since no scatter or absorption takes place in vacuum conditions, the particles can only stream and particles must be conserved. However, if particles are transported along a single discrete direction only as illustrated in Fig.~\ref{fig:rayeffect_ex} ($\hat{\Omega} = <\sqrt{2}/2, \sqrt{2}/2>$ in Fig.~\ref{rayeffect_ex} and~\ref{fig:rayeffect_comp}) the phenomena observed in Fig.~\ref{fig:rayeffect_comp} is observed. As the discretization becomes more refined, the isotropic source becomes more heavily biased in the $\hat{\Omega}$ direction. This phenomena is called ray effect and has been thoroughly studied by many \citep{ref:mathewsk} \citep{ref:tencerj}.
 
 All particles must stream from one voxel to adjacent voxels. The streaming is considered (in 2D) along $<\sqrt{2}/2, \sqrt{2}/2>$ as shown in Fig.~\ref{fig:rayeffect_ex1}. All particles in the initial cell must stream outward into the two cells touching in the $\hat{\Omega}$ direction. The particles in each voxel split, half go to the voxel above and the other half travel to the right. This process is illustrated in Fig.~\ref{fig:rayeffect_ex}.
 

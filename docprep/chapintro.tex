@@ -1,76 +1,30 @@
 %%
-%% This is file `chapmin.tex',
-%% generated with the docstrip utility.
+%% Edward T. Norris
+%% Discrete Ordinates Computed Tomography Organ Dose Simulator (DOCTORS)
+%% 
+%% === Introduction ===
 %%
-%% The original source files were:
-%%
-%% ths.dtx  (with options: `chapmin')
-%% 
-%% IMPORTANT NOTICE:
-%% 
-%% For the copyright see the source file.
-%% 
-%% Any modified versions of this file must be renamed
-%% with new filenames distinct from chapmin.tex.
-%% 
-%% For distribution of the original source see the terms
-%% for copying and modification in the file ths.dtx.
-%% 
-%% This generated file may be distributed as long as the
-%% original source files, as listed above, are part of the
-%% same distribution. (The sources need not necessarily be
-%% in the same archive or directory.)
 
 
-Computed tomography (CT) is becoming increasingly pervasive in medical diagnostics since its introduction in 1973 by \citet{ref:hounsfieldg} as improved algorithms give doctors access to more information. Increased information results in faster and more accurate diagnosis. However, the exponentially increasing usage of CT and corresponding radiation dose it delivers to the patient has raised concerns regarding potential long term radiation risks~\citep{ref:brennerd} \citep{ref:einsteina1} \citep{ref:abramsh} \citep{ref:einsteina2} \citep{ref:mccolloughc} \citep{ref:yul}. A study by \citet{ref:kovalchiks} found that using a low-dose screening method as opposed to CT radiography reduced lung cancer mortality in high risk patients by 20\%. Currently, dose estimation relies on \textit{a priori} computation verified with a standardized benchmark. Once the procedure (whether diagnostic or treatment) is completed, the dose distribution is assumed to follow the empirical model.
+Since its introduction in 1973 by \citet{ref:hounsfieldg} computed tomography (CT) has become pervasive in medical diagnostics as improved algorithms and techniques give doctors access to higher quality information. Increased information results in faster and more accurate diagnosis. However, the exponentially increasing usage of CT and corresponding dose patients receive has raised concerns regarding potential long term risks~\citep{ref:brennerd} \citep{ref:einsteina1} \citep{ref:abramsh} \citep{ref:einsteina2} \citep{ref:mccolloughc} \citep{ref:yul}. These concerns are exemplified by the push for low dose CT.
 
-No methodology currently exists to verify that the dosimetry evaluation was accurate after the patient has undergone the procedure. This work proposes a methodology by which a patient's CT reconstruction is used to compute the dose received from the radiation beam. This can also help doctors estimate spatial dose distribution to the patient to ensure no specific organ received more dose than permissible.
+A study by \citet{ref:kovalchiks} found that using a low-dose screening method as opposed to CT radiography reduced lung cancer mortality in high risk patients by 20\%. 
 
-This work implements and analyses a new computer code system called Discrete Ordinate CT ORgan dose Simulator (DOCTORS) by which the dose to a patient can be computed with a full transport solution using a CT phantom. The methodology converts a CT mesh into a voxel phantom of materials and densities. Then a discrete ordinate method computes the flux throughout the phantom. Local energy deposition is assumed relieving the need for secondary electron transport.
+Though concerns have been raised in the medical community about the risks associated with CT, the techniques used to quantify dose are very simple and not patient specific. The dose-length-product (DLP) is used as a measure to quantify the effective dose a patient receives. However, the DLP must be modified by a factor accounting for may variations amongst patients such as age, gender, and size as well as the kVp used in the procedure. Currently, dose estimation relies on \textit{a priori} computation verified with a standardized benchmark. 
+
+No methodology currently exists to verify that the dosimetry evaluation was accurate after the patient has undergone the procedure. This work proposes patient specific a methodology by which a patient's CT reconstruction is used to compute the dose received from the radiation beam. This can also help doctors estimate spatial dose distribution to the patient to ensure no specific organ received more dose than permissible.
+
+This work implements and analyses a new computer code system called Discrete Ordinate CT ORgan dose Simulator (DOCTORS) by which the dose to a patient can be computed with a full transport solution inside a CT phantom. The methodology converts a CT mesh into a voxel phantom of materials and densities. The user supplies information about the beam and a discrete ordinate method computes the flux throughout the phantom. The flux is then used to compute the dose using local energy deposition to relieve the need for secondary electron transport.
+
+DOCTORS leverages graphics processing units (GPUs) to accelerate the transport step. GPUs differ from the central processing unit (CPU) in that each of the many cores performs identical instruction to all others at the same time but each with different data. For example, consider a grayscale 1024$\times$768 image. If some pixelwise operation is applied on a CPU, 786,432 operations must occur. Onboard a GPU with 1024 cores, every pixel in the entire row can be computed simultaneously reducing the number of operations to 768. However, issues such as communication to and from the GPU and cache coherency problems can degrade performance. GPU technology and performance is discussed more thoroughly in Section~\ref{sec:cuda}.
+
+In addition to rapidly computing the patient dose, another goal of DOCTORS is to present the code in a user-friendly fashion. To this end, a graphical user interface (GUI) was developed. The GUI utilizes the Qt5 graphics framework for the window, buttons, and other necessary widgets. The GUI leads the user through the steps necessary to use the code in an intuitive way by using colors to indicated required and completed steps. The output is then plotted graphically as well as sent to an ASCII text file for more advanced postprocessing. Utilization of Qt5 also makes the code portable, it can be compiled on either Linux or Windows operating systems with no changes to the code. More details about the GUI are included in Section~\ref{sec:gui}.
+
+BRIEF DISCUSSION OF RESULTS
 
 Another, similar, application is dose estimation of patients receiving radiation therapy. Often, before the procedure, a time dependent, 4D CT scan of the patient is taken so that radiologists can account for breathing patterns during administration of the treatment [CITE]. With further development, this methodology may enable real time dose computation as the treatment is administered. This would be greatly beneficial to both patients and the doctors administering the procedure.
 
-\begin{figure}
-    \centering
-    \begin{subfigure}[b]{0.38\textwidth}
-        \includegraphics[width=\textwidth]{figs/backproject1}
-        \caption{}
-        \label{fig:beamconexy}
-    \end{subfigure}
-    ~
-    \begin{subfigure}[b]{0.19\textwidth}
-        \includegraphics[width=\textwidth]{figs/backproject2}
-        \caption{}
-        \label{fig:beamfanxy}
-    \end{subfigure}
-    ~
-    \begin{subfigure}[b]{0.38\textwidth}
-        \includegraphics[width=\textwidth]{figs/backproject3}
-        \caption{}
-        \label{fig:subsweep_general3}
-    \end{subfigure}
-    \caption{(a) The original phantom. (b) The sinogram produced by 360 projections. (c) The filter backprojection reconstruction.}\label{fig:backprojection}
-\end{figure}
-
-In order for the proposed methodology to be viable, the patient's CT phantom must be available. The phantom is reconstructed from the CT data. Though it is not the focus of this work, a brief summary of reconstruction algorithms is given here.
-
-Fundamentally, all reconstructions algorithms are based on a thin parallel beam of x-rays rotating axially about a patient to produce a sinogram. The inverse radon transform backprojects each row of the sinogram back to physical space. Filtering each row in Fourier space and then compositing all layers together recreates the image [CTIE]. This methodology has been extended to fan beams [CITE] and cone beams [CITE]. After the filtered backprojection, iterative reconstruction techniques can be applied to greatly improve the reconstruction quality [CITE].
-
-Along any particular ray, monoenergetic particles will attenuate through a homogenous media according to the Beer-Lambert law given in Eq.~\ref{eq:beer_lambert} [CITE] resulting in a small fraction of the source particles reaching the detector. This phenomena leads to an image of the attenuating media but also results in the detector receiving information about the attenuation coefficient, $\mu$, along that ray. With sufficient rays of varying directionality, the entire object can be quantified with respect to its spatially distributed attenuation coefficient. The Hounsfield units (also called CT numbers) are traditionally scaled such that -1000 is dry air and water is zero [CITE].
-
-\begin{equation}\label{eq:beer_lambert}
-I(x) = I_0 e^{-\mu x}
-\end{equation}
-
-Once a patient specific phantom is obtained, the flux throughout the mesh must be computed. Computational techniques to do this can be split into two broad categories: Monte Carlo and deterministic.
-
-Monte Carlo codes are generally known for their accuracy; they are able to sample the problem and attain arbitrarily high precision given sufficient runtime. They also take advantage of combinatorial geometry allowing a user to produce geometrically complex 3D structures. Deterministic methods are generally much faster than their Monte Carlo counterparts but do not benefit from excess runtime. They also consume vastly more resources, particularly random-access memory (RAM). However, in regularly structures meshes, deterministic methods can greatly outperform Monte Carlo. A large number of spatial regions slows down the particle transport in Monte Carlo and increases the RAM required to store the numerous voxels.
-
-Deterministic codes can be accelerated with the use of a graphics processing unit (GPU). GPUs differ from the central processing unit (CPU) in that each of the many cores performs identical instruction to all others at the same time but each with different data. For example, consider a grayscale 1024$\times$768 image. If some pixelwise operation is applied on a CPU, 786,432 operations must occur. Onboard a GPU with 1024 cores, every pixel in the entire row can be computed simultaneously reducing the number of operations to 768. However, issues such as communication to and from the GPU and cache coherency problems can degrade performance. GPU technology and performance is discussed more thoroughly in Section~\ref{sec:cuda}.
-
-In addition to rapidly computing the patient dose, another goal of DOCTORS is to present the code in a user-friendly fashion. To this end, a graphical user interface (GUI) was developed. The GUI utilize the Qt5 graphics framework for the window, buttons, and other necessary widgets. The GUI leads the user through the steps necessary to use the code in an intuitive way by using colors to indicated required and completed steps. The output is then plotted graphically as well as sent to an ASCII text file for more advanced postprocessing. More details about the GUI are included in Section~\ref{sec:gui}.
-
-BRIEF DISCUSSION OF RESULTS
+The remainder of this work is organized into five chapters. Chapter 2 summarizes the existing literature pertinent to this work. Chapter 3 lays the mathematical foundation for each of the major components of DOCTORS. Chapter 4 gives a overview of the implementation strategies used to transform the mathematical framework in Chapter 3 into code that can execute on a modern computing platform. Chapter 5 summarizes the results obtained. It quantifies both the dosimetric accuracy and runtime of the DOCTORS code. Finally, Chapter 6 summarizes the entire work and provides some concluding remarks. Afterward, some appendices provide additional information that was not included in the main text but may still be helpful to a reader. 
 
 \endinput
 %%
