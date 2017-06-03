@@ -9,7 +9,7 @@ This chapter covers the details of the implementation of the different component
 
 The code is available from the GitHub repository. At the time of this writing, the repository is located at \texttt{https://github.com/eNorris/thesis}.
 
-The code is implemented in C++ and requires a C0x11 complianct compiler. The user interface is written using the Qt5 framework. GPU computation is performed via CUDA which must be compiled seperatly by Nvidia's proprietary compiler, \texttt{nvcc}.
+The code is implemented in C++ and requires a C0x11 compliant compiler. The user interface is written using the Qt5 framework. GPU computation is performed via CUDA which must be compiled seperatly by Nvidia's proprietary compiler, \texttt{nvcc}.
 
 \section{Vector Flattening}\label{sec:flatten}
 
@@ -98,11 +98,29 @@ The 2D data is stored in a special format optimized for scatter matrix data.
     \caption{The format of the AMPX file. (a) The file contains a header, a list of directory records, energy group information and a list of nuclide entries. (b) Each nuclide entry contains multiple records; the two of concern in this work are the last two containing gamma data.}\label{fig:ampx}
 \end{figure}
 
-SHOW CARBON ELEMENTAL DATA
+Figure~\ref{fig:sigmacomp} shows the microscopic cross section data pulled from 
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/sigmacomp1}
+        \caption{}
+        \label{fig:ampx1}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/sigmacomp2}
+        \caption{}
+        \label{fig:ampx2}
+    \end{subfigure}
+    \caption{The microscopic cross section in bars for hydrogen and oxygen. Both subfigures show identical data, (a) shows the entire data range available in the reference data library and (b) shows only the data range applicable to DOCTORS.}\label{fig:sigmacomp}
+\end{figure}
 
 \section{Generation of Material Cross Section Data}\label{sec:xsgen}
 
 Once the data is parsed, weighted combinations of elemental data is used to create material cross sections.
+
+MT AND MF NUMBERS
 
 WATER EXAMPLE.
 

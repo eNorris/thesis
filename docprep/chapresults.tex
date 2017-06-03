@@ -36,8 +36,6 @@ The water phantom in Fig.~\ref{fig:phantomWaterModified} can be broken into four
 \label{fig:phantomWaterModified}
 \end{figure}
 
-
-
 \subsection{Gantry Handling}
 In some phantom models, a gantry is present. The gantry poses a challenge since it is a highly attenuating material relative to the patient which reduces the available flux.
 
@@ -190,6 +188,30 @@ The detailed flux distribution from MCNP6 and the solver are not included here, 
     \end{subfigure}
     \caption{Comparison}\label{fig:bench_cone1_centerdifffig}
 \end{figure}
+
+\begin{figure}[tb]
+  \begin{center}
+   \includegraphics[width=3.75in]{figs/bench_cone1_centerdiff3}
+  \end{center}
+  \caption{The 19 group center flux comparison}
+\label{fig:bench_cone1_centerdiff3}
+\end{figure}
+
+A plot is below.
+
+\begin{figure}[tb]
+  \begin{center}
+   \includegraphics[width=3.75in]{figs/bench_cone1_centerdiff47}
+  \end{center}
+  \caption{The 47 group center flux comparison}
+\label{fig:bench_cone1_centerdiff47}
+\end{figure}
+
+The analytical point is computed as
+\begin{equation}
+\frac{d\varphi}{dE} = \frac{e^{-(\mu^g_a x_a + \mu^g_w x_w)}}{4\pi G (x_a + x_w)^2 (\Delta E)^g}
+\end{equation}
+where $\mu_a^g$ and $\mu_w^g$ are the attenuation coefficients for air and water repectively for the $g$ group, $x_a$ and $x_w$ are the pathlength through air and water respectively, and $\Delta E$ is the width of the $g$ group in MeV.
 
 \section{3 Cone-Beam Water Benchmark}
 
