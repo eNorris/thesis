@@ -563,7 +563,7 @@ void MainWindow::on_actionMCNP6_Generation_triggered()
     }
 
     McnpWriter mcnpwriter;
-    mcnpwriter.writeMcnp("../mcnp.gitignore/mcnp_out.inp", m_mesh, m_srcParams, false);
+    mcnpwriter.writeMcnp("../mcnp.gitignore/mcnp_out.inp", m_mesh, m_srcParams, true);
 }
 
 void MainWindow::xsParseErrorHandler(QString msg)

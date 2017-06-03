@@ -250,6 +250,13 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *, const Mesh *mes
                 {
                     RAY_T acceptance = 1.0;
 
+                    if(zIndxStart == 7 && yIndxStart == 32 && xIndxStart == 31)
+                        qDebug() << "Here";
+                    std::vector<RAY_T> travlength;
+                    std::vector<RAY_T> travmu;
+                    std::vector<RAY_T> travoptic;
+
+
                     //qDebug() << "voxel " << xIndxStart << " " << yIndxStart << " " << zIndxStart;
                     RAY_T x = mesh->xNodes[xIndxStart] + mesh->dx[xIndxStart]/2;
                     RAY_T y = mesh->yNodes[yIndxStart] + mesh->dy[yIndxStart]/2;
@@ -382,6 +389,9 @@ std::vector<RAY_T> *Solver::basicRaytraceCPU(const Quadrature *, const Mesh *mes
                             //                   [cm] * [b] * [atom/b-cm]
                             meanFreePaths[ie] += tmin * xs->m_tot1d[zid*groups + ie] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx];
                         }
+                        travlength.push_back(tmin);
+                        travmu.push_back(xs->m_tot1d[zid*groups + 0] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx]);
+                        travoptic.push_back(tmin * xs->m_tot1d[zid*groups + 0] * mesh->atomDensity[xIndx*xjmp + yIndx*yjmp + zIndx]);
 
                         // Update cell indices and positions
                         if(dirHitFirst == DIRECTION_X) // x direction
