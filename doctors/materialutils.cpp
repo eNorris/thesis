@@ -566,8 +566,8 @@ const std::vector<int> MaterialUtils::waterElements{
 
 const std::vector<std::vector<float> > MaterialUtils::waterWeights{
     std::vector<float> {0.000f, 0.755f, 0.232f, 0.013f}, // Air
-    std::vector<float> {0.112f, 0.888f, 0.000f, 0.000f}, // Water
-    std::vector<float> {0.112f, 0.888f, 0.000f, 0.000f}, // Container
+    std::vector<float> {0.112f, 0.000f, 0.888f, 0.000f}, // Water
+    std::vector<float> {0.112f, 0.000f, 0.888f, 0.000f}, // Container
     std::vector<float> {1.000f, 0.000f, 0.000f, 0.000f}  // Empty 20
 };
 
