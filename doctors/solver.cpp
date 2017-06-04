@@ -623,14 +623,14 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
                 //SOL_T totalFlux = (*cFlux)[iie*mesh->voxelCount() + ir] + (*uFlux)[iep*mesh->voxelCount() + ri];
                 //int zidIndx = mesh->zoneId[ir];
                 //         [#]  += [#/cm^2]                                        * [b]                                        * [1/b-cm]              * [cm^3]
-                totalSource[ir] += m_4pi_inv*(*cFlux)[iie*mesh->voxelCount() + ir] * xs->scatxs2d(mesh->zoneId[ir], iie, ie, 0) * mesh->atomDensity[ir] * mesh->vol[ir];
+                totalSource[ir] += (*cFlux)[iie*mesh->voxelCount() + ir] * xs->scatxs2d(mesh->zoneId[ir], iie, ie, 0) * mesh->atomDensity[ir] * mesh->vol[ir];
 
 
         // downscatter from uncollided flux
         for(unsigned int iie = highestEnergy; iie <= ie; iie++) // Source energy
             for(unsigned int ir = 0; ir < mesh->voxelCount(); ir++)
                 //         [#]  += [#/cm^2]                                        * [b]                                        *  [1/b-cm]             * [cm^3]
-                totalSource[ir] += m_4pi_inv*(*uFlux)[iie*mesh->voxelCount() + ir] * xs->scatxs2d(mesh->zoneId[ir], iie, ie, 0) * mesh->atomDensity[ir] * mesh->vol[ir];
+                totalSource[ir] += (*uFlux)[iie*mesh->voxelCount() + ir] * xs->scatxs2d(mesh->zoneId[ir], iie, ie, 0) * mesh->atomDensity[ir] * mesh->vol[ir];
 
         // Add the external (uncollided) source
         //for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
@@ -735,7 +735,7 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
                                     influxZ = outboundFluxZ[ix*xjmp + iy*yjmp + iz+1];
                             }
 
-                            SOL_T inscatter = m_4pi_inv*(*cFlux)[ie*mesh->voxelCount() + ir] * xs->scatxs2d(zid, ie, ie, 0) * mesh->atomDensity[ir] * mesh->vol[ir];
+                            SOL_T inscatter = (*cFlux)[ie*mesh->voxelCount() + ir] * xs->scatxs2d(zid, ie, ie, 0) * mesh->atomDensity[ir] * mesh->vol[ir];
 
                             SOL_T numer = totalSource[ir] +  inscatter +                                                                                            // [#]
                                     mesh->Ayz[ie*quad->angleCount()*mesh->yElemCt*mesh->zElemCt + iang*mesh->yElemCt*mesh->zElemCt + iy*mesh->zElemCt + iz] * influxX +  // [cm^2 * #/cm^2]  The 2x is already factored in
