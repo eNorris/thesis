@@ -634,13 +634,6 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_12">
           <item>
-           <widget class="QLabel" name="label_9">
-            <property name="text">
-             <string>X</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QDoubleSpinBox" name="sourceXDoubleSpinBox">
             <property name="decimals">
              <number>2</number>
@@ -652,7 +645,14 @@
              <double>10000.000000000000000</double>
             </property>
             <property name="value">
-             <double>25.390000000000001</double>
+             <double>25.010000000000002</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>X</string>
             </property>
            </widget>
           </item>
@@ -688,7 +688,7 @@
              <double>10000.000000000000000</double>
             </property>
             <property name="value">
-             <double>3.520000000000000</double>
+             <double>-10.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -724,7 +724,7 @@
              <double>10000.000000000000000</double>
             </property>
             <property name="value">
-             <double>6.890000000000000</double>
+             <double>6.260000000000000</double>
             </property>
            </widget>
           </item>
