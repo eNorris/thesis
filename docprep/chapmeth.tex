@@ -143,7 +143,7 @@ where the group number is indexed by superscript $g$.
 \label{fig:energy_groups}
 \end{figure}
 
-The user must provide cross section data in the form of an AMPX formatted binary file (Format detaisl are provided in Section~\ref{sec:xsparse}). The cross section data file contains group structure information. Group averaged cross section values from energy $E_1$ to $E_2$ are computed using Eq.~\ref{eq:groupxs} where $\sigma(E)$ is the continuous microscopic cross section. A weighting function, $f$, is used to weight the energies. The weighting function can be any of a number commonly used functions. The SCALE data libraries us a uniform function [CITE].
+The user must provide cross section data in the form of an AMPX formatted binary file (Format detaisl are provided in Section~\ref{sec:xsparse}). The cross section data file contains group structure information. Group averaged cross section values from energy $E_1$ to $E_2$ are computed using Eq.~\ref{eq:groupxs} where $\sigma(E)$ is the continuous microscopic cross section. A weighting function, $f$, is used to weight the energies. The weighting function can be any of a number commonly used functions. The SCALE data libraries use a uniform function [CITE].
 \begin{equation}\label{eq:groupxs}
 \sigma_G = \frac{\int_{E_1}^{E_2}f(E')\sigma(E') dE'}{\int_{E_1}^{E_2} f(E') dE'}
 \end{equation}
@@ -156,11 +156,11 @@ In photon based problems, upscatter is typically negligible [CITE]. By the time 
 \end{equation}
 which nearly identical; only the starting point for the scatter summation changes. Computationally, though, the lack of upscatter makes a significant difference. The highest energy group can be solved independently of all those below it. Once that group is solved, the next group can also be solved and so forth. In the presence of upscatter, the highest group depends on the solution to all groups below it so all energy groups must be solved simultaneously.
 
-The group structure cannot be arbitrarily selected by DOCOTRS, instead it is determined by the external cross section data file loaded by the user. The energy group structure should be selected appropriately for the problem. The cross sections currently included with DOCTORS are those available from the SCALE 6.2 distribution. Those cross sections are designed for light water reactor analysis and are not well suited to medical physics applications. This is currently one of the greatest limitations of DOCOTRS. The SCALE cross section data also contains neutron data which is useless for the CT dosimetry DOCTORS performs. More details of the cross section parsing and generation are included in Section~\ref{sec:xsparse} and~\ref{sec:xsgen} respectively.
+The group structure cannot be arbitrarily selected by DOCOTRS, instead it is determined by the external cross section data file loaded by the user. The energy group structure should be selected appropriately for the problem. The cross sections currently included with DOCTORS are those available from the SCALE 6.2 distribution. Those cross sections are designed for light water reactor analysis and are not well suited to medical physics applications. This is one of the limitations of the current version of DOCOTRS. The SCALE cross section data also contains neutron data which is useless for the CT dosimetry DOCTORS performs. More details of the cross section parsing and generation are included in Section~\ref{sec:xsparse} and~\ref{sec:xsgen} respectively.
 
 \subsection{Spatial Discretization}
 
-The problem domain is split into an evenly spaced Cartesian grid. Uniform grid spacing is not required by discrete ordinate methods though it is helpful [CITE], but is necessarily the case with CT voxel phantoms.
+The problem domain is split into an evenly spaced Cartesian grid. Uniform grid spacing is not required by discrete ordinate methods though it is helpful and can speed up the computation[CITE].
 
 The problem domain for a CT voxel phantom is a regular, rectangular parallelepiped of dimension $D_x \times D_y \times D_z$, the values of which are known based on the CT setup provided by the user. The mesh is partitioned into $N_x$, $N_y$, and $N_z$ evenly spaced bins along each major direction as shown in Fig.~\ref{fig:spatial_disc}. The total number of voxels, $N_V$ is easily computed from the number of bins in each major direction:
 \begin{equation} \label{eq:n_v}
@@ -199,7 +199,7 @@ To solve the fully discretized form of the Linear Boltzmann Equation given in Eq
 \end{equation}
 To a first order approximation, a partial derivative is computed
 \begin{equation} \label{eq:deriv_1}
-\frac{\partial f(\zeta)}{\partial \zeta} \approx \frac{f(\zeta+\Delta \zeta/2) - f(\zeta + \Delta \zeta/2)}{\Delta \zeta}
+\frac{\partial f(\zeta)}{\partial \zeta} \approx \frac{f(\zeta+\Delta \zeta/2) - f(\zeta - \Delta \zeta/2)}{\Delta \zeta}
 \end{equation}
 with respect to $\zeta$. Combining Eq.~\ref{eq:grad} and~\ref{eq:deriv_1}, the $\hat{\Omega} \cdot \nabla \psi$ term can be rewritten as:
 \begin{equation} \label{eq:spatial_1}
@@ -591,7 +591,7 @@ Once $\zeta_\varphi$ is computed,
 is evaluated. If the condition is met, the angle is accepted and raytraced normally, otherwise, it is rejected immediately.
 
 Treatment for the $\theta$ variable is similar to that of $\varphi$ except the polar angle is required instead of the azimuthal angle. The polar angle of an arbitrary vector $\boldsymbol{\xi}$ can be computed using \begin{equation}\label{eq:thetacos}
-\cos(\theta_\xi) = \frac{\xi_z}{\sqrt{\xi_z^2 + \xi_y^2 + \xi_z^2}}.
+\cos(\theta_\xi) = \frac{\xi_z}{\sqrt{\xi_x^2 + \xi_y^2 + \xi_z^2}}.
 \end{equation}
 This is used to compute the polar angle for both $\boldsymbol{s}$ and $\boldsymbol{c}$. The difference between the polar angles of the two vectors 
 \begin{equation}\label{eq:thetacos2}
@@ -748,13 +748,13 @@ where $\mathcal{E_{a,i}}$ is the energy deposition from absorption and $\mathcal
 \begin{equation}\label{eq:depa}
 \mathcal{E}_{a,i} = \sum_{g=0}^{G-1} \Sigma_{a,i}^g \varphi_i^g V_i \bar{E}^g F_1
 \end{equation}
-where $\bar{E}$ is the average energy (in MeV) of the $g^{th}$ group and $F_1$ is a unit conversion factor that converts MeV to Joules. Equation~\ref{eq:depa} assumes total local energy deposition in the voxel of interest. The energy deposition from scatter is
+where $\bar{E}$ is the average energy (in MeV) of the $g^{th}$ group and $F_1$ is a unit conversion factor that converts MeV to Joules. The average group energy is assumed to be the average between the two bounding energies of the group. Equation~\ref{eq:depa} assumes total local energy deposition in the voxel of interest. The energy deposition from scatter is
 \begin{equation}\label{eq:deps}
 \mathcal{E}_{s,i} = \sum_{g=0}^{G-1} \sum_{h=g-1}^{G-1} \left[ \Sigma_{s,i}^{g,h} \varphi_i^g V_i (\bar{E}^g-\bar{E}^h) F_1 \right]
 \end{equation}
 making the total deposition
 \begin{equation}\label{eq:dept2}
-\mathcal{E}_{T,i} = V_i F_1 \sum_{g=0}^{G-1} \varphi_i^g \left[\Sigma_{a,i}^g \bar{E}^g + \sum_{h=g-1}^{G-1} \left\{ \Sigma_{s,i}^{g,h}  (\bar{E}^g-\bar{E}^h) \right\} \right]
+\mathcal{E}_{T,i} = V_i F_1 \sum_{g=0}^{G-1} \varphi_i^g \left[\Sigma_{a,i}^g \bar{E}^g + \sum_{h=g+1}^{G-1} \left\{ \Sigma_{s,i}^{g,h}  (\bar{E}^g-\bar{E}^h) \right\} \right]
 \end{equation}
 The mass of the voxel, $M_i$ is then computed
 \begin{equation}
@@ -762,7 +762,7 @@ M_i = \rho_i V_i F_2
 \end{equation}
 where $\rho_i$ is the density in g/cm$^3$ and $F_2$ is a conversion factor to convert grams to kilograms. The dose (in Gy) to the voxel is then
 \begin{equation}\label{eq:dosedep}
-D_i = \frac{\mathcal{E}_{T,i}}{M_i} = \frac{F_1}{\rho_i F_2} \sum_{g=0}^{G-1} \varphi_i^g \left[\Sigma_{a,i}^g \bar{E}^g + \sum_{h=g-1}^{G-1} \left\{ \Sigma_{s,i}^{g,h}  (\bar{E}^g-\bar{E}^h) \right\} \right].
+D_i = \frac{\mathcal{E}_{T,i}}{M_i} = \frac{F_1}{\rho_i F_2} \sum_{g=0}^{G-1} \varphi_i^g \left[\Sigma_{a,i}^g \bar{E}^g + \sum_{h=g+1}^{G-1} \left\{ \Sigma_{s,i}^{g,h}  (\bar{E}^g-\bar{E}^h) \right\} \right].
 \end{equation}
 
 \endinput

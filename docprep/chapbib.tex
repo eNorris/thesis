@@ -48,7 +48,7 @@ Codes such as EGS4, its improved versions EGSnrc, and EGS5 \citep{ref:nelsonw}, 
 
 The alternative to Monte Carlo is deterministic solutions. The best known solution techniques include the discrete ordinate method, the finite element method, and the method of characteristics. The discrete ordinate method is employed by DOCTORS and the methodology is covered independently in Section~\ref{sec:discordlit}.
 
-One of the most well known MOC codes id DeCART. DeCART is actually a coupled solver in that it utilizes different solution modalities for the radial plane and the axial direction. It uses a more complex modality in the radial plane such as MOC and then uses diffusion to transport particles axially~\citep{ref:hursinm}.
+One of the most well known MOC codes is DeCART. DeCART is actually a coupled solver in that it utilizes different solution modalities for the radial plane and the axial direction. It uses a more complex modality in the radial plane such as MOC and then uses diffusion to transport particles axially~\citep{ref:hursinm}.
 
 The Method of Characteristics is a deterministic solution that has some advantages over discrete ordinates but is very complex to set up in 3D. One implementation is the TRANSMED code which was used to compute external beam therapy dose profiles accurately~\citep{ref:williamsm}.
 
@@ -66,7 +66,7 @@ COMPUTATION
 
 In order for the proposed methodology to be viable, the patient's CT phantom must be available. The phantom is reconstructed from the CT data. Though it is not the focus of this work, a brief summary of reconstruction algorithms is given here.
 
-Fundamentally, all reconstructions algorithms are based on a thin parallel beam of x-rays rotating axially about a patient to produce a sinogram. The inverse radon transform backprojects each row of the sinogram back to physical space. Filtering each row in Fourier space and then compositing all layers together recreates the image [CTIE]. This methodology has been extended to fan beams [CITE] and cone beams [CITE]. After the filtered backprojection, iterative reconstruction techniques can be applied to greatly improve the reconstruction quality [CITE].
+Fundamentally, all reconstructions algorithms are based on a thin parallel beam of x-rays rotating axially about a patient to produce a sinogram. The inverse radon transform backprojects each row of the sinogram back to physical space. Filtering each row in Fourier space and then compositing all layers together recreates the image [CTIE]. This methodology has been extended to fan beams [CITE] and cone beams [CITE]. Besides the filtered backprojection (FBP) method, iterative reconstruction techniques can also be applied to greatly improve the image reconstruction quality [CITE].
 
 \begin{figure}
     \centering
@@ -138,7 +138,7 @@ Bone 15     & > 1500        &  4.3 & 12.7 &  4.3 & 45.3 &     & 0.2 & 11.1 & 0.3
 \end{sidewaystable}
 
 \section{Discrete Ordinates}\label{sec:discordlit}
-The dsicrete ordinates method dates back to CITE but remains one of the most prominent solution modalities for ration transport in use today. A comprehensive review of discrete ordinate methods is given by \citet{ref:lewise}. Additional references include [CITES].
+The dsicrete ordinates method dates back to CITE but remains one of the most prominent solution modalities for radiation transport in use today. A comprehensive review of discrete ordinate methods is given by \citet{ref:lewise}. Additional references include [CITES].
 
 The oldest major discrete ordinate method implementation is DORT which was superceded by its 3D counterpart TORT~\citep{ref:rhoadesw}. Since TORT, new discrete ordinate method implementations have laregly been extensions allowing more advanced computation.
 
