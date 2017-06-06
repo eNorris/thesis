@@ -64,7 +64,8 @@ SOURCES += main.cpp\
     sourceparams.cpp \
     solverparams.cpp \
     picturelabel.cpp \
-    ctmapdialog.cpp
+    ctmapdialog.cpp \
+    doseconverter.cpp
 
 SOURCES -= cuda_kernels.cu \
            cuda_link.cu
@@ -99,7 +100,8 @@ HEADERS  += mainwindow.h \
     sourceparams.h \
     solverparams.h \
     picturelabel.h \
-    ctmapdialog.h
+    ctmapdialog.h \
+    doseconverter.h
 
 
 HEADERS -= cuda_link.h \
