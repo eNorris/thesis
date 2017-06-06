@@ -522,7 +522,6 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
     std::vector<SOL_T> outboundFluxX(mesh->voxelCount(), -100.0f);
     std::vector<SOL_T> outboundFluxY(mesh->voxelCount(), -100.0f);
     std::vector<SOL_T> outboundFluxZ(mesh->voxelCount(), -100.0f);
-    //std::vector<SOL_T> extSource(xs->groupCount() * mesh->voxelCount(), 0.0f);
 
     std::vector<SOL_T> errMaxList;
     std::vector<std::vector<SOL_T> > errList;
@@ -580,30 +579,6 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
         }
     }
 
-    /*
-    if(uFlux != NULL)
-    {
-        //qDebug() << "Loading uncollided flux into external source";
-        for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)  // Sink energy
-            for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
-                for(unsigned int iep = highestEnergy; iep <= ie; iep++) // Source energy
-                    //                               [#]   =                        [#/cm^2]      * [cm^3]        *  [b]                               * [1/b-cm]
-                    extSource[ie*mesh->voxelCount() + ri] += (*uFlux)[iep*mesh->voxelCount() + ri] * mesh->vol[ri] * xs->scatxs2d(mesh->zoneId[ri], iep, ie, 0) * mesh->atomDensity[ri];
-
-        //OutWriter::writeArray("externalSrc.dat", extSource);
-    }
-    else
-    {
-        qDebug() << "Building external source";
-        int srcIndxE = xs->groupCount() - 1;
-        int srcIndxX = 32;
-        int srcIndxY = 4;  //mesh->yElemCt/2;
-        int srcIndxZ = 8;
-        //                                                                              [#] = [#]
-        extSource[srcIndxE * mesh->voxelCount() + srcIndxX*xjmp + srcIndxY*yjmp + srcIndxZ] = 1.0;
-    }
-    */
-
     for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)  // for every energy group
     {
         int iterNum = 1;
@@ -631,6 +606,17 @@ void Solver::gsSolverIsoCPU(const Quadrature *quad, const Mesh *mesh, const XSec
             for(unsigned int ir = 0; ir < mesh->voxelCount(); ir++)
                 //         [#]  += [#/cm^2]                                        * [b]                                        *  [1/b-cm]             * [cm^3]
                 totalSource[ir] += (*uFlux)[iie*mesh->voxelCount() + ir] * xs->scatxs2d(mesh->zoneId[ir], iie, ie, 0) * mesh->atomDensity[ir] * mesh->vol[ir];
+
+
+        // DEBUG
+        if(ie == highestEnergy)
+        {
+            std::vector<float> t(mesh->voxelCount(), 0);
+            for(unsigned int ir = 0; ir < mesh->voxelCount(); ir++)
+                t[ir] += totalSource[ir];
+            OutWriter::writeDose("dbg_totalSource_highestEnergy_iso", *mesh, t);
+        }
+        // !DEBUG
 
         // Add the external (uncollided) source
         //for(unsigned int ri = 0; ri < mesh->voxelCount(); ri++)
@@ -954,11 +940,9 @@ void Solver::gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const
     std::vector<SOL_T> *cFlux = new std::vector<SOL_T>(xs->groupCount() * quad->angleCount() * mesh->voxelCount(), 0.0);
     std::vector<SOL_T> *scalarFlux = new std::vector<SOL_T>(xs->groupCount() * mesh->voxelCount(), 0.0f);
     std::vector<SOL_T> tempScalarFlux(mesh->voxelCount());
-    //std::vector<SOL_T> preFlux(mesh->voxelCount(), -100.0f);
     std::vector<SOL_T> outboundFluxX(mesh->voxelCount(), -100.0f);
     std::vector<SOL_T> outboundFluxY(mesh->voxelCount(), -100.0f);
     std::vector<SOL_T> outboundFluxZ(mesh->voxelCount(), -100.0f);
-    //std::vector<SOL_T> extSource(xs->groupCount() * quad->angleCount() * mesh->voxelCount(), 0.0f);
     std::vector<SOL_T> totalSource(quad->angleCount() * mesh->voxelCount(), 0.0f);
 
     std::vector<SOL_T> errMaxList;
@@ -978,8 +962,6 @@ void Solver::gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const
     SOL_T outx;
     SOL_T outy;
     SOL_T outz;
-
-    //const XSection &xsref = *xs;
 
     if(uFlux == NULL && srcPar == NULL)
     {
@@ -1014,46 +996,6 @@ void Solver::gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const
         }
     }
 
-    /*
-    if(uFlux != NULL)
-    {
-        qDebug() << "Computing 1st collision source";
-        for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)
-            for(unsigned int ia = 0; ia < quad->angleCount(); ia++)
-                for(unsigned int ir = 0; ir < mesh->voxelCount(); ir++)
-                {
-                    float firstColSrc = 0.0f;
-                    // TODO - should the equality condition be there?
-                    for(unsigned int iep = highestEnergy; iep <= ie; iep++)  // For every higher energy that can downscatter
-                        for(unsigned int il = 0; il <= solPar->pn; il++)  // For every Legendre expansion coeff
-                        {
-                            // The 2l+1 term is already accounted for in the XS
-                            //float legendre_coeff = (2*l + 1) / M_4PI * xs->scatxs2d(mesh->zoneId[ri], epi, ei, l);  // [b]
-                            SOL_T legendre_coeff = m_4pi_inv * xs->scatxs2d(mesh->zoneId[ir], iep, ie, il);  // [b]
-                            SOL_T integral = static_cast<SOL_T>(0.0);
-                            for(unsigned int iap = 0; iap < quad->angleCount(); iap++) // For every angle
-                                integral += legendre.table(iap, ia, il) * (*uFlux)[iep*ejmp + iap*ajmp + ir] * quad->wt[iap];
-                            // [b/cm^2]  = [b]  * [1/cm^2]
-                            firstColSrc += legendre_coeff * integral;
-                        }
-
-                    //                          [#]   =    [b/cm^2]      * [cm^3]          * [1/b-cm]
-                    extSource[ie*ejmp + ia*ajmp + ir] = firstColSrc * mesh->vol[ir] * mesh->atomDensity[ir];
-                }
-
-        qDebug() << "Finished 1st collision source computation";
-
-        OutWriter::writeArray("externalSrc.dat", extSource);
-    }
-    else
-    {
-        qWarning() << "Building external source is illegal in anisotropic case!";
-
-        //       [#] = [#]
-        extSource[0] = 1.0;
-    }
-    */
-
     qDebug() << "Solving " << mesh->voxelCount() * quad->angleCount() * xs->groupCount() << " elements in phase space";
 
     for(unsigned int ie = highestEnergy; ie < xs->groupCount(); ie++)  // for every energy group
@@ -1071,41 +1013,40 @@ void Solver::gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const
             for(unsigned int ia = 0; ia < quad->angleCount(); ia++)
                 for(unsigned int ir = 0; ir < mesh->voxelCount(); ir++)
                 {
-                    //if(ir = 32768)
-                    //{
-                    //    qDebug() << "stop";
-                    //}
                     SOL_T coeff = static_cast<SOL_T>(0.0);
                     unsigned int zid = mesh->zoneId[ir];
                     for(unsigned int iap = 0; iap < quad->angleCount(); iap++) // For all other angles
                         for(unsigned int il = 0; il <= solPar->pn; il++)  // For all Legendre
                         {
+                            if(ir == 32*64*16 + 32*16 + 7)
+                            {
+                                qDebug() << "stop here";
+                            }
+                            float uf = (*uFlux)[iep*ejmp + iap*ajmp + ir];
+                            float cf = (*cFlux)[iep*ejmp + iap*ajmp + ir];
+                            if(ie == iep && cf > 0)
+                            {
+                                qDebug() << "Broke";
+                            }
                             SOL_T totalFlux = (*uFlux)[iep*ejmp + iap*ajmp + ir] + (*cFlux)[iep*ejmp + iap*ajmp + ir];
-
-                            //if(totalFlux > 0)
-                            //{
-                            //    qDebug() << "nonzero";
-                            //}
-
                             coeff += legendre.table(ia, iap, il) * xs->scatxs2d(zid, iep, ie, il) * quad->wt[iap] * totalFlux;
-                            //totalSource[ia*mesh->voxelCount() + ir] += m_4pi_inv*legendre.table(ia, iap, il) *
-                            //        xs->scatxs2d(zid, iep, ie, il) *
-                            //        totalFlux *
-                            //        quad->wt[iap] *
-                            //        mesh->atomDensity[ir] * mesh->vol[ir];
                         }
                     totalSource[ia*mesh->voxelCount() + ir] += coeff * mesh->atomDensity[ir] * mesh->vol[ir];
                 }
 
-        //for(unsigned int i = 0; i < quad->angleCount() * mesh->voxelCount(); i++)
-        //    totalSource[i] += extSource[ie*quad->angleCount()*mesh->voxelCount() + i];
+        // DEBUG
+        if(ie == highestEnergy)
+        {
+            std::vector<float> t(mesh->voxelCount(), 0);
+            for(unsigned int ir = 0; ir < mesh->voxelCount(); ir++)
+                for(unsigned int iap; iap < quad->angleCount(); iap++)
+                    t[ir] += totalSource[iap*mesh->voxelCount() + ir] * quad->wt[iap];
+            OutWriter::writeDose("dbg_totalSource_highestEnergy_p0", *mesh, t);
+        }
+        // !DEBUG
 
         while(iterNum <= maxIterations && maxDiff > epsilon)  // while not converged
         {
-            //qDebug() << "Iteration #" << iterNum;
-
-            //preFlux = tempFlux;  // Store flux from previous iteration for convergance eval
-
             // Clear for a new sweep
             for(unsigned int i = 0; i < tempScalarFlux.size(); i++)
                 tempScalarFlux[i] = 0;
@@ -1113,7 +1054,6 @@ void Solver::gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const
             for(unsigned int ia = 0; ia < quad->angleCount(); ia++)  // for every angle
             {
                 //qDebug() << "Angle #" << iang;
-
 
                 // Find the correct direction to sweep
                 int izStart = 0;                  // Sweep start index
@@ -1200,17 +1140,10 @@ void Solver::gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const
                                     influxZ = outboundFluxZ[ix*xjmp + iy*yjmp + iz+1];
                             }
 
-                            //if(iterNum == 1 && ri == mesh->voxelCount()/2 && ia==0)
-                            //{
-                            //    qDebug() << "Zoom";
-                            //    //SOL_T v = totalSource[ia*mesh->voxelCount() + ri];
-                            //}
-
                             SOL_T inscatter = 0;
                             for(unsigned int iap = 0; iap < quad->angleCount(); iap++)
                                 for(unsigned int il = 0; il <= solPar->pn; il++)
-                                    inscatter += //m_4pi_inv*legendre.table(ia, iap, il) *
-                                            legendre.table(ia, iap, il) * xs->scatxs2d(zid, ie, ie, il) * quad->wt[iap] *
+                                    inscatter += legendre.table(ia, iap, il) * xs->scatxs2d(zid, ie, ie, il) * quad->wt[iap] *
                                             (*cFlux)[ie*ejmp + iap*ajmp + ri] * mesh->atomDensity[ri] * mesh->vol[ri];
 
                             SOL_T numer = totalSource[ia*mesh->voxelCount() + ri] + inscatter +                                                                                             // [#]

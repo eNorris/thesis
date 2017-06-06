@@ -16,8 +16,6 @@ OutWriter::OutWriter()
 
 }
 
-
-
 void OutWriter::writeZoneId(std::string filename, const Mesh& mesh)
 {
     std::ofstream fout;

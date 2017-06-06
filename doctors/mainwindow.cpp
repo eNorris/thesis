@@ -24,6 +24,7 @@
 #include "solver.h"
 #include "mcnpwriter.h"
 #include "materialutils.h"
+#include "doseconverter.h"
 
 #undef SLOT
 #define _SLOT(a) "1"#a
@@ -743,6 +744,18 @@ void MainWindow::onSolverFinished(std::vector<SOL_T> *solution)
     default:
         qCritical() << "No solver of type " << m_solType;
     }
+
+    if(scalar.size() > 0)
+    {
+        OutWriter::writeDose("dose_icrp.dat", *m_mesh, DoseConverter::doseIcrp(*m_xs, *m_mesh, *m_raytrace, scalar));
+        OutWriter::writeDose("dose_edep.dat", *m_mesh, DoseConverter::doseEdep(*m_xs, *m_mesh, *m_raytrace, scalar));
+    }
+    else
+    {
+        OutWriter::writeDose("icrp_dose.dat", *m_mesh, DoseConverter::doseIcrp(*m_xs, *m_mesh, *m_raytrace, *solution));
+        OutWriter::writeDose("edep_dose.dat", *m_mesh, DoseConverter::doseEdep(*m_xs, *m_mesh, *m_raytrace, *solution));
+    }
+
 }
 
 void MainWindow::on_solverGpuCheckBox_toggled(bool gpuOn)

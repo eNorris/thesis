@@ -7,13 +7,12 @@
 #include <algorithm>
 //#include <iomanip>
 //#include <QDebug>
+//#include <QDebug>
 
 #include <iostream>
 //#include <cstdarg>  // For variadic templates
 
 #include "globals.h"
-
-//#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 class Mesh;
 class Quadrature;
@@ -30,6 +29,9 @@ public:
     template<typename T>
     static void writeAngularFlux(std::string filename, const XSection &xs, const Quadrature &quad, const Mesh &mesh, const std::vector<T>& flux);
 
+    template<typename T>
+    static void writeDose(std::string filename, const Mesh& mesh, const std::vector<T>& dose);
+
     static void writeZoneId(std::string filename, const Mesh& mesh);
 
     template<typename T>
@@ -42,6 +44,8 @@ public:
     static void writeArray3(std::string filename, const std::vector<T1>& arry1, const std::vector<T2>& arry2, const std::vector<T3>& arry3);
 
     static void writeFloatArrays(std::string filename, const std::vector<std::vector<float> >& arry);
+
+
 
 };
 
@@ -121,6 +125,35 @@ void OutWriter::writeAngularFlux(std::string filename, const XSection &xs, const
 }
 
 template<typename T>
+void OutWriter::writeDose(std::string filename, const Mesh& mesh, const std::vector<T>& dose)
+{
+    std::ofstream fout;
+    fout.open(filename.c_str());
+
+    fout << 3 << '\n';
+    fout << mesh.xElemCt << '\n';
+    fout << mesh.yElemCt << '\n';
+    fout << mesh.zElemCt << '\n';
+
+    for(unsigned int i = 0; i < mesh.xElemCt; i++)
+        fout << mesh.xNodes[i] << '\n';
+    for(unsigned int i = 0; i < mesh.yElemCt; i++)
+        fout << mesh.yNodes[i] << '\n';
+    for(unsigned int i = 0; i < mesh.zElemCt; i++)
+        fout << mesh.zNodes[i] << '\n';
+
+    if(mesh.voxelCount() != dose.size())
+        std::cout << "WARNING: OutWriter::writeDose: the mesh size did not match the data size" << std::endl;
+        //qDebug() << "WARNING: OutWriter::writeScalarFlux: the mesh size did not match the data size";
+
+    for(unsigned int i = 0; i < dose.size(); i++)
+        fout << dose[i] << '\n';
+
+    fout.flush();
+    fout.close();
+}
+
+template<typename T>
 void OutWriter::writeArray(std::string filename, const std::vector<T>& arry, int offset, int elements)
 {
     std::cout << "Writing 1D data to " << filename << std::endl;
@@ -183,6 +216,7 @@ void OutWriter::writeArray3(std::string filename, const std::vector<T1>& arry1, 
     fout.flush();
     fout.close();
 }
+
 
 
 

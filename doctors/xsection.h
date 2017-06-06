@@ -21,6 +21,8 @@ public:
     const std::vector<int> *m_elements;
     const std::vector<std::vector<float> > *m_weights;
 
+    std::vector<float> gbounds;
+
     XSection();
     ~XSection();
 

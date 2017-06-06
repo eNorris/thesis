@@ -314,6 +314,8 @@ bool XSection::addAll(AmpxParser *parser){
 
     bool allPassed = true;
 
+    gbounds = parser->getGammaEnergy();
+
     // Add the materials to the xs library
     for(unsigned int i = 0; i < m_elements->size(); i++)
         if(allPassed)
