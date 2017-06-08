@@ -41,11 +41,17 @@ std::vector<T> DoseConverter::doseIcrp(const XSection &xs, const Mesh &mesh, con
     const std::vector<float> icrpDe = {0.01,   0.015,  0.02,   0.03,  0.04,
                                  0.05,   0.06,   0.07,   0.08,  0.10,
                                  0.15,   0.2,    0.3,    0.4,   0.5,
-                                 0.511,  0.6,    0.662,  0.8,   1.0};
+                                 0.511,  0.6,    0.662,  0.8,   1.0,
+                                 1.117,  1.33,   1.5,    2.0,   3.0,
+                                 4.0,    5.0,    6.0,    6.129, 8.0,
+                                 10.0,   15.0,   20.0,   30.0, 40.0};
     const std::vector<float> icrpDf = {0.0337, 0.0664, 0.0986, 0.158, 0.199,
                                 0.226,   0.248,  0.273,  0.297, 0.355,
                                 0.528,   0.721,  1.12,   1.52,  1.92,
-                                1.96,    2.3,    2.54,   3.04,  3.72};
+                                1.96,    2.3,    2.54,   3.04,  3.72,
+                                4.10,    4.75,   5.24,   6.55,  8.84,
+                                10.8,    12.7,   14.4,   14.6,  17.6,
+                                20.6,    27.7,   34.4,   46.1,  56.0};
 
     std::vector<float> conversionFactor;
     conversionFactor.resize(xs.groupCount(), 0.0);
@@ -55,26 +61,30 @@ std::vector<T> DoseConverter::doseIcrp(const XSection &xs, const Mesh &mesh, con
         int iStart = 0;
         int iEnd = 0;
 
-        while(icrpDe[iStart+1] <= xs.gbounds[ie])
+        while(icrpDe[iStart+1] <= (xs.gbounds[ie+1]/1e6))
+        {
+            float q = icrpDe[iStart+1];
+            float v = xs.gbounds[ie+1]/1e6;
             iStart++;
+        }
 
-        while(icrpDe[iEnd] < xs.gbounds[ie+1])
+        while(icrpDe[iEnd+1] < xs.gbounds[ie]/1e6)
             iEnd++;
 
         float sumDose = 0.0f;
-        for(unsigned int i = iStart; i < iEnd; i++)
+        for(unsigned int i = iStart; i <= iEnd; i++)
         {
-            float leftE = MYMAX(xs.gbounds[ie], icrpDe[i-1]);
-            float rightE = MYMIN(xs.gbounds[ie+1], icrpDe[i]);
+            float leftE = MYMAX(xs.gbounds[ie+1]/1e6, icrpDe[i]);
+            float rightE = MYMIN(xs.gbounds[ie]/1e6, icrpDe[i+1]);
             float dE = rightE - leftE;
-            float slope = (icrpDf[i] - icrpDf[i-1])/(icrpDe[i] - icrpDe[i-1]);
-            float leftDf = slope * (leftE - icrpDe[i]) - icrpDf[i];
-            float rightDf = slope * (rightE - icrpDe[i]) - icrpDf[i];;
+            float slope = (icrpDf[i+1] - icrpDf[i])/(icrpDe[i+1] - icrpDe[i]);
+            float leftDf = slope * (leftE - icrpDe[i]) + icrpDf[i];  // y = m(x - xi) + yi
+            float rightDf = slope * (rightE - icrpDe[i]) + icrpDf[i];
             float dosePart = (leftDf + rightDf)/2;
             sumDose += dosePart * dE;
         }
 
-        float sumE = xs.gbounds[ie] - xs.gbounds[ie+1];
+        float sumE = (xs.gbounds[ie] - xs.gbounds[ie+1])/1e6;
 
         conversionFactor[ie] = sumDose/sumE;
     }
@@ -107,29 +117,40 @@ std::vector<T> DoseConverter::doseEdep(const XSection &xs, const Mesh &mesh, con
     }
 
     T gramToKg = 0.001;
-    T mevToJ = 1.60218e-13;
+    T evToJ = 1.60218e-19;
 
     for(unsigned int ir = 0; ir < mesh.voxelCount(); ir++)
     {
+        if(ir == 32*64*16 + 32*16 + 8)
+        {
+            qDebug() << "Hi";
+        }
         int zid = mesh.zoneId[ir];
         for(unsigned int ie = 0; ie < xs.groupCount(); ie++)
         {
-            //       Sigma_a = Sigma_t - Sigma-s
-            T sigE = (xs.totXs1d(zid, ie)-xs.scatXs1d(zid, ie)) * (xs.gbounds[ie] - xs.gbounds[ie+1]);
+            //[eV/cm] =   Sigma_a = Sigma_t - Sigma-s [b]            * [1/b-cm]             * [eV]
+            T sigE = (xs.totXs1d(zid, ie)-xs.scatXs1d(zid, ie)) * mesh.atomDensity[ir] * (xs.gbounds[ie] - xs.gbounds[ie+1]);
 
             // For every energy group lower compute g->h
             for(unsigned int iep = ie+1; iep < xs.groupCount(); iep++)
             {
-                T sig_gh = xs.scatxs2d(zid, ie, iep, 0) - xs.scatxs2d(zid, ie, iep, 0);
-                T E_g = xs.gbounds[ie] - xs.gbounds[ie+1];
-                T E_h = xs.gbounds[iep] - xs.gbounds[iep+1];
-                sigE += sig_gh * (E_g - E_h);
+                // [1/cm]=     [b]                          * [1/b-cm]
+                T sig_gh = xs.scatxs2d(zid, ie, iep, 0) * mesh.atomDensity[ir];
+
+                // [eV]
+                T E0 = (xs.gbounds[ie] + xs.gbounds[ie+1])/2;   // Energy before collision
+                T Ep = (xs.gbounds[iep] + xs.gbounds[iep+1])/2; // energy after collision
+
+                //       [1/cm] * [eV]
+                sigE += sig_gh * (E0 - Ep);
             }
 
+            // [eV/cm^3]        1/cm^2]                                                          * [eV/cm]
             depDose[ir] += (uflux[ie*mesh.voxelCount() + ir] + cflux[ie*mesh.voxelCount() + ir]) * sigE;
         }
 
-        depDose[ir] *= mevToJ / (gramToKg * mesh.density[ir]);
+        // [J/kg]     [J/eV] / ([kg/g]  * [g/cm^3]) = [J-cm^3/eV-kg]
+        depDose[ir] *= evToJ / (gramToKg * mesh.density[ir]);
     }
 
     return depDose;
