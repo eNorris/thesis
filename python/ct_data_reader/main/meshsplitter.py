@@ -1,6 +1,6 @@
 __author__ = 'etnc6d'
 
-filename = '/media/Storage/thesis/mcnp.gitignore/meshtax'
+filename = '/media/Storage/thesis/mcnp.gitignore/meshtaz'
 
 file = open(filename, 'r')
 #with open(filename, 'r') as file:
@@ -13,6 +13,10 @@ lines = file.readlines()
 
 for line in lines:
     l = line.lstrip()
+
+    if l.startswith("Mesh Tally Number"):
+        print(l)
+
     if l.startswith("Energy"):
         fout.close()
         indx += 1
