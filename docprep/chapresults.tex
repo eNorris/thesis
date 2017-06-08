@@ -7,7 +7,7 @@
 
 
 \section{Preprocessing}
-Two computational phantoms were used for verification of the DOCTORS code.
+Two computational phantoms were used for verification of the DOCTORS code. The first phantom is a $256 \times 256 \times 64$ voxel mesh of a 35 cm water phantom. The water phantom is in an acrylic casing and the entire mesh measures $50 \times 50 \times 12.5$ cm. Each voxel is then a cube with sides of 1.95 mm. The mesh has a total of 4194304 voxels. The second phantom is of the same dimensions and resolution, but of a realistic human phantom. The mesh emulates a CT scan of a patient's midsection where the liver would be located.
 
 Some preprocessing was done to each phantom before it was used in DOCTORS to provide results.
 
@@ -213,17 +213,45 @@ The analytical points are computed
 \end{equation}
 where $\mu_a^g$ and $\mu_w^g$ are the attenuation coefficients for air and water repectively for the $g$ group, $x_a$ and $x_w$ are the pathlength through air and water respectively, and $\Delta E$ is the width of the $g$ group in MeV. Dividing by the number of groups maintains consistency with the computational codes which uniformly distribute particles across all groups.
 
+In MCNP6, the effective dose was computed using a FMESH4 tally with associated DE and DF cards to weight the flux. The most accurate tally to compute the absorbed dose with is a F6 tally, however, those cannot be spatially distributed via a FMESH tally. Therefore, a F4 tally was used with a multiplier designed to emulate a F6 tally as closely as possible. The comparison is shown in Fig.~\ref{fig:mcnp_f4vsf6}.
+
+\begin{figure}[tb]
+  \begin{center}
+   \includegraphics[width=3.75in]{figs/mcnp_f4vsf6}
+  \end{center}
+  \caption{Comparison of the absorbed dose computed with F4 and F6 tallies in MCNP6. All eight data points were located at the center of the phantom and the two computation methods were within 2\% of each other.}
+\label{fig:mcnp_f4vsf6}
+\end{figure}
+
+The effective dose and absorbed doses are given in Fig.~\ref{fig:b2_dose}.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/b2_effdose}
+        \caption{}
+        \label{fig:b2_effdose}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/b2_absdose}
+        \caption{}
+        \label{fig:b2_absdose}
+    \end{subfigure}
+    \caption{(a) The effective dose computed using ICRP 116 fluence-to-dose conversion factors. (b) The absorbed dose.}\label{fig:b2_dose}
+\end{figure}
+
 \section{16 Cone-Beam Water Benchmark}
 
-And now 16.
+INSERT THE RESULTS FROM THE 16 BEAM BENCHMARK
 
 \section{16 Cone-beam Phantom Benchmark}
 
-It's a person!
+INSERT THE RESULTS FROM THE 16 BEAM PHANTOM BENCHMARK
 
 \section{GPU Acceleration}
 
-it's faster!
+INSERT THE RESULTS FROM THE GPU ACCELERATION
 
 
 \endinput

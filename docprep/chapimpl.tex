@@ -5,15 +5,22 @@
 %% === Implementation ===
 %%
 
-This chapter covers the details of the implementation of the different components of the DOCTORS code base.
-
-The code is available from a GitHub Git repository. At the time of this writing, the repository is located at \texttt{https://github.com/eNorris/thesis} and is only available subject to special request and license agreement. An executable version is available.
+This chapter covers the details of the implementation of the different components of the DOCTORS code base. The code is available from a GitHub Git repository. At the time of this writing, the repository is located at \texttt{https://github.com/eNorris/thesis} and is only available subject to special request and license agreement. An executable version is available.
 
 The code is implemented in C++ and requires a C0x11 compliant compiler. The user interface is written using the Qt5 framework. GPU computation is performed via CUDA which must be compiled seperatly by Nvidia's proprietary compiler, \texttt{nvcc}.
 
 \section{Vector Flattening}\label{sec:flatten}
 
-Data is stored as \texttt{std::vector<>} objects.
+Data is stored in large, multi-dimensional arrays. For example, the CT voxel phantom can be intuitively stored as a 3D array of floating precision values which can be easily indexed. However, DOCTORS is written such that it is extensible to GPUs. GPUs are not optimized for data stored in a multi-dimensional fashion, but rather for data stored as a single 1-dimensional array. To emulate the 3-dimensional storage arrangement of the data, indexing arithmetic is used.
+
+On the CPU, data is stored as C++ \texttt{std::vector<T>} objects where the \texttt{T} template parameter can be either \texttt{float} or \texttt{double} depending on the precision (32 bits or 64 bits respectively) needed. The storage space available to a \texttt{std::vector<T>} object is effectively unlimited, bounded only by the host CPU's physical RAM. However, other effects such as memory fragmentation can limit the practical size of a single, continuous \texttt{std::vector<T>} object significantly. To emulate indexing of a $N_x \times N_y$ matrix, a single \texttt{std::vector<T>} is created and resized to $N_x \times N_y$ elements. The global index, $i$, in the flattened array is then
+\begin{equation}
+i = i_x N_y + i_y.
+\end{equation}
+This pattern extends to multi-dimensional matrices. For example, a $N_x \times N_y$ matrix would be globally indexed as
+\begin{equation}
+i = i_x N_y N_z + i_y N_z + i_z.
+\end{equation}
 
 Figure~\ref{fig:indx_ex} gives an example of the spatial indexing scheme using an $8 \times 8 \times 8$ mesh. The indicated voxel has $i_x$, $i_y$, and $i_z$ indices of 1, 5, and 6 respectively. Therefore, the index value of the highlighted voxel is $1 \times 8 \times 8 + 5 \times 8 + 6$ = 110. This flattening pattern continues to higher dimensional phase space to encompas energy and direction.
 
@@ -21,7 +28,7 @@ Figure~\ref{fig:indx_ex} gives an example of the spatial indexing scheme using a
   \begin{center}
    \includegraphics[width=3.75in]{figs/indx_ex}
   \end{center}
-  \caption{The indexing scheme.}
+  \caption{Conversion from 3D indexing to 1D "flattened" indexing.}
 \label{fig:indx_ex}
 \end{figure}
 

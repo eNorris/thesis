@@ -9,7 +9,9 @@ This chapter summarizes the conclusions drawn from the results given in Chapter 
 
 \section{First conclusion}
 
-I concluded many things.
+The raytracer is very fast compared to the discrete ordinate solution which computes the collided flux. The uncollided flux quantifies the source distribution from the medical system. This uniquely enables discrete ordinate solutions to rapidly characterize complex systems. Multiple cone beams and fan beams are possible as well as many other, more complex beam shapes.
+
+Anisotropy cannot be ignored.
 
 \section{Applicability to Clinical Settings}
 With further development, DOCTORS is well positioned to become a code of significant clincal impact.
@@ -34,10 +36,10 @@ NJOY or AMPX.
 Use 4D CT to do temporal stuff as well as spatial stuff.
 
 \subsection{Partial Acceptance Criteria}
-Allow it in the raytracer.
+In the current version of doctors, the raytracer is very accurate with respect to MCNP6 in predicting the uncollided flux, except for along the periphery of the beam. Voxels are currently either completely inside the beam or completely outside of it as determined by its isocenter. A more sophisticated technique whereby a voxel cah be partially accepted in the beam would remove these artifacts.
 
 \subsection{Multileaf Collimation}
-Collimators!
+Some medical systems currently utilize a multileaf collimator [CITE] to deliver dose to a specific organ or region of the body. As the 
 
 \subsection{Extension to Therapy Beams}
 High energy will be more anisotropic. Will need spherical harmonics.

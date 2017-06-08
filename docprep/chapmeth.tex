@@ -60,7 +60,7 @@ The coordinate system used in DOCTORS is shown in Fig.~\ref{fig:coord_sys}. A di
 
 The rotation symmetrical ($S_N$) quadrature is implemented in DOCTORS. From amongst many different quadrature sets, the rotation symmetrical quadratures were selected because they are easy to implement, rotationally symmetric, and used in production discrete ordinate solvers~\citep{ref:evanst} which enables simple, direct comparison to other solvers. Arbitrary quadratures are permissible in a plain text file supplied by the user enabling other quadratures.
 
-ADD THEORY AND MATH OF ANGLE/WEIGHT GENERATION?
+The $S_N$ quadrature ensures 90$\deg$ symmetry about any axis. In order to ensure the rotational symmetry, the $S_N$ quadrature has a single degree of freedom. The $LQ_N$ quadrature (which is the specific $S_N$ implemented in DOCTORS) uses the remaining degree of freedom to minimize error caused when integrating Legendre polynomials since that class of polynomials are used to represent anisotropy in scattering (see Sec.~\ref{sec:aniso}). For a more through discussion of quadrature generation, see \citet{ref:lewise}.
 
 To include a user defined quadrature, the plain text file should be formatted such that it contains four columns similar to Table~\ref{tab:quad_format} (without any headings). No checks are performed to ensure that octants are covered, this allows simple testing quadratures that utilize only a single direction to be used. Values for $\mu$, $\eta$, and $\xi$ do not necessarily need to add to unity as they will be automatically normalized by DOCTORS. Likewise, the weights will be normalized such that their summation is unity. However, user defined directions \textit{should not} be parallel to any major axis. Doing so may result in undefined behavior. Also, after normalization, no two rows should have identical values for $\mu$, $\eta$, and $\xi$ such as the last two rows of Table~\ref{tab:quad_interp}, nor may any weights be negative. The data in Table~\ref{tab:quad_format} would be read in and renormalized by DOCTORS resulting in data identical to  Table~\ref{tab:quad_interp}.
 
@@ -375,7 +375,7 @@ The termination criteria is given by Eq.~\ref{eq:conv4}. Computation of a value 
 \varepsilon_i > \varepsilon_{i-1}
 \end{equation}
 
-\subsection{Anisotropy Treatment}
+\subsection{Anisotropy Treatment}\label{sec:aniso}
 
 Scatter is assumed to be a function of only the scatter angle $\theta_s$ between the initial, $\hat{\Omega}_a$, and scattered, $\hat{\Omega}_{a'}$, directions. The cosine of the scatter angle, $\mu_s$ is related by 
 \begin{equation} \label{eq:scat_cos}
@@ -537,15 +537,6 @@ S(\boldsymbol{s}, E, \hat{\Omega})
 \delta\left( \hat{\Omega}, \frac{\boldsymbol{r}-\boldsymbol{s}}{|\boldsymbol{r}-\boldsymbol{s}|^2}\right)
 d \boldsymbol{s}.
 \end{equation}
-
-
-%\begin{equation} \label{eq:col3}
-%\begin{split}
-%	&\left[ \hat{\Omega} \cdot \nabla + \Sigma_t(\boldsymbol{r}, E) \right]
-%	\psi_c(\boldsymbol{r}, E, \hat{\Omega}) = \\
-%	&\int_{4 \pi} \int_0^\infty \Sigma_s(\boldsymbol{r}, E' \rightarrow E, %\hat{\Omega}' \rightarrow \hat{\Omega}) \psi(\boldsymbol{r}, E', %\hat{\Omega}') dE' d\hat{\Omega}'
-%\end{split}
-%\end{equation}
 
 \section{Source Generation}
 All photon transport problems considered in the DOCTORS code are ultimately driven by an external source, namely the medical equipment producing the photon beam. These sources can come in a variety of geometric shapes and energy spectra. Currently, DOCTORS has a number of built-in beam types available for analysis including point sources, fan beams, and cone beams. Fan beams and cone beams can be arranged about a phantom to produce an axial slice. Currently, helical paths are not supported, though they could be added with little additional effort. The geometry of fan beams and cone beams in DOCTORS is shown in Fig.~\ref{fig:shape}.
@@ -740,17 +731,17 @@ where $H^g$ is the conversion factor for the $g^{th}$ group.
 
 \subsection{Energy Deposition}
 
-The alternative way to compute the dose is directly from the local energy deposition. The total deposition, $\mathcal{E_{T,i}}$ for voxel $i$ is
+The alternative way to compute the dose is directly from the local energy deposition. The total deposition, $\mathcal{E}_{T,i}$ for voxel $i$ is
 \begin{equation}\label{eq:dept}
 \mathcal{E}_{T,i} = \mathcal{E}_{a,i} + \mathcal{E}_{s,i}
 \end{equation} 
-where $\mathcal{E_{a,i}}$ is the energy deposition from absorption and $\mathcal{E_{s,i}}$ is the energy deposition from scatter. The absorption deposition is
+where $\mathcal{E}_{a,i}$ is the energy deposition from absorption and $\mathcal{E}_{s,i}$ is the energy deposition from scatter. The absorption deposition is
 \begin{equation}\label{eq:depa}
 \mathcal{E}_{a,i} = \sum_{g=0}^{G-1} \Sigma_{a,i}^g \varphi_i^g V_i \bar{E}^g F_1
 \end{equation}
 where $\bar{E}$ is the average energy (in MeV) of the $g^{th}$ group and $F_1$ is a unit conversion factor that converts MeV to Joules. The average group energy is assumed to be the average between the two bounding energies of the group. Equation~\ref{eq:depa} assumes total local energy deposition in the voxel of interest. The energy deposition from scatter is
 \begin{equation}\label{eq:deps}
-\mathcal{E}_{s,i} = \sum_{g=0}^{G-1} \sum_{h=g-1}^{G-1} \left[ \Sigma_{s,i}^{g,h} \varphi_i^g V_i (\bar{E}^g-\bar{E}^h) F_1 \right]
+\mathcal{E}_{s,i} = \sum_{g=0}^{G-1} \sum_{h=g+1}^{G-1} \left[ \Sigma_{s,i}^{g,h} \varphi_i^g V_i (\bar{E}^g-\bar{E}^h) F_1 \right]
 \end{equation}
 making the total deposition
 \begin{equation}\label{eq:dept2}

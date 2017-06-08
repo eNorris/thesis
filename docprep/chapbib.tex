@@ -24,43 +24,34 @@
 This chapter summarizes the literature reviewed in preparation of this work. The literature review is split into multiple sections, each highlighting relevant works pertaining to a particular component or methodology behind DOCTORS. The first two sections cover current dose estimation techniques and steps necessary for preprocessing data. Section~\ref{sec:discordlit} covers historical and recent work in discrete ordinate solution methodology, the methodology used by DOCTORS. The remaining sections give an overview of GPU hardware and other implementation facets.
 
 \section{CT Dose Estimation}
-As discussed in Chapter 1, the dose a patient receives from both diagnostic CT procedures and radiation therapy is of great concern to the medical community [CITE]. However, dose quantification is not currently patient specific. The air kerma (measured in Gy) measures the x-ray beam intensity and can be measured directly [CITE]. As the x-ray beam passes through the patient, it deposits energy. The energy deposition per unit mass is the absorbed dose (measured in Gy) which is then weighted by the radiation type to give the equivalent dose (measured in Sv). The equivalent dose quantifies the biological detriment to the patient from the procedure. The effective dose (measured in Sv) accounts for the radiosensitivity of each organ and is the most meaningful measure of risk to the patient. Any two procedures that result in the same effective dose to the patient carry the same acute and long-term risks. Any procedure that gives an effective dose to a patient has the same risk as any procedure that would give the same whole body dose.
+As discussed in Chapter 1, the dose a patient receives from both diagnostic CT procedures and radiation therapy is of great concern to the medical community [CITE]. However, dose quantification is not currently patient specific. Measuring the dose in a patient directly is impossible, intead the air kerma (measured in Gy), which measures the x-ray beam intensity, and can be measured directly [CITE]. As the x-ray beam passes through the patient, it deposits energy. The energy deposition per unit mass is the absorbed dose (measured in Gy) which is then weighted by the radiation type to give the equivalent dose (measured in Sv). The equivalent dose quantifies the biological detriment to the patient from the procedure. The effective dose (measured in Sv) accounts for the radiosensitivity of each organ and is the most meaningful measure of risk to the patient. Any two procedures that result in the same effective dose to the patient carry the same acute and long-term risks. Any procedure that gives an effective dose to a patient has the same risk as any procedure that would give the same whole body dose.
 
 Unfortunately, neither the absorbed dose, equivalent dose, nor effective dose to a patient can be measured directly. Instead, the CT Dose Index (CTDI) is measured using a pencil shaped ionization chamber at the center of  a standardized acrylic phantom placed at the scanner isocenter~\citep{ref:hudaw}. The CTDI quantifies the equivalent dose the patient receives from a single slice of the CT scan protocol. The CTDI does \textit{not} capture patient-specific papameters, but rather quantifies the amount or radiation emitted by the source.
 
 The CTDI does not provide the dose from an entire procedure, but rather a single slice. The dose from a procedure is obtained from the dose-length-product (DLP) which is the product of the CTDI and the axial scan length. The DLP is related to the effective dose to the patient for a particular procedure by a conversion factor that is dependent on many variables including the anatomical region scanned, the x-ray tube voltage, and the patient's age, gender, and size~\citep{ref:hudaw}.
 
+INSERT MORE EXAMPLES.
 \citet{ref:lauk} found that severly obese patients received twice as much dose from CT procedures as others on average. Some patients received as much as five times the typical dose.
 
 The need for a complete understanding of the transport and scatter through the patient motivates full transport solutions. Typical solution modalities involve three key steps: (1) interpret the user input and prepare the solver, (2) run the transport solution to compute the scalar flux, and (3) convert the scalar flux to a dose. The first step is completely code dependent. The second and third steps of all major solvers falls into one of a few categories.
 
-Monte Carlo codes have been used in the past to compute flux-to-dose conversion factors for a reference person~\citep{ref:icrp116}. The values provided by~\citet{ref:icrp116} are energy dependent conversion factors, $H(E)$ that convert flux to effective dose for a particular orientation. The dose, $D$ is then computed
+Nearly all transport solutions fall into one of two categories: Monte Carlo and deterministic. Monte Carlo codes are generally known for their accuracy; they are able to sample the problem and attain arbitrarily high precision given sufficient runtime. They also take advantage of combinatorial geometry allowing a user to produce geometrically complex 3D structures. Deterministic methods are generally much faster than their Monte Carlo counterparts but do not benefit from excess runtime. They also consume vastly more resources, particularly random-access memory (RAM). However, in regularly structures meshes, deterministic methods can greatly outperform Monte Carlo. A large number of spatial regions slows down the particle transport in Monte Carlo and increases the RAM required to store the numerous voxels.
+
+Codes such as EGS4, its improved versions EGSnrc, and EGS5 \citep{ref:nelsonw}, and PENELOPE \citep{ref:salvatf} are early Monte Carlo that have shown very good comparison to experimental results. However, these codes were developed primarily for shower simulations in high energy physics.
+
+Monte Carlo codes such as TOPAS [CITE], Geant4 \citep{ref:agostinellis}, and MCNP6 [CITE] are the current gold standard in computational dosimetry \citep{ref:jiax}. This work compares results to those obtained from MCNP6. MCNP6 is a Monte Carlo code developed for general purpose particle transport and is well validated. MCNP6 was selected for comparison because it is so well validated and the input files can be easily generated procedurally. Codes whose input such as Geant4 do not lend themselves easily to procedural code generation are difficult to benchmark precisely against for arbitrary computational phantoms.
+
+The alternative to Monte Carlo is deterministic solutions. The best known solution techniques include the discrete ordinate method, the finite element method, and the method of characteristics. The discrete ordinate method is employed by DOCTORS and the methodology is covered independently in Section~\ref{sec:discordlit}. Other deterministic methods are summarized here.
+
+The method of characteristics solves the characteristic form of the Boltzmann transport equation which is defined along a single direction (called the characteristic). Along that direction, the 3-dimensional gradient operator found in the full Boltzmann equation (see Sec.~\ref{sec:lbe}) becomes a 1-dimensional derivitive. This reduction gives rise to an analytical solution along the characteristic [CITE]. Sufficient characteristic solutions solved simulateously gives the solution over the entire problem domain. Currently, though, MOC has not been extended to full 3D, instead, hybrid methods such as the NEM-$S_N$ technique employed by DeCART have been used. DeCART uses 2D MOC to solve planar slices of reactor transport problems and links the slices using diffusion~\citep{ref:hursinm}. Another MOC implementation is the TRANSMED code which was used to compute external beam therapy dose profiles accurately~\citep{ref:williamsm}. Method of characteristic solutions have been extended to the time dependent domain by \citet{ref:hoffmana}.
+
+However the energy dependent flux is computed, it must afterward be converted to dose. Monte Carlo codes have been used in the past to compute flux-to-dose conversion factors for a reference person~\citep{ref:icrp116}. The values provided by~\citet{ref:icrp116} are energy dependent conversion factors, $H(E)$ that convert flux to effective dose for a particular orientation. The dose, $D$ is then computed
 \begin{equation}
 D = \int_0^\infty \varphi(E) H(E) dE
 \end{equation}
-where $\varphi$ is the scalar flux.
+where $\varphi$ is the scalar flux. The weakness of this method is that even though the flux may be computed to be patient specific, the weighting factors are evaluated using a standard reference man phantom.
 
-Monte Carlo codes are generally known for their accuracy; they are able to sample the problem and attain arbitrarily high precision given sufficient runtime. They also take advantage of combinatorial geometry allowing a user to produce geometrically complex 3D structures. Deterministic methods are generally much faster than their Monte Carlo counterparts but do not benefit from excess runtime. They also consume vastly more resources, particularly random-access memory (RAM). However, in regularly structures meshes, deterministic methods can greatly outperform Monte Carlo. A large number of spatial regions slows down the particle transport in Monte Carlo and increases the RAM required to store the numerous voxels.
-
-Monte Carlo codes such as TOPAS and Geant4 \citep{ref:agostinellis} are the gold standard \citep{ref:jiax}
-
-Codes such as EGS4, its improved versions EGSnrc, and EGS5 \citep{ref:nelsonw}, and PENELOPE \citep{ref:salvatf} are all Monte Carlo and have shown very good results to experimental. But they are developed for high energy physics.
-
-The alternative to Monte Carlo is deterministic solutions. The best known solution techniques include the discrete ordinate method, the finite element method, and the method of characteristics. The discrete ordinate method is employed by DOCTORS and the methodology is covered independently in Section~\ref{sec:discordlit}.
-
-One of the most well known MOC codes is DeCART. DeCART is actually a coupled solver in that it utilizes different solution modalities for the radial plane and the axial direction. It uses a more complex modality in the radial plane such as MOC and then uses diffusion to transport particles axially~\citep{ref:hursinm}.
-
-The Method of Characteristics is a deterministic solution that has some advantages over discrete ordinates but is very complex to set up in 3D. One implementation is the TRANSMED code which was used to compute external beam therapy dose profiles accurately~\citep{ref:williamsm}.
-
-The MOC solution has been extended to the time dependent domain by \citet{ref:hoffmana}.
-
-Raytracing algorithms have been developed for numerous discret ordinate codes include RAY3D~\citep{ref:yingz} and ATTILLA~\citep{ref:wareingt} which utilizes unstructured tetrahedral meshes.
-
-
-
-Dose estimations have been made using many methodologies including 
-
-COMPUTATION
+Alternatively, codes can compute the dose deposition directly during the transport solution. The simplest example of this is in Monte Carlo codes which tally the energy deposited by each collision rather than track length in voxels which estimates the absorbed dose. Since the particle type that caused the scatter is always, known, the equivalent dose is simple to compute. However, in order to compute the effective dose, which is organ weighted, the organ to which the voxel of interest belongs must be known. In general, this is a very difficult problem with no fully automated solutions without significant additional information about human anatomy and the scan procedure employed. Therefore, this dose estimation technique is rarely employed in practice.
 
 \section{CT Phantom Generation}
 
@@ -96,7 +87,7 @@ Along any particular ray, monoenergetic particles will attenuate through a homog
 I(x) = I_0 e^{-\mu x}
 \end{equation}
 
-The reconstruction populates the CT mesh with CT numers, also known as Hounsfield units. These values are related to the attenuation coefficient of the material represented by the voxel. Traditionally, a CT number of zero corresponds to the attenuation of water while -1000 corresponds to dry air CITE though some variations do exist \citep{ref:plessisf} \citep{ref:sawc}.
+The reconstruction populates the CT mesh with CT numers, also known as Hounsfield units. These values are related to the attenuation coefficient of the material represented by the voxel. Traditionally, a CT number of zero corresponds to the attenuation of water while -1000 corresponds to dry air [CITE] though some variations do exist \citep{ref:plessisf} \citep{ref:sawc}.
 
 \citet{ref:schneideru} proposed a method to utilize different phantom materials to calibrate a HU-to-material conversion. He used only six different materials that descriminated between fat, water, muscle, and three densities of bone. From the calibration curve, he computed proton stopping powers accurate to within 1-2\%.
 
@@ -138,9 +129,9 @@ Bone 15     & > 1500        &  4.3 & 12.7 &  4.3 & 45.3 &     & 0.2 & 11.1 & 0.3
 \end{sidewaystable}
 
 \section{Discrete Ordinates}\label{sec:discordlit}
-The dsicrete ordinates method dates back to CITE but remains one of the most prominent solution modalities for radiation transport in use today. A comprehensive review of discrete ordinate methods is given by \citet{ref:lewise}. Additional references include [CITES].
+The dsicrete ordinates method dates back to [CITE] but remains one of the most prominent solution modalities for radiation transport in use today. A comprehensive review of discrete ordinate methods is given by \citet{ref:lewise}. Additional references include [CITES].
 
-The oldest major discrete ordinate method implementation is DORT which was superceded by its 3D counterpart TORT~\citep{ref:rhoadesw}. Since TORT, new discrete ordinate method implementations have laregly been extensions allowing more advanced computation.
+The oldest major discrete ordinate method implementation is DORT which was superceded by its 3D counterpart TORT~\citep{ref:rhoadesw}. Since TORT, new discrete ordinate method implementations have laregly been extensions allowing more advanced computation or updates to modernize the code.
 
 Discrete ordinate methods are almost always done on a Cartesian grid, though alternative derivations on general geometry do exist~\citep{ref:dehart}. Extension to unstructured tetrahedral meshes was done by ~\citet{ref:wareingt}.
 
@@ -148,25 +139,29 @@ Discrete ordinate methods are almost always done on a Cartesian grid, though alt
 
 Denovo is a massively parallel general-purpose discrete ordinate solver developed by~\citet{ref:evanst} to replace TORT. Denovo uses modern programming standards and utilizes the Exnihilo package for data processing and solution methods~\citep{ref:evanst2}. 
 
-KBA DISCUSSION
+To overcome ray effect artifacts (discussed more thouroughly in Sec.~\ref{sec:uncol}), discrete ordinate solutions often employ a raytracing algorithm to compute the uncollided flux. The uncollided flux is then computed using the full discrete ordinate method. Raytracing algorithms have been developed for numerous discret ordinate codes include RAY3D~\citep{ref:yingz} and ATTILLA~\citep{ref:wareingt} which utilizes unstructured tetrahedral meshes.
+
+INSERT KBA DISCUSSION
 
 \section{Raytracing}
 
-Many raytracing algorithms are based on the Bresenham line raserizing algorithm which was designed for graph plotting hardware~citep{ref:bresenhamj}. That algorithm was intende to produce lines acceptable for human interpretation and no guarantee is made that all pixels along the line will be identified making this class of algorithms inappropriate for dosimetric raytracing since attenuation through some voxels would be skipped. Some extensions have been added to it that guarantee passage through all voxels though~\citep{ref:liuy}.
+Many raytracing algorithms are based on the Bresenham line raserizing algorithm which was designed for graph plotting hardware~citep{ref:bresenhamj}. That algorithm was intended to produce lines acceptable for human interpretation and no guarantee is made that all pixels along the line will be identified making this class of algorithms inappropriate for dosimetric raytracing since attenuation through some voxels would be skipped. Some extensions have been added to it that guarantee passage through all voxels though~\citep{ref:liuy}.
 
-\citet{ref:clearyj} proposed a voxel traversal algorithm in which they initially identify the voxel containing the starting point of the ray, and transport it to the first surface of its bounding voxel it would cross. This is done by computing the distance traveled in order to cross each enclosing surface. The surface with the least distance is the first surface crossed. Therefore, the particle is advanced to the intersection point and considered inside the next cell, having crossed the surface. This process is repeated until a termination criteria is met.
+\citet{ref:clearyj} proposed a voxel traversal algorithm in which he initially identifies the voxel containing the starting point of the ray, and transport it to the first surface of its bounding voxel it would cross. This is done by computing the distance traveled to cross each enclosing surface. The surface with the least distance is the first surface crossed. Therefore, the particle is advanced to the intersection point and considered inside the next cell, having crossed the surface. This process is repeated until a termination criteria is met.
 
-This work uses the raytracing algorithm proposed by~\citet{ref:wooa} which is very similar to the method proposed by~\citet{ref:clearyj} but based on the parametric equation of a line, $\boldsymbol{u} + \boldsymbol{v}t$ which makes implementation in 3D simple. Since its develpment, many improvements and extensions have been made for alternate geometries such as rhombic dodecahedra~\citep{ref:hel}
+This work uses the raytracing algorithm proposed by~\citet{ref:wooa} which is very similar to the method proposed by~\citet{ref:clearyj} but based on the parametric equation of a line, $\boldsymbol{u} + \boldsymbol{v}t$ which makes implementation in 3D simple. Since its develpment, many improvements and extensions have been made for alternate geometries such as rhombic dodecahedra~\citep{ref:hel} for volume rendering but the core algorithm remains state of the art for floating-point arithmetic. On systems that are highly efficient at computing integer arithmetic, alternatives exist which are faster~\citep{ref:liuy} but they do not outperform on hardware optimized for floating-point operations.
 
-GPU RAYTRACING
+INSERT SECTION ON GPU RAYTRACING
 
 \section{GPU Acceleration}
+
+A graphics processing unit (GPU) is similar to a central processing unit (CPU)in that it executes instructions to process data. However, it differs in that a CPU may have up up to 22 physical cores, each of which can operate independently, a GPU has up to thousands of cores, but they cannot operate independently. Instead, cores execute simulaneously in groups called warps. All cores in a warp execute the same instruction at the same time as all others. 
 
 Two major GPU manufacturers control the vast majority of the market, Nvidia and AMD [CITE]. In 2007, Nvidia released its Compute Unified Device Architecture (CUDA) language. CUDA allows code written in C/C++/FORTRAN to communicate with a GPU with minimal additional code. Therefore, CUDA was selected for the GPU acceleration of DOCTORS. Therefore, only Nvidia GPUs are considered in this work.
 
 In GPU texts, the GPU itself is referred to as a device and the CPU or other hardward running the GPU is referred to as the host. The device has its own instruction set which requires a special compiler. The device also has its own onboard memory so data must be copied from the host to the device and then back.
 
-Conceptually, code run on the device is split into block on a grid, each block then runs multiple concurrent computations, each on a thread. In hardware, threads execute on 32-128 streaming multiprocessors depending on the GPU architecture.
+Conceptually, code run on the device is split into block on a grid, each block then runs multiple concurrent computations, each on a thread. In hardware, threads execute in a warp (32 to 128 streaming multiprocessors depending on the GPU architecture).
 
 Monte Carlo dose computation for protons has been accelerated by GPU technology \citep{ref:jiax} and Monte Carlo in voxelized geometries has been done by \citep{ref:hissoinys} for monoenergetic beams.
 

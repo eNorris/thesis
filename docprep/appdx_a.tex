@@ -1,42 +1,109 @@
 %%
-%% This is file `chapmin.tex',
-%% generated with the docstrip utility.
+%% Edward T. Norris
+%% Discrete Ordinates Computed Tomography Organ Dose Simulator (DOCTORS)
+%% 
+%% === Appendix A ===
 %%
-%% The original source files were:
-%%
-%% ths.dtx  (with options: `chapmin')
-%% 
-%% IMPORTANT NOTICE:
-%% 
-%% For the copyright see the source file.
-%% 
-%% Any modified versions of this file must be renamed
-%% with new filenames distinct from chapmin.tex.
-%% 
-%% For distribution of the original source see the terms
-%% for copying and modification in the file ths.dtx.
-%% 
-%% This generated file may be distributed as long as the
-%% original source files, as listed above, are part of the
-%% same distribution. (The sources need not necessarily be
-%% in the same archive or directory.)
 
+This appendix gives a brief summary of flux moments and the Legendre spherical harmonics needed to compute them.
 
- %% ... sample chapter ...
+\section{Flux Moments}\label{appdx:moments}
 
-This appendix covers the math for Legendre polynomials and spherical harmonics
+The flux moments are an alternate representation of the angular flux  within a system. The rationale behind usage of flux moments is that they map the discrete flux ($\psi$) from a function of angle to a function of $P_N$ expansion. This reduces the amount of memory required for computation. Storing $\psi$ directly requires storing $G \times N_V \times N_a$ values where $G$ is the number of groups, $N_V$ is the number of voxels, and $N_a$ is the number of angles. Storing the flux moments, however, requires storing only $G \times N_V \times (N^2 + 2N + 1)$ values where $N$ is the $P_N$ expansion value. For example, a problem requiring $S_6$ needs $6 \times 8 = 48$ directions, but a problem requiring $P_6$ needs 49 expansion coefficients which would seem approximately eqivalent, but typical problems require far more discrete directions than expansion coefficients. Comples problems can easily require $S_{16}$ or higher but expansions above $P_5$ are rarely encountered.
 
 \section{Legendre Polynomials}\label{appdx:leg}
 
-They exist.
+The Legendre polynomials are solutions to:
+\begin{equation}
+\begin{split}
+P_0(\mu) &= 1 \\
+P_l(\mu) &= \frac{1}{2^l l!} \frac{d^l}{d\mu^l}(\mu^2 - 1)^l \,, \quad l \in \mathbb{N}
+\end{split}
+\end{equation}
+where $\mathbb{N}$ is the set of natural numbers (1, 2, 3...). Table~\ref{tab:legendre} gives the solution of the first few Legendre polynomials. The Legendre polynomials are orthogonal on the domain $[-1, 1]$ in that
+\begin{equation}
+\frac{1}{2} \int_{-1}^{1} P_l(\mu) P_{l'}(\mu) d\mu = 
+\begin{cases}
+\frac{1}{2l+1} \,, \quad l = l'\\
+0 \,, \quad \text{otherwise}
+\end{cases}
+\end{equation}
 
-\subsection{Spherical Harmonics}
+\begin{table}[ht]
+\caption{Legendre Polynomials}
+\centering 
+\begin{tabular}{c c}
+\hline \hline   
+$P_l$    & $P_l(\mu)$ \\ [0.5ex] 
+\hline
+$P_0$ & 1 \\
+$P_1$ & $\mu$ \\ 
+$P_2$ & $\frac{1}{2}(3\mu^2 - 1)$ \\
+$P_3$ & $\frac{1}{2}(5\mu^3 - 3\mu)$ \\
+$P_4$ & $\frac{1}{8}(35\mu^4 - 30x^2 + 3)$ \\
+$P_5$ & $\frac{1}{8}(63\mu^5 - 70\mu^3 + 15\mu)$ \\
+$P_6$ & $\frac{1}{16}(231\mu^6 - 315^4 + 105^2 - 5)$ \\
+$P_7$ & $\frac{1}{16}(429\mu^7 + 693\mu^5 - 315^3 + 35^3\mu)$ \\[1ex]
+\hline
+\end{tabular}
+\label{tab:legendre}
+\end{table}
 
-They also exist.
+The orthogonality of the Legendre polynomials allows an infinite series to exactly represent any function on the domain $[-1, 1]$ as
+\begin{equation}
+f(\mu) = \sum_{l=0}^{\infty} C_l P_l(\mu)
+\end{equation}
+with apprpriately selected constants, $C_l$ and is used to approximate functions arbitrarily
+\begin{equation}
+f(\mu) \approx \sum_{l=0}^{N} C_l P_l(\mu).
+\end{equation}
+The Legendre polynomials are extended into the associated Legendre polynomials which have an additional orthogonality.
 
-The real harmonics. The even/odd harmonics.
+\section{Associated Legendre Polynomials}\label{appdx:assoc}
 
-The addition theorem.
+The associated Legendre polynomials are defined as the solution to
+\begin{equation}
+\begin{split}
+P_l^m(\mu) &= (-1)^m (1-\mu^2)^{m/2} \frac{d^m}{d\mu^m}P_l(\mu) \\
+P_l^0(\mu) &= P_l(\mu)
+\end{split}
+\end{equation}
+and exhibit the following orthogonality on $[-1, 1]$:
+\begin{equation}
+\frac{1}{2} \int_{-1}^{1} P_l^m(\mu) P_{}^{}(\mu) d\mu = 
+\begin{cases}
+\frac{1}{2l+1} \frac{(l+m)!}{(l-m)!} \,, \quad l=l' \text{ and } m=m'\\
+0\,, \quad \text{otherwise}.
+\end{cases}
+\end{equation}
+The spherical harmonics take advantage of the double orthogonality to approximate 2D distributions.
+
+\section{Spherical Harmonics}\label{appdx:spherical}
+
+The spherical harmonics are defined as:
+\begin{equation}
+Y_{lm}(\hat{\Omega}) = \sqrt{\frac{(2l+1)(l-m)!}{(l+m)!}}P_l^m(\mu)e^{e \tau m}
+\end{equation}
+where $\mu$ is the cosine of the angle between $\hat{Omega}$ and the $x$-axis and $\tau$ is the rotation about the $x$-axis with respect to the $y$-axis of $\hat{\Omega}$ projected onto the $yz$ plane which can be compuated as:
+\begin{equation}
+\tau = \frac{\eta}{\sqrt{\eta^2 + \xi^2}}.
+\end{equation}
+The spherical harmonics have the orghogonality
+\begin{equation}
+\int_{}^{}Y_{lm}(\hat{Omega})Y_{l'm'}^*(\hat{\Omega}) d\hat{\Omega}= 
+\begin{cases}
+1 \,, \quad l = l' \text{ and } m = m' \\
+0 \,, \quad \text{otherwise}
+\end{cases}
+\end{equation}
+where $Y_{lm}^*$ is the complex conjugate of $Y_{lm}$. Using the addition theorem which states
+\begin{equation}
+P_l(\hat{\Omega} \cdot \hat{\Omega}') = \frac{1}{2l+1}\sum_{m=-l}^{l}Y_{lm}^*(\hat{\Omega}') Y_{lm}(\hat{\Omega})
+\end{equation}
+gives
+\begin{equation}
+P_l(\hat{\Omega} \cdot \hat{\Omega}') = P_l(\mu)P_l(\mu') + 2\sum_{m=1}^{l}\frac{(l-m)!}{(l+m)!}P_l^m(\mu) P_l^m(\mu') cos(m[\tau - \tau']).
+\end{equation}
 
 \endinput
 %%
