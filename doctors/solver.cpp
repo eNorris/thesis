@@ -5,6 +5,7 @@
 
 #include <QDebug>
 #include <QThread>
+#include <QtMath>
 
 #include "quadrature.h"
 #include "mesh.h"
@@ -922,7 +923,6 @@ void Solver::gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const
     Legendre legendre;
     legendre.precompute(quad, solPar->pn);
 
-
     std::vector<SOL_T> *cFlux = new std::vector<SOL_T>(xs->groupCount() * quad->angleCount() * mesh->voxelCount(), 0.0);
     std::vector<SOL_T> *scalarFlux = new std::vector<SOL_T>(xs->groupCount() * mesh->voxelCount(), 0.0f);
     std::vector<SOL_T> tempScalarFlux(mesh->voxelCount());
@@ -1002,21 +1002,32 @@ void Solver::gsSolverLegendreCPU(const Quadrature *quad, const Mesh *mesh, const
                     SOL_T coeff = static_cast<SOL_T>(0.0);
                     unsigned int zid = mesh->zoneId[ir];
                     for(unsigned int iap = 0; iap < quad->angleCount(); iap++) // For all other angles
-                        for(unsigned int il = 0; il <= solPar->pn; il++)  // For all Legendre
-                        {
-                            if(ir == 32*64*16 + 32*16 + 7)
+                    {
+                        SOL_T totalFlux = (*uFlux)[iep*ejmp + iap*ajmp + ir] + (*cFlux)[iep*ejmp + iap*ajmp + ir];
+                        if(totalFlux > 0)
+                            for(unsigned int il = 0; il <= solPar->pn; il++)  // For all Legendre
                             {
-                                qDebug() << "stop here";
+                                //if(ir == 32*64*16 + 32*16 + 7)
+                                //{
+                                //    qDebug() << "stop here";
+                                //}
+                                //float uf = (*uFlux)[iep*ejmp + iap*ajmp + ir];
+                                //float cf = (*cFlux)[iep*ejmp + iap*ajmp + ir];
+                                //if(ie == iep && cf > 0)
+                                //{
+                                //    qDebug() << "Broke";
+                                //}
+
+                                //float leg = legendre.table(ia, iap, il);
+                                //float xss = xs->scatxs2d(zid, iep, ie, il);
+
+                                //SOL_T q = qMax(static_cast<SOL_T>(0.0), legendre.table(ia, iap, il) * xs->scatxs2d(zid, iep, ie, il));
+
+                                //coeff += (2*il+1) * legendre.table(ia, iap, il) * xs->scatxs2d(zid, iep, ie, il) * quad->wt[iap] * totalFlux;
+                                coeff += legendre.table(ia, iap, il) * xs->scatxs2d(zid, iep, ie, il) * quad->wt[iap] * totalFlux;
+                                //coeff += q * quad->wt[iap] * totalFlux;
                             }
-                            float uf = (*uFlux)[iep*ejmp + iap*ajmp + ir];
-                            float cf = (*cFlux)[iep*ejmp + iap*ajmp + ir];
-                            if(ie == iep && cf > 0)
-                            {
-                                qDebug() << "Broke";
-                            }
-                            SOL_T totalFlux = (*uFlux)[iep*ejmp + iap*ajmp + ir] + (*cFlux)[iep*ejmp + iap*ajmp + ir];
-                            coeff += legendre.table(ia, iap, il) * xs->scatxs2d(zid, iep, ie, il) * quad->wt[iap] * totalFlux;
-                        }
+                    }
                     totalSource[ia*mesh->voxelCount() + ir] += coeff * mesh->atomDensity[ir] * mesh->vol[ir];
                 }
 

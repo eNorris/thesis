@@ -116,13 +116,23 @@ void Legendre::precompute(const Quadrature *quad, const unsigned int pn)
     m_pn = pn;
     m_table.resize(m_angles * m_angles * (m_pn + 1));
 
+    // These are stored for navigating the table quickly later
     m_ia1jmp = m_angles * (m_pn + 1);
     m_ia2jmp = m_pn + 1;
 
     for(unsigned int ia1 = 0; ia1 < m_angles; ia1++)
         for(unsigned int ia2 = 0; ia2 < m_angles; ia2++)
             for(unsigned int il = 0; il <= m_pn; il++)
+            {
+                //float mu1 = quad->mu[ia1];
+                //float mu2 = quad->mu[ia2];
+                //float eta1 = quad->eta[ia1];
+                //float eta2 = quad->eta[ia2];
+                //float zi1 = quad->zi[ia1];
+                //float zi2 = quad->zi[ia2];
+                //float mu = quad->mu[ia1]*quad->mu[ia2] + quad->eta[ia1]*quad->eta[ia2] + quad->zi[ia1]*quad->zi[ia2];
                 m_table[ia1*m_ia1jmp + ia2*m_ia2jmp + il] = (*this)(il, quad->mu[ia1]*quad->mu[ia2] + quad->eta[ia1]*quad->eta[ia2] + quad->zi[ia1]*quad->zi[ia2]);
+            }
 
     m_precomputed = true;
 }

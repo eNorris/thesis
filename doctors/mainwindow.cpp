@@ -265,6 +265,16 @@ void MainWindow::on_launchSolverPushButton_clicked()
         return;
     }
 
+    m_solvParams->gpu_accel = ui->solverGpuCheckBox->isChecked();
+    m_solvParams->pn = ui->paramsPnComboBox->currentIndex()-1;  // First entry is "Pn"
+
+    if(ui->paramsPnComboBox->currentIndex() == 0 && ui->paramsTypeComboBox->currentIndex() > 1)
+    {
+        QString errmsg = QString("No Pn expansion was specified but anisotropy was requested.");
+        QMessageBox::warning(this, "Isotropy error", errmsg, QMessageBox::Close);
+        return;
+    }
+
     // When the raytracer finishes, the gs solver is automatically launched
     switch(m_solType)
     {
@@ -752,8 +762,8 @@ void MainWindow::onSolverFinished(std::vector<SOL_T> *solution)
     }
     else
     {
-        OutWriter::writeDose("icrp_dose.dat", *m_mesh, DoseConverter::doseIcrp(*m_xs, *m_mesh, *m_raytrace, *solution));
-        OutWriter::writeDose("edep_dose.dat", *m_mesh, DoseConverter::doseEdep(*m_xs, *m_mesh, *m_raytrace, *solution));
+        OutWriter::writeDose("dose_icrp.dat", *m_mesh, DoseConverter::doseIcrp(*m_xs, *m_mesh, *m_raytrace, *solution));
+        OutWriter::writeDose("dose_edep.dat", *m_mesh, DoseConverter::doseEdep(*m_xs, *m_mesh, *m_raytrace, *solution));
     }
 
 }
