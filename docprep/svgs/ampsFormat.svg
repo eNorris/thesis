@@ -14,7 +14,7 @@
    viewBox="0 0 744.09448819 1052.3622047"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="0.91 r13725"
    sodipodi:docname="ampsFormat.svg">
   <defs
      id="defs4" />
@@ -26,15 +26,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.7"
-     inkscape:cx="218.58323"
-     inkscape:cy="466.83864"
+     inkscape:cx="1625.2331"
+     inkscape:cy="700.08491"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="1056"
-     inkscape:window-x="1920"
-     inkscape:window-y="24"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -44,7 +44,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -52,6 +52,20 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
+    <rect
+       y="769.78516"
+       x="1643.5343"
+       height="41.416256"
+       width="245.46707"
+       id="rect4300"
+       style="opacity:1;fill:#dcdcdc;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <rect
+       style="opacity:1;fill:#dcdcdc;fill-opacity:1;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect4298"
+       width="245.46707"
+       height="41.416256"
+       x="1299.2974"
+       y="768.35663" />
     <rect
        style="fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect4125"
@@ -605,7 +619,7 @@
          sodipodi:role="line">Word 2</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:sans-serif"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
        x="1893.0209"
        y="206.90973"
        id="text4915"
@@ -617,7 +631,7 @@
          id="tspan4917"
          x="1893.0209"
          y="206.90973"
-         style="font-size:36px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman, '">Word 440</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:36px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">Word 110</tspan></text>
     <text
        inkscape:export-ydpi="300"
        inkscape:export-xdpi="300"
@@ -1061,5 +1075,217 @@
          x="403.28561"
          id="tspan3442"
          sodipodi:role="line">...</tspan></text>
+    <text
+       inkscape:export-ydpi="300"
+       inkscape:export-xdpi="300"
+       inkscape:export-filename="/media/Storage/thesis/docprep/ampxbytes2.png"
+       sodipodi:linespacing="125%"
+       id="text4264"
+       y="802.34601"
+       x="1309.0524"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '"
+         y="802.34601"
+         x="1309.0524"
+         id="tspan4266"
+         sodipodi:role="line">B8  01  00  00</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       x="1653.3381"
+       y="803.77454"
+       id="text4268"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/media/Storage/thesis/docprep/ampxbytes2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan4270"
+         x="1653.3381"
+         y="803.77454"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">00  00  01  B8</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       x="1096.9622"
+       y="801.32483"
+       id="text4280"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/media/Storage/thesis/docprep/ampxbytes2.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan4282"
+         x="1096.9622"
+         y="801.32483"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">Big Endian</tspan></text>
+    <text
+       inkscape:export-ydpi="300"
+       inkscape:export-xdpi="300"
+       inkscape:export-filename="/media/Storage/thesis/docprep/ampxbytes2.png"
+       sodipodi:linespacing="125%"
+       id="text4284"
+       y="805.48218"
+       x="1905.2385"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '"
+         y="805.48218"
+         x="1905.2385"
+         id="tspan4286"
+         sodipodi:role="line">Little Endian</tspan></text>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 1517.3402,769.41225 c 1.4286,-32.14286 155.0001,-30 154.2857,0"
+       id="path4288"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 1457.3402,769.41225 c -0.7143,-47.14286 275.7142,-47.14285 274.2857,0"
+       id="path4290"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 1397.3402,769.41225 c 0,-58.57143 397.857,-62.14286 397.8571,0"
+       id="path4292"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 1339.4831,769.41225 c -0.7143,-83.57143 522.1428,-75 520,0"
+       id="path4296"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
+    <text
+       transform="matrix(0,-1,1,0,0,0)"
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       x="-105.6824"
+       y="1505.3667"
+       id="text4278"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/media/Storage/thesis/docprep/ampxbytes1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan4280"
+         x="-105.6824"
+         y="1505.3667"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:36px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">Byte 5</tspan></text>
+    <text
+       inkscape:export-ydpi="300"
+       inkscape:export-xdpi="300"
+       inkscape:export-filename="/media/Storage/thesis/docprep/ampxbytes1.png"
+       sodipodi:linespacing="125%"
+       id="text4282"
+       y="1569.1763"
+       x="-105.6824"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"
+       transform="matrix(0,-1,1,0,0,0)"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:36px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '"
+         y="1569.1763"
+         x="-105.6824"
+         id="tspan4284"
+         sodipodi:role="line">Byte 6</tspan></text>
+    <text
+       transform="matrix(0,-1,1,0,0,0)"
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       x="-105.6824"
+       y="1632.9857"
+       id="text4286"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/media/Storage/thesis/docprep/ampxbytes1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan4288"
+         x="-105.6824"
+         y="1632.9857"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:36px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">Byte 7</tspan></text>
+    <text
+       inkscape:export-ydpi="300"
+       inkscape:export-xdpi="300"
+       inkscape:export-filename="/media/Storage/thesis/docprep/ampxbytes1.png"
+       sodipodi:linespacing="125%"
+       id="text4290"
+       y="1696.7953"
+       x="-105.6824"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"
+       transform="matrix(0,-1,1,0,0,0)"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:36px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '"
+         y="1696.7953"
+         x="-105.6824"
+         id="tspan4292"
+         sodipodi:role="line">Byte 8</tspan></text>
+    <text
+       inkscape:export-ydpi="300"
+       inkscape:export-xdpi="300"
+       inkscape:export-filename="/media/Storage/thesis/docprep/ampxbytes1.png"
+       sodipodi:linespacing="125%"
+       id="text4294"
+       y="1876.7953"
+       x="-105.6824"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"
+       transform="matrix(0,-1,1,0,0,0)"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:36px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '"
+         y="1876.7953"
+         x="-105.6824"
+         id="tspan4296"
+         sodipodi:role="line">Byte 437</tspan></text>
+    <text
+       transform="matrix(0,-1,1,0,0,0)"
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       x="-105.6824"
+       y="1940.6049"
+       id="text4298"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/media/Storage/thesis/docprep/ampxbytes1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan4300"
+         x="-105.6824"
+         y="1940.6049"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:36px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">Byte 438</tspan></text>
+    <text
+       inkscape:export-ydpi="300"
+       inkscape:export-xdpi="300"
+       inkscape:export-filename="/media/Storage/thesis/docprep/ampxbytes1.png"
+       sodipodi:linespacing="125%"
+       id="text4302"
+       y="2004.4143"
+       x="-105.6824"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       xml:space="preserve"
+       transform="matrix(0,-1,1,0,0,0)"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:36px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '"
+         y="2004.4143"
+         x="-105.6824"
+         id="tspan4304"
+         sodipodi:role="line">Byte 439</tspan></text>
+    <text
+       transform="matrix(0,-1,1,0,0,0)"
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       x="-105.6824"
+       y="2068.2239"
+       id="text4306"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/media/Storage/thesis/docprep/ampxbytes1.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan4308"
+         x="-105.6824"
+         y="2068.2239"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:36px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, '">Byte 440</tspan></text>
   </g>
 </svg>
