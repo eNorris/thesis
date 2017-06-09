@@ -28,17 +28,40 @@ Figure~\ref{fig:indx_ex} gives an example of the spatial indexing scheme using a
 A variable that is dependent on $x$, $y$, $z$, $E$, and $\Omega$ would be written as $\phi(x, y, z, E, \Omega)$ would be discretized to $\phi(i_x, i_y, i_z, G, i_a)$. Rather than storing $\phi$ as a 5-dimensional matrix, $\phi$ is stored as a 1-dimensional vector of the same number of elements.
 
 \section{Cross Section Parsing}\label{sec:xsparse}
-AMPX cross sections are stored in a binary format. The binary file is split into a series of records. Each record contains a string of binary bytes between a four byte header and four byte footer. The header and footer are identical and, when interpreted as a signed four byte integer, give the size in words of the record. Each word is a 32-bit section (4~bytes) of binary data. An example record is shown in Fig.~\ref{fig:ampxbytes1}.
+AMPX cross sections are stored in a binary format. Figure~\ref{fig:ampx} shows the data format of the overall file. The binary file is split into a sequence of records. The header section of the file has overall information about the file including the number of nuclides stored, their energy group structure, and a comment string describing file. Following the header section is a list of directory records. Each directory has information about a specific nuclide including the cross section reaction types available, temperatures for which the cross sections were evaluated, the number of Legendre expansion coefficients stored in the scatter matrix, and other data. Following the directories, more records follow that describe the energy structure used in the file. There is one such record for each particle type. The libraries used in the current version of DOCTORS have both neutron and photon cross section data stored.
 
-The data is stored in Big Endian format which must be converted to Little Endian for most Intel and AMD processors.  The endianess rearrangement is shown in Fig.~\ref{fig:ampxbytes2}. All records are one of 12 unique types. Each type of record is formatted and interpreted differently. For example, Type 1 contains general information about the data file such as the number of nuclides, number of energy groups, and a brief description. Type 2 records contains a list of floating-point numbers representing the energy group boundaries. Figure~\ref{fig:ampxbytes1} shows a Type 1 record. In the case of the header bytes given in Fig.~\ref{fig:ampxbytes1} and~\ref{fig:ampxbytes2}, the bytes correspond to the integer 440 which is the length in bytes of the record (not including the header or footer).
+The file header section, directories, and energy group boundaries describe the structural information necessary to read the following nuclide records. Nuclides are listed in the same order their directories are found after the header setion. Each nuclide contains numerous records.
 
-Each word of data is sequentially read, reordered, and converted to an apprpriately typed variable. Table~\ref{tab:reorder} shows the converstion for the record given in Fig.~\ref{fig:ampxbytes1}.
+
+
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/ampx1}
+        \caption{}
+        \label{fig:ampx1}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/ampx2}
+        \caption{}
+        \label{fig:ampx2}
+    \end{subfigure}
+    \caption{The format of the AMPX file. (a) The file contains a header, a list of directory records, energy group information and a list of nuclide entries. (b) Each nuclide entry contains multiple records; the two of concern in this work are the last two containing gamma data.}\label{fig:ampx}
+\end{figure}
+
+Each record contains a string of data bytes between a four byte header and four byte footer. The header and footer are identical and, when interpreted as a signed four byte integer, give the size in bytes of the record. An example record is shown in Fig.~\ref{fig:ampxbytes1}.
+
+The data is stored in Big Endian format which must be converted to Little Endian for most Intel and AMD processors.  The endianess rearrangement is shown in Fig.~\ref{fig:ampxbytes2}. Each record is one of 12 unique types; each type of record is formatted and interpreted differently. For example, Type 1 contains general information about the data file such as the number of nuclides, number of energy groups, and a brief description. Type 2 records contains a list of floating-point numbers representing the energy group boundaries. Figure~\ref{fig:ampxbytes1} shows a Type 1 record. In the case of the header bytes given in Fig.~\ref{fig:ampxbytes1} and~\ref{fig:ampxbytes2}, the bytes correspond to the integer 440 which is the length in bytes of the record (not including the header or footer).
+
+Each byte of data is sequentially read, reordered, and converted to an apprpriately typed variable. Table~\ref{tab:reorder} shows the converstion for the record given in Fig.~\ref{fig:ampxbytes1}.
 
 \begin{figure}[tb]
   \begin{center}
    \includegraphics[width=3.75in]{figs/ampxbytes1}
   \end{center}
-  \caption{An example record parsed. The header and footer are identical and are the number of 32-bit words in the record.}
+  \caption{An example record parsed. The header and footer are identical and equal to the number of bytes in the record.}
 \label{fig:ampxbytes1}
 \end{figure}
 
@@ -46,7 +69,7 @@ Each word of data is sequentially read, reordered, and converted to an apprpriat
   \begin{center}
    \includegraphics[width=2.75in]{figs/ampxbytes2}
   \end{center}
-  \caption{The byte reordering from Big Endian to Little Endian. Individual bits withing a byte are not rearranged, but the ordering of the four bytes withing a 32-bit word is reversed.}
+  \caption{The byte reordering from Big Endian to Little Endian. Individual bits within a byte are not rearranged, but the ordering of the four bytes withing a 32-bit word is reversed.}
 \label{fig:ampxbytes2}
 \end{figure}
 
@@ -74,31 +97,30 @@ Each word of data is sequentially read, reordered, and converted to an apprpriat
 
 The header always reports the number of 8-bit bytes required to store the data. However, some data types, such as texttt{char}, are only one byte so each word represents multiple (4 in the case of \texttt{char}) distinct characters.
 
-DOCTORS reads AMPX fromatted binary data files. Figure~\ref{fig:ampx} shows the data format of the overall file. 
 
 The first entry in each nuclide entry is the directory record. The directory contains general information regarding the nuclide and information necessary to parse the proceeding records. Following the directory, Bondarenko data, resonance parameters, neutron data, and gamma production which are not of interest in photon only problems are read.
 
 The penultimate record contains the average cross section data. This data is averaged over all energies and directions using Eq.~\ref{eq:groupxs}. The only data used in this section in DOCTORS is the total cross section values necessary for implementing the fully discretized form of the LBE given in Eq.~\ref{eq:boltz_i}.
 
-The 2D data is stored in a special format optimized for scatter matrix data.
+The 2D data is stored in a special format optimized for scatter matrix data. The format concists of a sequence of "magic numbers" interpersed within a list of data points. A magic number is a nine digit number IIIJJJKKK. The first three digits, III, are the group number of the highest energy group to scatter to the energy of interest. The next three digits, JJJ, are the group number of the lowest energy to scatter. The final three digits, KKK, are the group number of the sink energy to which particles are scattering. Given a magic number \texttt{magic}, the three values can be computed in Listing~\ref{lst:magic}. Note that the group numbers are indexed from 1 to $G$ instead of 0 to $G-1$ as required by DOCTORS. This is corrected by subtracting 1 while doing the indexing arithmetic.
 
-\begin{figure}
-    \centering
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figs/ampx1}
-        \caption{The AMPX file format}
-        \label{fig:ampx1}
-    \end{subfigure}
-    ~
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figs/ampx2}
-        \caption{The structure of each individual record.}
-        \label{fig:ampx2}
-    \end{subfigure}
-    \caption{The format of the AMPX file. (a) The file contains a header, a list of directory records, energy group information and a list of nuclide entries. (b) Each nuclide entry contains multiple records; the two of concern in this work are the last two containing gamma data.}\label{fig:ampx}
-\end{figure}
+\begin{listing}
+\begin{minted}[frame=lines,linenos]{c++}
+# Given magic
+KKK = magic % 1000
+JJJ = (magic % 1000000 - KKK) /1000
+III = (magic - JJJ - KKK) / 1000000
 
-Figure~\ref{fig:sigmacomp} shows the microscopic cross section data pulled from 
+src = JJJ
+while src >= III
+	data = READ_NEXT_BINARY_FLOAT()
+	xs[(src - 1)*G + KKK - 1] = data
+	src = src - 1
+\end{minted}
+\caption{Computation of the source and sink groups from the magic number and the subsequent data parsing.}\label{lst:magic}
+\end{listing}
+
+Figure~\ref{fig:sigmacomp} shows the microscopic cross section data pulled from the 200-neutron/47-gamma group data file currently used by DOCTORS for hydrogen and oxygen. The data is compared to reference data pulled directly from the ENDF/B-VII.1 photoatomic (MT=501) data library~\citep{ref:cullend} accessible through the Sigma database~\citep{ref:sigma}.
 
 \begin{figure}
     \centering
@@ -118,11 +140,26 @@ Figure~\ref{fig:sigmacomp} shows the microscopic cross section data pulled from
 
 \section{Generation of Material Cross Section Data}\label{sec:xsgen}
 
-Once the data is parsed, weighted combinations of elemental data is used to create material cross sections.
+Once the data is parsed, weighted combinations of elemental data is used to create material cross sections. Cross section data for photons always uses the naturally ocurring since photo-atomic reactions are not sensitive to the nuclear differences between isotopes. The compositions of N materials are assumed to be given as weight fractions, $w_i$ subject to
+\begin{equation}
+sum_{i = 1}^N w_i = 1
+\end{equation}
+and is converted to an atom fraction, $a_i$:
+\begin{equation}
+a_i = \frac{w_i}{M m_i}
+\end{equation}
+where
+\begin{equation}
+M = \sum_{i = 1}^N \frac{w_i}{m_i}
+\end{equation}
+and $m_i$ is the element's atomic weight.
 
-MT AND MF NUMBERS
+In the solution employed by DOCTORS, only the total and scattering cross sections are required. The AMPX data files however, support arbitrary reaction types and have up to a dozen or more reactions for photo-atomic reactions alone for elemental datasets. The reaction types are identified by their MT designation. The total, inelastic, and elastic scatter cross sections are MT 501, 502, and 504 respectively. The scatter cross section used by DOCTORS is the sum of the elastic and inelastic cross sections.
 
-WATER EXAMPLE.
+The cross section of compound materials are computed as a weighted summation of their components. For example, the cross section of water for a particular reaction would be
+\begin{equation}
+\sigma_{H_2 O} = \frac{2 \sigma_H + \sigma_O}{3}.
+\end{equation}
 
 \begin{figure}
     \centering
@@ -141,17 +178,40 @@ WATER EXAMPLE.
 \end{figure}
 
 \section{Qt5 Framework}\label{sec:qt}
-The Qt5 framework was used for implementation of the user interface. Qt5 enables asynchronous calls through its ssignal/slot mechanism. A signal can be emitted which will execute all connected slots. Signals and slots can be connected manually by the user except for ones automatically generated by Qt. Qt prvides a user interface for building user interfaces. Components such a sbuttons, drop boxes, radio buttons, etc. are offered to the user. Qt makes extensive use of polymorphism. All user components inherit from the base \texttt{QWidget} class which inherits from \texttt{QObject}. Any class that utilizes the signal/sloot mechanism must extend the \texttt{QOjbect} class.
+The Qt5 framework was used for implementation of the user interface. Qt5 enables asynchronous calls through its signal/slot mechanism. Signals and slots are special functions that have additional processing performed by the meta-object-compiler (MOC). A signal can be emitted which will execute all connected slots. Signals and slots are connected manually by the user except special ones automatically generated by Qt5. 
+
+Qt5 prvides a user interface for building user interfaces. Components such a sbuttons, drop boxes, radio buttons, etc. are made available to the user. Through extensive use of polymorphism, Qt simplifies the addition of graphical interactive elements called widgets. All widgets inherit from the base \texttt{QWidget} class which inherits from \texttt{QObject}. Any class that utilizes the signal/slot mechanism must extend the \texttt{QOjbect} class. As an example, a button can be created in the Qt5 user interface and named \texttt{button1}. This object will be accessible as \texttt{ui->button1}. When the user clicks on the button, the signal \texttt{button1.clicked()} will automatically be emitted. The user can connect this signal to any slot with an identical number arguments of the same type. The \texttt{button1.clicked()} signal can be connected to the slot \texttt{doStuff1()} but not \texttt{doStuff2(int)} since the arguments are not compatible.
 
 Listing~\ref{lst:sync1} gives a pseudocode snippet that has a long function that will block the user interface. A corresponding dequence diagram is given in Fig.~\ref{fig:sync1}. When the user interacts with the GUI, the writer object begins executing the \texttt{doWrite()} function. Until this function completes, the UI thread will be busy an dunable to handle additionaly user interaction or updates. This results in the GUI becoming unresponsive and potentially issuing a warning to the user from the operating system.
 
 \begin{listing}
-\begin{minted}[frame=lines,linenos]{python}
-import numpy as np
-def myfcn(hello,world):
-   return hello*world
+\begin{minted}[frame=lines,linenos]{c++}
+class MainWindow : public QWindow
+{
+	// Constructor
+	MainWindow(QObject *parent);
+	
+	// Other parts of the class
+	
+public slot:
+	void doSomethingLong();
+}
+
+void MainWindow::doSomethingLong()
+{
+	// Execute a long piece of code
+}
+	
+
+MainWindow::MainWindow(QObject *parent)
+{
+	// Initializations
+	
+	// When a button named button1 which was created in the Qt5 creator interface is clicked, the clicked() signal is automatically emitted which executes the doSomethingLong() function
+	MainWindow.connect(ui->button1, clicked(), this, doSomethingLong())
+}
 \end{minted}
-\caption{Blah blah blah.}\label{lst:sync1}
+\caption{A long function causes the user interface to block.}\label{lst:sync1}
 \end{listing}
 
 \begin{figure}[tb]
@@ -164,6 +224,36 @@ def myfcn(hello,world):
 
 The code in Listing~\ref{lst:sync1} is updated to use the Qt signal/slot mechanism.
 
+\begin{listing}
+\begin{minted}[frame=lines,linenos]{c++}
+class MainWindow : public QWindow
+{
+	// Constructor
+	MainWindow(QObject *parent);
+	
+	// Other parts of the class
+	
+public slot:
+	void doSomethingLong();
+}
+
+void MainWindow::doSomethingLong()
+{
+	// Execute a long piece of code
+}
+	
+
+MainWindow::MainWindow(QObject *parent)
+{
+	// Initializations
+	
+	// When a button named button1 which was created in the Qt5 creator interface is clicked, the clicked() signal is automatically emitted which executes the doSomethingLong() function
+	MainWindow.connect(ui->button1, clicked(), this, doSomethingLong())
+}
+\end{minted}
+\caption{A long function causes the user interface to block.}\label{lst:sync1}
+\end{listing}
+
 \begin{figure}[tb]
   \begin{center}
    \includegraphics[width=3.75in]{figs/writer_async}
@@ -174,7 +264,7 @@ The code in Listing~\ref{lst:sync1} is updated to use the Qt signal/slot mechani
 
 \section{Graphical User Interface}\label{sec:gui}
 
-The GUI is cool. Lots of pictures of it.
+INSERT PICTURES OF THE GUI
 
 \section{CUDA}\label{sec:cuda}
 CUDA code is compoiled with the Nvidia complier nvcc. Qt uses the gcc compiler and its MOC generator for meta code. In order to connect CUDA code to the Qt MOC, the CUDA code is compiled by nvcc to produce a .o file. Qt then compiles all other files into corresponding.o files. The linker than automactically picks up all of the .o files gneerated by nvcc. The final result is an executable that has a Qt generarted user interface that can communicat with an Nvidia graphics card through the CUDA language.
