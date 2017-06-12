@@ -5,9 +5,11 @@
 
 #include <QDebug>
 #include <QMessageBox>
+#include <fstream>
 
 #include "xs_reader/ampxparser.h"
 #include "materialutils.h"
+#include "quadrature.h"
 
 XSection::XSection() : m_elements(NULL), m_weights(NULL), m_groups(0), m_matsLoaded(0)
 {
@@ -36,15 +38,31 @@ float XSection::totXs1d(const int matid, const int g) const
 
 float XSection::scatxs2d(const int matid, const int gSrcIndx, const int gSinkIndx, const int n) const
 {
+    //qDebug() << "This function is now depricated until flux moments are implemented";
+
     if(matid > m_matsLoaded || gSrcIndx >= m_groups || gSinkIndx >= m_groups || n > m_pn)
     {
-        qDebug() << "XSection::scatxs2d(): 39: Illegal index value";
+        qDebug() << "Illegal index value";
         qDebug() << "Violated matid > m_matsLoaded || gSrcIndx >= m_groups || gSinkIndx >= m_groups || n > m_pn";
         qDebug() <<  matid << "> " << m_matsLoaded << " || " << gSrcIndx << " >= " << m_groups << " || " << gSinkIndx << " >= " << m_groups << " || " << n << " > " << m_pn;
         return -1.0;
     }
     const int pnCount = m_pn+1;
     return m_scat2d[matid*m_groups*m_groups*pnCount + gSrcIndx*m_groups*pnCount + gSinkIndx*pnCount + n];
+}
+
+float XSection::scatxsKlein(const int matid, const int gSrcIndx, const int gSinkIndx, const int aSrcIndx, const int aSinkIndx) const
+{
+    if(matid > m_matsLoaded || gSrcIndx >= m_groups || gSinkIndx >= m_groups || aSrcIndx >= m_angles || aSinkIndx >= m_angles)
+    {
+        QString errmsg = QString("Indexing subscript went out of bounds in scatxsKlein()");
+        //errmsg += "The table has room for " + QString::number(m_mats) + " materials.";
+        QMessageBox::warning(NULL, "Indexing Error", errmsg, QMessageBox::Close);
+        //qDebug() <<  matid << "> " << m_matsLoaded << " || " << gSrcIndx << " >= " << m_groups << " || " << gSinkIndx << " >= " << m_groups << " || " << n << " > " << m_pn;
+        return -1.0;
+    }
+    //const int pnCount = m_pn+1;
+    return m_scatKlein[matid*m_groups*m_groups*m_angles*m_angles + gSrcIndx*m_groups*m_angles*m_angles + gSinkIndx*m_angles*m_angles + aSrcIndx*m_angles + aSinkIndx];
 }
 
 bool XSection::allocateMemory(const unsigned int materialCount, const unsigned int groupCount, const unsigned int pn)
@@ -104,7 +122,7 @@ bool XSection::allocateMemory(const unsigned int groupCount, const unsigned int 
 {
     if(m_elements == NULL || m_weights == NULL)
         return false;
-    return allocateMemory(m_elements->size()+1, groupCount, pn);
+    return allocateMemory(m_weights->size()+1, groupCount, pn);
 }
 
 bool XSection::addMaterial(const std::vector<int> &z, const std::vector<float> &w, const AmpxParser *p)
@@ -317,7 +335,7 @@ bool XSection::addAll(AmpxParser *parser){
     gbounds = parser->getGammaEnergy();
 
     // Add the materials to the xs library
-    for(unsigned int i = 0; i < m_elements->size(); i++)
+    for(unsigned int i = 0; i < m_weights->size(); i++)
         if(allPassed)
             allPassed &= addMaterial(*m_elements, (*m_weights)[i], parser);
 
@@ -326,6 +344,110 @@ bool XSection::addAll(AmpxParser *parser){
         allPassed &= addMaterial(std::vector<int>{}, std::vector<float>{}, parser);
 
     return allPassed;
+}
+
+bool XSection::buildKleinTable(Quadrature *quad)
+{
+    m_angles = quad->angleCount();
+
+    m_scatKlein.clear();
+
+    // Allocate memory
+    try{
+        m_scatKlein.resize(m_matsLoaded * m_groups * m_groups * m_angles * m_angles);
+    }
+    catch(std::bad_alloc &bad){
+        QString errmsg = QString("bad_alloc caught during XS initialization of the Klein-Nishina scatter xs data, requested ");
+        errmsg += QString::number(m_matsLoaded * m_groups * m_groups * m_angles * m_angles * sizeof(float));
+        errmsg += " bytes. Reported error: ";
+        errmsg += bad.what();
+        QMessageBox::warning(NULL, "Out of Memory", errmsg, QMessageBox::Close);
+        return false;
+    }
+
+    std::vector<float> tmp_mu;
+    tmp_mu.resize(m_scatKlein.size());
+
+    // Once the data is loaded, the Klein-Nishina data table is built as well.
+    unsigned int zjmp = m_groups * m_groups * m_angles * m_angles;
+    unsigned int ejmp = m_groups * m_angles * m_angles;
+    unsigned int epjmp = m_angles * m_angles;
+    unsigned int ajmp = m_angles;
+
+    const float mec2 = 0.511E6;  // Rest mass energy of electron in eV
+
+    for(int zid = 0; zid < m_matsLoaded; zid++)
+        for(int ie = 0; ie < m_groups; ie++)
+            for(int iep = 0; iep < m_groups; iep++)
+            {
+                // Skip upscatter
+                if(iep < ie)
+                    continue;
+
+                float sigE = scatxs2d(zid, ie, iep, 0); // sigma(E -> E')
+
+                // Every ie -> iep follows the Klein Nishina formula:
+                // sigma(iep/ie, mu) = K*q*(1 + q^2 - (1-mu^2)), q = iep/ie
+                float K = 0;
+
+                for(int ia = 0; ia < m_angles; ia++)
+                    for(int iap = 0; iap < m_angles; iap++)
+                    {
+                        float mu = quad->mu[ia]*quad->mu[iap] + quad->eta[ia]*quad->eta[iap] + quad->zi[ia]*quad->zi[iap];
+                        float E = (gbounds[ie] + gbounds[ie+1])/2;
+                        //float Ep = (gbounds[iep] + gbounds[iep+1])/2;
+                        //float q = Ep/E;
+                        float q = 1/(1 + (E/mec2)*(1-mu));
+                        m_scatKlein[zid*zjmp + ie*ejmp + iep*epjmp + ia*ajmp + iap] = q*(q*q + mu*mu);  //q*q*q + q*mu*mu;
+                        K += m_scatKlein[zid*zjmp + ie*ejmp + iep*epjmp + ia*ajmp + iap] * quad->wt[ia] * quad->wt[iap];
+                        tmp_mu[zid*zjmp + ie*ejmp + iep*epjmp + ia*ajmp + iap] = mu;
+                    }
+
+                // The integral over all Omega and Omega' must equal sigE
+
+                for(int ia = 0; ia < m_angles; ia++)
+                    for(int iap = 0; iap < m_angles; iap++)
+                    {
+
+                        m_scatKlein[zid*zjmp + ie*ejmp + iep*epjmp + ia*ajmp + iap] *= (sigE/K);
+                    }
+            }
+
+
+    std::ofstream fout;
+    fout.open("kleinlog.dat");
+    for(unsigned int i = 0; i < m_scatKlein.size(); i++)
+        fout << tmp_mu[i] << "\t" << m_scatKlein[i] << '\n';
+    fout.close();
+    /*
+    std::vector<float> tst;
+    tst.resize(m_groups);
+    for(int ie = 0; ie < m_groups; ie++)
+        for(int iep = 0; iep < m_groups; iep++)
+            for(int ia = 0; ia < m_angles; ia++)
+                for(int iap = 0; iap < m_angles; iap++)
+                {
+                    float q = m_scatKlein[2*zjmp + ie*ejmp + iep*epjmp + ia*ajmp + iap];
+                    tst[ie] += m_scatKlein[2*zjmp + ie*ejmp + iep*epjmp + ia*ajmp + iap] * quad->wt[ia] * quad->wt[iap];
+                }
+
+    std::vector<float> tst2;
+    std::vector<float> mu2;
+    tst2.resize(m_angles);
+    mu2.resize(m_angles);
+    for(iep = 0; iep < m_groups; iep++)
+        for(int ia = 0; ia < m_angles; ia++)
+            for(int iap = 0; iap < m_angles; iap++)
+            {
+                //mu2[] = 5;
+                //tst2[] = 5;
+            }
+            */
+
+    // tst should be identical to scat1d
+    qDebug() << "Done";
+
+    return true;
 }
 
 bool XSection::setElements(const std::vector<int> &elem, const std::vector<std::vector<float> > &wt)

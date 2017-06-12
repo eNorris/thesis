@@ -121,10 +121,10 @@ std::vector<T> DoseConverter::doseEdep(const XSection &xs, const Mesh &mesh, con
 
     for(unsigned int ir = 0; ir < mesh.voxelCount(); ir++)
     {
-        if(ir == 32*64*16 + 32*16 + 8)
-        {
-            qDebug() << "Hi";
-        }
+        //if(ir == 32*64*16 + 32*16 + 8)
+        //{
+        //    qDebug() << "Hi";
+        //}
         int zid = mesh.zoneId[ir];
         for(unsigned int ie = 0; ie < xs.groupCount(); ie++)
         {

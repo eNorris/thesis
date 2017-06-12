@@ -170,9 +170,14 @@ Mesh *CtDataManager::ctNumberToHumanPhantom(Mesh *mesh)
             qDebug() << "EXPLODE!";
         }
 
-        if(mesh->zoneId[i] == 0)
+        if(mesh->zoneId[i] == 0) // Air
         {
             mesh->density[i] = 0.001225f;  // force air density because it is very sensitive to miscalibrations
+        }
+
+        if(mesh->zoneId[i] == 19) // Aluminum
+        {
+            mesh->density[i] = 2.70f;
         }
 
         mesh->atomDensity[i] = mesh->density[i] * atomPerG[mesh->zoneId[i]] * 1.0E-24f;  // g/cc * @/g * cm^2/b = @/cm-b
@@ -182,6 +187,14 @@ Mesh *CtDataManager::ctNumberToHumanPhantom(Mesh *mesh)
             qDebug() << "Got zero density";
         }
     }
+
+    Histogram h(0, 70000, 10000);
+    for(int i = 0; i < mesh->voxelCount(); i++)
+        h.insert(mesh->ct[i]);
+    std::ofstream fout;
+    fout.open("./ctunits.dat");
+    fout << h;
+    qDebug() << "Finished histogram";
 
     return mesh;
 }

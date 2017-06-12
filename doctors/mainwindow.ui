@@ -516,6 +516,11 @@
               <string>Harmonic</string>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>Klein-Nishina</string>
+             </property>
+            </item>
            </widget>
           </item>
           <item>

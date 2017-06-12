@@ -509,7 +509,8 @@ const std::vector<int> MaterialUtils::hounsfieldRangePhantom19{
     1400,
     1500,
     3000,  // 19
-    1000000,  // 20
+    65000,  // 20 (Al gantry)
+    1000000,  // 21
 };
 
 const std::vector<int> MaterialUtils::hounsfieldRangePhantom19Elements{
@@ -524,30 +525,32 @@ const std::vector<int> MaterialUtils::hounsfieldRangePhantom19Elements{
     17,    // Chlorine
     18,    // Argon
     19,    // Potassium
-    20     // Calcium
+    20,    // Calcium
+    13     // Aluminum (for gantry)
 };
 
 const std::vector<std::vector<float> > MaterialUtils::hounsfieldRangePhantom19Weights{
-    std::vector<float> {0.000f, 0.000f, 0.757f, 0.232f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.013f, 0.000f, 0.000f}, // Air 1
-    std::vector<float> {0.103f, 0.105f, 0.031f, 0.749f, 0.002f, 0.000f, 0.002f, 0.003f, 0.003f, 0.000f, 0.002f, 0.000f}, // Lung 2
-    std::vector<float> {0.112f, 0.508f, 0.012f, 0.364f, 0.001f, 0.000f, 0.000f, 0.001f, 0.001f, 0.000f, 0.000f, 0.000f}, // Adipose/adrenal 3
-    std::vector<float> {0.100f, 0.163f, 0.043f, 0.684f, 0.004f, 0.000f, 0.000f, 0.004f, 0.003f, 0.000f, 0.000f, 0.000f}, // Small intestine 4
-    std::vector<float> {0.097f, 0.447f, 0.025f, 0.359f, 0.000f, 0.000f, 0.023f, 0.002f, 0.001f, 0.000f, 0.001f, 0.045f}, // Bone 5
-    std::vector<float> {0.091f, 0.414f, 0.027f, 0.368f, 0.000f, 0.001f, 0.032f, 0.002f, 0.001f, 0.000f, 0.001f, 0.063f}, // Bone 6
-    std::vector<float> {0.085f, 0.378f, 0.029f, 0.379f, 0.000f, 0.001f, 0.041f, 0.002f, 0.001f, 0.000f, 0.001f, 0.082f}, // Bone 7
-    std::vector<float> {0.080f, 0.345f, 0.031f, 0.388f, 0.000f, 0.001f, 0.050f, 0.002f, 0.001f, 0.000f, 0.001f, 0.010f}, // Bone 8
-    std::vector<float> {0.075f, 0.316f, 0.032f, 0.397f, 0.000f, 0.001f, 0.058f, 0.002f, 0.001f, 0.000f, 0.000f, 0.116f}, // Bone 9
-    std::vector<float> {0.071f, 0.289f, 0.034f, 0.404f, 0.000f, 0.001f, 0.066f, 0.002f, 0.001f, 0.000f, 0.000f, 0.131f}, // Bone 10
-    std::vector<float> {0.067f, 0.264f, 0.035f, 0.412f, 0.000f, 0.002f, 0.072f, 0.003f, 0.000f, 0.000f, 0.000f, 0.144f}, // Bone 11
-    std::vector<float> {0.063f, 0.242f, 0.037f, 0.418f, 0.000f, 0.002f, 0.078f, 0.003f, 0.000f, 0.000f, 0.000f, 0.157f}, // Bone 12
-    std::vector<float> {0.060f, 0.221f, 0.038f, 0.424f, 0.000f, 0.002f, 0.084f, 0.003f, 0.000f, 0.000f, 0.000f, 0.168f}, // Bone 13
-    std::vector<float> {0.056f, 0.201f, 0.039f, 0.430f, 0.000f, 0.002f, 0.089f, 0.003f, 0.000f, 0.000f, 0.000f, 0.179f}, // Bone 14
-    std::vector<float> {0.053f, 0.183f, 0.040f, 0.435f, 0.000f, 0.002f, 0.094f, 0.003f, 0.000f, 0.000f, 0.000f, 0.189f}, // Bone 15
-    std::vector<float> {0.051f, 0.166f, 0.041f, 0.440f, 0.000f, 0.002f, 0.099f, 0.003f, 0.000f, 0.000f, 0.000f, 0.198f}, // Bone 16
-    std::vector<float> {0.048f, 0.150f, 0.042f, 0.444f, 0.000f, 0.002f, 0.103f, 0.003f, 0.000f, 0.000f, 0.000f, 0.207f}, // Bone 17
-    std::vector<float> {0.046f, 0.136f, 0.042f, 0.449f, 0.000f, 0.002f, 0.107f, 0.003f, 0.000f, 0.000f, 0.000f, 0.215f}, // Bone 18
-    std::vector<float> {0.043f, 0.122f, 0.043f, 0.453f, 0.000f, 0.002f, 0.111f, 0.003f, 0.000f, 0.000f, 0.000f, 0.222f}, // Bone 19
-    std::vector<float> {1.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f}  // Empty 20
+    std::vector<float> {0.000f, 0.000f, 0.757f, 0.232f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.013f, 0.000f, 0.000f, 0.000f}, // Air 1
+    std::vector<float> {0.103f, 0.105f, 0.031f, 0.749f, 0.002f, 0.000f, 0.002f, 0.003f, 0.003f, 0.000f, 0.002f, 0.000f, 0.000f}, // Lung 2
+    std::vector<float> {0.112f, 0.508f, 0.012f, 0.364f, 0.001f, 0.000f, 0.000f, 0.001f, 0.001f, 0.000f, 0.000f, 0.000f, 0.000f}, // Adipose/adrenal 3
+    std::vector<float> {0.100f, 0.163f, 0.043f, 0.684f, 0.004f, 0.000f, 0.000f, 0.004f, 0.003f, 0.000f, 0.000f, 0.000f, 0.000f}, // Small intestine 4
+    std::vector<float> {0.097f, 0.447f, 0.025f, 0.359f, 0.000f, 0.000f, 0.023f, 0.002f, 0.001f, 0.000f, 0.001f, 0.045f, 0.000f}, // Bone 5
+    std::vector<float> {0.091f, 0.414f, 0.027f, 0.368f, 0.000f, 0.001f, 0.032f, 0.002f, 0.001f, 0.000f, 0.001f, 0.063f, 0.000f}, // Bone 6
+    std::vector<float> {0.085f, 0.378f, 0.029f, 0.379f, 0.000f, 0.001f, 0.041f, 0.002f, 0.001f, 0.000f, 0.001f, 0.082f, 0.000f}, // Bone 7
+    std::vector<float> {0.080f, 0.345f, 0.031f, 0.388f, 0.000f, 0.001f, 0.050f, 0.002f, 0.001f, 0.000f, 0.001f, 0.010f, 0.000f}, // Bone 8
+    std::vector<float> {0.075f, 0.316f, 0.032f, 0.397f, 0.000f, 0.001f, 0.058f, 0.002f, 0.001f, 0.000f, 0.000f, 0.116f, 0.000f}, // Bone 9
+    std::vector<float> {0.071f, 0.289f, 0.034f, 0.404f, 0.000f, 0.001f, 0.066f, 0.002f, 0.001f, 0.000f, 0.000f, 0.131f, 0.000f}, // Bone 10
+    std::vector<float> {0.067f, 0.264f, 0.035f, 0.412f, 0.000f, 0.002f, 0.072f, 0.003f, 0.000f, 0.000f, 0.000f, 0.144f, 0.000f}, // Bone 11
+    std::vector<float> {0.063f, 0.242f, 0.037f, 0.418f, 0.000f, 0.002f, 0.078f, 0.003f, 0.000f, 0.000f, 0.000f, 0.157f, 0.000f}, // Bone 12
+    std::vector<float> {0.060f, 0.221f, 0.038f, 0.424f, 0.000f, 0.002f, 0.084f, 0.003f, 0.000f, 0.000f, 0.000f, 0.168f, 0.000f}, // Bone 13
+    std::vector<float> {0.056f, 0.201f, 0.039f, 0.430f, 0.000f, 0.002f, 0.089f, 0.003f, 0.000f, 0.000f, 0.000f, 0.179f, 0.000f}, // Bone 14
+    std::vector<float> {0.053f, 0.183f, 0.040f, 0.435f, 0.000f, 0.002f, 0.094f, 0.003f, 0.000f, 0.000f, 0.000f, 0.189f, 0.000f}, // Bone 15
+    std::vector<float> {0.051f, 0.166f, 0.041f, 0.440f, 0.000f, 0.002f, 0.099f, 0.003f, 0.000f, 0.000f, 0.000f, 0.198f, 0.000f}, // Bone 16
+    std::vector<float> {0.048f, 0.150f, 0.042f, 0.444f, 0.000f, 0.002f, 0.103f, 0.003f, 0.000f, 0.000f, 0.000f, 0.207f, 0.000f}, // Bone 17
+    std::vector<float> {0.046f, 0.136f, 0.042f, 0.449f, 0.000f, 0.002f, 0.107f, 0.003f, 0.000f, 0.000f, 0.000f, 0.215f, 0.000f}, // Bone 18
+    std::vector<float> {0.043f, 0.122f, 0.043f, 0.453f, 0.000f, 0.002f, 0.111f, 0.003f, 0.000f, 0.000f, 0.000f, 0.222f, 0.000f}, // Bone 19
+    std::vector<float> {0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 1.000f}, // Aluminum gantry
+    std::vector<float> {1.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f, 0.000f}  // Empty 20
 };
 
 const std::vector<int> MaterialUtils::water{

@@ -75,6 +75,7 @@ MainWindow::MainWindow(QWidget *parent):
     MainWindow::m_goodPalette = new QPalette();
     m_goodPalette->setColor(QPalette::Text, Qt::green);
 
+    // Construct the dialogs
     outputDialog = new OutputDialog(this);
     geomDialog = new GeomDialog(this);
     quadDialog = new QuadDialog(this);
@@ -85,6 +86,7 @@ MainWindow::MainWindow(QWidget *parent):
     m_configSelectDialog->setAcceptMode(QFileDialog::AcceptOpen);
     m_configSelectDialog->setFileMode(QFileDialog::ExistingFile);
 
+    // Construct the data readers
     m_parser = new AmpxParser;
     m_solver = new Solver;
     m_xs = new XSection;
@@ -127,6 +129,10 @@ MainWindow::MainWindow(QWidget *parent):
 
     connect(this, SIGNAL(signalLaunchRaytracerHarmonic(const Quadrature*,const Mesh*,const XSection*, const SolverParams*,const SourceParams*)), m_solver, SLOT(raytraceHarmonic(const Quadrature*,const Mesh*,const XSection*,const SolverParams*,const SourceParams*)));
     connect(this, SIGNAL(signalLaunchSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const SolverParams*, const SourceParams*,const std::vector<RAY_T>*)), m_solver, SLOT(gsSolverHarmonic(const Quadrature*,const Mesh*,const XSection*,const SolverParams*,const SourceParams*,const std::vector<RAY_T>*)));
+
+    connect(this, SIGNAL(signalLaunchRaytracerKlein(const Quadrature*,const Mesh*,const XSection*, const SolverParams*,const SourceParams*)), m_solver, SLOT(raytraceKlein(const Quadrature*,const Mesh*,const XSection*,const SolverParams*,const SourceParams*)));
+    connect(this, SIGNAL(signalLaunchSolverKlein(const Quadrature*,const Mesh*,const XSection*,const SolverParams*, const SourceParams*,const std::vector<RAY_T>*)), m_solver, SLOT(gsSolverKlein(const Quadrature*,const Mesh*,const XSection*,const SolverParams*,const SourceParams*,const std::vector<RAY_T>*)));
+
 
     connect(energyDialog, SIGNAL(notifyOkClicked()), this, SLOT(energyGroupsUpdated()));
 
@@ -268,9 +274,10 @@ void MainWindow::on_launchSolverPushButton_clicked()
     m_solvParams->gpu_accel = ui->solverGpuCheckBox->isChecked();
     m_solvParams->pn = ui->paramsPnComboBox->currentIndex()-1;  // First entry is "Pn"
 
-    if(ui->paramsPnComboBox->currentIndex() == 0 && ui->paramsTypeComboBox->currentIndex() > 1)
+    if(ui->paramsPnComboBox->currentIndex() == 0 && (m_solType == LEGENDRE || m_solType == HARMONIC))
     {
-        QString errmsg = QString("No Pn expansion was specified but anisotropy was requested.");
+        QString errmsg = QString("No Pn expansion was specified but Legendre expansion was requested.\n");
+        errmsg += "Error generated @ MainWindow::on_launchSolverPushButton_clicked()";
         QMessageBox::warning(this, "Isotropy error", errmsg, QMessageBox::Close);
         return;
     }
@@ -286,6 +293,10 @@ void MainWindow::on_launchSolverPushButton_clicked()
         break;
     case MainWindow::HARMONIC:
         emit signalLaunchRaytracerHarmonic(m_quad, m_mesh, m_xs, m_solvParams, m_srcParams);
+        break;
+    case MainWindow::KLEIN:
+        m_xs->buildKleinTable(m_quad);
+        emit signalLaunchRaytracerKlein(m_quad, m_mesh, m_xs, m_solvParams, m_srcParams);
         break;
     default:
         qDebug() << "No solver of type " << m_solType;
@@ -499,10 +510,36 @@ void MainWindow::on_quadData2ComboBox_activated(int)
 
 void MainWindow::on_paramsTypeComboBox_activated(int indx)
 {
-    ui->paramsPnComboBox->setEnabled(indx > 1);
+    //if(ui->paramsTypeComboBox->currentIndex() == LEGENDRE || ui->paramsTypeComboBox->currentIndex() == HARMONIC)
+    //    ui->paramsPnComboBox->setEnabled(true);
+    //else
+    //    ui->paramsPnComboBox->setEnabled(false);
+    //ui->paramsPnComboBox->setEnabled(indx > 1);
     m_solType = indx - 1; // Resetting to the default (indx = 0) rolls over to UINT_MAX
 
-    m_solverLoaded = (indx == 1 || (indx > 1 && ui->paramsPnComboBox->currentIndex() > 1));
+    switch(m_solType)
+    {
+    case ISOTROPIC:
+        ui->paramsPnComboBox->setEnabled(false);
+        m_solverLoaded = true;
+        break;
+    case LEGENDRE:
+        ui->paramsPnComboBox->setEnabled(true);
+        m_solverLoaded = (ui->paramsPnComboBox->currentIndex() > 1);
+        break;
+    case HARMONIC:
+        ui->paramsPnComboBox->setEnabled(true);
+        m_solverLoaded = (ui->paramsPnComboBox->currentIndex() > 1);
+        break;
+    case KLEIN:
+        ui->paramsPnComboBox->setEnabled(false);
+        m_solverLoaded = true;
+        break;
+    default:
+        qDebug() << "Illegal solver type selected: " << indx;
+    }
+
+    //m_solverLoaded = (indx == 1 || (indx > 1 && ui->paramsPnComboBox->currentIndex() > 1));
 
     updateLaunchButton();
 }
@@ -623,6 +660,11 @@ bool MainWindow::buildMaterials(AmpxParser *parser)
 
     return m_xs->addAll(parser);
 
+    //if(!m_xs->addAll(parser))
+    //    return false;
+
+    //return m_xs->buildKleinTable();
+
     // One extra material for the empty material at the end
     //m_xs->allocateMemory(static_cast<const unsigned int>(MaterialUtils::hounsfieldRangePhantom19.size()) + 1, parser->getGammaEnergyGroups(), m_pn);
 
@@ -718,6 +760,10 @@ void MainWindow::onRaytracerFinished(std::vector<RAY_T>* uncollided)
         OutWriter::writeAngularFlux("raytrace_flux_harm.dat", *m_xs, *m_quad, *m_mesh, *uncollided);
         emit signalLaunchSolverHarmonic(m_quad, m_mesh, m_xs, m_solvParams, m_srcParams, uncollided);
         break;
+    case MainWindow::KLEIN:
+        OutWriter::writeAngularFlux("raytrace_flux_klein.dat", *m_xs, *m_quad, *m_mesh, *uncollided);
+        emit signalLaunchSolverKlein(m_quad, m_mesh, m_xs, m_solvParams, m_srcParams, uncollided);
+        break;
     default:
         qCritical() << "No solver of type " << m_solType;
     }
@@ -727,7 +773,8 @@ void MainWindow::onSolverFinished(std::vector<SOL_T> *solution)
 {
     m_solution = solution;
 
-    std::vector<SOL_T> scalar;
+    std::vector<SOL_T> scalarCol;
+    std::vector<RAY_T> scalarUnc;
 
     switch(m_solType)
     {
@@ -736,34 +783,55 @@ void MainWindow::onSolverFinished(std::vector<SOL_T> *solution)
         break;
     case MainWindow::LEGENDRE:
         OutWriter::writeAngularFlux("solver_angular_leg.dat", *m_xs, *m_quad, *m_mesh, *solution);
-        scalar.resize(m_xs->groupCount() * m_mesh->voxelCount(), static_cast<SOL_T>(0));
+        scalarCol.resize(m_xs->groupCount() * m_mesh->voxelCount(), static_cast<SOL_T>(0));
+        scalarUnc.resize(m_xs->groupCount() * m_mesh->voxelCount(), static_cast<SOL_T>(0));
         for(unsigned int ie = 0; ie < m_xs->groupCount(); ie++)
             for(unsigned int ir = 0; ir < m_mesh->voxelCount(); ir++)
             {
                 unsigned int scalarOffset = ie*m_mesh->voxelCount() + ir;
                 unsigned int angularOffset = ie*m_mesh->voxelCount()*m_quad->angleCount() + ir;
                 for(unsigned int ia = 0; ia < m_quad->angleCount(); ia++)
-                    scalar[scalarOffset] += (*solution)[angularOffset + ia*m_mesh->voxelCount()] * m_quad->wt[ia];
+                {
+                    scalarCol[scalarOffset] += (*m_solution)[angularOffset + ia*m_mesh->voxelCount()] * m_quad->wt[ia];
+                    scalarUnc[scalarOffset] += (*m_raytrace)[angularOffset + ia*m_mesh->voxelCount()] * m_quad->wt[ia];
+                }
             }
-        OutWriter::writeScalarFlux("solver_scalar_leg.dat", *m_xs, *m_mesh, scalar);
+        OutWriter::writeScalarFlux("solver_scalar_leg.dat", *m_xs, *m_mesh, scalarCol);
 
         break;
     case MainWindow::HARMONIC:
         OutWriter::writeAngularFlux("solver_flux_harm.dat", *m_xs, *m_quad, *m_mesh, *solution);
         break;
+    case MainWindow::KLEIN:
+        OutWriter::writeAngularFlux("solver_angular_klein.dat", *m_xs, *m_quad, *m_mesh, *solution);
+        scalarCol.resize(m_xs->groupCount() * m_mesh->voxelCount(), static_cast<SOL_T>(0));
+        scalarUnc.resize(m_xs->groupCount() * m_mesh->voxelCount(), static_cast<SOL_T>(0));
+        for(unsigned int ie = 0; ie < m_xs->groupCount(); ie++)
+            for(unsigned int ir = 0; ir < m_mesh->voxelCount(); ir++)
+            {
+                unsigned int scalarOffset = ie*m_mesh->voxelCount() + ir;
+                unsigned int angularOffset = ie*m_mesh->voxelCount()*m_quad->angleCount() + ir;
+                for(unsigned int ia = 0; ia < m_quad->angleCount(); ia++)
+                {
+                    scalarCol[scalarOffset] += (*m_solution)[angularOffset + ia*m_mesh->voxelCount()] * m_quad->wt[ia];
+                    scalarUnc[scalarOffset] += (*m_raytrace)[angularOffset + ia*m_mesh->voxelCount()] * m_quad->wt[ia];
+                }
+            }
+        OutWriter::writeScalarFlux("solver_scalar_klein.dat", *m_xs, *m_mesh, scalarCol);
+        break;
     default:
         qCritical() << "No solver of type " << m_solType;
     }
 
-    if(scalar.size() > 0)
+    if(scalarCol.size() > 0)
     {
-        OutWriter::writeDose("dose_icrp.dat", *m_mesh, DoseConverter::doseIcrp(*m_xs, *m_mesh, *m_raytrace, scalar));
-        OutWriter::writeDose("dose_edep.dat", *m_mesh, DoseConverter::doseEdep(*m_xs, *m_mesh, *m_raytrace, scalar));
+        OutWriter::writeDose("dose_icrp.dat", *m_mesh, DoseConverter::doseIcrp(*m_xs, *m_mesh, scalarUnc, scalarCol));
+        OutWriter::writeDose("dose_edep.dat", *m_mesh, DoseConverter::doseEdep(*m_xs, *m_mesh, scalarUnc, scalarCol));
     }
     else
     {
-        OutWriter::writeDose("dose_icrp.dat", *m_mesh, DoseConverter::doseIcrp(*m_xs, *m_mesh, *m_raytrace, *solution));
-        OutWriter::writeDose("dose_edep.dat", *m_mesh, DoseConverter::doseEdep(*m_xs, *m_mesh, *m_raytrace, *solution));
+        OutWriter::writeDose("dose_icrp.dat", *m_mesh, DoseConverter::doseIcrp(*m_xs, *m_mesh, *m_raytrace, *m_solution));
+        OutWriter::writeDose("dose_edep.dat", *m_mesh, DoseConverter::doseEdep(*m_xs, *m_mesh, *m_raytrace, *m_solution));
     }
 
 }

@@ -41,6 +41,7 @@ public:
     const static unsigned int ISOTROPIC = 0;
     const static unsigned int LEGENDRE = 1;
     const static unsigned int HARMONIC = 2;
+    const static unsigned int KLEIN = 3;
 
 private:
     Ui::MainWindow *ui;
@@ -125,6 +126,9 @@ signals:
 
     void signalLaunchRaytracerHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs,  const SolverParams *solPar, const SourceParams *srcPar);
     void signalLaunchSolverHarmonic(const Quadrature *quad, const Mesh *mesh, const XSection *xs,  const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux);
+
+    void signalLaunchRaytracerKlein(const Quadrature *quad, const Mesh *mesh, const XSection *xs,  const SolverParams *solPar, const SourceParams *srcPar);
+    void signalLaunchSolverKlein(const Quadrature *quad, const Mesh *mesh, const XSection *xs,  const SolverParams *solPar, const SourceParams *srcPar, const std::vector<RAY_T> *uflux);
 
     void signalDebugHalt(std::vector<float>);
     void signalBeginXsParse(QString);
