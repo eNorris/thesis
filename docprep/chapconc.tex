@@ -7,16 +7,20 @@
 
 This chapter summarizes the conclusions drawn from the results given in Chapter 5 and suggests further improvements to DOCTORS.
 
-\section{First conclusion}
+\section{Accuracy}
 
 The raytracer is very fast compared to the discrete ordinate solution which computes the collided flux. The uncollided flux quantifies the source distribution from the medical system. This uniquely enables discrete ordinate solutions to rapidly characterize complex systems. Multiple cone beams and fan beams are possible as well as many other, more complex beam shapes.
 
-Anisotropy cannot be ignored.
+The collided flux suffers from the isotropic approximation made to simplify the code.
 
 \section{Applicability to Clinical Settings}
 With further development, DOCTORS is well positioned to become a code of significant clincal impact.
 
 Great effort was put into producing a code that is simple to use yet capable of producing powerful results quickly. However, usage in a clinical setting would likely require further refinement of the GUI to make the code more robust and intuitive. Additionally, the direct output of DOCTORS may not necessarily be of clinical importance since 
+
+\section{GPU Speedup}
+
+The GPU acceleration algorithm was found to speed the DOCTORS code up by a factor of ~40x.
 
 \section{Future Work}
 
@@ -24,16 +28,19 @@ A number of simple modifications to DOCTORS could be made that would greatly inc
 
 In addition to specific modifications, some additional, broader future goals can also be identified.
 
+\subsection{Anisotropy Treatment}
+A more sophisticated anisotropy treatment would be appropriate since the collided flux was found to have issues regarding its behavior. 
+
 \subsection{Group Structure}
 
 The cross section data currently used by DOCTORS are taken from SCALE6.2. While these cross sections have been found to be sufficient to produce flux distributions in medical CT imaging, a more refined group structure designed for medical applications would be worth investigation.
 
 This work can be done using either NJOY [CITE] or the newly released AMPX [CITE] code. Either code has the capability to collapse an ENDF formatted data file into a group structure of the user's choosing in the format DOCTORS reads.
 
-NJOY or AMPX.
+INSERT SECTION ABOUT NJOY or AMPX.
 
 \subsection{Temporal Extension}
-Use 4D CT to do temporal stuff as well as spatial stuff.
+An advantage of the raytracer is that it is very fast. Therefore, it can characterize many beams and integrate them temporally easily. This would allow DOCTORS to model more complex beam shapes and scan protocols accurately.
 
 \subsection{Partial Acceptance Criteria}
 In the current version of doctors, the raytracer is very accurate with respect to MCNP6 in predicting the uncollided flux, except for along the periphery of the beam. Voxels are currently either completely inside the beam or completely outside of it as determined by its isocenter. A more sophisticated technique whereby a voxel cah be partially accepted in the beam would remove these artifacts.
@@ -42,10 +49,10 @@ In the current version of doctors, the raytracer is very accurate with respect t
 Some medical systems currently utilize a multileaf collimator [CITE] to deliver dose to a specific organ or region of the body. As the 
 
 \subsection{Extension to Therapy Beams}
-High energy will be more anisotropic. Will need spherical harmonics.
+DOCTORS can likely be extended to high energy therapeutic beams for clinical treatment. However, higher energy photons will scatter more anisotropicly. This will require spherical harmonics and high order $P_l$ expansion tables in the cross section data.
 
 \subsection{Organ Identification}
-Currently, DOCTORS cannot automatically identify specific organs, thus it is only able to compute the equivalent dose via dose deposition.
+Currently, DOCTORS cannot automatically identify specific organs, thus it is only able to compute the equivalent dose via dose deposition. If specific organs could be identified, tissue specific weighting factors could be applied resulting in the effective dose to each organ which would be of greater clinical significance. However, such identification currently requires additional input about the scan protocol and extensive knowledge about the human anatomy not currently integrated into DOCTORS.
 
 \endinput
 %%

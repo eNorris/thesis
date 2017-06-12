@@ -60,7 +60,29 @@ The coordinate system used in DOCTORS is shown in Fig.~\ref{fig:coord_sys}. A di
 
 The rotation symmetrical ($S_N$) quadrature is implemented in DOCTORS. From amongst many different quadrature sets, the rotation symmetrical quadratures were selected because they are easy to implement, rotationally symmetric, and used in production discrete ordinate solvers~\citep{ref:evanst} which enables simple, direct comparison to other solvers. Arbitrary quadratures are permissible in a plain text file supplied by the user enabling other quadratures.
 
-The $S_N$ quadrature ensures 90$\deg$ symmetry about any axis. In order to ensure the rotational symmetry, the $S_N$ quadrature has a single degree of freedom. The $LQ_N$ quadrature (which is the specific $S_N$ implemented in DOCTORS) uses the remaining degree of freedom to minimize error caused when integrating Legendre polynomials since that class of polynomials are used to represent anisotropy in scattering (see Sec.~\ref{sec:aniso}). For a more through discussion of quadrature generation, see \citet{ref:lewise}.
+The $S_N$ quadrature ensures 90 degree symmetry about any axis. In order to ensure the rotational symmetry, the $S_N$ quadrature has a single degree of freedom. The $LQ_N$ quadrature (which is the specific $S_N$ implemented in DOCTORS) uses the remaining degree of freedom to minimize error caused when integrating Legendre polynomials since that class of polynomials are used to represent anisotropy in scattering (see Sec.~\ref{sec:aniso}). For a more through discussion of quadrature generation, see \citet{ref:lewise}. Figure~\ref{fig:quad} shows the simples three quadratures implemented in DOCTORS.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{figs/quad2}
+        \caption{}
+        \label{fig:quad2}
+    \end{subfigure}
+    ~ 
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{figs/quad4}
+        \caption{}
+        \label{fig:quad4}
+    \end{subfigure}
+    ~ 
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{figs/quad6}
+        \caption{}
+        \label{fig:quad6}
+    \end{subfigure}
+    \caption{Some various $S_N$ quadratures. The black dots indicate the location of a ray. (a) $S_2$ (b) $S_4$ (c) $S_6$ }\label{fig:quad}
+\end{figure}
 
 To include a user defined quadrature, the plain text file should be formatted such that it contains four columns similar to Table~\ref{tab:quad_format} (without any headings). No checks are performed to ensure that octants are covered, this allows simple testing quadratures that utilize only a single direction to be used. Values for $\mu$, $\eta$, and $\xi$ do not necessarily need to add to unity as they will be automatically normalized by DOCTORS. Likewise, the weights will be normalized such that their summation is unity. However, user defined directions \textit{should not} be parallel to any major axis. Doing so may result in undefined behavior. Also, after normalization, no two rows should have identical values for $\mu$, $\eta$, and $\xi$ such as the last two rows of Table~\ref{tab:quad_interp}, nor may any weights be negative. The data in Table~\ref{tab:quad_format} would be read in and renormalized by DOCTORS resulting in data identical to  Table~\ref{tab:quad_interp}.
 
@@ -377,6 +399,8 @@ The termination criteria is given by Eq.~\ref{eq:conv4}. Computation of a value 
 
 \subsection{Anisotropy Treatment}\label{sec:aniso}
 
+INSERT WHY NOT USE FLUX MOMENTS
+
 Scatter is assumed to be a function of only the scatter angle $\theta_s$ between the initial, $\hat{\Omega}_a$, and scattered, $\hat{\Omega}_{a'}$, directions. The cosine of the scatter angle, $\mu_s$ is related by 
 \begin{equation} \label{eq:scat_cos}
 \mu_s = \Omega_a \cdot \Omega_{a'} = \cos(\theta_s) \,, \quad 0 \leq \theta_s \leq \pi.
@@ -395,8 +419,17 @@ The data files containing the scatter cross sections stor the information using 
 \Sigma_{s, i, a, a'}^{g, g'} = \sum_{l=0}^L \frac{2l+1}{4 \pi}\Sigma_{s, i, l}^{g, g'} P_l(\mu_s).
 \end{equation}
 
+An alternate anisotropy treatment is to use the Klein-Nishina formula~\citep{ref:shultisj}. The Klein-Nishina formula describes the scattering cross section as
+\begin{equation}
+\sigma(E, \mu) \propto q^3 + q\mu^2
+\end{equation}
+where
+\begin{equation}
+q(E, \mu) = \frac{1}{1 + (E/E_0)(1-\mu)}
+\end{equation}
+
 \section{Uncollided Solution Methods}\label{sec:uncol}
-One of the earliest problems with the discrete ordinate methods is the presence of ray effect. Ray effect arises due to the restriction of particle transport to a set of discrete directions. To illustrate ray effect, consider a point source streaming particles isotropically into vacuum. Since no scatter or absorption takes place in vacuum conditions, the particles can only stream and particles must be conserved. However, if particles are transported along a single discrete direction only as illustrated in Fig.~\ref{fig:rayeffect_ex} ($\hat{\Omega} = <\sqrt{2}/2, \sqrt{2}/2>$ in Fig.~\ref{rayeffect_ex} and~\ref{fig:rayeffect_comp}) the phenomena observed in Fig.~\ref{fig:rayeffect_comp} is observed. As the discretization becomes more refined, the isotropic source becomes more heavily biased in the $\hat{\Omega}$ direction. This phenomena is called ray effect and has been thoroughly studied by many \citep{ref:mathewsk} \citep{ref:tencerj}.
+One of the earliest problems with the discrete ordinate methods is the presence of ray effect. Ray effect arises due to the restriction of particle transport to a set of discrete directions. To illustrate ray effect, consider a point source streaming particles isotropically into vacuum. Since no scatter or absorption takes place in vacuum conditions, the particles can only stream and particles must be conserved. However, if particles are transported along a single discrete direction only as illustrated in Fig.~\ref{fig:rayeffect_ex} ($\hat{\Omega} = <\sqrt{2}/2, \sqrt{2}/2>$ in Fig.~\ref{fig:rayeffect_ex} and~\ref{fig:rayeffect_comp}) the phenomena observed in Fig.~\ref{fig:rayeffect_comp} is observed. As the discretization becomes more refined, the isotropic source becomes more heavily biased in the $\hat{\Omega}$ direction. This phenomena is called ray effect and has been thoroughly studied by many \citep{ref:mathewsk} \citep{ref:tencerj}.
 
 All particles must stream from one voxel to adjacent voxels. The streaming is considered (in 2D) along $<\sqrt{2}/2, \sqrt{2}/2>$ as shown in Fig.~\ref{fig:rayeffect_ex}. All particles in the initial cell must stream outward into the two cells touching in the $\hat{\Omega}$ direction. The particles in each voxel split, half go to the voxel above and the other half travel to the right. This process is illustrated in Fig.~\ref{fig:rayeffect_ex}.
 
@@ -626,11 +659,11 @@ The focal point about which the CT system rotates is assumed to be the center of
     \end{subfigure}
     ~
     \begin{subfigure}[b]{0.2\textwidth}
-        \includegraphics[width=\textwidth]{figs/proj24}
+        \includegraphics[width=\textwidth]{figs/proj64}
         \caption{}
         \label{fig:proj24}
     \end{subfigure}
-    \caption{Different numbers of fan beam projections ($N$). (a) $N = 6$. (b) $N = 12$. (c) $N = 16$. (d) $N = 24$.}\label{fig:fanproj}
+    \caption{Different numbers of fan beam projections ($N$). (a) $N = 6$. (b) $N = 12$. (c) $N = 16$. (d) $N = 64$.}\label{fig:fanproj}
 \end{figure}
 
 Rotation of an arbitrary point $(x,y)$ about the origin $\theta$ radians to a new position $(x', y')$ is performed by
@@ -652,9 +685,7 @@ y' = (y - y_f) \cos \theta + (x - x_f) \sin \theta + y_f.
 \end{equation}
 
 \subsection{Cone Source and Multi-cone Source}
-Cone sources are identical to fan beam sources except for the rejection criteria used to determine whether or not a voxel is inside the beam. The rejection criteria is a function of only a single parameter, $\theta$, the maximum permissible angle between the center of the beam, $\boldsymbol{s}$, and a ray toward the point of interest, $\boldsymbol{c}$.
-
-The angle between $\boldsymbol{s}$ and $\boldsymbol{c}$ is
+Cone sources are identical to fan beam sources except for the rejection criteria used to determine whether or not a voxel is inside the beam. The rejection criteria is a function of only a single parameter, $\theta$, the maximum permissible angle between the center of the beam, $\boldsymbol{s}$, and a ray toward the point of interest, $\boldsymbol{c}$. The angle between $\boldsymbol{s}$ and $\boldsymbol{c}$ is
 \begin{equation}\label{eq:zetacos}
 \cos(\zeta) = \frac{<S_x, S_y, S_z>}{\sqrt{S_x^2 + S_y^2 + S_z^2}} \cdot \frac{<C_x, C_y, C_z>}{\sqrt{C_x^2 + C_y^2 + C_z^2}}
 \end{equation}
@@ -666,7 +697,7 @@ Once the angle is computed, the condition
 \begin{equation}\label{eq:zetacon}
 |\zeta| < \theta
 \end{equation}
-is evaluated to determine whether the ray is accepted or rejected.
+is evaluated to determine whether the ray is accepted or rejected. Figure~\ref{fig:beamfancone} shows a comparison of the cone beam and fan beam shapes. The most noticable difference is in the $xz$ plne where the cone beam is circular, but the fan beam produces a rectangular cross section.
 
 \begin{figure}
     \centering
@@ -705,21 +736,21 @@ is evaluated to determine whether the ray is accepted or rejected.
         \caption{Fan xz}
         \label{fig:beamfanxz}
     \end{subfigure}
-    \caption{The beam shapes.}\label{fig:beamfancone}
+    \caption{Comparison of a cone beam (a), (c), and (e) to a fan beam (b), (d), and (f). The cone beam is 20 degrees in both the $xy$ and $yz$ planes but the fant beam is different. The cross section of the cone beam is cicular (e), but the fan beam cross section is rectangular (f).}\label{fig:beamfancone}
 \end{figure}
 
 \section{Dose Computation}
-Dose can be computed in either one of two ways. The first way is to compute the fluence distribution and multiply by a fluence-to-dose conversion factor from ICRP 116 [CITE]. The second way to compute dose is to compute the energy deposition in each cell. In both methods, transport of secondary particles is neglected and all energy deposition is assumed to be local.
+Dose can be computed in either one of two ways. The first way is to compute the fluence distribution and multiply by a fluence-to-dose conversion factor from ICRP~116~\citep{ref:icrp116}. The second way to compute dose is to compute the energy deposition in each cell. In both methods, transport of secondary particles is neglected and all energy deposition is assumed to be local.
 
 \subsection{Fluence-to-dose Conversion}
 
-The publications of the ICRP include fluence-to-dose conversion factors for a reference phantom from various particle types and patient orientations. For CT systems, the rotationally symmetric (ROT) orientation is the most appropriate since the beam rotates about the patient. Figure~\ref{fig:icrp116_rotconv} shows the energy dependent fluence-to-dose conversions for the ROT orientation.
+The publications of the ICRP include fluence-to-dose conversion factors for a reference phantom from various particle types and patient orientations. For CT systems, the rotationally symmetric (ROT) orientation is the most appropriate since the beam rotates about the patient. Figure~\ref{fig:icrp116_rotconv} shows the energy dependent fluence-to-dose conversions for the ROT orientation. ICRP 116 distributes the conversion factors as point-wise data which must be converted to group data. This is performed using linear interpolation between the ICRP 116 data points.
 
 \begin{figure}[tb]
   \begin{center}
    \includegraphics[width=3.75in]{figs/icrp116_rotconv}
   \end{center}
-  \caption{Fluence-to-dose conversion factors from ICRP 116 for photons.}
+  \caption{Fluence-to-dose conversion factors from ICRP 116 for photons and the group averaged conversion factors for the 47-group data library in DOCTORS.}
 \label{fig:icrp116_rotconv}
 \end{figure}
 
@@ -751,7 +782,7 @@ The mass of the voxel, $M_i$ is then computed
 \begin{equation}
 M_i = \rho_i V_i F_2
 \end{equation}
-where $\rho_i$ is the density in g/cm$^3$ and $F_2$ is a conversion factor to convert grams to kilograms. The dose (in Gy) to the voxel is then
+where $\rho_i$ is the density in g/cm$^3$ and $F_2$ is a conversion factor to convert grams to kilograms. The absorbed dose (in Gy) to the voxel is then
 \begin{equation}\label{eq:dosedep}
 D_i = \frac{\mathcal{E}_{T,i}}{M_i} = \frac{F_1}{\rho_i F_2} \sum_{g=0}^{G-1} \varphi_i^g \left[\Sigma_{a,i}^g \bar{E}^g + \sum_{h=g+1}^{G-1} \left\{ \Sigma_{s,i}^{g,h}  (\bar{E}^g-\bar{E}^h) \right\} \right].
 \end{equation}

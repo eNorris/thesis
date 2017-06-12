@@ -9,6 +9,8 @@ This chapter covers the details of the implementation of the different component
 
 The code is implemented in C++ and requires a C0x11 compliant compiler. The user interface is written using the Qt5 framework. GPU computation is performed via CUDA which must be compiled seperatly by Nvidia's proprietary compiler, \texttt{nvcc}.
 
+INSERT NOTE ABOUT CODE LISTING FORMATTING
+
 \section{Vector Flattening}\label{sec:flatten}
 
 Data is stored in large, multi-dimensional arrays. For example, the CT voxel phantom can be intuitively stored as a 3D array of floating precision values which can be easily indexed. However, DOCTORS is written such that it is extensible to GPUs. GPUs are not optimized for data stored in a multi-dimensional fashion, but rather for data stored as a single 1-dimensional array. To emulate the 3-dimensional storage arrangement of the data, indexing arithmetic is used.
@@ -39,9 +41,6 @@ AMPX cross sections are stored in a binary format. Figure~\ref{fig:ampx} shows t
 
 The file header section, directories, and energy group boundaries describe the structural information necessary to read the following nuclide records. Nuclides are listed in the same order their directories are found after the header setion. Each nuclide contains numerous records.
 
-
-
-
 \begin{figure}
     \centering
     \begin{subfigure}[b]{0.45\textwidth}
@@ -60,13 +59,11 @@ The file header section, directories, and energy group boundaries describe the s
 
 Each record contains a string of data bytes between a four byte header and four byte footer. The header and footer are identical and, when interpreted as a signed four byte integer, give the size in bytes of the record. An example record is shown in Fig.~\ref{fig:ampxbytes1}.
 
-The data is stored in Big Endian format which must be converted to Little Endian for most Intel and AMD processors.  The endianess rearrangement is shown in Fig.~\ref{fig:ampxbytes2}. Each record is one of 12 unique types; each type of record is formatted and interpreted differently. For example, Type 1 contains general information about the data file such as the number of nuclides, number of energy groups, and a brief description. Type 2 records contains a list of floating-point numbers representing the energy group boundaries. Figure~\ref{fig:ampxbytes1} shows a Type 1 record. In the case of the header bytes given in Fig.~\ref{fig:ampxbytes1} and~\ref{fig:ampxbytes2}, the bytes correspond to the integer 440 which is the length in bytes of the record (not including the header or footer).
-
-Each byte of data is sequentially read, reordered, and converted to an apprpriately typed variable. Table~\ref{tab:reorder} shows the converstion for the record given in Fig.~\ref{fig:ampxbytes1}.
+The data is stored in Big Endian format which must be converted to Little Endian for most Intel and AMD processors.  The endianess rearrangement is shown in Fig.~\ref{fig:ampxbytes2}. Each record is one of 12 unique types; each type of record is formatted and interpreted differently. For example, Type 1 contains general information about the data file such as the number of nuclides, number of energy groups, and a brief description. Type 2 records contains a list of floating-point numbers representing the energy group boundaries. Figure~\ref{fig:ampxbytes1} shows a Type 1 record. In the case of the header bytes given in Fig.~\ref{fig:ampxbytes1} and~\ref{fig:ampxbytes2}, the bytes correspond to the integer 440 which is the length in bytes of the record (not including the header or footer). Each byte of data is sequentially read, reordered, and converted to an apprpriately typed variable. Table~\ref{tab:reorder} shows the converstion for the record given in Fig.~\ref{fig:ampxbytes1}.
 
 \begin{figure}[tb]
   \begin{center}
-   \includegraphics[width=3.75in]{figs/ampxbytes1}
+   \includegraphics[width=4.75in]{figs/ampxbytes1}
   \end{center}
   \caption{An example record parsed. The header and footer are identical and equal to the number of bytes in the record.}
 \label{fig:ampxbytes1}
@@ -74,7 +71,7 @@ Each byte of data is sequentially read, reordered, and converted to an apprpriat
 
 \begin{figure}[tb]
   \begin{center}
-   \includegraphics[width=2.75in]{figs/ampxbytes2}
+   \includegraphics[width=4.75in]{figs/ampxbytes2}
   \end{center}
   \caption{The byte reordering from Big Endian to Little Endian. Individual bits within a byte are not rearranged, but the ordering of the four bytes withing a 32-bit word is reversed.}
 \label{fig:ampxbytes2}
@@ -91,15 +88,15 @@ Each byte of data is sequentially read, reordered, and converted to an apprpriat
   1   & 8B 69 00 00 & 00 00 69 8B & 27019  & ID                        \\
   2   & A4 01 00 00 & 00 00 01 A4 & 420    & Number of nuclides        \\
   ... &      ---    &      ---    &    --- & ---                       \\
-  11  & 70 75 6F 43 & 43 6F 75 70 & "Coup" & First word of the title   \\
-  12  & 20 64 65 6C & 6C 65 64 20 & "led " & Second word of the title  \\
+  11  & 70 75 6F 43 & 43 6F 75 70 & "Coup" & First four \texttt{char} of the title   \\
+  12  & 20 64 65 6C & 6C 65 64 20 & "led " & Second four \texttt{char} of the title  \\
   ... &     ---     &    ---      &  ---   & ---                       \\
-  440 & 20 20 20 20 & 20 20 20 20 & "    " & 4 spaces ending the title \\
-  441 & B8 01 00 00 & 00 00 01 B8 & 440    & Footer                    \\ 
+  110 & 20 20 20 20 & 20 20 20 20 & "    " & 4 spaces ending the title \\
+  111 & B8 01 00 00 & 00 00 01 B8 & 440    & Footer                    \\ 
   [1ex]      % [1ex] adds vertical space
   \hline
 \end{tabular}
-\label{table:reorder}
+\label{tab:reorder}
 \end{table}
 
 The header always reports the number of 8-bit bytes required to store the data. However, some data types, such as texttt{char}, are only one byte so each word represents multiple (4 in the case of \texttt{char}) distinct characters.
@@ -113,7 +110,7 @@ The 2D data is stored in a special format optimized for scatter matrix data. The
 
 \begin{listing}
 \begin{minted}[frame=lines,linenos]{c++}
-# Given magic
+magic = READ_NEXT_BINARY_INT()
 KKK = magic % 1000
 JJJ = (magic % 1000000 - KKK) /1000
 III = (magic - JJJ - KKK) / 1000000
@@ -149,7 +146,7 @@ Figure~\ref{fig:sigmacomp} shows the microscopic cross section data pulled from 
 
 Once the data is parsed, weighted combinations of elemental data is used to create material cross sections. Cross section data for photons always uses the naturally ocurring since photo-atomic reactions are not sensitive to the nuclear differences between isotopes. The compositions of N materials are assumed to be given as weight fractions, $w_i$ subject to
 \begin{equation}
-sum_{i = 1}^N w_i = 1
+\sum_{i = 1}^N w_i = 1
 \end{equation}
 and is converted to an atom fraction, $a_i$:
 \begin{equation}
@@ -193,14 +190,14 @@ Listing~\ref{lst:sync1} gives a pseudocode snippet that has a long function that
 
 \begin{listing}
 \begin{minted}[frame=lines,linenos]{c++}
-class MainWindow : public QWindow
+class MainWindow : public QMainWindow
 {
 	// Constructor
 	MainWindow(QObject *parent);
 	
 	// Other parts of the class
 	
-public slot:
+protected slots:
 	void doSomethingLong();
 }
 
@@ -214,8 +211,12 @@ MainWindow::MainWindow(QObject *parent)
 {
 	// Initializations
 	
-	// When a button named button1 which was created in the Qt5 creator interface is clicked, the clicked() signal is automatically emitted which executes the doSomethingLong() function
-	MainWindow.connect(ui->button1, clicked(), this, doSomethingLong())
+	// When a button named button1 which was created in the Qt5
+	creator interface is clicked, the clicked() signal is 
+	automatically emitted which executes the doSomethingLong()
+	function
+	connect(ui->button1, clicked(), this, 
+		doSomethingLong());
 }
 \end{minted}
 \caption{A long function causes the user interface to block.}\label{lst:sync1}
@@ -229,36 +230,53 @@ MainWindow::MainWindow(QObject *parent)
 \label{fig:sync1}
 \end{figure}%
 
-The code in Listing~\ref{lst:sync1} is updated to use the Qt signal/slot mechanism.
+The code in Listing~\ref{lst:sync1} is updated to use the Qt signal/slot mechanism whose code is given in Listing~\ref{lst:async1}.
 
 \begin{listing}
 \begin{minted}[frame=lines,linenos]{c++}
 class MainWindow : public QWindow
 {
+	// Member variables
+	QThread workerThread;
+	Worker *worker;
+	
 	// Constructor
 	MainWindow(QObject *parent);
 	
-	// Other parts of the class
-	
-public slot:
-	void doSomethingLong();
-}
-
-void MainWindow::doSomethingLong()
-{
-	// Execute a long piece of code
+protected slots:
+	handleResult();
 }
 	
-
 MainWindow::MainWindow(QObject *parent)
 {
 	// Initializations
+	worker = new Worker;
 	
-	// When a button named button1 which was created in the Qt5 creator interface is clicked, the clicked() signal is automatically emitted which executes the doSomethingLong() function
-	MainWindow.connect(ui->button1, clicked(), this, doSomethingLong())
+	worker.moveToThread(&workerThread);
+	
+	// Set up the thread connections
+	connect(&workerThread, finished(), worker, deleteLater());
+	connect(this, begin(), worker, doSomethingLong());
+	connect(worker, done(), this, handleResult());
 }
+
+class Worker : public QObject
+{
+private signals:
+	void done();
+	
+public slots:
+	void soSomethingLong();
+}
+
+Worker::doSomethingLong()
+{
+	// Do stuff...
+	emit done();
+}
+
 \end{minted}
-\caption{A long function causes the user interface to block.}\label{lst:sync1}
+\caption{Signals and slots enable a long function to be called without blocking the user interface.}\label{lst:async1}
 \end{listing}
 
 \begin{figure}[tb]
@@ -274,7 +292,7 @@ MainWindow::MainWindow(QObject *parent)
 INSERT PICTURES OF THE GUI
 
 \section{CUDA}\label{sec:cuda}
-CUDA code is compoiled with the Nvidia complier nvcc. Qt uses the gcc compiler and its MOC generator for meta code. In order to connect CUDA code to the Qt MOC, the CUDA code is compiled by nvcc to produce a .o file. Qt then compiles all other files into corresponding.o files. The linker than automactically picks up all of the .o files gneerated by nvcc. The final result is an executable that has a Qt generarted user interface that can communicat with an Nvidia graphics card through the CUDA language.
+CUDA code is compoiled with the Nvidia complier nvcc. Qt5 uses the gcc compiler and its MOC generator for meta code. In order to connect CUDA code to the Qt MOC, the CUDA code is compiled by nvcc to produce a .o file. Qt5 then compiles all other files into corresponding.o files. The linker than automactically picks up all of the .o files gneerated by nvcc. The final result is an executable that has a Qt5 generarted user interface that can communicat with an Nvidia graphics card through the CUDA language.
 
 The sweep through the mesh is different.
 
@@ -311,29 +329,27 @@ We first split the sweep process into $N_L$ subsweeps. For a $N_x \times N_x \ti
     \centering
     \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{figs/subsweep_cube1}
-        \caption{Subsweep 0 ($S=0$)}
+        \caption{}
         \label{fig:subsweep_cube1}
     \end{subfigure}
-    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
-      %(or a blank line to force the subfigure onto a new line)
+    ~ 
     \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{figs/subsweep_cube2}
-        \caption{Subsweep 1 ($S=1$)}
+        \caption{}
         \label{fig:subsweep_cube2}
     \end{subfigure}
-    ~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
-    %(or a blank line to force the subfigure onto a new line)
+    ~ 
     \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{figs/subsweep_cube3}
-        \caption{Subsweep 6 ($S=6$)}
+        \caption{}
         \label{fig:subsweep_cube3}
     \end{subfigure}
     \begin{subfigure}[b]{0.45\textwidth}
         \includegraphics[width=\textwidth]{figs/subsweep_cube4}
-        \caption{Subsweep 6 ($S=6$) with labels}
+        \caption{) with labels}
         \label{fig:subsweep_cube4}
     \end{subfigure}
-    \caption{The progression of subsweeps throughout a sweep. Each subsweep must complete before those after it. Each voxel within a subsweep can be solved in parallel with all others in its subsweep.}\label{fig:subsweep_cube}
+    \caption{The progression of subsweeps throughout a sweep. Each subsweep must complete before those after it. Each voxel within a subsweep can be solved in parallel with all others in its subsweep. (a) Subsweep 0 ($S=0$) (b) Subsweep 1 ($S=1$) (c) Subsweep 6 ($S=6$) (d)Subsweep 6 ($S=6$) with labels.}\label{fig:subsweep_cube}
 \end{figure}
 
 In general, blah blah.

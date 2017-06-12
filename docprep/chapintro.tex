@@ -6,10 +6,10 @@
 %%
 
 
-Since its introduction in 1973 by \citet{ref:hounsfieldg} computed tomography (CT) has become pervasive in medical diagnostics as improved algorithms and techniques give doctors access to higher quality information. Increased information results in faster and more accurate diagnosis. However, the exponentially increasing usage of CT and dose patients receive from it has raised concerns of potential long term risks~\citep{ref:brennerd} \citep{ref:einsteina1} \citep{ref:abramsh} \citep{ref:einsteina2} \citep{ref:mccolloughc} \citep{ref:yul}. These concerns are exemplified by the push for low dose CT.
+Since its introduction in 1973 by \citet{ref:hounsfieldg} computed tomography (CT) has become pervasive in medical diagnostics as improved algorithms and techniques give doctors access to higher quality information. Increased information results in faster and more accurate diagnosis. However, the exponentially increasing usage of CT and dose patients receive from it has raised concerns of potential long term risks~\citep{ref:brennerd,ref:einsteina1,ref:abramsh,ref:einsteina2,ref:mccolloughc,ref:yul}. These concerns are exemplified by the push for low dose CT.
 
-INSERT MORE LOW DOSE CT STUFF
-A study by \citet{ref:kovalchiks} found that using a low-dose screening method as opposed to CT radiography reduced lung cancer mortality in high risk patients by 20\%. 
+%INSERT MORE LOW DOSE CT STUFF
+%A study by \citet{ref:kovalchiks} found that using a low-dose screening method as opposed to CT radiography reduced lung cancer mortality in high risk patients by 20\%. 
 
 Though concerns have been raised in the medical community about the risks associated with CT, the techniques used to quantify dose are very simple and not patient specific. The dose-length-product (DLP) is used as a measure to quantify the effective dose a patient receives. However, the DLP must be modified by a factor accounting for many variations amongst patients such as age, gender, and size as well as the kVp used in the procedure. Currently, dose estimation relies on \textit{a priori} computation verified with a standardized benchmark. 
 
@@ -23,7 +23,7 @@ In addition to rapidly computing the patient dose, another goal of DOCTORS is to
 
 INSERT BRIEF DISCUSSION OF RESULTS
 
-Another, similar, application is dose estimation of patients receiving radiation therapy. Often, before the procedure, a time dependent, 4D CT scan of the patient is taken so that radiologists can account for breathing patterns during administration of the treatment [CITE]. With further development, this methodology may enable real time dose computation as the treatment is administered. This would be greatly beneficial to both patients and the doctors administering the procedure.
+Another, similar, application is dose estimation of patients receiving radiation therapy. Often, before the procedure, a time dependent, 4D CT scan of the patient is taken so that radiologists can account for breathing patterns during administration of the treatment~\citep{ref:pant}. With further development, this methodology may enable real time dose computation as the treatment is administered. This would be greatly beneficial to both patients and the doctors administering the procedure.
 
 The remainder of this work is organized into five chapters. Chapter 2 summarizes the existing literature pertinent to this work. Chapter 3 lays the mathematical foundation for each of the major components of DOCTORS. Chapter 4 gives a overview of the implementation strategies used to transform the mathematical framework in Chapter 3 into code that can execute on a modern computing platform. Chapter 5 summarizes the results obtained. It quantifies both the dosimetric accuracy and runtime of the DOCTORS code. Finally, Chapter 6 summarizes the entire work and provides some concluding remarks. Afterward, some appendices provide additional information that was not included in the main text but may still be helpful to a reader. 
 
