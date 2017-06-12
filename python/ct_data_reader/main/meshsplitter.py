@@ -1,6 +1,6 @@
 __author__ = 'etnc6d'
 
-filename = '/media/Storage/thesis/mcnp.gitignore/meshtaz'
+filename = '/media/Storage/thesis/mcnp.gitignore/meshtan'
 
 file = open(filename, 'r')
 #with open(filename, 'r') as file:

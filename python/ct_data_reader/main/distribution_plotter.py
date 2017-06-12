@@ -3,7 +3,7 @@ import matplotlib.pyplot as pyplot
 
 __author__ = 'etnc6d'
 
-with open("/media/Storage/thesis/build-doctors-Desktop_Qt_5_4_1_GCC_64bit-Debug/ctdist.dat", 'r') as f:
+with open("/media/Storage/thesis/doctors/ctunits.dat", 'r') as f:
     a = numpy.loadtxt(f)
 
 x = a[:-1, 0]
@@ -13,13 +13,17 @@ x -= shift
 overflow = a[-1, 1]
 
 pyplot.figure()
-pyplot.semilogy(x, v, 'r', [0, 0], [1, 1E5], 'k--', [-1000, -1000], [1, 1E5], 'k--')
-pyplot.title("HU Frequency (Liver)")
-pyplot.xlabel("Houndsfield Number")
-pyplot.ylabel("Count")
-pyplot.axis([-shift, 3000-shift, 0, 100000])
+pyplot.plot(x, v, 'b', [0, 0], [1, 1E5], 'k--')
+#pyplot.title("HU Frequency (Liver)")
+pyplot.xlabel("CT Number")
+pyplot.ylabel("Frequency")
+pyplot.axis([-shift, 50000-shift, 0, 100000])
 
 print("Overflows: " + str(overflow))
+
+sm = sum(v)
+f = sm/(256*256*64)
+print("sum = " + str(sm) + " = " + str(f))
 
 v = pyplot.cm.viridis(numpy.linspace(0, 256, 256, dtype=numpy.int))
 r = [x[0] for x in v]
@@ -29,7 +33,7 @@ b = [x[2] for x in v]
 for r, g, b in zip(r, g, b):
     # brushes.push_back(QBrush(QColor::fromRgbF(0.0000,    1.0000,    1.0000)));
     s = "brushes.push_back(QBrush(QColor::fromRgbF(" + str(r) + ",    " + str(g) + ",    " + str(b) + ")));"
-    print(s)
+    #print(s)
 
 #print(pyplot.cm.viridis(numpy.linspace(0, 256, 256, dtype=numpy.int)))
 
