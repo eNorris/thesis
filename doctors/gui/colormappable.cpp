@@ -126,6 +126,7 @@ void ColorMappable::loadPhantom19Brush()
     brushes.push_back(QBrush(QColor::fromRgbF(0.477504,  0.821444,  0.318195)));
     brushes.push_back(QBrush(QColor::fromRgbF(0.647257,  0.8584,    0.209861)));
     brushes.push_back(QBrush(QColor::fromRgbF(0.82494,   0.88472,   0.106217)));  // 19
+    brushes.push_back(QBrush(QColor::fromRgbF(0.0000,    0.0000,    0.0000))); // Al Gantry
     brushes.push_back(QBrush(QColor::fromRgbF(1.0000,    0.0000,    1.0000)));  // 20 - Illegal
 }
 
