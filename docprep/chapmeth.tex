@@ -399,8 +399,6 @@ The termination criteria is given by Eq.~\ref{eq:conv4}. Computation of a value 
 
 \subsection{Anisotropy Treatment}\label{sec:aniso}
 
-INSERT WHY NOT USE FLUX MOMENTS
-
 Scatter is assumed to be a function of only the scatter angle $\theta_s$ between the initial, $\hat{\Omega}_a$, and scattered, $\hat{\Omega}_{a'}$, directions. The cosine of the scatter angle, $\mu_s$ is related by 
 \begin{equation} \label{eq:scat_cos}
 \mu_s = \Omega_a \cdot \Omega_{a'} = \cos(\theta_s) \,, \quad 0 \leq \theta_s \leq \pi.
@@ -413,6 +411,8 @@ Scatter is assumed to be a function of only the scatter angle $\theta_s$ between
   \caption{The scatter angle. A photon (blue) at energy $E$ traveling in direction $\Omega$, hits a stationary atom (green) and scatters into a new direction $\Omega'$ with a new energy $E'$.}
 \label{fig:scat_ang}
 \end{figure}%
+
+Typically, at this point, discrete ordinate methods will describe the discrete angular flux, $\psi$ using flux moments, $\phi$. The motivation for using flux moments is that they improve computational performance and reduce memory overhead.
 
 The data files containing the scatter cross sections stor the information using Legendre polynomial expansion coefficients. The use of a Legendre expansion removes the dependence on the quadrature from the data. This allows any quadrature to work with any cross section dataset. A $l$-order Legendre polynomial is denoted by $P_l$. Details of the Legendre polynomials can be found in Appendix~\ref{appdx:leg}. The anisotropic scatter cross section is rewritten using a Legendre expansion as
 \begin{equation} \label{eq:leg_1}
