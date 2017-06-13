@@ -62,13 +62,13 @@
  % ... front matter - thesis abstract ...
 
 \begin{ThesisAbstract}
-This is the text for the abstract. Here, I explain what I did and how cool I am for doing it. Because I am awesome.
-
 Computed tomography (CT) has become pervasive in medical diagnostics as improved imaging techniques and processing algorithms provide higher quality information to doctors. However, the exponentially increasing usage of CT has raised concerns regarding long term low-dose radiological risks. Currently, the dose to patients is computed using Monte Carlo methods and experimental tests. In other areas of radiation transport, deterministic codes have been shown to be much faster than Monte Carlo codes.
 
 Currently, no deterministic methodology exists to automatically generate a spatially distributed dose profile from a CT voxel phantom. This work proposes a new code, Discrete Ordinate CT Organ Dose Simulator (DOCTORS) which utilizes a GPU accelerated raytracer and discrete ordinate solver to compute photon flux in the patient. The flux is then converted to dose.
 
-The DOCTORS code was benchmarked against MCNP6 and found to have very good agreement using both a water phantom and a realistic patient phantom. DOCTORS was also found to be much faster than MCNP6, even more so with GPU acceleration.
+The DOCTORS code was benchmarked against MCNP6 and found to have good qualitative agreement using both a water phantom and a realistic patient phantom. DOCTORS was also found to be much faster than MCNP6; MCNP takes hours to compute flux profiles that take less than a minute using DOCTORS.
+
+A GPU algorithm was implemented that speeds up the DOCTORS code by a factor of 39.
 
 \end{ThesisAbstract}
 
