@@ -11,7 +11,7 @@ This chapter summarizes the solution methodology employed by DOCTORS. The techni
 
 The discrete ordinate solver computes the flux distribution inside the CT mesh given a source, physical geometry information, and other associated solver parameters such as quadrature and energy discretization. Discrete ordinates is a deterministic solution to the linear Boltzmann equation.
 
-\subsection{The Boltzmann Equation}
+\subsection{The Boltzmann equation}\label{sec:lbe}
 
 The linear Boltzmann equation (LBE) is generally true of any particle for which outside forces (electromagnetic or gravitational) are either not present or negligible and particle-particle collisions are insignificant. Therefore, the LBE is generally not valid for charged particles or systems whose particle density is on the order of the confining medium. In such systems, particle-particle interactions may not be negligible requiring the non-linear Boltzmann equation.
 
@@ -47,7 +47,7 @@ An external source $S$ produces particles per volume. Combining the removal term
 \end{equation}
 which is the LBE. The following sections show how Eq.~\ref{eq:boltz} is discretized and solved computationally.
 
-\subsection{Angular Discretization}
+\subsection{Angular discretization}
 The coordinate system used in DOCTORS is shown in Fig.~\ref{fig:coord_sys}. A discrete set of $N_a$ angles ($\Omega_{a}, \quad a = 0 \ldots N_a-1$) is selected to represent continuous directional space. Particles are transported only along these discrete directions from each voxel to adjacent voxels.
 
 \begin{figure}[tb]
@@ -60,7 +60,7 @@ The coordinate system used in DOCTORS is shown in Fig.~\ref{fig:coord_sys}. A di
 
 The rotation symmetrical ($S_N$) quadrature is implemented in DOCTORS. From amongst many different quadrature sets, the rotation symmetrical quadratures were selected because they are easy to implement, rotationally symmetric, and used in production discrete ordinate solvers~\citep{ref:evanst} which enables simple, direct comparison to other solvers. Arbitrary quadratures are permissible in a plain text file supplied by the user enabling other quadratures.
 
-The $S_N$ quadrature ensures 90 degree symmetry about any axis. In order to ensure the rotational symmetry, the $S_N$ quadrature has a single degree of freedom. The $LQ_N$ quadrature (which is the specific $S_N$ implemented in DOCTORS) uses the remaining degree of freedom to minimize error caused when integrating Legendre polynomials since that class of polynomials are used to represent anisotropy in scattering (see Sec.~\ref{sec:aniso}). For a more through discussion of quadrature generation, see \citet{ref:lewise}. Figure~\ref{fig:quad} shows the simples three quadratures implemented in DOCTORS.
+The $S_N$ quadrature ensures 90 degree symmetry about any axis. In order to ensure the rotational symmetry, the $S_N$ quadrature has a single degree of freedom. The $LQ_N$ quadrature (which is the specific $S_N$ implemented in DOCTORS) uses the remaining degree of freedom to minimize error caused when integrating Legendre polynomials since that class of polynomials are used to represent anisotropy in scattering (see Sec.~\ref{sec:aniso}). For a more thorough discussion of quadrature generation, see \citet{ref:lewise}. Figure~\ref{fig:quad} shows the simplest three quadratures implemented in DOCTORS.
 
 \begin{figure}
     \centering
@@ -147,7 +147,7 @@ where the subscript $a$ denotes the direction number and $\omega_a$ is a weight 
 \int_{4 \pi} f(\hat{\Omega}) d\hat{\Omega} \approx \sum_{a=0}^{N_a-1} f(\hat{\Omega}_a) \omega_a = 1.
 \end{equation}
 
-\subsection{Energy Discretization}
+\subsection{Energy discretization}
 
 Continuous energy is discretized into $G$ groups indexed from 0 to $G-1$ as illustrated in Fig.~\ref{fig:energy_groups}. Therefore, Eq.~\ref{eq:boltz_a} becomes
 \begin{equation} \label{eq:boltz_e}
@@ -165,12 +165,12 @@ where the group number is indexed by superscript $g$.
 \label{fig:energy_groups}
 \end{figure}
 
-The user must provide cross section data in the form of an AMPX formatted binary file (Format detaisl are provided in Section~\ref{sec:xsparse}). The cross section data file contains group structure information. Group averaged cross section values from energy $E_1$ to $E_2$ are computed using Eq.~\ref{eq:groupxs} where $\sigma(E)$ is the continuous microscopic cross section. A weighting function, $f$, is used to weight the energies. The weighting function can be any of a number commonly used functions. The SCALE data libraries use a uniform function [CITE].
+The user must provide cross section data in the form of an AMPX formatted binary file (Format details are provided in Section~\ref{sec:xsparse}). The cross section data file contains group structure information. Group averaged cross section values from energy $E_1$ to $E_2$ are computed using Eq.~\ref{eq:groupxs} where $\sigma(E)$ is the continuous microscopic cross section. A weighting function, $f$, is used to weight the energies. The weighting function can be any of a number commonly used functions. The SCALE data libraries use a uniform function.
 \begin{equation}\label{eq:groupxs}
 \sigma_G = \frac{\int_{E_1}^{E_2}f(E')\sigma(E') dE'}{\int_{E_1}^{E_2} f(E') dE'}
 \end{equation}
 
-In photon based problems, upscatter is typically negligible [CITE]. By the time photons become low enough in energy to upscatter significantly, they are no longer of dosimetric concern. Removing upscatter reduces Eq.~\ref{eq:boltz_e} to
+In photon based problems, upscatter is typically negligible. By the time photons become low enough in energy to upscatter significantly, they are no longer of dosimetric concern. Removing upscatter reduces Eq.~\ref{eq:boltz_e} to
 \begin{equation} \label{eq:boltz_e2}
 \left[ \hat{\Omega}_a \cdot \nabla + \Sigma_t^g(\boldsymbol{r}) \right]
 \psi_{a}^{g}(\boldsymbol{r}) = 
@@ -180,9 +180,9 @@ which nearly identical; only the starting point for the scatter summation change
 
 The group structure cannot be arbitrarily selected by DOCOTRS, instead it is determined by the external cross section data file loaded by the user. The energy group structure should be selected appropriately for the problem. The cross sections currently included with DOCTORS are those available from the SCALE 6.2 distribution. Those cross sections are designed for light water reactor analysis and are not well suited to medical physics applications. This is one of the limitations of the current version of DOCOTRS. The SCALE cross section data also contains neutron data which is useless for the CT dosimetry DOCTORS performs. More details of the cross section parsing and generation are included in Section~\ref{sec:xsparse} and~\ref{sec:xsgen} respectively.
 
-\subsection{Spatial Discretization}
+\subsection{Spatial discretization}
 
-The problem domain is split into an evenly spaced Cartesian grid. Uniform grid spacing is not required by discrete ordinate methods though it is helpful and can speed up the computation[CITE].
+The problem domain is split into an evenly spaced Cartesian grid. Uniform grid spacing is not required by discrete ordinate methods though it is helpful and can speed up the computation.
 
 The problem domain for a CT voxel phantom is a regular, rectangular parallelepiped of dimension $D_x \times D_y \times D_z$, the values of which are known based on the CT setup provided by the user. The mesh is partitioned into $N_x$, $N_y$, and $N_z$ evenly spaced bins along each major direction as shown in Fig.~\ref{fig:spatial_disc}. The total number of voxels, $N_V$ is easily computed from the number of bins in each major direction:
 \begin{equation} \label{eq:n_v}
@@ -206,7 +206,7 @@ Voxels can be indexed in one of two ways, either by their component indices or g
 \begin{equation} \label{eq:indx_flat}
 i = i_x (N_z + N_y) + i_y N_z + i_z.
 \end{equation}
-In general, this is known as "flattening" a matrix into a one-dimensional vector. More details about the flattening implementation used in DOCTORS is given in Section~\ref{sec:flatten}. Using global indexing discussed, the fully discretized the steady state LBE given is
+In general, this is known as "flattening" a matrix into a one-dimensional vector. More details about the flattening implementation used in DOCTORS is given in Section~\ref{sec:flatten}. Using global indexing discussed, the fully discretized steady state LBE is
 \begin{equation} \label{eq:boltz_i}
 \left[ \hat{\Omega}_a \cdot \nabla + \Sigma_{t,i}^g \right]
 \psi_{i,a}^{g} = 
@@ -289,7 +289,7 @@ Using the generalized approximation given in Eq.~\ref{eq:deriv_2}, Eq.~\ref{eq:b
 
 In order for the discretized LBE to be solved using Eq.~\ref{eq:boltz_i2}, both the incoming and outgoing flux must be known. Therefore, in order to compute the average flux in a cell, some relationship between the average flux and the outgoing surface fluxes must be known. These values can be related by any one of many different mechanisms, the most common of which is the diamond difference approximation.
 
-\subsection{Diamond Difference Approximation}
+\subsection{Diamond difference approximation}
 
 The diamond difference approximation, relates the incoming and outgoing surface fluxes to the cell averaged flux. The cell averaged flux is assumed to be the average of any two opposite surface fluxes. This is assumed to be the case in all three spatial dimensions leading to:
 \begin{equation} \label{eq:dd}
@@ -370,7 +370,7 @@ The outgoing flux values are then used as the incoming flux values for subsequen
 
 Repeatedly iteration Eq.~\ref{eq:boltz_i5} will eventually yield the solution to the flux distribution regardless of the initial guess. Choosing an accurate guess can greatly accelerate the code and guide convergence on a more accurate solution as discussed in more detail in Section~\ref{sec:uncol}. Either way, some metric must be used to determine when to stop the iteration process.
 
-\subsection{Convergence Criteria}
+\subsection{Convergence criteria}
 The typical convergence criteria used to determine whether or not to terminate further iteration is the maximum relative error from the previous iteration to the current iteration given in Eq.~\ref{eq:conv} over the phase space $\mathbb{R}$ where $t$ is the current iteration number. Once the relative error in the parameter of interest, $\phi$, is below some threshold, $\epsilon$, the iteration stops and the solution is considered converged.
 
 \begin{equation}\label{eq:conv}
@@ -385,7 +385,7 @@ t > T
 
 Under further investigation, the cause of the convergence failure that results in Eq.~\ref{eq:conv2} being exercised often stems from floating point error. The flux magnitude fluctuates wildly in regions of very flow flux, such as the gantry. In these regions, the relative uncertainty remains much higher than in regions with smoother flux distributions. 
 
-ADD FIGURE TO SHOW CONVERGENCE RATE.
+%ADD FIGURE TO SHOW CONVERGENCE RATE.
 
 In order to measure the uncertainty due to floating-point error, another convergence criteria was added. Rather than considering the relative change from iteration to iteration, the total absolute change is measured:
 \begin{equation}\label{eq:conv3}
@@ -397,7 +397,7 @@ The termination criteria is given by Eq.~\ref{eq:conv4}. Computation of a value 
 \varepsilon_i > \varepsilon_{i-1}
 \end{equation}
 
-\subsection{Anisotropy Treatment}\label{sec:aniso}
+\subsection{Anisotropy treatment}\label{sec:aniso}
 
 Scatter is assumed to be a function of only the scatter angle $\theta_s$ between the initial, $\hat{\Omega}_a$, and scattered, $\hat{\Omega}_{a'}$, directions. The cosine of the scatter angle, $\mu_s$ is related by 
 \begin{equation} \label{eq:scat_cos}
@@ -414,19 +414,28 @@ Scatter is assumed to be a function of only the scatter angle $\theta_s$ between
 
 Typically, at this point, discrete ordinate methods will describe the discrete angular flux, $\psi$ using flux moments, $\phi$. The motivation for using flux moments is that they improve computational performance and reduce memory overhead.
 
-The data files containing the scatter cross sections stor the information using Legendre polynomial expansion coefficients. The use of a Legendre expansion removes the dependence on the quadrature from the data. This allows any quadrature to work with any cross section dataset. A $l$-order Legendre polynomial is denoted by $P_l$. Details of the Legendre polynomials can be found in Appendix~\ref{appdx:leg}. The anisotropic scatter cross section is rewritten using a Legendre expansion as
+The data files containing the scatter cross sections store the information using Legendre polynomial expansion coefficients. The use of a Legendre expansion removes the dependence on the quadrature from the data. This allows any quadrature to work with any cross section dataset. A $l$-order Legendre polynomial is denoted by $P_l$. Details of the Legendre polynomials can be found in Appendix~\ref{appdx:leg}. The anisotropic scatter cross section is rewritten using a Legendre expansion as
 \begin{equation} \label{eq:leg_1}
 \Sigma_{s, i, a, a'}^{g, g'} = \sum_{l=0}^L \frac{2l+1}{4 \pi}\Sigma_{s, i, l}^{g, g'} P_l(\mu_s).
 \end{equation}
 
 An alternate anisotropy treatment is to use the Klein-Nishina formula~\citep{ref:shultisj}. The Klein-Nishina formula describes the scattering cross section as
-\begin{equation}
+\begin{equation}\label{eq:klein}
 \sigma(E, \mu) \propto q^3 + q\mu^2
 \end{equation}
 where
 \begin{equation}
-q(E, \mu) = \frac{1}{1 + (E/E_0)(1-\mu)}
+q(E, \mu) = \frac{1}{1 + (E/E_0)(1-\mu)}.
 \end{equation}
+Figure~\ref{fig:klein} shows a comparison of the Klein-Nishina scattering cross section as a function of scatter angle versus the computed cross sections in DOCTORS using the Klein-Nishina formula given in Eq.~\ref{eq:klein}. The slight discrepancy between the two is due to the postprocessing used to merge data from the DOCTORS output. The underlying trends are identical.
+
+\begin{figure}[tb]
+  \begin{center}
+   \includegraphics[width=3.75in]{figs/klein}
+  \end{center}
+  \caption{Comparison of the Klein-Nishina formula to the computed cross section values in DOCTORS using the Klein-Nishina anisotropy treatment.}
+\label{fig:klein}
+\end{figure}
 
 \section{Uncollided Solution Methods}\label{sec:uncol}
 One of the earliest problems with the discrete ordinate methods is the presence of ray effect. Ray effect arises due to the restriction of particle transport to a set of discrete directions. To illustrate ray effect, consider a point source streaming particles isotropically into vacuum. Since no scatter or absorption takes place in vacuum conditions, the particles can only stream and particles must be conserved. However, if particles are transported along a single discrete direction only as illustrated in Fig.~\ref{fig:rayeffect_ex} ($\hat{\Omega} = <\sqrt{2}/2, \sqrt{2}/2>$ in Fig.~\ref{fig:rayeffect_ex} and~\ref{fig:rayeffect_comp}) the phenomena observed in Fig.~\ref{fig:rayeffect_comp} is observed. As the discretization becomes more refined, the isotropic source becomes more heavily biased in the $\hat{\Omega}$ direction. This phenomena is called ray effect and has been thoroughly studied by many \citep{ref:mathewsk} \citep{ref:tencerj}.
@@ -537,7 +546,7 @@ dE' d\hat{\Omega}' \\
 \end{split}
 \end{equation}
 
-A rigorous derivation for the uncollided flux is not provided in this work but can be obtained from [CITE]. Instead, an intuitive approach is used. First, consider an isotropic point source in a homogeneous media. The (scalar) flux is well known to be
+A rigorous derivation for the uncollided flux is not provided in this work. Instead, an intuitive approach is used. First, consider an isotropic point source in a homogeneous media. The (scalar) flux is well known to be
 \begin{equation}
 \varphi(r, E) = \frac{S(E) e^{-\mu(E) r}}{4 \pi r^2}
 \end{equation}
@@ -571,7 +580,7 @@ S(\boldsymbol{s}, E, \hat{\Omega})
 d \boldsymbol{s}.
 \end{equation}
 
-\section{Source Generation}
+\section{Source Generation}\label{sec:source_gen}
 All photon transport problems considered in the DOCTORS code are ultimately driven by an external source, namely the medical equipment producing the photon beam. These sources can come in a variety of geometric shapes and energy spectra. Currently, DOCTORS has a number of built-in beam types available for analysis including point sources, fan beams, and cone beams. Fan beams and cone beams can be arranged about a phantom to produce an axial slice. Currently, helical paths are not supported, though they could be added with little additional effort. The geometry of fan beams and cone beams in DOCTORS is shown in Fig.~\ref{fig:shape}.
 
 \begin{figure}
@@ -590,7 +599,7 @@ All photon transport problems considered in the DOCTORS code are ultimately driv
     \caption{(a) The fanbeam is defined by $\theta$ in the polar coordinate and $\varphi$ azimuthally. (b) The cone beam is described only be $\theta$.}\label{fig:shape}
 \end{figure}
 
-\subsection{Point Source}
+\subsection{Point source}
 The simplest source implemented is an isotropic point source. This source is defined only by its position and energy distribution. Given a vector from the source to the center of the geometry, $\boldsymbol{s}$, and a vector from the source to the center of a cell, $\boldsymbol{c}$,the uncollided flux is computing using Eq.~\ref{eq:isouncol}. The collided flux is then computed using the discrete ordinate solution to the LBE given in Eq.~\ref{eq:col2}. The vectors are shown in Fig.~\ref{fig:phi}.
 
 \begin{figure}[tb]
@@ -601,7 +610,7 @@ The simplest source implemented is an isotropic point source. This source is def
 \label{fig:phi}
 \end{figure}
 
-\subsection{Fan Source}
+\subsection{Fan source}
 In addition to the values defining a point source (position $\boldsymbol{s}$ and the energy distribution) a fan source is defined by two additional parameters, $\varphi$ and $\theta$ which describe the azimuthal and polar angles subtended by the fan beam respectively. Figure~\ref{fig:shape_fanbeam} shows $\varphi$ and $\theta$ with respect to the geometry setup. The raytracing algorithm used for the fan beam is identical to the point source raytracer except for one difference: before the raytracing is done, whether the ray falls within the fan beam is determined and any ray falling outside the fan beam is not traced, instead its uncollided flux is immediately set to zero. Some voxels are partially enclosed inside the beam which is not accounted for resulting in artifacts at the edges of the beam.
 
 To determine whether a ray is accepted or rejected, the ray direction is first projected onto the $xy$ plane giving $<s_x, s_y, 0>$ and $<c_x, c_y, 0>$. Then the cosine of the angle between them, $\zeta_\varphi$, is computed using 
@@ -635,7 +644,7 @@ If the condition is not met, the ray is rejected and no raytrace is performed. F
 \label{fig:fan_rejection}
 \end{figure}
 
-\subsection{Multi-fan Source}
+\subsection{Multi-fan source}
 The focal point about which the CT system rotates is assumed to be the center of the $xy$ plane and at the same $z$-elevation as the first user specified point. The focal spot defines the center of each fan beam.
 
 \begin{figure}
@@ -684,7 +693,7 @@ and
 y' = (y - y_f) \cos \theta + (x - x_f) \sin \theta + y_f.
 \end{equation}
 
-\subsection{Cone Source and Multi-cone Source}
+\subsection{Cone source and multi-cone source}
 Cone sources are identical to fan beam sources except for the rejection criteria used to determine whether or not a voxel is inside the beam. The rejection criteria is a function of only a single parameter, $\theta$, the maximum permissible angle between the center of the beam, $\boldsymbol{s}$, and a ray toward the point of interest, $\boldsymbol{c}$. The angle between $\boldsymbol{s}$ and $\boldsymbol{c}$ is
 \begin{equation}\label{eq:zetacos}
 \cos(\zeta) = \frac{<S_x, S_y, S_z>}{\sqrt{S_x^2 + S_y^2 + S_z^2}} \cdot \frac{<C_x, C_y, C_z>}{\sqrt{C_x^2 + C_y^2 + C_z^2}}
@@ -742,7 +751,7 @@ is evaluated to determine whether the ray is accepted or rejected. Figure~\ref{f
 \section{Dose Computation}
 Dose can be computed in either one of two ways. The first way is to compute the fluence distribution and multiply by a fluence-to-dose conversion factor from ICRP~116~\citep{ref:icrp116}. The second way to compute dose is to compute the energy deposition in each cell. In both methods, transport of secondary particles is neglected and all energy deposition is assumed to be local.
 
-\subsection{Fluence-to-dose Conversion}
+\subsection{Fluence-to-dose conversion}
 
 The publications of the ICRP include fluence-to-dose conversion factors for a reference phantom from various particle types and patient orientations. For CT systems, the rotationally symmetric (ROT) orientation is the most appropriate since the beam rotates about the patient. Figure~\ref{fig:icrp116_rotconv} shows the energy dependent fluence-to-dose conversions for the ROT orientation. ICRP 116 distributes the conversion factors as point-wise data which must be converted to group data. This is performed using linear interpolation between the ICRP 116 data points.
 
@@ -760,7 +769,7 @@ D_i = \sum_{g=0}^{G-1} \varphi_i^g H^g
 \end{equation}
 where $H^g$ is the conversion factor for the $g^{th}$ group.
 
-\subsection{Energy Deposition}
+\subsection{Energy deposition}
 
 The alternative way to compute the dose is directly from the local energy deposition. The total deposition, $\mathcal{E}_{T,i}$ for voxel $i$ is
 \begin{equation}\label{eq:dept}

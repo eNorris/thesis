@@ -21,7 +21,7 @@
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{mstthesis}[2017/02/07 v3.0 Missouri S&T Thesis Class]
+\ProvidesClass{mstthesis}[2017/03/23 v3.2 Missouri S&T Thesis Class]
 \RequirePackage{ifthen}[2001/05/26]
 \newboolean{timesfree}
 \newboolean{timescomm}
@@ -73,8 +73,8 @@
   \RequirePackage{newtxmath}[2015/02/13]
 }{}
 \RequirePackage{geometry}[2008/12/21]
-\geometry{letterpaper,total={6in,8.875in},includehead}
-\geometry{top=0.515in,headheight=0.125in,headsep=0.4375in,left=1.515in}
+\geometry{letterpaper,total={6in,8.995in}}
+\geometry{top=1.03125in,headheight=0.125in,headsep=0.3125in,left=1.515in}
 
 \RequirePackage[american]{babel}[2008/07/06]
 \RequirePackage{setspace}[2000/12/01]
@@ -85,7 +85,7 @@
 \RequirePackage{titlesec}[2007/08/12]
 \titleformat{\chapter}{\singlespacing\center\normalsize\bfseries\uppercase}%
   {\thechapter.}{.5em}{}[\doublespacing]
-\titlespacing{\chapter}{0pt}{-0.5in}{0.6875in}
+\titlespacing{\chapter}{0pt}{-0.4375in}{0.6875in}
 \titleformat{\section}{\singlespacing\normalsize\bfseries\uppercase}%
   {\thesection.}{.5em}{}[\doublespacing]
 \titleformat{\subsection}[runin]{\normalsize\bfseries}%
@@ -105,7 +105,7 @@
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}
 
-\RequirePackage[authoryear,sort]{natbib}[2000/07/24]
+ %\RequirePackage[authoryear,sort]{natbib}[2000/07/24]
 
 \RequirePackage[labelsep=period]{caption}[2011/11/02]
 \RequirePackage[defaultlines=3,all]{nowidow}
@@ -123,37 +123,30 @@
 }
 \setlength{\parindent}{0.5in}
 
-\newcommand{\ThesisAdviser}[1]{\thadviser{#1}}
-\newcommand{\CoThesisAdviser}[1][false]{%
-\ifthenelse{\equal{#1}{true}}{\cothadviser{#1}}{}}
+\setcounter{tocdepth}{3}
+\addtocounter{secnumdepth}{1}
+
+\newcommand{\ThesisAdvisor}[1]{\advisor{#1}}
+\newcommand{\ThesisCommittee}[1]{\committee{#1}}
 
 \newenvironment{ThesisTitlePage}[1]{%
   \ifthenelse{\equal{#1}{ms}}%
-     {\thesistype{1}\degree{MASTER OF SCIENCE}}%
-     {\thesistype{2}\degree{DOCTOR OF PHILOSOPHY}}}%
+     {\thesistype{1}\GraduateDegree{MASTER OF SCIENCE}}%
+     {\thesistype{2}\GraduateDegree{DOCTOR OF PHILOSOPHY}}}%
 {\titlepage}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
  \def\thesistitle#1{\gdef\@thesistitle{#1}}
  \def\author#1{\gdef\@author{#1}}
- \def\degree#1{\gdef\@degree{#1}}
+ % ... added koh, 2017/03/15 ...
+ \def\advisor#1{\gdef\@advisor{#1}}
+ \def\committee#1{\gdef\@committee{#1}}
+ \newcount\numdeg \numdeg=1
+ \def\thesistype#1{\numdeg=#1}
+ % ... end of added commands (koh, 2017/03/15) ...
+ \def\GraduateDegree#1{\gdef\@GraduateDegree{#1}}
  \def\department#1{\gdef\@department{#1}}
- \newcount\numcomm \numcomm=1
- \def\thesistype#1{\numcomm=#1}
- \def\thadviser#1{\gdef\@thadviser{#1}}
- \def\projadviser#1{\gdef\@projadviser{#1}} \projadviser{*}
- \def\cothadviser#1{\gdef\@cothadviser{#1}} \cothadviser{*}
- \def\coprojadviser#1{\gdef\@coprojadviser{#1}} \coprojadviser{*}
- \def\doctype{\if \@projadviser *Thesis \else Project \fi}
- \def\adviser{\if \@projadviser *\@thadviser \else \@projadviser\fi}
- \def\coadviser{\if \@coprojadviser *\@cothadviser\else \@coprojadviser\fi}
- \def\memberone#1{\gdef\@memberone{#1}}
- \def\membertwo#1{\gdef\@membertwo{#1}}
- \def\memberthree#1{\gdef\@memberthree{#1}}
- \def\memberfour#1{\gdef\@memberfour{#1}}
- \def\memberfive#1{\gdef\@memberfive{#1}}
- \def\membersix#1{\gdef\@membersix{#1}}
  \def\copyrightyear#1{\gdef\@copyrightyear{#1}} \copyrightyear{\the\year}
  \def\graddate#1{\gdef\@graddate{#1}}
 
@@ -161,7 +154,7 @@
 
 \def\titlepage{%
 
-  \ifnum\numcomm<2 \typeout{---------------Masters Thesis----------}
+  \ifnum\numdeg<2 \typeout{---------------Masters Thesis----------}
 
      \thispagestyle{empty}
      \mbox{}\vspace*{\fill}
@@ -174,39 +167,25 @@
          by \\ [24pt]
          {\uppercase\expandafter{\@author}}\\ [24pt]
          \end{doublespace}
-         A \uppercase\expandafter{\doctype} \\[12pt]
+         A THESIS \\[12pt]
          Presented to the Graduate Faculty of the\\ [18pt]
          MISSOURI UNIVERSITY OF SCIENCE AND TECHNOLOGY\\ [18pt]
          In Partial Fulfillment of the Requirements for the Degree\\[24pt]
-         \uppercase\expandafter{\@degree}\\[18pt]
+         \uppercase\expandafter{\@GraduateDegree}\\[18pt]
          ~in~\\[18pt]%
          \uppercase\expandafter{\@department} \\[18pt]
          \@graddate\\[18pt]
          Approved by\\
      \vspace*{0.375in}
      \end{center}
-     \if \coadviser *  % no coadviser
-        \begin{center}
+     \begin{center}
         \begin{minipage}{5in}
           \begin{center}\begin{onehalfspacing}
-          \adviser, Advisor\\
-          \@memberone \\
-          \@membertwo\\
+          \@advisor\\
+          \@committee\\
           \end{onehalfspacing}\end{center}
         \end{minipage}
-        \end{center}
-     \else
-        \begin{center}
-        \begin{minipage}{5in}
-          \begin{center}\begin{onehalfspacing}
-          \adviser, Co-advisor\\
-          \@memberone, Co-advisor \\
-          \@membertwo\\
-          \@memberthree \\
-          \end{onehalfspacing}\end{center}
-        \end{minipage}
-        \end{center}
-     \fi
+     \end{center}
      \end{singlespace}
      \vspace*{\fill}
      \newpage
@@ -231,39 +210,22 @@
          Presented to the Graduate Faculty of the\\ [18pt]
          MISSOURI UNIVERSITY OF SCIENCE AND TECHNOLOGY\\ [18pt]
          In Partial Fulfillment of the Requirements for the Degree\\[24pt]
-         \uppercase\expandafter{\@degree}\\[18pt]
+         \uppercase\expandafter{\@GraduateDegree}\\[18pt]
          ~in~\\[18pt]%
          \uppercase\expandafter{\@department} \\[18pt]
          \@graddate\\[18pt]
          Approved by\\
      \vspace*{0.3in}
      \end{center}
-     \if \coadviser *  % no coadviser
         \begin{center}
         \begin{minipage}{5in}
           \begin{center}\begin{onehalfspacing}
-          \adviser, Advisor\\
-          \@memberone \\
-          \@membertwo\\
-          \@memberthree \\
-          \@memberfour \\
+          \@advisor\\
+          \@committee\\
           \end{onehalfspacing}\end{center}
         \end{minipage}
         \end{center}
-     \else
-        \begin{center}
-        \begin{minipage}{5in}
-          \begin{center}\begin{onehalfspacing}
-          \adviser, Co-advisor\\
-          \@memberone, Co-advisor \\
-          \@membertwo\\
-          \@memberthree \\
-          \@memberfour \\
-          \end{onehalfspacing}\end{center}
-        \end{minipage}
-        \end{center}
-     \fi
-     \end{singlespace}
+      \end{singlespace}
      \vspace*{\fill}
      \newpage
      \pagestyle{myheadings}
@@ -344,6 +306,7 @@
   \singlespacing\setlength{\parskip}{10\p@}
   \@starttoc{toc}%
   \if@restonecol\twocolumn\fi
+  \setlength{\parskip}{0pt}\doublespacing% ... added by koh ...
   }
 
 \setlength{\cftfigindent}{0pt}
@@ -437,8 +400,9 @@
 \newcommand{\ThesisPaperKeywords}[1]{\noindent\textbf{Keywords:} #1}
 \newcommand{\ThesisPaperReferences}[1]{\bibliography{#1}}
 \newenvironment{ThesisPaperAbstract}%
-   {\vspace*{0.25in}\begin{center}\textbf{Abstract}\\}%
-   {\end{center}}
+   {\vspace*{0.25in}\noindent\textbf{ABSTRACT}\\
+    \addcontentsline{toc}{section}{ABSTRACT}}%
+   {}
 
 \newcommand{\ThesisBodyChapter}[1]{%
   \ifthenelse{\boolean{firstThesisOnlyChapter}}%
@@ -457,10 +421,11 @@
   \setboolean{firstThesisOnlyChapter}{false}
   \titleformat{\chapter}{\singlespacing\center\normalsize\bfseries\uppercase}%
     {\thechapter.}{.5em}{}[\doublespacing]
-  \titlespacing{\chapter}{0pt}{-0.5in}{0.6875in}
+  \titlespacing{\chapter}{0pt}{-0.4375in}{0.6875in}
 }
 
 \newcommand{\ThesisAppendixChapter}[1]{\chapter{#1}}
+
 \def\@chapter[#1]#2{\ifnum \c@secnumdepth >\m@ne
                          \refstepcounter{chapter}%
                          \typeout{\@chapapp\space\thechapter.}%
@@ -503,7 +468,7 @@
     {\addcontentsline{toc}{chapter}{\MakeUppercase{Appendix}}%
      \addtocontents{toc}{\protect\setcounter{tocdepth}{-1}}%
      \titleformat{\chapter}{\center\normalsize\bfseries\uppercase}%
-        {}{.5em}{APPENDIX  \\ \vspace*{0.125in}\ \\}%
+        {}{.5em}{APPENDIX  \\ \vspace*{0.125in}\ \\ \center}%
      \titlespacing{\chapter}{0pt}{-0.59375in}{0.6875in}%
      \titleformat{\section}{\normalsize\bfseries\uppercase}{}{.5em}{}%
      \titleformat{\subsection}[runin]%
@@ -517,7 +482,8 @@
      \titleformat{\chapter}%[block]%
        {\vspace*{\stretch{1}}\center\normalsize\bfseries\uppercase}%
        {APPENDIX \thechapter}{0em}%
-       {\\~\\\hspace{-1in}\nopagenumber}[\vspace*{\stretch{1}}\newpage]
+       {\\~\\\nopagenumber}[\vspace*{\stretch{1}}\newpage]
+ %      {\\~\\\hspace{-1in}\nopagenumber}[\vspace*{\stretch{1}}\newpage]
      %\titlespacing{\chapter}{0pt}{-0.5in}{0.6875in}
      \titleformat{\section}{\normalsize\bfseries\uppercase}{}{.5em}{}%
      \titleformat{\subsection}[runin]%
@@ -533,12 +499,14 @@
 
 
 \newenvironment{ThesisBibliography}[1]{%
-  \chapter*{#1} % ... added by koh ...
-      \addcontentsline{toc}{chapter}{#1}%
+  \renewcommand{\bibname}{REFERENCES}
+ %\chapter*{#1} % ... added by koh ...
+  \clearpage\addcontentsline{toc}{chapter}{#1}%
 }{}
 
 \newenvironment{ThesisPaperBibliography}[1]{%
-  \section*{#1} % ... added by koh ...
+ \renewcommand{\bibname}{REFERENCES}
+ %\section*{#1} % ... added by koh ...
       \addcontentsline{toc}{section}{#1}%
 }{}
 

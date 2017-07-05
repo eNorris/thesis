@@ -9,7 +9,7 @@ This appendix gives a brief summary of flux moments and the Legendre spherical h
 
 \section{Flux Moments}\label{appdx:moments}
 
-The flux moments are an alternate representation of the angular flux  within a system. The rationale behind usage of flux moments is that they map the discrete flux ($\psi$) from a function of angle to a function of $P_N$ expansion. This reduces the amount of memory required for computation. Storing $\psi$ directly requires storing $G \times N_V \times N_a$ values where $G$ is the number of groups, $N_V$ is the number of voxels, and $N_a$ is the number of angles. Storing the flux moments, however, requires storing only $G \times N_V \times (N^2 + 2N + 1)$ values where $N$ is the $P_N$ expansion value. For example, a problem requiring $S_6$ needs $6 \times 8 = 48$ directions, but a problem requiring $P_6$ needs 49 expansion coefficients which would seem approximately eqivalent, but typical problems require far more discrete directions than expansion coefficients. Comples problems can easily require $S_{16}$ or higher but expansions above $P_5$ are rarely encountered.
+The flux moments are an alternate representation of the angular flux  within a system. The rationale behind usage of flux moments is that they map the discrete flux ($\psi$) from a function of angle to a function of $P_N$ expansion. This reduces the amount of memory required for computation. Storing $\psi$ directly requires storing $G \times N_V \times N_a$ values where $G$ is the number of groups, $N_V$ is the number of voxels, and $N_a$ is the number of angles. Storing the flux moments, however, requires storing only $G \times N_V \times (N^2 + 2N + 1)$ values where $N$ is the $P_N$ expansion value. For example, a problem requiring $S_6$ needs $6 \times 8 = 48$ directions, but a problem requiring $P_6$ needs 49 expansion coefficients which would seem approximately eqivalent, but typical problems require far more discrete directions than expansion coefficients. Complex problems can easily require $S_{16}$ or higher but expansions above $P_5$ are rarely encountered.
 
 \section{Legendre Polynomials}\label{appdx:leg}
 
@@ -28,6 +28,7 @@ where $\mathbb{N}$ is the set of natural numbers (1, 2, 3...). Table~\ref{tab:le
 0 \,, \quad \text{otherwise}
 \end{cases}
 \end{equation}
+holds.
 
 \begin{table}[ht]
 \caption{Legendre Polynomials}
@@ -84,13 +85,13 @@ The spherical harmonics are defined as:
 \begin{equation}
 Y_{lm}(\hat{\Omega}) = \sqrt{\frac{(2l+1)(l-m)!}{(l+m)!}}P_l^m(\mu)e^{e \tau m}
 \end{equation}
-where $\mu$ is the cosine of the angle between $\hat{Omega}$ and the $x$-axis and $\tau$ is the rotation about the $x$-axis with respect to the $y$-axis of $\hat{\Omega}$ projected onto the $yz$ plane which can be compuated as:
+where $\mu$ is the cosine of the angle between $\hat{\Omega}$ and the $x$-axis and $\tau$ is the rotation about the $x$-axis with respect to the $y$-axis of $\hat{\Omega}$ projected onto the $yz$ plane which can be compuated as:
 \begin{equation}
 \tau = \frac{\eta}{\sqrt{\eta^2 + \xi^2}}.
 \end{equation}
 The spherical harmonics have the orghogonality
 \begin{equation}
-\int_{}^{}Y_{lm}(\hat{Omega})Y_{l'm'}^*(\hat{\Omega}) d\hat{\Omega}= 
+\int_{}^{}Y_{lm}(\hat{\Omega})Y_{l'm'}^*(\hat{\Omega}) d\hat{\Omega}= 
 \begin{cases}
 1 \,, \quad l = l' \text{ and } m = m' \\
 0 \,, \quad \text{otherwise}

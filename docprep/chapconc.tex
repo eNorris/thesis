@@ -11,53 +11,40 @@ This chapter summarizes the conclusions drawn from the results given in Chapter 
 
 The raytracer is very fast compared to the discrete ordinate solution which computes the collided flux. The uncollided flux quantifies the source distribution from the medical system. This uniquely enables discrete ordinate solutions to rapidly characterize complex systems. Multiple cone beams and fan beams are possible as well as many other, more complex beam shapes.
 
-The collided flux suffers from the isotropic approximation made to simplify the code.
+Qualitatively, the most of the trends identified by DOCTORS agreed very well with MCNP6. The largest discrepancy was in the attenuation of particles through the patient region. However, since the raytracer is very accurate with respect to MCNP6, the difference is likely with the discrete ordinate methodology rather that cross section related. The key driver of this discrepancy is believed to be due to poor treatment of the angular transport either by way of the quadrature or anisotropy treatment.
 
-THE ANISOTROPY LOOKS QUESTIONABLE - higher quad and or Pl.
-
-AVOID BIASED BEAMS
+This indicates that DOCTORS is better suited for problems that use a broad, distributed source as opposed to a narrow, directionally biased source. Such directional sources, require much higher quadratures to accurately characterize the beam due to ray effect.
 
 \section{Applicability to Clinical Settings}
-With further development, DOCTORS is well positioned to become a code of significant clincal impact.
+With further development, DOCTORS is well positioned to become a code of significant clincal impact. Though it is still lacking in medical diagnostic quality accuracy, it is easily extensible and capable of characterization of complex beams making it ideal for some types of clinical dosimetry.
 
-Great effort was put into producing a code that is simple to use yet capable of producing powerful results quickly. However, usage in a clinical setting would likely require further refinement of the GUI to make the code more robust and intuitive. Additionally, the direct output of DOCTORS may not necessarily be of clinical importance since 
+Great effort was put into producing a code that is simple to use yet capable of producing powerful results quickly. However, usage in a clinical setting would likely require further refinement of the GUI to make the code more robust and intuitive. Additionally, the direct output of DOCTORS may not necessarily be of clinical importance since radiologists and technitians are more interested in compliance with regulations and ensuring patient safety. Therefore, a bulk report of overall numbers would likely be of more benfit than the entire spatial flux and dose distribution in a clinical setting.
 
 \section{GPU Speedup}
 
-The GPU acceleration algorithm was found to speed the DOCTORS code up by a factor of ~40x.
+The GPU algorithm was implemented in CUDA and is very straightforward. At each subsweep, the global index of all voxels that can be computed in parallel are determined and a kernel is launched that executes those voxels. Unsurprisingly, this algorithms scales much better on larger problems where more time is spent in the computational execution of the kernal as opposed to the overhead operations of launching the kernel and memory transfer.
 
-Very simple and easy to implement
+The GPU acceleration algorithm was found to speed the DOCTORS code up by a factor of ~40x for large problems and only a factor of 3-6x for smaller problems. The improved accuracy of double precision arithmetic was found to outweigh the speed improvement from faster calculations.
 
 \section{Future Work}
 
-A number of simple modifications to DOCTORS could be made that would greatly increase the code's usability and robustness. One of these modifications, generation of more refined group structures, is not a change to DOCTORS \textit{per se} but rather a change in the input cross section data. The other changes are additions to DOCTORS that would add new capabilities to the software.
+A number of simple modifications to DOCTORS could be made that would greatly increase the code's usability and robustness. One of these modifications, generation of more refined group structures, is not a change to DOCTORS \textit{per se} but rather a change in the input cross section data. The other changes are additions to DOCTORS that would add new capabilities to the software. In addition to specific modifications, some additional, broader future goals can also be identified.
 
-In addition to specific modifications, some additional, broader future goals can also be identified.
+\subsection{Anisotropy treatment}
+A more sophisticated anisotropy treatment would be appropriate since the collided flux was found to have issues regarding its behavior. Alternatively, adding a spherical harmonics solver may help the anisotropy treatment as well, or at least reduce its memory footprint and runtime. This would require moving the solution from discrete angle space to flux moment space which can greatly complicate the debugging. However, once the correctness of the overall algorithm is shown, this step should be relatively simple.
 
-\subsection{Anisotropy Treatment}
-A more sophisticated anisotropy treatment would be appropriate since the collided flux was found to have issues regarding its behavior. 
+\subsection{Group structure}
+The cross section data currently used by DOCTORS are taken from SCALE6.2. While these cross sections have been found to be sufficient to produce flux distributions in medical CT imaging, a more refined group structure designed for medical applications would be worth investigation. Also, the data distribtuion from SCALE6.2 contains potentially export controlled information since it also includes nuclear reactor materials. A medical purposed cross section library would alleviate this problem and allow the code to be freely released with a dataset. In the current version of DOCTORS, the user is required to obtian the cross section data files independently. This work can be done using either NJOY or the newly released AMPX code. Either code has the capability to collapse an ENDF formatted data file into a group structure of the user's choosing in the format DOCTORS reads.
 
-\subsection{Group Structure}
+\subsection{Therapy extension}
+An advantage of the raytracer is that it is very fast. Therefore, it can characterize many beams and integrate them temporally easily. This would allow DOCTORS to model more complex beam shapes and scan protocols accurately. This would be particularly useful for medical treatment systems that use a multileaf collimator.
 
-The cross section data currently used by DOCTORS are taken from SCALE6.2. While these cross sections have been found to be sufficient to produce flux distributions in medical CT imaging, a more refined group structure designed for medical applications would be worth investigation.
+Some treatment systems employ a multileaf collimator to continuously shape the beam, resulting in a large dose deposition only at the area of interest. DOCTORS can likely be extended to high energy therapeutic beams for clinical treatment. However, higher energy photons will scatter more anisotropicly. This will require careful analysis of the angular treatment used.
 
-This work can be done using either NJOY [CITE] or the newly released AMPX [CITE] code. Either code has the capability to collapse an ENDF formatted data file into a group structure of the user's choosing in the format DOCTORS reads.
-
-INSERT SECTION ABOUT NJOY or AMPX.
-
-\subsection{Temporal Extension}
-An advantage of the raytracer is that it is very fast. Therefore, it can characterize many beams and integrate them temporally easily. This would allow DOCTORS to model more complex beam shapes and scan protocols accurately.
-
-\subsection{Partial Acceptance Criteria}
+\subsection{Partial acceptance criteria}
 In the current version of doctors, the raytracer is very accurate with respect to MCNP6 in predicting the uncollided flux, except for along the periphery of the beam. Voxels are currently either completely inside the beam or completely outside of it as determined by its isocenter. A more sophisticated technique whereby a voxel cah be partially accepted in the beam would remove these artifacts.
 
-\subsection{Multileaf Collimation}
-Some medical systems currently utilize a multileaf collimator [CITE] to deliver dose to a specific organ or region of the body. As the 
-
-\subsection{Extension to Therapy Beams}
-DOCTORS can likely be extended to high energy therapeutic beams for clinical treatment. However, higher energy photons will scatter more anisotropicly. This will require spherical harmonics and high order $P_l$ expansion tables in the cross section data.
-
-\subsection{Organ Identification}
+\subsection{Organ identification}
 Currently, DOCTORS cannot automatically identify specific organs, thus it is only able to compute the equivalent dose via dose deposition. If specific organs could be identified, tissue specific weighting factors could be applied resulting in the effective dose to each organ which would be of greater clinical significance. However, such identification currently requires additional input about the scan protocol and extensive knowledge about the human anatomy not currently integrated into DOCTORS.
 
 \endinput

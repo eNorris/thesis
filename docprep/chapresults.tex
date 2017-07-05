@@ -12,10 +12,10 @@ Two computational phantoms were used for verification of the DOCTORS code. The f
 
 Hounsfield units range from -1000 for air to 0 for water and higher for more radiopaque materials. However, data is stored as an 16-bit \texttt{unsigned int} in the CT voxel phantoms. Therefore, the data has 1024 ($2^{10}$) added to it to avoid rolling negative values over. The first step is to reinterpret the \texttt{unsigned int} values as \texttt{int} values and subtract 1024.
 
-\subsection{Artifact Removal}
-At the periphery of the computational mesh, artifacts can appear as a byproduct of the reconstruction algorithm used. Figure~\ref{fig:phantomWaterUnmodified} shows the artifacts in question in a $sy$ slice at the lowest ($z = 0$) level in the phantom. Two hundred sixty one (261) artifacts were detected in the phantom. To remove these artifacts, the CT number of any voxels whose CT number was greater than or equal to 65500 was set to 0. Figure~\ref{fig:phantomWaterModified} shows the same cross sectional plot after the artifacts are removed.
+\subsection{Artifact removal}
+At the periphery of the computational mesh, artifacts can appear as a byproduct of the reconstruction algorithm used. Figure~\ref{fig:phantomWaterUnmodified} shows the artifacts in question in a $xy$ slice at the lowest ($z = 0$) level in the phantom. Two hundred sixty one (261) artifacts were detected in the phantom. To remove these artifacts, the CT number of any voxels whose CT number was greater than or equal to 65500 was set to 0. Figure~\ref{fig:phantomWaterModified} shows the same cross sectional plot after the artifacts are removed.
 
-The water phantom in Fig.~\ref{fig:phantomWaterModified} can be broken into four regions: the water phantom, the container, the air, and the corner artifacts. The water phantom is the centermost region of the slice
+The water phantom in Fig.~\ref{fig:phantomWaterModified} can be broken into four regions: the water phantom, the container, the air, and the corner artifacts. The water phantom is the centermost region of the slice.
 
 \begin{figure}[tb]
   \begin{center}
@@ -33,7 +33,7 @@ The water phantom in Fig.~\ref{fig:phantomWaterModified} can be broken into four
 \label{fig:phantomWaterModified}
 \end{figure}
 
-\subsection{Geometry Simplification}
+\subsection{Geometry simplification}
 The original phantom data for both the water phantom and the liver phantom are $256\times256\times64$ meshes which result in 4,194,304 total voxels. Though MCNP6 is capable of running such a mesh, the overhead of loading the mesh into memory and initiating the Monte Carlo solver can take on the order of hours. Therefore, the benchmarks were run using a simplified geometry of $64\times64\times16$ which has only 65,536 voxels. The smaller files can run to completion of $10^9$ particles within two hours.
 
 \begin{figure}[tb]
@@ -55,13 +55,13 @@ The original phantom data for both the water phantom and the liver phantom are $
 \begin{figure}
     \centering
     \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figs/phantomwater_64}
+        \includegraphics[width=\textwidth]{figs/phantomwater_256}
         \caption{}
         \label{fig:waterHistLin}
     \end{subfigure}
     ~
     \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{figs/phantomwater_256}
+        \includegraphics[width=\textwidth]{figs/phantomwater_64}
         \caption{}
         \label{fig:waterHistLog}
     \end{subfigure}
@@ -70,7 +70,7 @@ The original phantom data for both the water phantom and the liver phantom are $
 
 \section{Cone-Beam Water Benchmark}\label{sec:cone1}
 
-The first benchmark, is a 8 degree cone targeting a water phantom. The water phantom is a 35 cm diameter water cylinder that stands 12.5 inches tall. The water is encased in a 0.5 cm thick plastic container. Each voxel in the mesh is assigned one of the materials given in Table~\ref{tab:watermats}. Note that the CT range column is of the raw data before 1024 is subtracted. Once the artifacts are removed, the histogram is plotted in Figure~\ref{fig:waterHist}. The logarithmic scaled histogram shows the low frequency voxels between -800 and -100 the are difficult to identify as water or air. These voxels are around the periphery of 
+The first benchmark, is a 8 degree cone targeting a water phantom. The water phantom is a 35 cm diameter water cylinder that stands 12.5 inches tall. The water is encased in a 0.5 cm thick plastic container. Each voxel in the mesh is assigned one of the materials given in Table~\ref{tab:watermats}. Note that the CT range column is of the raw data before 1024 is subtracted. Once the artifacts are removed, the histogram is plotted in Figure~\ref{fig:waterHist}. The logarithmic scaled histogram shows the low frequency voxels between -800 and -100 the are difficult to identify as water or air. These voxels are around the periphery of the container.
 
 \begin{table}[ht]
 \caption{Water Regions}
@@ -172,7 +172,7 @@ where $\mu_a^g$ and $\mu_w^g$ are the attenuation coefficients for air and water
 
 The results shown in Fig.~\ref{fig:bench_cone1_centerdiff47} agree with the MCNP6 uncollided flux distribution much more accurately than for the 19-group approximation. Therefore, all results after this use the 47-group approximation exclusively. Ideally, a more refined dataset with \textit{only} photon data in the diagnostic range would be used, but currently, no such data set is available in DOCTORS.
 
-\subsection{Diagnostic Pulse}
+\subsection{Diagnostic pulse}
 Once the 19 and 47 group datasets were compared using the uniform energy distribution, a second benchmark was created. This benchmark uses a 1-group pulse of photons in group 41 (70-75 keV). Using a single group pulse is not representative of a diagnostic x-ray beam, but it makes interpretation of the results simpler. Since all uncollided flux is in a single group, the downscatter and within-group inscatter can be differentiated explicitly which would not be otherwise possible. This facilitates debugging of code and validation against MCNP6.
 
 Figure~\ref{fig:b2_unc} shows the uncollided flux distribution for both MCNP6 and DOCTORS. Qualitatively, the distributions appear to agree very well except for the artifacts around the edges of the beam in the MCNP6 results.
@@ -195,7 +195,7 @@ Figure~\ref{fig:b2_unc} shows the uncollided flux distribution for both MCNP6 an
     \caption{Comparison of the uncollided flux in (a) DOCTORS and (b) MCNP6. }\label{fig:b2_unc}
 \end{figure}
 
-Figure~\ref{fig:b2_col} shows a comparison of the MCNP6 collided flux and the DOCTORS collided flux. The DOCTORS flux exhibits noticable ray effect artifacts but good qualitative agreement otherwise with respect to the shape of the flux distribution. A vertical lineout of Fig.~\ref{fig:b2_col} is shown in Fig.~\ref{fig:b2_col_comp}. The lack of anisotropy results in more particles streaming out to the side of the beam and backscattering that expected. This causes a buildup when the beam enters the phantom and a rapid decrease as more particles scatter than predicted by MCNP6.
+Figure~\ref{fig:b2_col} shows a comparison of the MCNP6 collided flux and the DOCTORS collided flux. The DOCTORS flux exhibits noticable ray effect artifacts but good qualitative agreement otherwise with respect to the shape of the flux distribution. A vertical lineout of Fig.~\ref{fig:b2_col} is shown in Fig.~\ref{fig:b2_col_comp}. The lack of anisotropy results in more particles streaming out to the side of the beam and backscattering that expected. This causes a buildup when the beam enters the phantom and a rapid decrease as more particles scatter than predicted by MCNP6. Figure~\ref{fig:b2_aniso} shows lineouts for the in-group scatter with the uncollided flux (group~41) and the purely downscattered flux in group~42. Figure~\ref{fig:b2_aniso} shows lineouts for the in-group scatter with the uncollided flux (group~41) and the purely downscattered flux in group~42.
 
 \begin{figure}
     \centering
@@ -221,7 +221,6 @@ Figure~\ref{fig:b2_col} shows a comparison of the MCNP6 collided flux and the DO
 \label{fig:b2_col_comp}
 \end{figure}
 
-Figure~\ref{fig:b2_aniso} shows lineouts for the in-group scatter with the uncollided flux (group~41) and the purely downscattered flux in group~42.
 \begin{figure}
     \centering
     \begin{subfigure}[b]{0.3\textwidth}
@@ -235,10 +234,10 @@ Figure~\ref{fig:b2_aniso} shows lineouts for the in-group scatter with the uncol
         \caption{}
         \label{fig:b2_aniso_g42}
     \end{subfigure}
-    \caption{Linout showing the anisotropy. (a) Group 41 (70-75 keV). (b) Group 42 (60-70 keV). }\label{fig:b2_aniso}
+    \caption{Lineout showing the effect of anisotropy. (a) Group 41 (70-75 keV). (b) Group 42 (60-70 keV). }\label{fig:b2_aniso}
 \end{figure}
 
-Figure~\ref{fig:b2_aniso} shows lineouts for the in-group scatter with the uncollided flux (group~41) and the purely downscattered flux in group~42.
+
 \begin{figure}
     \centering
     \begin{subfigure}[b]{0.3\textwidth}
@@ -252,10 +251,10 @@ Figure~\ref{fig:b2_aniso} shows lineouts for the in-group scatter with the uncol
         \caption{}
         \label{fig:b2_quad_g42}
     \end{subfigure}
-    \caption{Linout showing the effect of quadrature. (a) Group 41 (70-75 keV). (b) Group 42 (60-70 keV). }\label{fig:b2_quad}
+    \caption{Lineout showing the effect of quadrature. (a) Group 41 (70-75 keV). (b) Group 42 (60-70 keV). }\label{fig:b2_quad}
 \end{figure}
 
-In MCNP6, the effective dose was computed using a FMESH4 tally with associated DE and DF cards to weight the flux. The most accurate tally to compute the absorbed dose with is a F6 tally, however, those cannot be spatially distributed via a FMESH tally. Therefore, a F4 tally was used with a multiplier designed to emulate a F6 tally as closely as possible. The comparison is shown in Fig.~\ref{fig:mcnp_f4vsf6}. The F6 and F4 tallies agreed within 2\% at the center of the phantom, which validates that the spatially distributed FMESH with a FM multiplier is a good approximation of the energy depositied in a voxel.
+In MCNP6, the effective dose was computed using a FMESH tally with associated DE and DF cards to weight the flux. The most accurate tally to compute the absorbed dose with is a F6 tally, however, those cannot be spatially distributed via a FMESH tally. Therefore, a F4 tally was used with a multiplier designed to emulate a F6 tally as closely as possible. The comparison is shown in Fig.~\ref{fig:mcnp_f4vsf6}. The F6 and F4 tallies agreed within 2\% at the center of the phantom, which validates that the spatially distributed FMESH with a FM multiplier is a good approximation of the energy depositied in a voxel.
 
 \begin{figure}[tb]
   \begin{center}
@@ -286,18 +285,96 @@ The effetive dose and equivalent doese in DOCTORS are computed using Eq.~\ref{eq
 
 \section{16 Cone-Beam Water Benchmark}
 
-This benchmark is design to test the multi-cone beam projection. Sixteen cone beams are simultaneously used to generate the data. Each cone beam fires the 1-group diagnostic pulse energy spectra described in Sec.~\ref{sec:cone1}.
+This benchmark is designed to test the multi-cone beam projection. Sixteen cone beams are simultaneously used to generate the data. Each cone beam fires the 1-group diagnostic pulse energy spectra described in Sec.~\ref{sec:cone1}. Overall, the raytracer shows excellent agreement but the collided flux has more error than expected.
+
+The uncollided flux, which should be nearly identical between MCNP6 and DOCTORS is shown in Fig.~\ref{fig:b3_unc}. The relative error between the two and a vertical lineout through the center are shown in Fig.~\ref{fig:b3_comp}.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/b3_unc_ray}
+        \caption{}
+        \label{fig:b3_dr_unc}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/b3_unc_mc}
+        \caption{}
+        \label{fig:b3_mc_unc}
+    \end{subfigure}
+    \caption{Comparison of the uncollided flux in (a) DOCTORS and (b) MCNP6 for the 16 cone-beam water benchmark problem.}\label{fig:b3_unc}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/b3_unc_comp}
+        \caption{}
+        \label{fig:b3_unc_comp}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/b3_unc_lineout}
+        \caption{}
+        \label{fig:b3_unc_lineout}
+    \end{subfigure}
+    \caption{Comparison of the uncollided flux in (a) DOCTORS and (b) MCNP6 for the 16 cone-beam water benchmark problem.}\label{fig:b3_comp}
+\end{figure}
+
+The collided flux is shown in Fig.~\ref{fig:b3_col}. The MCNP6 collided flux is much more uniform across the patient. The uniformity is seen in both the side-by-side comparison of the flux distributions shown in Fig.~\ref{fig:b3_col} and the vertical lineout shown in Fig.~\ref{fig:b3_col_comp_g41}. DOCTORS overestimates the flux at the periphery and underestimates the flux at the center of the patient. The trend is effectively an overestimation of the attenuation through the patient by DOCTORS.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/b3_col_s6kg41}
+        \caption{}
+        \label{fig:b3_dr_col}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/b3_col_mc_g41}
+        \caption{}
+        \label{fig:b3_mc_col}
+    \end{subfigure}
+    \caption{Comparison of the collided flux in (a) DOCTORS and (b) MCNP6 for the 16 cone-beam water benchmark problem.}\label{fig:b3_col}
+\end{figure}
+
+\begin{figure}[tb]
+  \begin{center}
+   \includegraphics[width=3.75in]{figs/b3_col_comp_g41}
+  \end{center}
+  \caption{Vertical lineout of the collided flux for the 16 cone-beam water benchmark problem.}
+\label{fig:b3_col_comp_g41}
+\end{figure}
+
+Knowing that the flux profiles vary, the dose profiles can also be compared; a similar discrepancy appears in the dose profile generated from both dose computation methodologies used. Qualitatively, the dose profiles in both MCNP6 and DOCTORS are very similar, though the DOCTORS dose is overestimated by roughly a factor of two. This is believed to indicate that the scatter distribution at lower energies is being overestimated. This overestimation is in turn caused by the angular treatment of the transport.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/b3_edep_lineout}
+        \caption{}
+        \label{fig:b3_edep_lineout}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/b3_icrp_lineout}
+        \caption{}
+        \label{fig:b3_icrp_lineout}
+    \end{subfigure}
+    \caption{Comparison of the dose to the water phantom using (a) the energy deposition model and (b) the ICRP fluence-to-dose conversion model.}\label{fig:b3_dose}
+\end{figure}
+
+The angular transport is affected by two parameteres: the quadrature and the anisotropy treatment. Since the anisotropy treatment was explored in the previous benchmark and no significant changes were found be increasing the $P_N$ expansion or changing the anisotropy methodology altogether, the problem likely lies with the quadrature. Higher quadratures may result in significantly improved flux distributions since lower quadratures will cause particles to preferentially leave the beam if insufficient angular directions are within the beam. This then motivates the final benchmark problem.
+
 
 \section{64 Cone-beam Phantom Benchmark}
 
-INSERT THE RESULTS FROM THE 16 BEAM PHANTOM BENCHMARK
+The final benchmark problem uses 64 cone beams surrounding a full patient phantom. Since the triangular artifacts were still seen in the 16-beam water phantom, the number of beams used in this benchmark was increased to 64 cone beam projections. Also, each beam was moved further from the isocenter of the phantom. The total diameter between the detector and x-ray tube is 1 meter, thus the coordinate of the first projection is at $y$ = -25 cm. The cone beam was broadened to 30 degrees to more closely match the CT data. The energy distribution was not changed. This benchmark problem is much more realistic and provides a more distributed uncollided source which is expected to help mitigate some of the problems identified in the water benchmarks.
 
-\subsection{Patient Table}
-In some phantom models, a table the patient lies on is present. The gantry poses a challenge since it is a highly attenuating material relative to the patient which reduces the available flux. Further, the gantry is not mentioned in the literature which only consider the phantom. The CT number to material conversion developed by~\citet{ref:ottossonr} which is implemented in this work does not have an equivalent for the gantry region.
+In some phantom models, a table the patient lies on is present. The table poses a challenge since it is a highly attenuating material relative to the patient which reduces the available flux. Further, the table is not mentioned in the literature which only consider the phantom. The CT number to material conversion developed by~\citet{ref:ottossonr} which is implemented in this work does not have an equivalent for the table region.
 
-All voxels whose CT number is above the highest bone value given by~\citet{ref:ottossonr} are assumed to be part of the gantry. The gantry is assumed to be aluminum with a density of 2.70 g/cm$^{3}$.
-
-Since the triangular artifacts were still seen in the 16-beam water phantom, the number of beams used in this benchmark was increased to 64. Also, each beam was moved further from the isocenter of the phantom. The total diameter between the detector and x-ray tube is 1 meter, thus the coordinate of the first projection is at $y$ = -25 cm. The cone beam was broadened to 30 degrees to more closely match the CT data.
+All voxels whose CT number is above the highest bone value given by~\citet{ref:ottossonr} are assumed to be part of the table. The table is assumed to be aluminum with a density of 2.70 g/cm$^{3}$.
 
 \begin{figure}
     \centering
@@ -315,9 +392,73 @@ Since the triangular artifacts were still seen in the 16-beam water phantom, the
     \caption{The (a) full phantom and (b) simplified phantom after the CT numbers are converted into materials.}\label{fig:waterHist}
 \end{figure}
 
+As with the previous benchmark problem, the raytracer provides very good agreement (well within 1-2\% for most voxels) between MCNP6 and DOCTORS. Because the "corner artifacts" cannot be removed in the full phantom model, those artifacts show up in the flux profile. Since those regions are only air, the artifacts' impact on the overall results are expected to be negligible. Otherwise, the uncollided has no apparent artifacts such as the triangle artifacts in the previous benchmark problem. Figure~\ref{fig:b4_unc_diffs} shows that the profile between the two are effectively identical.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/b4_unc_dr}
+        \caption{}
+        \label{fig:b4_unc_dr}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/b4_unc_mc}
+        \caption{}
+        \label{fig:b4_unc_mc}
+    \end{subfigure}
+    \caption{Comparison of the uncollided flux in (a) DOCTORS and (b) MCNP6 for the 64 cone-beam phantom benchmark problem.}\label{fig:b4_unc}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/b4_unc_diff}
+        \caption{}
+        \label{fig:b4_unc_diff}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/b4_unc_lineout}
+        \caption{}
+        \label{fig:b4_unc_diff_lineout}
+    \end{subfigure}
+    \caption{The (a) relative difference between the MCNP6 and DOCTORS uncollided distribution and a (b) vertical lineout down the center.}\label{fig:b4_unc_diffs}
+\end{figure}
+
+Similar to the water phantom benchmarks, DOCTORS underestimates the dose on the interior of the patient. Again, this may be due to either the anisotropy treatment or the quadrature, further investigation will refeal the culprit.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/b4_col_s6kg47}
+        \caption{}
+        \label{fig:b4_col_s6kg47}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figs/b4_col_mc_g47}
+        \caption{}
+        \label{fig:b4_col_mc_g47}
+    \end{subfigure}
+    \caption{Comparison of the uncollided flux in (a) DOCTORS and (b) MCNP6 for the 64 cone-beam phantom benchmark problem.}\label{fig:b4_col}
+\end{figure}
+
+\begin{figure}[tb]
+  \begin{center}
+   \includegraphics[width=3.75in]{figs/b4_col_comp}
+  \end{center}
+  \caption{Comparison of the collided flux for the 64 cone-beam phantom benchmark problem.}
+\label{fig:b4_col_comp}
+\end{figure}
+
 \section{GPU Acceleration}
 
-Table~\ref{tab:cpu} summarizes the runtime required for the CPU-only version of DOCTORS and Table~\ref{tab:gpu} summarizes the analogous runtime results for the GPU accelerated version. 
+Table~\ref{tab:cpu} summarizes the runtime required for the CPU-only version of DOCTORS and Table~\ref{tab:gpu} summarizes the analogous runtime results for the GPU accelerated version. The speedup of the GPU over the CPU is given in Table~\ref{tab:speedup}. From those tables, a number of conclusions can be drawn.
+
+The first, and most obvious, conclusion is that the speedup for large problems is much greater than the speedup for small problems. The GPU failed to accelerate the $64 \times 64 \times 16$ problems by more than a factor of a few which hardly warrants any acceleration at all, instead further CPU optimization would likely benefit more. Larger problems showed significant speedups though due to the reduced proportion of time spent in overhead operations. The most time consuming part of the GPU computation is launching a new kernel. Each kernel is itself very simple and can execute rapidly so small problems that have kernels with fewer parallel tasks do not perform as well.
+
+The second, and more surprising, conclusion is that the speedup varied very little for single and double precision floating arithmetic. In fact, in most cases, the double precision outperformed the single precision! This result is unexpected in general, but even more so on a GPU where single precision is vastly superior. The higher precision allows the double precision computations to converge more rapidly reducing the total number of iteraions necessary. Since a large portion of the overall time spent is in overhead operations, the time savings of using single precision are actually outweighed by the time  savings of reducing the convergence iterations.
 
 \begin{table}[ht]
 \caption{CPU Runtime (msec)}
@@ -326,10 +467,10 @@ Table~\ref{tab:cpu} summarizes the runtime required for the CPU-only version of 
 \hline \hline   
 Data Type & Method & $64 \times 64 \times 16$ & $256 \times 256 \times 64$\\ [0.5ex] 
 \hline
-\texttt{float}  & Raytracer & 824.9   &  \\
-                & Solver    & 15,541  &  \\
-\texttt{double} & Raytracer & 933.6   & 179,613 \\
-                & Solver    & 14,348   & 2,408,000 \\  [1ex]
+\texttt{float}  & Raytracer & 820   &  125,000 \\
+                & Solver    & 15,500  &  2,700,000 \\
+\texttt{double} & Raytracer & 930   & 180,000 \\
+                & Solver    & 14,300   & 2,400,000 \\  [1ex]
 \hline
 \end{tabular}
 \label{tab:cpu}
@@ -342,13 +483,29 @@ Data Type & Method & $64 \times 64 \times 16$ & $256 \times 256 \times 64$\\ [0.
 \hline \hline   
 Data Type & Method & $64 \times 64 \times 16$ & $256 \times 256 \times 64$\\ [0.5ex] 
 \hline
-\texttt{float}  & Raytracer & 362.8   &  10,267 \\
-                & Solver    & 2,417.9  &  71,619 \\
-\texttt{double} & Raytracer & 362.6   & 13,452 \\
-                & Solver    & 4,554.5   & 61,355 \\  [1ex]
+\texttt{float}  & Raytracer & 360   &  10,300 \\
+                & Solver    & 2,420  &  71,600 \\
+\texttt{double} & Raytracer & 363   & 13,500 \\
+                & Solver    & 4,500   & 61,400 \\  [1ex]
 \hline
 \end{tabular}
-\label{tab:cpu}
+\label{tab:gpu}
+\end{table}
+
+\begin{table}[ht]
+\caption{Speedup}
+\centering 
+\begin{tabular}{l c r r}
+\hline \hline   
+Data Type & Method & $64 \times 64 \times 16$ & $256 \times 256 \times 64$\\ [0.5ex] 
+\hline
+\texttt{float}  & Raytracer & 2.3   & 12.2 \\
+                & Solver    & 6.4  &  37.6 \\
+\texttt{double} & Raytracer & 2.6   & 13.5 \\
+                & Solver    & 3.2   & 39.1 \\  [1ex]
+\hline
+\end{tabular}
+\label{tab:speedup}
 \end{table}
 
 \endinput
